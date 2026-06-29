@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodieFast | Delicious Food Delivered</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page { display: none; }
+        .page.active { display: block; }
+        .cart-badge { position: absolute; top: -5px; right: -10px; font-size: 0.75rem; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-8">
+                <h1 class="text-2xl font-bold text-orange-500 cursor-pointer" onclick="navigateTo('home')">
+                    <i class="fa-solid fa-utensils mr-2"></i>FoodieFast
+                </h1>
+                <nav class="hidden md:flex gap-6 text-gray-600 font-medium">
+                    <a href="#" onclick="navigateTo('home')" class="hover:text-orange-500 transition">Home</a>
+                    <a href="#" onclick="navigateTo('browse')" class="hover:text-orange-500 transition">Restaurants</a>
+                    <a href="#" onclick="navigateTo('admin')" class="hover:text-orange-500 transition">Admin</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="navigateTo('cart')" class="relative p-2 text-gray-600 hover:text-orange-500 transition">
+                    <i class="fa-solid fa-cart-shopping text-xl"></i>
+                    <span id="cart-count" class="cart-badge bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                </button>
+                <button class="md:hidden text-gray-600" onclick="toggleMobileMenu()">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden fixed inset-0 bg-white z-40 pt-20 px-6">
+        <div class="flex flex-col gap-6 text-xl font-medium">
+            <a href="#" onclick="navigateTo('home')" class="py-2 border-b border-gray-100">Home</a>
+            <a href="#" onclick="navigateTo('browse')" class="py-2 border-b border-gray-100">Restaurants</a>
+            <a href="#" onclick="navigateTo('admin')" class="py-2 border-b border-gray-100">Admin</a>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-8">
+
+        <!-- Home Page -->
+        <section id="page-home" class="page active">
+            <!-- Hero -->
+            <div class="relative h-[400px] bg-gray-100 mb-8">
+                <img src="https://images.unsplash.com/photo-1504674900247-0863b4b4e298?auto=format&fit=crop&w=1200&q=80" class="absolute inset-0 w-full h-full object-cover" alt="Hero">
+                <div class="absolute inset-0 bg-black/40"></div>
+                <div class="relative z-10 flex flex-col items-center pt-16 px-4 text-center text-white">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <i class="fa-solid fa-location-dot text-xl"></i>
+                        <span>Your location</span>
+                    </div>
+                    <h1 class="text-3xl font-bold mb-2">What are you craving?</h1>
+                    <div class="relative w-full max-w-xl">
+                        <input type="text" placeholder="Search for restaurants, dishes, or groceries" class="w-full pl-12 pr-4 py-3 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/80"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="mb-10">
+                <h2 class="text-2xl font-bold mb-6">Categories</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <!-- Category items -->
+                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
+                        <i class="fa-solid fa-utensils text-2xl text-orange-500"></i>
+                        <span class="font-medium">Restaurants</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
+                        <i class="fa-solid fa-shopping-basket text-2xl text-green-500"></i>
+                        <span class="font-medium">Groceries</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
+                        <i class="fa-solid fa-pills text-2xl text-red-500"></i>
+                        <span class="font-medium">Pharmacy</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
+                        <i class="fa-solid fa-utensils text-2xl text-purple-500"></i>
+                        <span class="font-medium">Fast Food</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
+                        <i class="fa-solid fa-wine-glass text-2xl text-yellow-500"></i>
+                        <span class="font-medium">Beverages</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
+                        <i class="fa-solid fa-birthday-cake text-2xl text-pink-500"></i>
+                        <span class="font-medium">Desserts</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Promo Banner -->
+            <div class="mb-10">
+                <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-6 text-white">
+                    <h3 class="text-xl font-bold mb-2">Special Offer: Free Delivery</h3>
+                    <p class="mb-4">On your first order over $15. Use code WELCOME</p>
+                    <button onclick="navigateTo('browse')" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded transition">Order Now</button>
+                </div>
+            </div>
+
+            <!-- Near You -->
+            <div class="mb-10">
+                <h2 class="text-2xl font-bold mb-6">Near You</h2>
+                <div id="home-restaurant-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- JS Rendered -->
+                </div>
+            </div>
+
+            <!-- Popular Restaurants (same as featured) -->
+            <div class="mb-10">
+                <h2 class="text-2xl font-bold mb-6">Popular Restaurants</h2>
+                <div id="home-featured-restaurants" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- JS Rendered -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Browsing Page -->
+        <section id="page-browse" class="page">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <h3 class="text-3xl font-bold">All Restaurants</h3>
+                <div class="relative w-full md:w-64">
+                    <input type="text" id="restaurant-search" placeholder="Search restaurants..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" oninput="filterRestaurants()">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+            <div id="restaurant-list" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- JS Rendered -->
+            </div>
+        </section>
+
+        <!-- Menu Page -->
+        <section id="page-menu" class="page">
+            <div class="mb-8 flex items-center gap-4">
+                <button onclick="navigateTo('browse')" class="text-gray-500 hover:text-orange-500 transition">
+                    <i class="fa-solid fa-chevron-left"></i> Back to Restaurants
+                </button>
+                <h3 id="menu-restaurant-name" class="text-3xl font-bold">Restaurant Menu</h3>
+            </div>
+            <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- JS Rendered -->
+            </div>
+        </section>
+
+        <!-- Cart Page -->
+        <section id="page-cart" class="page">
+            <h3 class="text-3xl font-bold mb-8">Your Cart</h3>
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="lg:w-2/3">
+                    <div id="cart-items" class="bg-white rounded-xl shadow-sm divide-y">
+                        <!-- JS Rendered -->
+                    </div>
+                </div>
+                <div class="lg:w-1/3">
+                    <div class="bg-white p-6 rounded-xl shadow-sm sticky top-24">
+                        <h4 class="text-xl font-bold mb-4">Order Summary</h4>
+                        <div class="flex justify-between mb-2 text-gray-600">
+                            <span>Subtotal</span>
+                            <span id="cart-subtotal">$0.00</span>
+                        </div>
+                        <div class="flex justify-between mb-4 text-gray-600">
+                            <span>Delivery Fee</span>
+                            <span id="cart-delivery">$5.00</span>
+                        </div>
+                        <div class="flex justify-between mb-6 text-xl font-bold border-t pt-4">
+                            <span>Total</span>
+                            <span id="cart-total" class="text-orange-500">$0.00</span>
+                        </div>
+                        <button onclick="navigateTo('checkout')" id="checkout-btn" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-bold transition disabled:bg-gray-300 disabled:cursor-not-allowed">
+                            Proceed to Checkout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Checkout Page -->
+        <section id="page-checkout" class="page">
+            <div class="max-w-3xl mx-auto">
+                <h3 class="text-3xl font-bold mb-8 text-center">Checkout</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h4 class="text-lg font-bold mb-4"><i class="fa-solid fa-truck mr-2"></i> Shipping Address</h4>
+                        <div class="space-y-4">
+                            <input type="text" placeholder="Full Name" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
+                            <input type="text" placeholder="Street Address" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="text" placeholder="City" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
+                                <input type="text" placeholder="Zip Code" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h4 class="text-lg font-bold mb-4"><i class="fa-solid fa-credit-card mr-2"></i> Payment Method</h4>
+                        <div class="space-y-4">
+                            <div class="p-3 border rounded-lg flex items-center gap-3 cursor-pointer bg-orange-50 border-orange-500">
+                                <input type="radio" name="payment" checked>
+                                <span class="font-medium">Credit Card</span>
+                            </div>
+                            <div class="p-3 border rounded-lg flex items-center gap-3 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="payment">
+                                <span class="font-medium">PayPal</span>
+                            </div>
+                            <div class="mt-4 space-y-3">
+                                <input type="text" placeholder="Card Number" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input type="text" placeholder="MM/YY" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
+                                    <input type="text" placeholder="CVC" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-center">
+                    <button onclick="processPayment()" class="bg-orange-500 hover:bg-orange-600 text-white px-12 py-4 rounded-xl font-bold text-xl transition shadow-lg">
+                        Place Order <i class="fa-solid fa-circle-check ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Order Success Page -->
+        <section id="page-success" class="page text-center py-20">
+            <div class="max-w-md mx-auto bg-white p-12 rounded-3xl shadow-sm">
+                <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fa-solid fa-check text-4xl"></i>
+                </div>
+                <h3 class="text-3xl font-bold mb-4">Order Placed!</h3>
+                <p class="text-gray-600 mb-8">Your delicious meal is on the way. You can track your order in the app.</p>
+                <button onclick="navigateTo('home')" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-bold transition">
+                    Return Home
+                </button>
+            </div>
+        </section>
+
+        <!-- Admin Page -->
+        <section id="page-admin" class="page">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-3xl font-bold">Restaurant Management</h3>
+                <button onclick="openAddRestaurantModal()" class="bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition">
+                    <i class="fa-solid fa-plus mr-2"></i> Add Restaurant
+                </button>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="px-6 py-3 font-bold text-gray-600">Restaurant</th>
+                            <th class="px-6 py-3 font-bold text-gray-600">Cuisine</th>
+                            <th class="px-6 py-3 font-bold text-gray-600">Rating</th>
+                            <th class="px-6 py-3 font-bold text-gray-600">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-restaurant-table">
+                        <!-- JS Rendered -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Add Restaurant Modal -->
+    <div id="modal-add-restaurant" class="hidden fixed inset-0 bg-black opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl p-6">
+            <h4 class="text-xl font-bold mb-4">Add New Restaurant</h4>
+            <div class="space-y-4">
+                <input type="text" id="new-res-name" placeholder="Restaurant Name" class="w-full p-2 border rounded-lg">
+                <input type="text" id="new-res-cuisine" placeholder="Cuisine (e.g. Italian)" class="w-full p-2 border rounded-lg">
+                <input type="text" id="new-res-image" placeholder="Image URL" class="w-full p-2 border rounded-lg">
+                <div class="flex justify-end gap-3 mt-6">
+                    <button onclick="closeAddRestaurantModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                    <button onclick="saveRestaurant()" class="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold">Save Restaurant</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        let restaurants = [
+            { id: 1, name: 'Burger Haven', cuisine: 'American', rating: 4.8, image: 'https://images.unsplash.com/photo-1571092142809-38a1792bc685?auto=format&fit=crop&w=400&q=80', featured: true, menu: [
+                { id: 101, name: 'Classic Cheeseburger', price: 12.99, desc: 'Juicy beef patty with cheddar cheese', category: 'Burgers', img: 'https://images.unsplash.com/photo-1568901347738-0aeca3466c7e?auto=format&fit=crop&w=100&q=80' },
+                { id: 102, name: 'Bacon BBQ Burger', price: 14.99, desc: 'Smoky BBQ sauce and crispy bacon', category: 'Burgers', img: 'https://images.unsplash.com/photo-1550507938-7b579738566d?auto=format&fit=crop&w=100&q=80' },
+                { id: 103, name: 'Truffle Fries', price: 6.99, desc: 'Golden fries with truffle oil', category: 'Sides', img: 'https://images.unsplash.com/photo-1573080523176-f87f7f125343?auto=format&fit=crop&w=100&q=80' },
+            ]},
+            { id: 2, name: 'Pasta Palace', cuisine: 'Italian', rating: 4.6, image: 'https://images.unsplash.com/photo-1551183538-19d3e8327d63?auto=format&fit=crop&w=400&q=80', featured: true, menu: [
+                { id: 201, name: 'Fettuccine Alfredo', price: 16.99, desc: 'Creamy parmesan sauce with fettuccine', category: 'Pasta', img: 'https://images.unsplash.com/photo-1645112431556-73973642c989?auto=format&fit=crop&w=100&q=80' },
+                { id: 202, name: 'Spaghetti Carbonara', price: 15.99, desc: 'Authentic Roman style with pancetta', category: 'Pasta', img: 'https://images.unsplash.com/photo-1612874742232-786a24bb266b?auto=format&fit=crop&w=100&q=80' },
+                { id: 203, name: 'Tiramisu', price: 8.99, desc: 'Classic coffee-flavored dessert', category: 'Dessert', img: 'https://images.unsplash.com/photo-1571877223155-aa600917591e?auto=format&fit=crop&w=100&q=80' },
+            ]},
+            { id: 3, name: 'Sushi Zen', cuisine: 'Japanese', rating: 4.9, image: 'https://images.unsplash.com/photo-1579883289990-dac84a72bca8?auto=format&fit=crop&w=400&q=80', featured: true, menu: [
+                { id: 301, name: 'Sashimi Platter', price: 24.99, desc: 'Fresh slices of salmon, tuna, and yellowtail', category: 'Sashimi', img: 'https://images.unsplash.com/photo-1534422472314-688964875c59?auto=format&fit=crop&w=100&q=80' },
+                { id: 302, name: 'California Roll', price: 12.99, desc: 'Avocado, cucumber, and crab', category: 'Rolls', img: 'https://images.unsplash.com/photo-1579871494447-982dca851d82?auto=format&fit=crop&w=100&q=80' },
+                { id: 303, name: 'Miso Soup', price: 4.99, desc: 'Traditional fermented soybean soup', category: 'Appetizer', img: 'https://images.unsplash.com/photo-1547592166-276041275531?auto=format&fit=crop&w=100&q=80' },
+            ]},
+            { id: 4, name: 'Green Leaf', cuisine: 'Vegan', rating: 4.5, image: 'https://images.unsplash.com/photo-1512621776951-b58f9C68377b?auto=format&fit=crop&w=400&q=80', featured: false, menu: [
+                { id: 401, name: 'Quinoa Bowl', price: 13.99, desc: 'Fresh quinoa with roasted vegetables', category: 'Bowls', img: 'https://images.unsplash.com/photo-1546069901-ba6Bca8191b0?auto=format&fit=crop&w=100&q=80' },
+            ]},
+        ];
+
+        let cart = [];
+        let currentRestaurant = null;
+
+        // --- Cart Persistence ---
+        function loadCart() {
+            const saved = localStorage.getItem('cart');
+            if (saved) {
+                try {
+                    cart = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Failed to parse cart from localStorage', e);
+                    cart = [];
+                }
+            }
+        }
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        // --- Navigation ---
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            document.getElementById('mobile-menu').classList.add('hidden');
+            window.scrollTo(0, 0);
+
+            if (pageId === 'home') renderHome();
+            if (pageId === 'browse') renderBrowse();
+            if (pageId === 'cart') renderCart();
+            if (pageId === 'admin') renderAdmin();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // --- Rendering Logic ---
+        function renderHome() {
+            const nearYouContainer = document.getElementById('home-restaurant-list');
+            const featured = restaurants.filter(r => r.featured);
+            nearYouContainer.innerHTML = featured.map(res => createRestaurantCard(res)).join('');
+
+            const popularContainer = document.getElementById('home-featured-restaurants');
+            popularContainer.innerHTML = restaurants.map(res => createRestaurantCard(res)).join('');
+        }
+
+        function renderBrowse() {
+            const container = document.getElementById('restaurant-list');
+            container.innerHTML = restaurants.map(res => createRestaurantCard(res)).join('');
+        }
+
+        function filterRestaurants() {
+            const query = document.getElementById('restaurant-search').value.toLowerCase();
+            const filtered = restaurants.filter(r =>
+                r.name.toLowerCase().includes(query) || r.cuisine.toLowerCase().includes(query)
+            );
+            document.getElementById('restaurant-list').innerHTML = filtered.map(res => createRestaurantCard(res)).join('');
+        }
+
+        function createRestaurantCard(res) {
+            return `
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer transition transform hover:scale-105 hover:shadow-md" onclick="openMenu(${res.id})">
+                    <img src="${res.image}" class="w-full h-48 object-cover" alt="${res.name}">
+                    <div class="p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-lg">${res.name}</h4>
+                            <span class="text-sm bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-bold">★ ${res.rating}</span>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-4">${res.cuisine}</p>
+                        <button class="w-full py-2 border border-orange-500 text-orange-500 rounded-lg font-medium hover:bg-orange-500 hover:text-white transition">
+                            View Menu
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openMenu(restaurantId) {
+            currentRestaurant = restaurants.find(r => r.id === restaurantId);
+            document.getElementById('menu-restaurant-name').innerText = currentRestaurant.name;
+            const container = document.getElementById('menu-items');
+
+            const categories = [...new Set(currentRestaurant.menu.map(i => i.category))];
+
+            container.innerHTML = categories.map(cat => `
+                <div>
+                    <h4 class="text-2xl font-bold mb-4 text-gray-700">${cat}</h4>
+                    <div class="space-y-4">
+                        ${currentRestaurant.menu.filter(i => i.category === cat).map(item => `
+                            <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                                <div class="flex gap-4">
+                                    <img src="${item.img}" class="w-16 h-16 rounded-lg object-cover" alt="${item.name}">
+                                    <div>
+                                        <h5 class="font-bold">${item.name}</h5>
+                                        <p class="text-gray-500 text-sm">${item.desc}</p>
+                                        <span class="text-orange-600 font-bold">$${item.price.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                                <button onclick="addToCart(${item.id})" class="bg-orange-500 text-white w-10 h-10 rounded-full hover:bg-orange-600 transition flex items-center justify-center">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            navigateTo('menu');
+        }
+
+        // --- Cart Logic ---
+        function addToCart(itemId) {
+            const item = currentRestaurant.menu.find(i => i.id === itemId);
+            const existing = cart.find(c => c.id === itemId);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+            updateCartUI();
+            saveCart();
+
+            // Toast notification
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all opacity-0 translate-y-10';
+            toast.innerText = `Added ${item.name} to cart!`;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('opacity-0', 'translate-y-10'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-10');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cart-count').innerText = count;
+        }
+
+        function removeFromCart(itemId) {
+            cart = cart.filter(i => i.id !== itemId);
+            renderCart();
+            updateCartUI();
+            saveCart();
+        }
+
+        function changeQty(itemId, delta) {
+            const item = cart.find(i => i.id === itemId);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) removeFromCart(itemId);
+                else renderCart();
+            }
+            updateCartUI();
+            saveCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="p-12 text-center">
+                        <i class="fa-solid fa-cart-shopping text-5xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500 text-lg">Your cart is empty!</p>
+                        <button onclick="navigateTo('browse')" class="mt-4 text-orange-500 font-bold hover:underline">Start Adding Food</button>
+                    </div>
+                `;
+                updateTotals(0);
+                document.getElementById('checkout-btn').disabled = true;
+                return;
+            }
+
+            document.getElementById('checkout-btn').disabled = false;
+            container.innerHTML = cart.map(item => `
+                <div class="p-4 flex items-center justify-between gap-4 bg-white">
+                    <div class="flex items-center gap-4">
+                        <img src="${item.img}" class="w-12 h-12 rounded-lg object-cover" alt="${item.name}">
+                        <div>
+                            <h5 class="font-bold">${item.name}</h5>
+                            <span class="text-orange-600 text-sm font-medium">$${item.price.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
+                            <button onclick="changeQty(${item.id}, -1)" class="text-gray-600 hover:text-orange-500"><i class="fa-solid fa-minus text-xs"></i></button>
+                            <span class="text-sm font-bold w-6 text-center">${item.qty}</span>
+                            <button onclick="changeQty(${item.id}, 1)" class="text-gray-600 hover:text-orange-500"><i class="fa-solid fa-plus text-xs"></i></button>
+                        </div>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-400 hover:text-red-600 px-2"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            updateTotals(subtotal);
+        }
+
+        function updateTotals(subtotal) {
+            const delivery = subtotal > 0 ? 5.00 : 0;
+            const total = subtotal + delivery;
+            document.getElementById('cart-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('cart-delivery').innerText = `$${delivery.toFixed(2)}`;
+            document.getElementById('cart-total').innerText = `$${total.toFixed(2)}`;
+        }
+
+        // --- Checkout Process ---
+        function processPayment() {
+            const btn = document.querySelector('#page-checkout button');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Processing...`;
+
+            setTimeout(() => {
+                cart = [];
+                updateCartUI();
+                saveCart();
+                navigateTo('success');
+            }, 2000);
+        }
+
+        // --- Admin Logic ---
+        function renderAdmin() {
+            const container = document.getElementById('admin-restaurant-table');
+            container.innerHTML = restaurants.map(res => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4 font-medium">${res.name}</td>
+                    <td class="px-6 py-4 text-gray-600">${res.cuisine}</td>
+                    <td class="px-6 py-4">★ ${res.rating}</td>
+                    <td class="px-6 py-4">
+                        <button onclick="deleteRestaurant(${res.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddRestaurantModal() {
+            document.getElementById('modal-add-restaurant').classList.remove('hidden');
+        }
+
+        function closeAddRestaurantModal() {
+            document.getElementById('modal-add-restaurant').classList.add('hidden');
+        }
+
+        function saveRestaurant() {
+            const name = document.getElementById('new-res-name').value;
+            const cuisine = document.getElementById('new-res-cuisine').value;
+            const image = document.getElementById('new-res-image').value.trim() || 'https://images.unsplash.com/photo-151432776755-7eb9373705a1?auto=format&fit=crop&w=400&q=80';
+
+            if (!name || !cuisine) return alert('Please fill in all required fields');
+
+            const newRes = {
+                id: Date.now(),
+                name,
+                cuisine,
+                image,
+                rating: 5.0,
+                featured: false,
+                menu: []
+            };
+
+            restaurants.push(newRes);
+            renderAdmin();
+            closeAddRestaurantModal();
+
+            // Clear inputs
+            document.getElementById('new-res-name').value = '';
+            document.getElementById('new-res-cuisine').value = '';
+            document.getElementById('new-res-image').value = '';
+        }
+
+        function deleteRestaurant(id) {
+            if (confirm('Are you sure you want to delete this restaurant?')) {
+                restaurants = restaurants.filter(r => r.id !== id);
+                renderAdmin();
+            }
+        }
+
+        // Init
+        window.onload = () => {
+            loadCart();
+            renderHome();
+            updateCartUI();
+        };
+    </script>
+</body>
+</html>
