@@ -1,599 +1,2148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodieFast | Delicious Food Delivered</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .page { display: none; }
-        .page.active { display: block; }
-        .cart-badge { position: absolute; top: -5px; right: -10px; font-size: 0.75rem; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go!Point - Food Delivery</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#22c55e', primaryDark: '#16a34a', secondary: '#f59e0b',
+        accent: '#fade40', light: '#f5f7fa', dark: '#0f172a'
+      }
+    }
+  }
+}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; background: #f5f7fa; }
+
+/* Location Permission Screen */
+.location-permission-screen {
+  position: fixed; inset: 0; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  display: flex; align-items: center; justify-content: center; z-index: 9999;
+  flex-direction: column; padding: 2rem;
+}
+.location-permission-screen.hidden { display: none; }
+.location-permission-content {
+  background: white; border-radius: 24px; padding: 3rem 2rem; max-width: 420px;
+  width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.location-icon-wrapper {
+  width: 120px; height: 120px; border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.5rem; animation: pulseLocation 2s infinite;
+}
+@keyframes pulseLocation {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  50% { box-shadow: 0 0 0 20px rgba(34, 197, 94, 0); }
+}
+.location-permission-content h2 { font-size: 1.75rem; font-weight: 700; color: #0f172a; margin-bottom: 0.75rem; }
+.location-permission-content p { color: #64748b; line-height: 1.6; margin-bottom: 1.5rem; }
+.allow-location-btn {
+  background: linear-gradient(135deg, #22c55e, #16a34a); color: white;
+  padding: 1rem 2.5rem; border-radius: 50px; border: none; font-size: 1.1rem;
+  font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.allow-location-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4); }
+.allow-location-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+.location-error {
+  background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 12px;
+  margin-top: 1rem; font-size: 0.875rem; display: none;
+}
+.location-error.show { display: block; }
+
+.navbar {
+  background: #0f172a; color: white; padding: 15px 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+.nav-logo { font-size: 28px; font-weight: 700; color: #22c55e; display: flex; align-items: center; gap: 10px; }
+.nav-logo img { width: 36px; height: 36px; border-radius: 8px; object-fit: contain; background: white; padding: 3px; }
+.nav-links { display: flex; gap: 25px; }
+.nav-links a { color: white; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: #22c55e; }
+.nav-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.nav-cart-btn, .nav-track-btn {
+  padding: 10px 20px; border: none; border-radius: 30px; color: white; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; font-size: 14px;
+}
+.nav-cart-btn { background: #22c55e; }
+.nav-cart-btn:hover { background: #16a34a; transform: translateY(-1px); }
+.nav-track-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  animation: pulseTrack 2s infinite;
+}
+@keyframes pulseTrack {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
+}
+.nav-track-btn:hover { background: linear-gradient(135deg, #2563eb, #1e40af); }
+.nav-login-btn {
+  background: transparent; padding: 10px 20px; border: 2px solid #22c55e;
+  border-radius: 30px; color: #22c55e; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; font-size: 14px;
+}
+.nav-login-btn:hover { background: #22c55e; color: white; }
+.cart-badge {
+  background: #ef4444; color: white; font-size: 11px; font-weight: 700;
+  width: 20px; height: 20px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+}
+
+.hero {
+  height: 450px;
+  background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836');
+  background-size: cover; background-position: center;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; color: white;
+}
+.hero-content h1 { font-size: 50px; margin-bottom: 15px; font-weight: 800; }
+.hero-content p { font-size: 18px; margin-bottom: 25px; opacity: 0.9; }
+.search-box { display: flex; justify-content: center; gap: 10px; }
+.search-box input {
+  width: 400px; padding: 15px 20px; border: none; border-radius: 30px;
+  outline: none; font-size: 15px; font-family: 'Poppins', sans-serif;
+}
+.search-box button {
+  padding: 15px 25px; background: #22c55e; border: none; border-radius: 30px;
+  color: white; font-weight: bold; cursor: pointer; transition: 0.2s;
+}
+.search-box button:hover { background: #16a34a; }
+
+.categories { padding: 40px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+.category {
+  background: white; padding: 12px 25px; border-radius: 30px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.08); cursor: pointer; transition: 0.2s;
+  font-weight: 500; border: 2px solid transparent;
+}
+.category:hover { border-color: #22c55e; transform: translateY(-2px); }
+
+.section-title { text-align: center; font-size: 34px; margin-top: 20px; margin-bottom: 30px; color: #0f172a; font-weight: 700; }
+
+.restaurants {
+  padding: 20px 40px 60px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px;
+}
+.card {
+  background: white; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,.08); transition: .3s; cursor: pointer;
+}
+.card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,.15); }
+.card img { width: 100%; height: 200px; object-fit: cover; }
+.card-content { padding: 20px; }
+.card-content h3 { margin-bottom: 10px; font-weight: 700; color: #0f172a; }
+.rating { color: #f59e0b; margin-bottom: 10px; font-size: 14px; }
+.info { display: flex; justify-content: space-between; font-size: 14px; color: #555; margin-bottom: 15px; }
+.order-btn {
+  width: 100%; padding: 12px; border: none; background: #22c55e;
+  color: white; font-weight: 600; border-radius: 10px; cursor: pointer; transition: 0.2s;
+}
+.order-btn:hover { background: #16a34a; }
+
+.footer { background: #0f172a; color: white; text-align: center; padding: 25px; margin-top: 40px; }
+
+.explorer-container { min-height: 100vh; background: #f8fafc; }
+.explorer-header {
+  background: white; border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 2rem; display: flex; justify-content: space-between;
+  align-items: center; flex-wrap: wrap;
+}
+.home-link {
+  background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px;
+  font-size: 14px; font-weight: 500; cursor: pointer; border: none;
+}
+.home-link:hover { background: #22c55e; }
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.cart-window {
+  position: fixed; bottom: 80px; right: 20px; width: 340px; max-height: 80vh;
+  z-index: 1000; box-shadow: 0 10px 35px rgba(0,0,0,0.25); border-radius: 22px;
+  overflow: hidden; display: none; transition: all 0.3s ease;
+}
+.cart-window.visible { display: block; }
+.cart-header { cursor: move; }
+.cart-content { max-height: 60vh; overflow-y: auto; }
+
+.step-indicator { display: flex; justify-content: space-between; margin-bottom: 2rem; }
+.step { flex: 1; text-align: center; padding: 0.5rem; position: relative; }
+.step:not(:last-child):after {
+  content: ''; position: absolute; top: 50%; right: 0; transform: translateY(-50%);
+  height: 2px; width: 100%; background-color: #ddd; z-index: 1;
+}
+.step.active .step-number { background-color: #f59e0b; color: white; }
+.step.completed .step-number { background-color: #22c55e; color: white; }
+.step-number {
+  width: 40px; height: 40px; border-radius: 50%; background-color: #e5e7eb; color: #6B7280;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-bottom: 0.5rem; position: relative; z-index: 2; font-weight: 600;
+}
+
+.glovo-button {
+  background-color: #22c55e; color: white; border-radius: 10px; padding: 12px 24px;
+  font-weight: 600; transition: all 0.3s ease; border: none; cursor: pointer;
+}
+.glovo-button:hover { background-color: #16a34a; transform: translateY(-2px); }
+.glovo-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.glovo-input, .glovo-select {
+  border: 2px solid #e5e7eb; border-radius: 10px; padding: 12px 16px;
+  transition: all 0.3s ease; width: 100%;
+}
+.glovo-input:focus, .glovo-select:focus { border-color: #22c55e; outline: none; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2); }
+
+.payment-section .payment-option {
+  border: 2px solid #e5e7eb; border-radius: 1rem; padding: 1.25rem 0.5rem;
+  text-align: center; cursor: pointer; transition: all 0.3s; background: white; position: relative;
+}
+.payment-section .payment-option:hover { border-color: #22c55e; transform: translateY(-3px); }
+.payment-section .payment-option.selected { border-color: #22c55e; background: rgba(34,197,94,0.08); }
+.payment-section .payment-option.selected::after {
+  content: '✓'; position: absolute; top: 0.75rem; right: 0.75rem;
+  background: #22c55e; color: white; width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;
+}
+.payment-section .phone-input {
+  display: flex; border: 2px solid #e5e7eb; border-radius: 0.75rem; overflow: hidden; background: white;
+}
+.payment-section .phone-input:focus-within { border-color: #22c55e; }
+.payment-section .phone-prefix {
+  background: #f0fdf4; padding: 0.875rem 1rem; border-right: 2px solid #e5e7eb;
+  font-weight: 600; color: #0f172a; display: flex; align-items: center;
+}
+.payment-section .phone-number {
+  flex: 1; border: none; padding: 0.875rem 1rem; font-size: 1rem; outline: none;
+  background: transparent; text-align: center; font-weight: 500;
+}
+
+.vehicle-available { background-color: #22c55e; color: white; }
+.vehicle-delivering { background-color: #3b82f6; color: white; }
+.vehicle-unavailable { background-color: #ef4444; color: white; }
+
+.status-pending { background-color: #fef3c7; color: #92400e; }
+.status-preparing { background-color: #dbeafe; color: #1e40af; }
+.status-ready { background-color: #e9d5ff; color: #6b21a8; }
+.status-out_for_delivery { background-color: #c7d2fe; color: #3730a3; }
+.status-completed { background-color: #d1fae5; color: #065f46; }
+.status-cancelled { background-color: #fee2e2; color: #991b1b; }
+
+.settings-modal {
+  display: none; position: fixed; inset: 0; background-color: rgba(0,0,0,0.5);
+  z-index: 1000; align-items: center; justify-content: center;
+}
+.settings-modal.active { display: flex; }
+.settings-content {
+  background: white; border-radius: 16px; width: 90%; max-width: 800px;
+  max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;
+}
+.settings-header {
+  padding: 1.5rem; border-bottom: 2px solid #e5e7eb;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.settings-body { overflow-y: auto; padding: 1.5rem; flex: 1; }
+.settings-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e5e7eb; overflow-x: auto; }
+.settings-tab {
+  padding: 0.75rem 1.5rem; border: none; background: none; cursor: pointer;
+  font-weight: 500; color: #6B7280; border-bottom: 3px solid transparent;
+  margin-bottom: -2px; white-space: nowrap;
+}
+.settings-tab.active { color: #22c55e; border-bottom-color: #22c55e; font-weight: 600; }
+.settings-tab-content { display: none; }
+.settings-tab-content.active { display: block; }
+.close-btn {
+  background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6B7280;
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  border-radius: 8px;
+}
+.close-btn:hover { background-color: #f3f4f6; }
+
+.sync-indicator {
+  position: fixed; top: 70px; right: 20px; z-index: 999;
+  background: white; border-radius: 20px; padding: 6px 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 0.75rem;
+  display: flex; align-items: center; gap: 6px;
+}
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+.sync-dot.offline { background: #ef4444; animation: none; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+@keyframes fade-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.animate-fade-in { animation: fade-in 0.3s ease-out; }
+
+#qrcode-container { display: flex; justify-content: center; margin: 15px 0; }
+
+.clickable-area { cursor: pointer; transition: all 0.3s ease; }
+.clickable-area:hover { transform: translateY(-2px); }
+
+.stats-card { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s ease; }
+
+.supabase-banner {
+  background: linear-gradient(135deg, #3ecf8e, #22c55e);
+  color: white; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;
+}
+
+/* Checkout Modal - Medium Size */
+.checkout-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center; z-index: 1000;
+  padding: 1rem;
+}
+.checkout-modal.active { display: flex; }
+.checkout-content {
+  background: white; border-radius: 24px; width: 100%; max-width: 550px;
+  max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.3); animation: slideUp 0.3s ease-out;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.checkout-header {
+  padding: 1.5rem 2rem; border-bottom: 1px solid #e5e7eb;
+  display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+}
+.checkout-body { overflow-y: auto; padding: 1.5rem 2rem; flex: 1; }
+.checkout-footer { padding: 1.5rem 2rem; border-top: 1px solid #e5e7eb; background: #f8fafc; }
+
+.location-display-card {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 2px solid #22c55e; border-radius: 16px; padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.location-display-card .location-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: #22c55e; color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem; margin-bottom: 0.75rem;
+}
+
+.delivery-method-btn {
+  padding: 1.25rem; border: 2px solid #e5e7eb; border-radius: 1rem;
+  cursor: pointer; transition: all 0.3s; background: white;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  position: relative;
+}
+.delivery-method-btn:hover { border-color: #22c55e; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+.delivery-method-btn.selected {
+  border-color: #22c55e; background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(22,163,74,0.08));
+}
+.delivery-method-btn.selected::after {
+  content: '✓'; position: absolute; top: 8px; right: 8px;
+  background: #22c55e; color: white; width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;
+}
+
+/* Kicki Drop Style Tracking */
+.kicki-tracking-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+  display: none; align-items: center; justify-content: center; z-index: 1000;
+  padding: 1rem;
+}
+.kicki-tracking-modal.active { display: flex; }
+.kicki-tracking-content {
+  background: #f8fafc; border-radius: 28px; width: 100%; max-width: 480px;
+  max-height: 92vh; overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.4); animation: slideUp 0.4s ease-out;
+}
+.kicki-tracking-header {
+  padding: 1.5rem 2rem 1rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.kicki-close-btn {
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  background: white; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 1.25rem;
+  color: #374151; transition: all 0.2s;
+}
+.kicki-close-btn:hover { background: #f3f4f6; transform: rotate(90deg); }
+
+.kicki-map-container {
+  height: 280px; margin: 0 1.5rem; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1); position: relative;
+}
+.kicki-map-container::after {
+  content: ''; position: absolute; inset: 0; border-radius: 20px;
+  border: 3px solid white; pointer-events: none;
+}
+
+.kicki-tracking-body {
+  padding: 1.5rem 2rem; overflow-y: auto; flex: 1;
+}
+
+.kicki-status-card {
+  background: white; border-radius: 20px; padding: 1.5rem;
+  margin-bottom: 1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.kicki-progress-bar {
+  height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;
+  margin: 1.5rem 0;
+}
+.kicki-progress-fill {
+  height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 3px; transition: width 0.5s ease;
+}
+
+.kicki-timeline {
+  position: relative; padding-left: 2rem;
+}
+.kicki-timeline::before {
+  content: ''; position: absolute; left: 11px; top: 8px; bottom: 8px;
+  width: 2px; background: #e5e7eb;
+}
+.kicki-timeline-item {
+  position: relative; padding-bottom: 1.5rem;
+}
+.kicki-timeline-item:last-child { padding-bottom: 0; }
+.kicki-timeline-dot {
+  position: absolute; left: -2rem; top: 4px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #e5e7eb; border: 3px solid #f8fafc;
+  display: flex; align-items: center; justify-content: center;
+}
+.kicki-timeline-item.completed .kicki-timeline-dot {
+  background: #22c55e;
+}
+.kicki-timeline-item.completed .kicki-timeline-dot::after {
+  content: '✓'; color: white; font-size: 0.7rem; font-weight: bold;
+}
+.kicki-timeline-item.active .kicki-timeline-dot {
+  background: #22c55e; animation: kickiPulse 2s infinite;
+}
+@keyframes kickiPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+}
+
+.kicki-driver-card {
+  background: white; border-radius: 20px; padding: 1.25rem;
+  display: flex; align-items: center; gap: 1rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-top: 1rem;
+}
+.kicki-driver-avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 1.5rem; flex-shrink: 0;
+}
+.kicki-driver-info { flex: 1; min-width: 0; }
+.kicki-driver-actions {
+  display: flex; gap: 0.5rem;
+}
+.kicki-action-btn {
+  width: 44px; height: 44px; border-radius: 50%; border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.kicki-action-btn.call { background: #22c55e; color: white; }
+.kicki-action-btn.call:hover { background: #16a34a; transform: scale(1.1); }
+.kicki-action-btn.message { background: #e5e7eb; color: #374151; }
+.kicki-action-btn.message:hover { background: #d1d5db; transform: scale(1.1); }
+
+.kicki-eta-card {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-radius: 20px; padding: 1.5rem; color: white;
+  text-align: center; margin-bottom: 1.5rem;
+}
+.kicki-eta-time { font-size: 2.5rem; font-weight: 800; }
+.kicki-eta-label { font-size: 0.875rem; opacity: 0.9; margin-top: 0.25rem; }
+
+.leaflet-container { z-index: 1; }
+.custom-marker {
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; color: white; font-size: 14px;
+  border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.driver-pulse { animation: driverPulse 1.5s infinite; }
+@keyframes driverPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@media print {
+  body * { visibility: hidden; }
+  #billModal, #billModal * { visibility: visible; }
+  #billModal { position: absolute; left: 0; top: 0; width: 100%; background: white; }
+  .no-print { display: none !important; }
+}
+
+@media(max-width:768px) {
+  .hero-content h1 { font-size: 34px; }
+  .search-box { flex-direction: column; align-items: center; }
+  .search-box input { width: 90%; }
+  .navbar { padding: 15px 20px; flex-wrap: wrap; gap: 10px; }
+  .nav-links { display: none; }
+}
+</style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body>
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-8">
-                <h1 class="text-2xl font-bold text-orange-500 cursor-pointer" onclick="navigateTo('home')">
-                    <i class="fa-solid fa-utensils mr-2"></i>FoodieFast
-                </h1>
-                <nav class="hidden md:flex gap-6 text-gray-600 font-medium">
-                    <a href="#" onclick="navigateTo('home')" class="hover:text-orange-500 transition">Home</a>
-                    <a href="#" onclick="navigateTo('browse')" class="hover:text-orange-500 transition">Restaurants</a>
-                    <a href="#" onclick="navigateTo('admin')" class="hover:text-orange-500 transition">Admin</a>
-                </nav>
-            </div>
-            <div class="flex items-center gap-4">
-                <button onclick="navigateTo('cart')" class="relative p-2 text-gray-600 hover:text-orange-500 transition">
-                    <i class="fa-solid fa-cart-shopping text-xl"></i>
-                    <span id="cart-count" class="cart-badge bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center">0</span>
-                </button>
-                <button class="md:hidden text-gray-600" onclick="toggleMobileMenu()">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
-            </div>
-        </div>
-    </header>
+<!-- LOCATION PERMISSION SCREEN -->
+<div id="locationPermissionScreen" class="location-permission-screen">
+  <div class="location-permission-content">
+    <div class="location-icon-wrapper">
+      <i class="fas fa-map-marker-alt text-white text-4xl"></i>
+    </div>
+    <h2>Enable Location</h2>
+    <p>Go!Point needs your location to show nearby restaurants and deliver your food quickly.</p>
+    <button id="allowLocationBtn" class="allow-location-btn" onclick="requestLocationPermission()">
+      <i class="fas fa-location-crosshairs"></i>
+      <span id="locationBtnText">Allow Location Access</span>
+    </button>
+    <div id="locationError" class="location-error">
+      <i class="fas fa-exclamation-circle mr-1"></i>
+      <span id="locationErrorText">Location access is required to use Go!Point. Please enable location in your browser settings.</span>
+    </div>
+  </div>
+</div>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden fixed inset-0 bg-white z-40 pt-20 px-6">
-        <div class="flex flex-col gap-6 text-xl font-medium">
-            <a href="#" onclick="navigateTo('home')" class="py-2 border-b border-gray-100">Home</a>
-            <a href="#" onclick="navigateTo('browse')" class="py-2 border-b border-gray-100">Restaurants</a>
-            <a href="#" onclick="navigateTo('admin')" class="py-2 border-b border-gray-100">Admin</a>
-        </div>
+<div id="syncIndicator" class="sync-indicator">
+  <div id="syncDot" class="sync-dot offline"></div>
+  <span id="syncText">Connecting...</span>
+</div>
+
+<div id="app" style="display:none;">
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <img src="17b.png" alt="Logo" onerror="this.style.display='none'">
+    <span id="mainTitle">Go!Point</span>
+  </div>
+  <div class="nav-links">
+    <a href="#" onclick="backToHomepage(); return false;">Home</a>
+    <a href="#" onclick="showRestaurantExplorer(); return false;">Restaurants</a>
+    <a href="#" onclick="return false;">Contact</a>
+  </div>
+  <div class="nav-actions">
+    <button id="trackOrderBtn" class="nav-track-btn hidden" onclick="openTrackingModal()">
+      <i class="fas fa-map-marked-alt"></i> <span id="trackBtnText">Track Order</span>
+    </button>
+    <button class="nav-login-btn" id="showRegisterOptionsBtn">
+      <i class="fas fa-user mr-1"></i> Management
+    </button>
+    <button class="nav-cart-btn" onclick="toggleCart()">
+      <i class="fas fa-shopping-cart"></i> Cart
+      <span id="cartCount" class="cart-badge hidden">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HOMEPAGE -->
+<div id="homepageContainer">
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Food Delivery in Somaliland</h1>
+      <p>Fast delivery from your favorite restaurants</p>
+      <div class="search-box">
+        <input type="text" id="homeSearchInput" placeholder="Search food or restaurant...">
+        <button id="homeSearchBtn">🔍 Search</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="categories">
+    <div class="category" onclick="showRestaurantExplorer()">🍔 Burgers</div>
+    <div class="category" onclick="showRestaurantExplorer()">🍕 Pizza</div>
+    <div class="category" onclick="showRestaurantExplorer()">🥗 Healthy</div>
+    <div class="category" onclick="showRestaurantExplorer()">🍗 Chicken</div>
+    <div class="category" onclick="showRestaurantExplorer()">☕ Coffee</div>
+    <div class="category" onclick="showRestaurantExplorer()">🍰 Desserts</div>
+  </div>
+
+  <h2 class="section-title">Popular Restaurants</h2>
+  <section class="restaurants" id="popularRestaurantsList"></section>
+
+  <footer class="footer">
+    <h3>Go!Point Food Delivery</h3>
+    <p>Fast • Reliable • Somaliland</p>
+    <p>© 2025 Go!Point Technologies</p>
+  </footer>
+</div>
+
+<!-- RESTAURANT EXPLORER -->
+<div id="restaurantExplorerContainer" class="explorer-container" style="display: none;">
+  <div class="explorer-header">
+    <div class="flex items-center gap-2">
+      <i class="fas fa-utensils text-2xl text-green-600"></i>
+      <span class="font-bold text-xl text-gray-800">Go!Point • Choose Restaurant</span>
+    </div>
+    <button id="backToHomepageBtn" class="home-link"><i class="fas fa-home mr-2"></i> Back to Homepage</button>
+  </div>
+
+  <div id="explorerRestaurantView" class="px-4 md:px-8 py-8">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-2">Choose Your Restaurant</h2>
+      <p class="text-gray-500 text-lg">Select from our partner restaurants and start ordering</p>
+    </div>
+    <div id="explorerRestaurantList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7"></div>
+  </div>
+
+  <div id="explorerMenuView" class="hidden px-4 md:px-8 py-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <button id="backToExplorerRestaurantsBtn" class="flex items-center text-amber-600 hover:text-amber-800 font-semibold bg-white px-5 py-2 rounded-full shadow-sm border border-gray-200 clickable-area">
+        <i class="fas fa-arrow-left mr-2"></i> Back to Restaurants
+      </button>
+      <div class="bg-white rounded-full px-5 py-2 shadow-sm">
+        <span class="text-sm text-gray-500">Now serving:</span>
+        <span id="selectedRestaurantNameExplorer" class="ml-1 font-bold text-gray-800"></span>
+      </div>
     </div>
 
-    <main class="container mx-auto px-4 py-8">
-
-        <!-- Home Page -->
-        <section id="page-home" class="page active">
-            <!-- Hero -->
-            <div class="relative h-[400px] bg-gray-100 mb-8">
-                <img src="https://images.unsplash.com/photo-1504674900247-0863b4b4e298?auto=format&fit=crop&w=1200&q=80" class="absolute inset-0 w-full h-full object-cover" alt="Hero">
-                <div class="absolute inset-0 bg-black/40"></div>
-                <div class="relative z-10 flex flex-col items-center pt-16 px-4 text-center text-white">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <i class="fa-solid fa-location-dot text-xl"></i>
-                        <span>Your location</span>
-                    </div>
-                    <h1 class="text-3xl font-bold mb-2">What are you craving?</h1>
-                    <div class="relative w-full max-w-xl">
-                        <input type="text" placeholder="Search for restaurants, dishes, or groceries" class="w-full pl-12 pr-4 py-3 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75">
-                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/80"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Categories -->
-            <div class="mb-10">
-                <h2 class="text-2xl font-bold mb-6">Categories</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- Category items -->
-                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
-                        <i class="fa-solid fa-utensils text-2xl text-orange-500"></i>
-                        <span class="font-medium">Restaurants</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
-                        <i class="fa-solid fa-shopping-basket text-2xl text-green-500"></i>
-                        <span class="font-medium">Groceries</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
-                        <i class="fa-solid fa-pills text-2xl text-red-500"></i>
-                        <span class="font-medium">Pharmacy</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
-                        <i class="fa-solid fa-utensils text-2xl text-purple-500"></i>
-                        <span class="font-medium">Fast Food</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
-                        <i class="fa-solid fa-wine-glass text-2xl text-yellow-500"></i>
-                        <span class="font-medium">Beverages</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-2 p-3 bg-white rounded-lg shadow hover:shadow-md transition">
-                        <i class="fa-solid fa-birthday-cake text-2xl text-pink-500"></i>
-                        <span class="font-medium">Desserts</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Promo Banner -->
-            <div class="mb-10">
-                <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-6 text-white">
-                    <h3 class="text-xl font-bold mb-2">Special Offer: Free Delivery</h3>
-                    <p class="mb-4">On your first order over $15. Use code WELCOME</p>
-                    <button onclick="navigateTo('browse')" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded transition">Order Now</button>
-                </div>
-            </div>
-
-            <!-- Near You -->
-            <div class="mb-10">
-                <h2 class="text-2xl font-bold mb-6">Near You</h2>
-                <div id="home-restaurant-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- JS Rendered -->
-                </div>
-            </div>
-
-            <!-- Popular Restaurants (same as featured) -->
-            <div class="mb-10">
-                <h2 class="text-2xl font-bold mb-6">Popular Restaurants</h2>
-                <div id="home-featured-restaurants" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- JS Rendered -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Browsing Page -->
-        <section id="page-browse" class="page">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                <h3 class="text-3xl font-bold">All Restaurants</h3>
-                <div class="relative w-full md:w-64">
-                    <input type="text" id="restaurant-search" placeholder="Search restaurants..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" oninput="filterRestaurants()">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
-                </div>
-            </div>
-            <div id="restaurant-list" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- JS Rendered -->
-            </div>
-        </section>
-
-        <!-- Menu Page -->
-        <section id="page-menu" class="page">
-            <div class="mb-8 flex items-center gap-4">
-                <button onclick="navigateTo('browse')" class="text-gray-500 hover:text-orange-500 transition">
-                    <i class="fa-solid fa-chevron-left"></i> Back to Restaurants
-                </button>
-                <h3 id="menu-restaurant-name" class="text-3xl font-bold">Restaurant Menu</h3>
-            </div>
-            <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- JS Rendered -->
-            </div>
-        </section>
-
-        <!-- Cart Page -->
-        <section id="page-cart" class="page">
-            <h3 class="text-3xl font-bold mb-8">Your Cart</h3>
-            <div class="flex flex-col lg:flex-row gap-8">
-                <div class="lg:w-2/3">
-                    <div id="cart-items" class="bg-white rounded-xl shadow-sm divide-y">
-                        <!-- JS Rendered -->
-                    </div>
-                </div>
-                <div class="lg:w-1/3">
-                    <div class="bg-white p-6 rounded-xl shadow-sm sticky top-24">
-                        <h4 class="text-xl font-bold mb-4">Order Summary</h4>
-                        <div class="flex justify-between mb-2 text-gray-600">
-                            <span>Subtotal</span>
-                            <span id="cart-subtotal">$0.00</span>
-                        </div>
-                        <div class="flex justify-between mb-4 text-gray-600">
-                            <span>Delivery Fee</span>
-                            <span id="cart-delivery">$5.00</span>
-                        </div>
-                        <div class="flex justify-between mb-6 text-xl font-bold border-t pt-4">
-                            <span>Total</span>
-                            <span id="cart-total" class="text-orange-500">$0.00</span>
-                        </div>
-                        <button onclick="navigateTo('checkout')" id="checkout-btn" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-bold transition disabled:bg-gray-300 disabled:cursor-not-allowed">
-                            Proceed to Checkout
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Checkout Page -->
-        <section id="page-checkout" class="page">
-            <div class="max-w-3xl mx-auto">
-                <h3 class="text-3xl font-bold mb-8 text-center">Checkout</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-xl shadow-sm">
-                        <h4 class="text-lg font-bold mb-4"><i class="fa-solid fa-truck mr-2"></i> Shipping Address</h4>
-                        <div class="space-y-4">
-                            <input type="text" placeholder="Full Name" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
-                            <input type="text" placeholder="Street Address" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
-                            <div class="grid grid-cols-2 gap-4">
-                                <input type="text" placeholder="City" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
-                                <input type="text" placeholder="Zip Code" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm">
-                        <h4 class="text-lg font-bold mb-4"><i class="fa-solid fa-credit-card mr-2"></i> Payment Method</h4>
-                        <div class="space-y-4">
-                            <div class="p-3 border rounded-lg flex items-center gap-3 cursor-pointer bg-orange-50 border-orange-500">
-                                <input type="radio" name="payment" checked>
-                                <span class="font-medium">Credit Card</span>
-                            </div>
-                            <div class="p-3 border rounded-lg flex items-center gap-3 cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="payment">
-                                <span class="font-medium">PayPal</span>
-                            </div>
-                            <div class="mt-4 space-y-3">
-                                <input type="text" placeholder="Card Number" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <input type="text" placeholder="MM/YY" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
-                                    <input type="text" placeholder="CVC" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-8 flex justify-center">
-                    <button onclick="processPayment()" class="bg-orange-500 hover:bg-orange-600 text-white px-12 py-4 rounded-xl font-bold text-xl transition shadow-lg">
-                        Place Order <i class="fa-solid fa-circle-check ml-2"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Order Success Page -->
-        <section id="page-success" class="page text-center py-20">
-            <div class="max-w-md mx-auto bg-white p-12 rounded-3xl shadow-sm">
-                <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="fa-solid fa-check text-4xl"></i>
-                </div>
-                <h3 class="text-3xl font-bold mb-4">Order Placed!</h3>
-                <p class="text-gray-600 mb-8">Your delicious meal is on the way. You can track your order in the app.</p>
-                <button onclick="navigateTo('home')" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-bold transition">
-                    Return Home
-                </button>
-            </div>
-        </section>
-
-        <!-- Admin Page -->
-        <section id="page-admin" class="page">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="text-3xl font-bold">Restaurant Management</h3>
-                <button onclick="openAddRestaurantModal()" class="bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition">
-                    <i class="fa-solid fa-plus mr-2"></i> Add Restaurant
-                </button>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-gray-50 border-b">
-                        <tr>
-                            <th class="px-6 py-3 font-bold text-gray-600">Restaurant</th>
-                            <th class="px-6 py-3 font-bold text-gray-600">Cuisine</th>
-                            <th class="px-6 py-3 font-bold text-gray-600">Rating</th>
-                            <th class="px-6 py-3 font-bold text-gray-600">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-restaurant-table">
-                        <!-- JS Rendered -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </main>
-
-    <!-- Add Restaurant Modal -->
-    <div id="modal-add-restaurant" class="hidden fixed inset-0 bg-black opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl p-6">
-            <h4 class="text-xl font-bold mb-4">Add New Restaurant</h4>
-            <div class="space-y-4">
-                <input type="text" id="new-res-name" placeholder="Restaurant Name" class="w-full p-2 border rounded-lg">
-                <input type="text" id="new-res-cuisine" placeholder="Cuisine (e.g. Italian)" class="w-full p-2 border rounded-lg">
-                <input type="text" id="new-res-image" placeholder="Image URL" class="w-full p-2 border rounded-lg">
-                <div class="flex justify-end gap-3 mt-6">
-                    <button onclick="closeAddRestaurantModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
-                    <button onclick="saveRestaurant()" class="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold">Save Restaurant</button>
-                </div>
-            </div>
-        </div>
+    <div class="flex space-x-4 mb-8 overflow-x-auto pb-2">
+      <button data-category="coffee" class="explorer-cat-btn bg-amber-500 text-white flex items-center space-x-2 px-6 py-3 rounded-full whitespace-nowrap shadow-md">☕ <span>Coffee</span></button>
+      <button data-category="food" class="explorer-cat-btn bg-white text-gray-700 hover:bg-amber-50 flex items-center space-x-2 px-6 py-3 rounded-full whitespace-nowrap">🍽️ <span>Food</span></button>
+      <button data-category="dessert" class="explorer-cat-btn bg-white text-gray-700 hover:bg-amber-50 flex items-center space-x-2 px-6 py-3 rounded-full whitespace-nowrap">🍰 <span>Dessert</span></button>
     </div>
 
-    <script>
-        // --- State Management ---
-        let restaurants = [
-            { id: 1, name: 'Burger Haven', cuisine: 'American', rating: 4.8, image: 'https://images.unsplash.com/photo-1571092142809-38a1792bc685?auto=format&fit=crop&w=400&q=80', featured: true, menu: [
-                { id: 101, name: 'Classic Cheeseburger', price: 12.99, desc: 'Juicy beef patty with cheddar cheese', category: 'Burgers', img: 'https://images.unsplash.com/photo-1568901347738-0aeca3466c7e?auto=format&fit=crop&w=100&q=80' },
-                { id: 102, name: 'Bacon BBQ Burger', price: 14.99, desc: 'Smoky BBQ sauce and crispy bacon', category: 'Burgers', img: 'https://images.unsplash.com/photo-1550507938-7b579738566d?auto=format&fit=crop&w=100&q=80' },
-                { id: 103, name: 'Truffle Fries', price: 6.99, desc: 'Golden fries with truffle oil', category: 'Sides', img: 'https://images.unsplash.com/photo-1573080523176-f87f7f125343?auto=format&fit=crop&w=100&q=80' },
-            ]},
-            { id: 2, name: 'Pasta Palace', cuisine: 'Italian', rating: 4.6, image: 'https://images.unsplash.com/photo-1551183538-19d3e8327d63?auto=format&fit=crop&w=400&q=80', featured: true, menu: [
-                { id: 201, name: 'Fettuccine Alfredo', price: 16.99, desc: 'Creamy parmesan sauce with fettuccine', category: 'Pasta', img: 'https://images.unsplash.com/photo-1645112431556-73973642c989?auto=format&fit=crop&w=100&q=80' },
-                { id: 202, name: 'Spaghetti Carbonara', price: 15.99, desc: 'Authentic Roman style with pancetta', category: 'Pasta', img: 'https://images.unsplash.com/photo-1612874742232-786a24bb266b?auto=format&fit=crop&w=100&q=80' },
-                { id: 203, name: 'Tiramisu', price: 8.99, desc: 'Classic coffee-flavored dessert', category: 'Dessert', img: 'https://images.unsplash.com/photo-1571877223155-aa600917591e?auto=format&fit=crop&w=100&q=80' },
-            ]},
-            { id: 3, name: 'Sushi Zen', cuisine: 'Japanese', rating: 4.9, image: 'https://images.unsplash.com/photo-1579883289990-dac84a72bca8?auto=format&fit=crop&w=400&q=80', featured: true, menu: [
-                { id: 301, name: 'Sashimi Platter', price: 24.99, desc: 'Fresh slices of salmon, tuna, and yellowtail', category: 'Sashimi', img: 'https://images.unsplash.com/photo-1534422472314-688964875c59?auto=format&fit=crop&w=100&q=80' },
-                { id: 302, name: 'California Roll', price: 12.99, desc: 'Avocado, cucumber, and crab', category: 'Rolls', img: 'https://images.unsplash.com/photo-1579871494447-982dca851d82?auto=format&fit=crop&w=100&q=80' },
-                { id: 303, name: 'Miso Soup', price: 4.99, desc: 'Traditional fermented soybean soup', category: 'Appetizer', img: 'https://images.unsplash.com/photo-1547592166-276041275531?auto=format&fit=crop&w=100&q=80' },
-            ]},
-            { id: 4, name: 'Green Leaf', cuisine: 'Vegan', rating: 4.5, image: 'https://images.unsplash.com/photo-1512621776951-b58f9C68377b?auto=format&fit=crop&w=400&q=80', featured: false, menu: [
-                { id: 401, name: 'Quinoa Bowl', price: 13.99, desc: 'Fresh quinoa with roasted vegetables', category: 'Bowls', img: 'https://images.unsplash.com/photo-1546069901-ba6Bca8191b0?auto=format&fit=crop&w=100&q=80' },
-            ]},
-        ];
+    <div id="explorerMenuItems" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7"></div>
+  </div>
+</div>
 
-        let cart = [];
-        let currentRestaurant = null;
+<!-- CHECKOUT MODAL (Medium Size - Replaces Delivery Form) -->
+<div id="checkoutModal" class="checkout-modal">
+  <div class="checkout-content">
+    <div class="checkout-header">
+      <div>
+        <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-shopping-bag text-primary mr-2"></i>Checkout</h3>
+        <p class="text-sm text-gray-500 mt-1">Complete your order details</p>
+      </div>
+      <button onclick="closeCheckout()" class="close-btn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="checkout-body">
+      <!-- Step Indicator -->
+      <div class="step-indicator mb-6">
+        <div class="step completed"><div class="step-number">1</div><div class="step-label">Cart</div></div>
+        <div class="step active"><div class="step-number">2</div><div class="step-label">Details</div></div>
+        <div class="step"><div class="step-number">3</div><div class="step-label">Payment</div></div>
+      </div>
+      
+      <!-- Order Summary Mini -->
+      <div class="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-sm text-gray-500">Items</p>
+            <p id="checkoutItemCount" class="font-semibold text-gray-800">0 items</p>
+          </div>
+          <div class="text-right">
+            <p class="text-sm text-gray-500">Total</p>
+            <p id="checkoutTotal" class="font-bold text-xl text-primary">$0.00</p>
+          </div>
+        </div>
+      </div>
 
-        // --- Cart Persistence ---
-        function loadCart() {
-            const saved = localStorage.getItem('cart');
-            if (saved) {
-                try {
-                    cart = JSON.parse(saved);
-                } catch (e) {
-                    console.error('Failed to parse cart from localStorage', e);
-                    cart = [];
-                }
-            }
-        }
-        function saveCart() {
-            localStorage.setItem('cart', JSON.stringify(cart));
-        }
+      <!-- Customer Location Display -->
+      <div class="location-display-card">
+        <div class="location-icon">
+          <i class="fas fa-map-marker-alt"></i>
+        </div>
+        <p class="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">Your Location</p>
+        <p id="customerLocationDisplay" class="font-semibold text-gray-800 text-lg">Detecting...</p>
+        <p id="customerCoordsDisplay" class="text-xs text-gray-500 mt-1"></p>
+      </div>
 
-        // --- Navigation ---
-        function navigateTo(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.add('active');
-            document.getElementById('mobile-menu').classList.add('hidden');
-            window.scrollTo(0, 0);
+      <form id="checkoutForm">
+        <!-- Personal Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-gray-700 mb-2 font-medium text-sm">Full Name *</label>
+            <input type="text" id="checkoutName" class="w-full glovo-input" placeholder="Your name" required>
+          </div>
+          <div>
+            <label class="block text-gray-700 mb-2 font-medium text-sm">Phone Number *</label>
+            <input type="tel" id="checkoutPhone" class="w-full glovo-input" placeholder="+252 6X XXX XXXX" required>
+          </div>
+        </div>
+        
+        <!-- Sub Address -->
+        <div class="mb-5">
+          <label class="block text-gray-700 mb-2 font-medium text-sm">
+            <i class="fas fa-home text-primary mr-1"></i> Sub-address / Details *
+          </label>
+          <textarea id="checkoutAddress" rows="2" class="w-full glovo-input" placeholder="Street, Building, Apartment, Landmark..." required></textarea>
+          <p class="text-xs text-gray-500 mt-1"><i class="fas fa-info-circle mr-1"></i>Add specific delivery instructions</p>
+        </div>
+        
+        <!-- Delivery Method -->
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-3 font-medium text-sm">🚚 Delivery Method *</label>
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" onclick="selectDeliveryMethod('bike')" id="bikeOption" class="delivery-method-btn">
+              <i class="fas fa-motorcycle text-3xl text-primary"></i>
+              <span class="font-semibold">Motorcycle</span>
+              <small class="text-gray-500">Fast delivery</small>
+            </button>
+            <button type="button" onclick="selectDeliveryMethod('taxi')" id="taxiOption" class="delivery-method-btn">
+              <i class="fas fa-car text-3xl text-primary"></i>
+              <span class="font-semibold">Taxi</span>
+              <small class="text-gray-500">Safe delivery</small>
+            </button>
+          </div>
+          <input type="hidden" id="deliveryMethod" required>
+        </div>
+        
+        <!-- Assigned Vehicle -->
+        <div class="mb-4 hidden" id="vehicleSelectionContainer">
+          <label class="block text-gray-700 mb-2 font-medium text-sm">Assigned Driver</label>
+          <div id="assignedVehicleDisplay" class="p-4 bg-green-50 border-2 border-green-200 rounded-lg"></div>
+          <input type="hidden" id="selectedVehicleId" required>
+        </div>
+      </form>
+    </div>
+    <div class="checkout-footer">
+      <div class="flex space-x-3">
+        <button type="button" onclick="closeCheckout()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-xl font-semibold">Back to Cart</button>
+        <button type="button" onclick="proceedToPayment()" class="flex-1 glovo-button">Continue to Payment</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-            if (pageId === 'home') renderHome();
-            if (pageId === 'browse') renderBrowse();
-            if (pageId === 'cart') renderCart();
-            if (pageId === 'admin') renderAdmin();
-        }
+<!-- PAYMENT FORM -->
+<div id="paymentForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md max-h-screen overflow-y-auto payment-section">
+    <h3 class="text-2xl font-bold text-primary mb-6 flex items-center">
+      <i class="fas fa-credit-card mr-3"></i>Payment Method
+    </h3>
+    <div class="step-indicator mb-8">
+      <div class="step completed"><div class="step-number">1</div><div class="step-label">Cart</div></div>
+      <div class="step completed"><div class="step-number">2</div><div class="step-label">Details</div></div>
+      <div class="step active"><div class="step-number">3</div><div class="step-label">Payment</div></div>
+    </div>
+    <div class="mb-8 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-100">
+      <div class="flex justify-between items-center">
+        <span class="text-lg font-semibold text-gray-800"><i class="fas fa-receipt text-primary mr-2"></i>Total:</span>
+        <span id="paymentTotal" class="text-2xl font-bold text-primary">$0.00</span>
+      </div>
+    </div>
+    <div class="form-group mb-8">
+      <label class="flex items-center justify-center gap-2 mb-4 text-lg font-semibold text-gray-800">
+        <i class="fas fa-credit-card text-primary"></i>Payment Method <span class="text-red-500">*</span>
+      </label>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="payment-option selected" data-value="telesom" data-prefix="63">
+          <i class="fas fa-mobile-alt text-2xl text-primary mb-2 block"></i><div class="font-semibold">Telesom</div><small class="text-gray-500">63 + 7 digits</small>
+        </div>
+        <div class="payment-option" data-value="edahab" data-prefix="65">
+          <i class="fas fa-wallet text-2xl text-amber-500 mb-2 block"></i><div class="font-semibold">E-Dahab</div><small class="text-gray-500">65 + 7 digits</small>
+        </div>
+        <div class="payment-option" data-value="cash" data-prefix="">
+          <i class="fas fa-hand-holding-usd text-2xl text-green-500 mb-2 block"></i><div class="font-semibold">Cash</div><small class="text-gray-500">On Delivery</small>
+        </div>
+      </div>
+      <input type="hidden" id="paymentMethod" value="telesom">
+    </div>
+    <div class="form-group mb-8" id="paymentPhoneContainer">
+      <label class="flex items-center justify-center gap-2 mb-4 font-semibold text-gray-800">
+        <i class="fas fa-phone text-primary"></i>Phone Number <span class="text-red-500">*</span>
+      </label>
+      <div class="phone-input" id="phoneInputWrapper">
+        <div class="phone-prefix" id="phonePrefix">+252 63</div>
+        <input type="tel" id="paymentPhone" class="phone-number" placeholder="XXX XXXX" maxlength="7" required autocomplete="off">
+      </div>
+      <div class="error-message text-red-500 mt-2 hidden text-sm" id="phoneError">Enter a valid 7-digit phone number</div>
+    </div>
+    <div class="flex space-x-4">
+      <button type="button" onclick="backToCheckout()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-4 px-6 rounded-xl font-semibold">
+        <i class="fas fa-arrow-left mr-2"></i>Back
+      </button>
+      <button type="button" id="payButton" onclick="submitDeliveryOrder()" class="flex-1 glovo-button">
+        <i class="fas fa-lock mr-2"></i>Place Order
+      </button>
+    </div>
+  </div>
+</div>
 
-        function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        }
+<!-- MANAGEMENT LOGIN -->
+<div id="loginForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
+    <div class="text-center mb-4"><div class="text-4xl mb-2">🔐</div></div>
+    <h3 class="text-2xl font-bold text-primary mb-6 text-center">Management Login</h3>
+    <p class="text-center text-gray-500 text-sm mb-4">Username: <b>admin</b> | Password: <b>admin123</b></p>
+    <form id="managementLoginForm">
+      <div class="mb-4"><label class="block text-gray-700 mb-2">Username</label><input type="text" id="username" class="w-full glovo-input" required></div>
+      <div class="mb-6"><label class="block text-gray-700 mb-2">Password</label><input type="password" id="password" class="w-full glovo-input" required></div>
+      <div class="flex space-x-3">
+        <button type="button" onclick="closeLoginForm()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg">Cancel</button>
+        <button type="submit" class="flex-1 glovo-button">Login</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-        // --- Rendering Logic ---
-        function renderHome() {
-            const nearYouContainer = document.getElementById('home-restaurant-list');
-            const featured = restaurants.filter(r => r.featured);
-            nearYouContainer.innerHTML = featured.map(res => createRestaurantCard(res)).join('');
+<!-- MANAGEMENT VIEW -->
+<div id="managementView" class="container mx-auto px-4 py-8 hidden">
+  <div class="mb-8">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-3xl font-bold text-primary mb-2">Management Dashboard</h1>
+        <p class="text-gray-600">Manage orders and view sales analytics</p>
+      </div>
+      <div class="space-x-3">
+        <button id="openSettingsBtn" class="bg-primary hover:bg-primaryDark text-white px-4 py-2 rounded-lg"><i class="fas fa-cog mr-2"></i>Settings</button>
+        <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">Logout</button>
+      </div>
+    </div>
 
-            const popularContainer = document.getElementById('home-featured-restaurants');
-            popularContainer.innerHTML = restaurants.map(res => createRestaurantCard(res)).join('');
-        }
+    <div id="supabaseSetupBanner" class="supabase-banner hidden">
+      <h3 class="text-lg font-bold mb-2"><i class="fas fa-database mr-2"></i>Supabase Setup Required</h3>
+      <p class="mb-2">Create a project at <a href="https://supabase.com" target="_blank" class="underline font-bold">supabase.com</a> and add your credentials</p>
+    </div>
 
-        function renderBrowse() {
-            const container = document.getElementById('restaurant-list');
-            container.innerHTML = restaurants.map(res => createRestaurantCard(res)).join('');
-        }
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+      <div class="stats-card bg-white p-4"><div class="flex items-center"><div class="p-3 rounded-full bg-green-100 mr-3"><i class="fas fa-calendar-day text-xl text-primary"></i></div><div><p class="text-gray-600 text-xs">Today</p><p id="todayOrders" class="text-xl font-bold">0</p></div></div></div>
+      <div class="stats-card bg-white p-4"><div class="flex items-center"><div class="p-3 rounded-full bg-blue-100 mr-3"><i class="fas fa-calendar-alt text-xl text-blue-600"></i></div><div><p class="text-gray-600 text-xs">Month</p><p id="monthlyOrders" class="text-xl font-bold">0</p></div></div></div>
+      <div class="stats-card bg-white p-4"><div class="flex items-center"><div class="p-3 rounded-full bg-amber-100 mr-3"><i class="fas fa-dollar-sign text-xl text-amber-600"></i></div><div><p class="text-gray-600 text-xs">Revenue</p><p id="totalRevenue" class="text-xl font-bold">$0</p></div></div></div>
+      <div class="stats-card bg-white p-4"><div class="flex items-center"><div class="p-3 rounded-full bg-purple-100 mr-3"><i class="fas fa-truck text-xl text-purple-600"></i></div><div><p class="text-gray-600 text-xs">Active</p><p id="deliveryOrders" class="text-xl font-bold">0</p></div></div></div>
+      <div class="stats-card bg-white p-4"><div class="flex items-center"><div class="p-3 rounded-full bg-gray-100 mr-3"><i class="fas fa-clock text-xl text-gray-600"></i></div><div><p class="text-gray-600 text-xs">All Time</p><p id="totalOrders" class="text-xl font-bold">0</p></div></div></div>
+    </div>
 
-        function filterRestaurants() {
-            const query = document.getElementById('restaurant-search').value.toLowerCase();
-            const filtered = restaurants.filter(r =>
-                r.name.toLowerCase().includes(query) || r.cuisine.toLowerCase().includes(query)
-            );
-            document.getElementById('restaurant-list').innerHTML = filtered.map(res => createRestaurantCard(res)).join('');
-        }
+    <div class="bg-white rounded-xl p-6 mb-8 shadow-sm">
+      <h2 class="text-xl font-bold text-gray-800 mb-4"><i class="fas fa-cogs mr-2"></i>Fleet Management</h2>
+      <div id="vehiclesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
 
-        function createRestaurantCard(res) {
-            return `
-                <div class="bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer transition transform hover:scale-105 hover:shadow-md" onclick="openMenu(${res.id})">
-                    <img src="${res.image}" class="w-full h-48 object-cover" alt="${res.name}">
-                    <div class="p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-bold text-lg">${res.name}</h4>
-                            <span class="text-sm bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-bold">★ ${res.rating}</span>
-                        </div>
-                        <p class="text-gray-500 text-sm mb-4">${res.cuisine}</p>
-                        <button class="w-full py-2 border border-orange-500 text-orange-500 rounded-lg font-medium hover:bg-orange-500 hover:text-white transition">
-                            View Menu
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white rounded-xl p-6 shadow-sm">
+        <h2 class="text-xl font-bold mb-4"><i class="fas fa-bolt mr-2 text-primary"></i>Active Orders</h2>
+        <div id="pendingOrdersList" class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+          <div class="text-center py-8 text-gray-500"><i class="fas fa-inbox text-3xl mb-2"></i><p>No active orders</p></div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-6 shadow-sm">
+        <h2 class="text-xl font-bold mb-4"><i class="fas fa-check-circle mr-2 text-green-500"></i>Completed</h2>
+        <div id="completedOrdersList" class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+          <div class="text-center py-8 text-gray-500"><i class="fas fa-check-circle text-3xl mb-2"></i><p>No completed orders</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        function openMenu(restaurantId) {
-            currentRestaurant = restaurants.find(r => r.id === restaurantId);
-            document.getElementById('menu-restaurant-name').innerText = currentRestaurant.name;
-            const container = document.getElementById('menu-items');
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="settings-modal">
+  <div class="settings-content">
+    <div class="settings-header">
+      <h2 class="text-2xl font-bold text-primary"><i class="fas fa-cog mr-2"></i>Settings</h2>
+      <button onclick="closeSettingsModal()" class="close-btn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="settings-body">
+      <div class="settings-tabs">
+        <button onclick="showSettingsTab('system')" id="tabSystem" class="settings-tab active"><i class="fas fa-cog mr-2"></i>System</button>
+        <button onclick="showSettingsTab('registerRestaurant')" id="tabRegisterRestaurant" class="settings-tab"><i class="fas fa-utensils mr-2"></i>Add Restaurant</button>
+        <button onclick="showSettingsTab('registerVehicle')" id="tabRegisterVehicle" class="settings-tab"><i class="fas fa-motorcycle mr-2"></i>Register Vehicle</button>
+      </div>
+      
+      <div id="systemSettingsTab" class="settings-tab-content active">
+        <h3 class="text-lg font-semibold mb-4">General Settings</h3>
+        <div class="space-y-4">
+          <div><label class="block text-gray-700 mb-2">Business Name *</label><input type="text" id="businessName" class="w-full glovo-input" value="Go!Point"></div>
+          <div><label class="block text-gray-700 mb-2">Address *</label><textarea id="businessAddress" rows="2" class="w-full glovo-input">Hargeisa, Somaliland</textarea></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="block text-gray-700 mb-2">Phone *</label><input type="tel" id="businessPhone" class="w-full glovo-input" value="+252 61 XXX XXXX"></div>
+            <div><label class="block text-gray-700 mb-2">Email *</label><input type="email" id="businessEmail" class="w-full glovo-input" value="info@gopoint.com"></div>
+          </div>
+        </div>
+        <button onclick="saveSystemSettings()" class="glovo-button mt-6"><i class="fas fa-save mr-2"></i>Save</button>
+      </div>
+      
+      <div id="registerRestaurantTab" class="settings-tab-content hidden">
+        <h3 class="text-lg font-semibold mb-4">Add New Restaurant</h3>
+        <form id="restaurantRegistrationForm">
+          <div class="mb-4"><label class="block text-gray-700 mb-2">Name *</label><input type="text" id="newRestaurantName" class="w-full glovo-input" required></div>
+          <div class="mb-4"><label class="block text-gray-700 mb-2">Address *</label><input type="text" id="newRestaurantAddress" class="w-full glovo-input" required></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div><label class="block text-gray-700 mb-2">📍 Latitude *</label><input type="number" step="any" id="newRestaurantLat" class="w-full glovo-input" value="9.5600" required></div>
+            <div><label class="block text-gray-700 mb-2">📍 Longitude *</label><input type="number" step="any" id="newRestaurantLng" class="w-full glovo-input" value="44.0650" required></div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div><label class="block text-gray-700 mb-2">Phone *</label><input type="tel" id="newRestaurantPhone" class="w-full glovo-input" required></div>
+            <div><label class="block text-gray-700 mb-2">Email</label><input type="email" id="newRestaurantEmail" class="w-full glovo-input"></div>
+          </div>
+          <div class="mb-4"><label class="block text-gray-700 mb-2">Logo URL</label><input type="url" id="newRestaurantLogo" class="w-full glovo-input"></div>
+          <button type="submit" class="w-full glovo-button"><i class="fas fa-plus mr-2"></i>Register Restaurant</button>
+        </form>
+      </div>
+      
+      <div id="registerVehicleTab" class="settings-tab-content hidden">
+        <h3 class="text-lg font-semibold mb-4">Register New Vehicle</h3>
+        <form id="vehicleRegistrationForm">
+          <div class="mb-4"><label class="block text-gray-700 mb-2">Type *</label><select id="vehicleType" class="w-full glovo-select" required><option value="">Select</option><option value="bike">Motorcycle</option><option value="taxi">Taxi</option></select></div>
+          <div class="mb-4"><label class="block text-gray-700 mb-2">Plate Number *</label><input type="text" id="plateNumber" class="w-full glovo-input" required></div>
+          <div class="mb-4"><label class="block text-gray-700 mb-2">Driver Name *</label><input type="text" id="driverName" class="w-full glovo-input" required></div>
+          <div class="mb-4"><label class="block text-gray-700 mb-2">Driver Phone *</label><input type="tel" id="driverPhone" class="w-full glovo-input" required></div>
+          <button type="submit" class="w-full glovo-button"><i class="fas fa-plus mr-2"></i>Register Vehicle</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
-            const categories = [...new Set(currentRestaurant.menu.map(i => i.category))];
+<!-- CART WINDOW -->
+<div id="cartWindow" class="cart-window bg-white border border-gray-200">
+  <div class="cart-header bg-primary text-white p-4 flex justify-between items-center">
+    <h3 class="font-bold text-lg"><i class="fas fa-shopping-cart mr-2"></i>Your Order</h3>
+    <button onclick="toggleCart()" class="text-white hover:text-green-200"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="cart-content p-4">
+    <div id="cartItems" class="space-y-3 mb-4">
+      <div class="text-center py-6 text-gray-500"><i class="fas fa-coffee text-3xl mb-2"></i><p>Your cart is empty</p></div>
+    </div>
+    <div id="cartSummary" class="border-t pt-4 hidden">
+      <div class="flex justify-between items-center mb-4">
+        <span class="text-lg font-semibold text-gray-800">Total:</span>
+        <span id="totalPrice" class="text-xl font-bold text-primary">$0.00</span>
+      </div>
+      <button onclick="openCheckout()" id="checkoutBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-lg">Checkout</button>
+    </div>
+  </div>
+</div>
 
-            container.innerHTML = categories.map(cat => `
-                <div>
-                    <h4 class="text-2xl font-bold mb-4 text-gray-700">${cat}</h4>
-                    <div class="space-y-4">
-                        ${currentRestaurant.menu.filter(i => i.category === cat).map(item => `
-                            <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                                <div class="flex gap-4">
-                                    <img src="${item.img}" class="w-16 h-16 rounded-lg object-cover" alt="${item.name}">
-                                    <div>
-                                        <h5 class="font-bold">${item.name}</h5>
-                                        <p class="text-gray-500 text-sm">${item.desc}</p>
-                                        <span class="text-orange-600 font-bold">$${item.price.toFixed(2)}</span>
-                                    </div>
-                                </div>
-                                <button onclick="addToCart(${item.id})" class="bg-orange-500 text-white w-10 h-10 rounded-full hover:bg-orange-600 transition flex items-center justify-center">
-                                    <i class="fa-solid fa-plus"></i>
-                                </button>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
+<!-- KICKI DROP STYLE TRACKING MODAL -->
+<div id="trackingModal" class="kicki-tracking-modal">
+  <div class="kicki-tracking-content">
+    <div class="kicki-tracking-header">
+      <div>
+        <h3 class="text-lg font-bold text-gray-800">Order Tracking</h3>
+        <p class="text-sm text-gray-500" id="trackingOrderId">#------</p>
+      </div>
+      <button onclick="closeTrackingModal()" class="kicki-close-btn"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <!-- Map -->
+    <div class="kicki-map-container">
+      <div id="trackingMap" style="height: 100%; width: 100%;"></div>
+    </div>
+    
+    <div class="kicki-tracking-body">
+      <!-- ETA Card -->
+      <div class="kicki-eta-card">
+        <div class="kicki-eta-time" id="kickiEtaTime">-- min</div>
+        <div class="kicki-eta-label">Estimated Delivery Time</div>
+      </div>
+      
+      <!-- Status Card -->
+      <div class="kicki-status-card">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Status</span>
+          <span id="kickiCurrentStatus" class="text-sm font-bold text-primary">Pending</span>
+        </div>
+        <p id="kickiStatusMessage" class="text-gray-800 font-semibold">Your order is being prepared</p>
+        <div class="kicki-progress-bar">
+          <div class="kicki-progress-fill" id="kickiProgressFill" style="width: 20%"></div>
+        </div>
+      </div>
+      
+      <!-- Timeline -->
+      <div class="kicki-status-card">
+        <h4 class="font-bold text-gray-800 mb-4">Order Progress</h4>
+        <div class="kicki-timeline" id="kickiTimeline"></div>
+      </div>
+      
+      <!-- Driver Card -->
+      <div class="kicki-driver-card" id="kickiDriverCard" style="display:none;">
+        <div class="kicki-driver-avatar">
+          <i class="fas fa-motorcycle"></i>
+        </div>
+        <div class="kicki-driver-info">
+          <p class="font-bold text-gray-800" id="kickiDriverName">Driver Name</p>
+          <p class="text-sm text-gray-500" id="kickiDriverPlate">Plate: ---</p>
+        </div>
+        <div class="kicki-driver-actions">
+          <button onclick="callDriver()" class="kicki-action-btn call"><i class="fas fa-phone"></i></button>
+          <button onclick="whatsappDriver()" class="kicki-action-btn message"><i class="fab fa-whatsapp"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-            navigateTo('menu');
-        }
+<!-- BILL MODAL -->
+<div id="billModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md max-h-screen overflow-y-auto">
+    <div class="text-center mb-6">
+      <h2 id="billRestaurantName" class="text-2xl font-bold text-primary">Go!Point</h2>
+      <p id="billRestaurantAddress" class="text-gray-600"></p>
+      <p id="billRestaurantPhone" class="text-gray-600"></p>
+      <div id="qrcode-container" class="my-4"></div>
+    </div>
+    <div class="border-t border-b border-gray-200 py-4 mb-6">
+      <div class="flex justify-between mb-2"><span>Order #<span id="billOrderNumber">000</span></span><span id="billDateTime"></span></div>
+      <div class="flex justify-between"><span id="billCustomerInfo"></span><span>(Delivery)</span></div>
+      <div id="billDeliveryInfo" class="mt-2 text-sm"></div>
+      <div id="billVehicleInfo" class="mt-2 text-sm"></div>
+    </div>
+    <div id="billItems" class="mb-6"></div>
+    <div class="border-t border-gray-200 pt-4 mb-6">
+      <div class="flex justify-between text-lg font-bold mb-2"><span>Total:</span><span id="billTotal">$0.00</span></div>
+    </div>
+    <div class="flex space-x-3 no-print">
+      <button onclick="printBill()" class="flex-1 glovo-button"><i class="fas fa-print mr-2"></i>Print</button>
+      <button onclick="closeBill()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg">Close</button>
+    </div>
+  </div>
+</div>
 
-        // --- Cart Logic ---
-        function addToCart(itemId) {
-            const item = currentRestaurant.menu.find(i => i.id === itemId);
-            const existing = cart.find(c => c.id === itemId);
-            if (existing) {
-                existing.qty++;
-            } else {
-                cart.push({ ...item, qty: 1 });
-            }
-            updateCartUI();
-            saveCart();
+</div>
 
-            // Toast notification
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all opacity-0 translate-y-10';
-            toast.innerText = `Added ${item.name} to cart!`;
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.classList.remove('opacity-0', 'translate-y-10'); }, 10);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-10');
-                setTimeout(() => toast.remove(), 300);
-            }, 2000);
-        }
+<script>
+// ============================================================
+// SUPABASE CONFIGURATION
+// ============================================================
+const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
 
-        function updateCartUI() {
-            const count = cart.reduce((sum, item) => sum + item.qty, 0);
-            document.getElementById('cart-count').innerText = count;
-        }
+let supabase = null;
+let useSupabase = false;
 
-        function removeFromCart(itemId) {
-            cart = cart.filter(i => i.id !== itemId);
-            renderCart();
-            updateCartUI();
-            saveCart();
-        }
+try {
+  if (SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL_HERE') {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    useSupabase = true;
+    updateSyncStatus(true, "Connected");
+  } else {
+    updateSyncStatus(false, "Local Mode");
+  }
+} catch (e) {
+  console.error('Supabase init error:', e);
+  updateSyncStatus(false, "Offline");
+}
 
-        function changeQty(itemId, delta) {
-            const item = cart.find(i => i.id === itemId);
-            if (item) {
-                item.qty += delta;
-                if (item.qty <= 0) removeFromCart(itemId);
-                else renderCart();
-            }
-            updateCartUI();
-            saveCart();
-        }
+function updateSyncStatus(online, text) {
+  const dot = document.getElementById('syncDot'), txt = document.getElementById('syncText');
+  if (dot && txt) { dot.className = online ? 'sync-dot' : 'sync-dot offline'; txt.textContent = text; }
+}
 
-        function renderCart() {
-            const container = document.getElementById('cart-items');
-            if (cart.length === 0) {
-                container.innerHTML = `
-                    <div class="p-12 text-center">
-                        <i class="fa-solid fa-cart-shopping text-5xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-500 text-lg">Your cart is empty!</p>
-                        <button onclick="navigateTo('browse')" class="mt-4 text-orange-500 font-bold hover:underline">Start Adding Food</button>
-                    </div>
-                `;
-                updateTotals(0);
-                document.getElementById('checkout-btn').disabled = true;
-                return;
-            }
+// ============================================================
+// STATE
+// ============================================================
+let currentView = 'customer', activeCategory = 'coffee';
+let cart = [], cartVisible = false;
+let dragState = { isDragging: false, offsetX: 0, offsetY: 0 };
+let deliveryInfo = {}, paymentInfo = {};
+let customerLocation = null; // Global customer location from permission screen
+let customerLocationName = '';
+let qrcode = null, selectedVehicleId = null;
+let currentBillOrder = null, currentRestaurant = null;
+let selectedPayment = 'telesom', explorerInitialized = false;
+let trackingMap = null, driverMarker = null, driverSimulationInterval = null;
+let currentTrackedOrder = null;
+let selectedDeliveryMethod = null;
 
-            document.getElementById('checkout-btn').disabled = false;
-            container.innerHTML = cart.map(item => `
-                <div class="p-4 flex items-center justify-between gap-4 bg-white">
-                    <div class="flex items-center gap-4">
-                        <img src="${item.img}" class="w-12 h-12 rounded-lg object-cover" alt="${item.name}">
-                        <div>
-                            <h5 class="font-bold">${item.name}</h5>
-                            <span class="text-orange-600 text-sm font-medium">$${item.price.toFixed(2)}</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
-                            <button onclick="changeQty(${item.id}, -1)" class="text-gray-600 hover:text-orange-500"><i class="fa-solid fa-minus text-xs"></i></button>
-                            <span class="text-sm font-bold w-6 text-center">${item.qty}</span>
-                            <button onclick="changeQty(${item.id}, 1)" class="text-gray-600 hover:text-orange-500"><i class="fa-solid fa-plus text-xs"></i></button>
-                        </div>
-                        <button onclick="removeFromCart(${item.id})" class="text-red-400 hover:text-red-600 px-2"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>
-            `).join('');
+let restaurants = {}, vehicles = [], orders = [];
+let settings = { system: { businessName: 'Go!Point', businessAddress: 'Hargeisa, Somaliland', businessPhone: '+252 61 XXX XXXX', businessEmail: 'info@gopoint.com' } };
 
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            updateTotals(subtotal);
-        }
+const restaurantImages = [
+  'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=350&fit=crop',
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&h=350&fit=crop',
+  'https://images.unsplash.com/photo-1550547660-d9450f859349?w=500&h=350&fit=crop',
+  'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=500&h=350&fit=crop',
+  'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&h=350&fit=crop',
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&h=350&fit=crop'
+];
 
-        function updateTotals(subtotal) {
-            const delivery = subtotal > 0 ? 5.00 : 0;
-            const total = subtotal + delivery;
-            document.getElementById('cart-subtotal').innerText = `$${subtotal.toFixed(2)}`;
-            document.getElementById('cart-delivery').innerText = `$${delivery.toFixed(2)}`;
-            document.getElementById('cart-total').innerText = `$${total.toFixed(2)}`;
-        }
+const defaultRestaurants = {
+  'damal-restaurant': {
+    name: 'Damal Restaurant', address: 'Downtown, Hargeisa', phone: '+252 61 1234567', email: 'info@damal.com',
+    logo: '', lat: 9.5600, lng: 44.0650, rating: 4.8, deliveryTime: '25 min', deliveryFee: '$2', cuisine: 'Mediterranean',
+    menu: {
+      coffee: [{ id: 1, name: 'Espresso', price: 3.50, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Rich & bold single shot' }, { id: 2, name: 'Cappuccino', price: 4.25, image: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=200&h=200&fit=crop', description: 'Espresso with steamed milk foam' }],
+      food: [{ id: 4, name: 'Signature Burger', price: 12.90, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop', description: 'Grilled beef, cheddar, fresh veggies' }, { id: 5, name: 'Truffle Pasta', price: 14.50, image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200&h=200&fit=crop', description: 'Creamy mushroom truffle sauce' }],
+      dessert: [{ id: 7, name: 'New York Cheesecake', price: 6.50, image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=200&h=200&fit=crop', description: 'Creamy classic cheesecake' }]
+    }
+  },
+  'hiddo-dhowr-pizza': {
+    name: 'Hiddo Dhowr Pizza', address: 'Main Street, Hargeisa', phone: '+252 61 2345678',
+    logo: '', lat: 9.5620, lng: 44.0680, rating: 4.9, deliveryTime: '20 min', deliveryFee: '$1.5', cuisine: 'Italian',
+    menu: {
+      coffee: [{ id: 10, name: 'Italian Espresso', price: 3.00, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Authentic Italian roast' }],
+      food: [{ id: 12, name: 'Margherita Pizza', price: 10.50, image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop', description: 'Classic tomato, mozzarella, basil' }, { id: 13, name: 'Pepperoni Pizza', price: 12.90, image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=200&h=200&fit=crop', description: 'Loaded with pepperoni' }],
+      dessert: [{ id: 15, name: 'Tiramisu', price: 7.25, image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=200&h=200&fit=crop', description: 'Classic Italian dessert' }]
+    }
+  },
+  'burger-house': {
+    name: 'Burger House', address: 'Central Market, Hargeisa', phone: '+252 61 3456789',
+    logo: '', lat: 9.5580, lng: 44.0620, rating: 4.7, deliveryTime: '18 min', deliveryFee: '$2', cuisine: 'American',
+    menu: {
+      coffee: [{ id: 17, name: 'Americano', price: 3.75, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Espresso with hot water' }],
+      food: [{ id: 18, name: 'Classic Burger', price: 9.90, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop', description: 'Beef patty, lettuce, tomato' }, { id: 19, name: 'Double Cheese Burger', price: 13.50, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=200&h=200&fit=crop', description: 'Double patty with extra cheese' }],
+      dessert: [{ id: 21, name: 'Milkshake', price: 5.50, image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=200&h=200&fit=crop', description: 'Vanilla, chocolate, or strawberry' }]
+    }
+  },
+  'som-coffee': {
+    name: 'Som Coffee', address: 'University Road, Hargeisa', phone: '+252 61 4567890',
+    logo: '', lat: 9.5640, lng: 44.0700, rating: 4.9, deliveryTime: '15 min', deliveryFee: '$1', cuisine: 'Cafe',
+    menu: {
+      coffee: [{ id: 22, name: 'Somali Spiced Coffee', price: 4.00, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Traditional cardamom & clove' }, { id: 23, name: 'Iced Latte', price: 4.50, image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', description: 'Cold espresso with milk' }],
+      food: [{ id: 25, name: 'Croissant', price: 3.25, image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200&h=200&fit=crop', description: 'Buttery French pastry' }],
+      dessert: [{ id: 27, name: 'Baklava', price: 4.50, image: 'https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=200&h=200&fit=crop', description: 'Layers of filo with nuts & honey' }]
+    }
+  }
+};
 
-        // --- Checkout Process ---
-        function processPayment() {
-            const btn = document.querySelector('#page-checkout button');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Processing...`;
+const defaultVehicles = [
+  { type: 'bike', plateNumber: 'B1234', driverName: 'Ahmed Ali', driverPhone: '+252631112222', status: 'available', lat: 9.5650, lng: 44.0700 },
+  { type: 'taxi', plateNumber: 'T5678', driverName: 'Mohamed Hassan', driverPhone: '+252653334444', status: 'available', lat: 9.5550, lng: 44.0550 },
+  { type: 'bike', plateNumber: 'B9012', driverName: 'Abdi Karim', driverPhone: '+252635556666', status: 'delivering', lat: 9.5700, lng: 44.0600 },
+  { type: 'taxi', plateNumber: 'T2468', driverName: 'Fatima Omar', driverPhone: '+252657778888', status: 'available', lat: 9.5610, lng: 44.0660 }
+];
 
-            setTimeout(() => {
-                cart = [];
-                updateCartUI();
-                saveCart();
-                navigateTo('success');
-            }, 2000);
-        }
+// ============================================================
+// LOCATION PERMISSION
+// ============================================================
+async function requestLocationPermission() {
+  const btn = document.getElementById('allowLocationBtn');
+  const btnText = document.getElementById('locationBtnText');
+  const errorDiv = document.getElementById('locationError');
+  const errorText = document.getElementById('locationErrorText');
+  
+  btn.disabled = true;
+  btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Requesting...';
+  errorDiv.classList.remove('show');
+  
+  if (!navigator.geolocation) {
+    errorText.textContent = 'Geolocation is not supported by your browser. Please use a modern browser with location support.';
+    errorDiv.classList.add('show');
+    btn.disabled = false;
+    btnText.innerHTML = '<i class="fas fa-location-crosshairs"></i> Try Again';
+    return;
+  }
+  
+  navigator.geolocation.getCurrentPosition(async (position) => {
+    customerLocation = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude
+    };
+    
+    // Reverse geocode to get area name
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${customerLocation.lat}&lon=${customerLocation.lng}&addressdetails=1`);
+      const data = await res.json();
+      customerLocationName = data.address?.suburb || data.address?.neighbourhood || data.address?.city || data.address?.county || 'Your Location';
+    } catch (e) {
+      customerLocationName = `${customerLocation.lat.toFixed(4)}, ${customerLocation.lng.toFixed(4)}`;
+    }
+    
+    // Hide permission screen and show app
+    document.getElementById('locationPermissionScreen').classList.add('hidden');
+    document.getElementById('app').style.display = 'block';
+    initApp();
+    
+  }, (error) => {
+    let msg = '';
+    switch(error.code) {
+      case error.PERMISSION_DENIED:
+        msg = 'Location permission was denied. Go!Point requires location access to function. Please enable it in your browser settings and reload.';
+        break;
+      case error.POSITION_UNAVAILABLE:
+        msg = 'Location information is unavailable. Please try again.';
+        break;
+      case error.TIMEOUT:
+        msg = 'Location request timed out. Please try again.';
+        break;
+      default:
+        msg = 'An unknown error occurred. Please try again.';
+    }
+    errorText.textContent = msg;
+    errorDiv.classList.add('show');
+    btn.disabled = false;
+    btnText.innerHTML = '<i class="fas fa-location-crosshairs"></i> Try Again';
+  }, { 
+    enableHighAccuracy: true, 
+    timeout: 15000, 
+    maximumAge: 0 
+  });
+}
 
-        // --- Admin Logic ---
-        function renderAdmin() {
-            const container = document.getElementById('admin-restaurant-table');
-            container.innerHTML = restaurants.map(res => `
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="px-6 py-4 font-medium">${res.name}</td>
-                    <td class="px-6 py-4 text-gray-600">${res.cuisine}</td>
-                    <td class="px-6 py-4">★ ${res.rating}</td>
-                    <td class="px-6 py-4">
-                        <button onclick="deleteRestaurant(${res.id})" class="text-red-500 hover:text-red-700">
-                            <i class="fa-solid fa-trash"></i> Delete
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+// ============================================================
+// SUPABASE DATABASE LAYER
+// ============================================================
+async function setupRealtimeListeners() {
+  if (!useSupabase) { 
+    loadFromLocalStorage(); 
+    return; 
+  }
+  
+  // Initial load
+  await loadFromSupabase();
+  
+  // Realtime subscriptions
+  supabase
+    .channel('orders-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+      loadFromSupabase();
+    })
+    .subscribe();
+    
+  supabase
+    .channel('vehicles-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
+      loadFromSupabase();
+    })
+    .subscribe();
+    
+  supabase
+    .channel('restaurants-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'restaurants' }, () => {
+      loadFromSupabase();
+    })
+    .subscribe();
+    
+  supabase
+    .channel('settings-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'settings' }, () => {
+      loadFromSupabase();
+    })
+    .subscribe();
+}
 
-        function openAddRestaurantModal() {
-            document.getElementById('modal-add-restaurant').classList.remove('hidden');
-        }
+async function loadFromSupabase() {
+  try {
+    // Load restaurants
+    const { data: restData } = await supabase.from('restaurants').select('*');
+    if (restData) {
+      restaurants = {};
+      restData.forEach(r => { restaurants[r.id] = r; });
+    }
+    
+    // Load vehicles
+    const { data: vehData } = await supabase.from('vehicles').select('*');
+    if (vehData) vehicles = vehData;
+    
+    // Load orders
+    const { data: orderData } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+    if (orderData) {
+      orders = orderData.map(o => ({
+        ...o,
+        id: o.id,
+        timestamp: new Date(o.created_at),
+        statusHistory: o.status_history || []
+      }));
+    }
+    
+    // Load settings
+    const { data: setData } = await supabase.from('settings').select('*').eq('id', 'app').single();
+    if (setData && setData.system) settings = setData;
+    
+    renderHomepageRestaurants();
+    renderExplorerRestaurants();
+    renderVehicles();
+    renderOrders();
+    updateStats();
+    loadSettingsToUI();
+    updateTrackButtonVisibility();
+  } catch (e) {
+    console.error('Error loading from Supabase:', e);
+  }
+}
 
-        function closeAddRestaurantModal() {
-            document.getElementById('modal-add-restaurant').classList.add('hidden');
-        }
+async function seedDefaultData() {
+  if (!useSupabase) return;
+  
+  try {
+    // Check if restaurants exist
+    const { data: existingRest } = await supabase.from('restaurants').select('id');
+    if (!existingRest || existingRest.length === 0) {
+      const inserts = Object.entries(defaultRestaurants).map(([id, data]) => ({ id, ...data }));
+      await supabase.from('restaurants').insert(inserts);
+    }
+    
+    // Check if vehicles exist
+    const { data: existingVeh } = await supabase.from('vehicles').select('id');
+    if (!existingVeh || existingVeh.length === 0) {
+      await supabase.from('vehicles').insert(defaultVehicles);
+    }
+    
+    // Check if settings exist
+    const { data: existingSet } = await supabase.from('settings').select('id').eq('id', 'app');
+    if (!existingSet || existingSet.length === 0) {
+      await supabase.from('settings').insert({ id: 'app', system: settings.system });
+    }
+  } catch (e) {
+    console.error('Seed error:', e);
+  }
+}
 
-        function saveRestaurant() {
-            const name = document.getElementById('new-res-name').value;
-            const cuisine = document.getElementById('new-res-cuisine').value;
-            const image = document.getElementById('new-res-image').value.trim() || 'https://images.unsplash.com/photo-151432776755-7eb9373705a1?auto=format&fit=crop&w=400&q=80';
+function loadFromLocalStorage() {
+  const sr = localStorage.getItem('gopoint_restaurants');
+  restaurants = sr ? JSON.parse(sr) : { ...defaultRestaurants };
+  const sv = localStorage.getItem('gopoint_vehicles');
+  vehicles = sv ? JSON.parse(sv) : defaultVehicles.map((v, i) => ({ ...v, id: String(i + 1) }));
+  const so = localStorage.getItem('gopoint_orders');
+  orders = so ? JSON.parse(so).map(o => ({ ...o, timestamp: new Date(o.timestamp) })) : [];
+  const ss = localStorage.getItem('gopointSettings');
+  if (ss) settings = JSON.parse(ss);
+  renderHomepageRestaurants(); renderExplorerRestaurants(); renderVehicles(); renderOrders(); updateStats(); loadSettingsToUI(); updateTrackButtonVisibility();
+}
 
-            if (!name || !cuisine) return alert('Please fill in all required fields');
+function saveLocalData() {
+  if (useSupabase) return;
+  localStorage.setItem('gopoint_restaurants', JSON.stringify(restaurants));
+  localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles));
+  localStorage.setItem('gopoint_orders', JSON.stringify(orders));
+  localStorage.setItem('gopointSettings', JSON.stringify(settings));
+}
 
-            const newRes = {
-                id: Date.now(),
-                name,
-                cuisine,
-                image,
-                rating: 5.0,
-                featured: false,
-                menu: []
-            };
+async function addOrderToDB(orderData) {
+  if (useSupabase) {
+    const { data, error } = await supabase.from('orders').insert({
+      type: orderData.type,
+      customer: orderData.customer,
+      payment: orderData.payment,
+      items: orderData.items,
+      total: orderData.total,
+      status: orderData.status,
+      coordinates: orderData.coordinates,
+      restaurant: orderData.restaurant,
+      vehicle: orderData.vehicle,
+      status_history: orderData.statusHistory || [{ status: 'pending', time: new Date().toISOString() }]
+    }).select().single();
+    
+    if (error) { console.error(error); return null; }
+    await loadFromSupabase();
+    return data.id;
+  } else {
+    const id = String(Date.now());
+    orders.push({ ...orderData, id, timestamp: new Date() });
+    saveLocalData(); renderOrders(); updateStats(); updateTrackButtonVisibility();
+    return id;
+  }
+}
 
-            restaurants.push(newRes);
-            renderAdmin();
-            closeAddRestaurantModal();
+async function updateOrderInDB(orderId, updates) {
+  if (useSupabase) {
+    const dbUpdates = {};
+    if (updates.status) dbUpdates.status = updates.status;
+    if (updates.statusHistory) dbUpdates.status_history = updates.statusHistory;
+    
+    await supabase.from('orders').update(dbUpdates).eq('id', orderId);
+    await loadFromSupabase();
+  } else {
+    const idx = orders.findIndex(o => o.id === orderId);
+    if (idx !== -1) {
+      orders[idx] = { ...orders[idx], ...updates };
+      saveLocalData(); renderOrders(); updateStats(); updateTrackButtonVisibility();
+    }
+  }
+}
 
-            // Clear inputs
-            document.getElementById('new-res-name').value = '';
-            document.getElementById('new-res-cuisine').value = '';
-            document.getElementById('new-res-image').value = '';
-        }
+async function addVehicleToDB(vd) {
+  if (useSupabase) {
+    await supabase.from('vehicles').insert(vd);
+    await loadFromSupabase();
+  } else {
+    vd.id = String(Date.now());
+    vehicles.push(vd);
+    saveLocalData(); renderVehicles();
+  }
+}
 
-        function deleteRestaurant(id) {
-            if (confirm('Are you sure you want to delete this restaurant?')) {
-                restaurants = restaurants.filter(r => r.id !== id);
-                renderAdmin();
-            }
-        }
+async function updateVehicleInDB(vid, updates) {
+  if (useSupabase) {
+    await supabase.from('vehicles').update(updates).eq('id', vid);
+    await loadFromSupabase();
+  } else {
+    const idx = vehicles.findIndex(v => v.id == vid);
+    if (idx !== -1) {
+      vehicles[idx] = { ...vehicles[idx], ...updates };
+      saveLocalData(); renderVehicles();
+    }
+  }
+}
 
-        // Init
-        window.onload = () => {
-            loadCart();
-            renderHome();
-            updateCartUI();
-        };
-    </script>
+async function addRestaurantToDB(key, data) {
+  if (useSupabase) {
+    await supabase.from('restaurants').insert({ id: key, ...data });
+    await loadFromSupabase();
+  } else {
+    restaurants[key] = data;
+    saveLocalData(); renderHomepageRestaurants(); renderExplorerRestaurants();
+  }
+}
+
+async function saveSettingsToDB() {
+  if (useSupabase) {
+    await supabase.from('settings').upsert({ id: 'app', system: settings.system });
+    await loadFromSupabase();
+  } else {
+    saveLocalData();
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function initApp() {
+  setupEventListeners();
+  makeCartDraggable();
+  initPaymentSection();
+  
+  if (useSupabase) {
+    seedDefaultData().then(() => setupRealtimeListeners());
+  } else {
+    setupRealtimeListeners();
+    document.getElementById('supabaseSetupBanner').classList.remove('hidden');
+  }
+}
+
+function initPaymentSection() {
+  document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+  document.querySelector('.payment-option[data-value="telesom"]').classList.add('selected');
+  selectedPayment = 'telesom';
+  document.getElementById('paymentMethod').value = selectedPayment;
+  phonePrefix.textContent = '+252 63';
+  paymentPhoneContainer.style.display = 'block';
+  if (phoneInput) phoneInput.value = '';
+  clearPhoneError();
+  const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+  document.getElementById('paymentTotal').textContent = `$${total.toFixed(2)}`;
+}
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+const phonePrefix = document.getElementById('phonePrefix');
+const phoneInput = document.getElementById('paymentPhone');
+const phoneInputWrapper = document.getElementById('phoneInputWrapper');
+const phoneError = document.getElementById('phoneError');
+const paymentPhoneContainer = document.getElementById('paymentPhoneContainer');
+
+function setupEventListeners() {
+  document.getElementById('showRegisterOptionsBtn').addEventListener('click', showManagementLoginForm);
+  document.getElementById('openSettingsBtn').addEventListener('click', openSettingsModal);
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+  document.getElementById('managementLoginForm').addEventListener('submit', e => { e.preventDefault(); login(); });
+  document.getElementById('vehicleRegistrationForm').addEventListener('submit', e => { e.preventDefault(); registerVehicle(); });
+  document.getElementById('restaurantRegistrationForm').addEventListener('submit', e => { e.preventDefault(); registerRestaurant(e); });
+  document.getElementById('homeSearchBtn').addEventListener('click', e => { e.preventDefault(); showRestaurantExplorer(); });
+  document.getElementById('homeSearchInput').addEventListener('keypress', e => { if (e.key === 'Enter') showRestaurantExplorer(); });
+  document.getElementById('backToHomepageBtn').addEventListener('click', backToHomepage);
+  document.getElementById('backToExplorerRestaurantsBtn').addEventListener('click', () => {
+    document.getElementById('explorerMenuView').classList.add('hidden');
+    document.getElementById('explorerRestaurantView').classList.remove('hidden');
+    currentRestaurant = null;
+  });
+  document.querySelectorAll('.payment-option').forEach(opt => opt.addEventListener('click', () => handlePaymentSelection(opt)));
+  document.querySelectorAll('.explorer-cat-btn').forEach(btn => btn.addEventListener('click', () => setExplorerCategory(btn.getAttribute('data-category'))));
+  if (phoneInput) phoneInput.addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7); clearPhoneError(); });
+}
+
+// ============================================================
+// RENDERING
+// ============================================================
+function renderStars(rating) {
+  if (!rating) return '⭐⭐⭐⭐';
+  let s = '⭐'.repeat(Math.floor(rating));
+  return s || '⭐⭐⭐';
+}
+
+function renderHomepageRestaurants() {
+  const c = document.getElementById('popularRestaurantsList'); c.innerHTML = '';
+  Object.keys(restaurants).forEach((k, i) => {
+    const r = restaurants[k], img = restaurantImages[i % restaurantImages.length];
+    const card = document.createElement('div'); card.className = 'card';
+    card.innerHTML = `<img src="${img}" alt="${r.name}"><div class="card-content"><h3>${r.name}</h3><div class="rating">${renderStars(r.rating)} <span class="text-gray-500 text-xs ml-1">(${r.rating || '4.5'})</span></div><div class="info"><span><i class="far fa-clock mr-1"></i>${r.deliveryTime || '20 min'}</span><span><i class="fas fa-motorcycle mr-1"></i>${r.deliveryFee || '$2'}</span></div><button class="order-btn">Order Now</button></div>`;
+    card.querySelector('.order-btn').addEventListener('click', e => { e.stopPropagation(); showRestaurantExplorer(); setTimeout(() => openRestaurantMenu(k), 200); });
+    card.addEventListener('click', () => { showRestaurantExplorer(); setTimeout(() => openRestaurantMenu(k), 200); });
+    c.appendChild(card);
+  });
+}
+
+function renderExplorerRestaurants() {
+  const list = document.getElementById('explorerRestaurantList'); list.innerHTML = '';
+  Object.keys(restaurants).forEach((k, i) => {
+    const r = restaurants[k], img = restaurantImages[i % restaurantImages.length];
+    const card = document.createElement('div');
+    card.className = 'bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer border border-gray-100';
+    card.innerHTML = `<div class="h-44 overflow-hidden"><img src="${img}" class="w-full h-full object-cover hover:scale-105 transition"></div><div class="p-5"><h3 class="text-xl font-bold">${r.name}</h3><div class="flex items-center my-2"><span class="text-amber-500 text-sm">${renderStars(r.rating)}</span><span class="text-gray-500 text-xs ml-2">(${r.rating || '4.5'})</span></div><div class="flex justify-between text-gray-500 text-sm mb-4"><span><i class="far fa-clock mr-1"></i>${r.deliveryTime || '20 min'}</span><span><i class="fas fa-motorcycle mr-1"></i>${r.deliveryFee || '$2'}</span></div><button class="select-restaurant-btn w-full bg-amber-500 text-white font-semibold py-2 rounded-xl hover:bg-amber-600">Select →</button></div>`;
+    card.querySelector('.select-restaurant-btn').addEventListener('click', e => { e.stopPropagation(); openRestaurantMenu(k); });
+    card.addEventListener('click', () => openRestaurantMenu(k));
+    list.appendChild(card);
+  });
+}
+
+function showRestaurantExplorer() {
+  if (!explorerInitialized) { renderExplorerRestaurants(); explorerInitialized = true; }
+  document.getElementById('homepageContainer').style.display = 'none';
+  document.getElementById('restaurantExplorerContainer').style.display = 'block';
+  document.getElementById('explorerMenuView').classList.add('hidden');
+  document.getElementById('explorerRestaurantView').classList.remove('hidden');
+  window.scrollTo({ top: 0 });
+}
+
+function backToHomepage() {
+  document.getElementById('restaurantExplorerContainer').style.display = 'none';
+  document.getElementById('homepageContainer').style.display = 'block';
+  window.scrollTo({ top: 0 });
+}
+
+function openRestaurantMenu(key) {
+  if (!restaurants[key]) return;
+  currentRestaurant = key;
+  document.getElementById('selectedRestaurantNameExplorer').innerText = restaurants[key].name;
+  activeCategory = 'coffee';
+  updateExplorerCategoryUI();
+  renderExplorerMenuItems();
+  document.getElementById('explorerRestaurantView').classList.add('hidden');
+  document.getElementById('explorerMenuView').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderExplorerMenuItems() {
+  if (!currentRestaurant || !restaurants[currentRestaurant]) return;
+  const items = restaurants[currentRestaurant].menu[activeCategory] || [];
+  const div = document.getElementById('explorerMenuItems');
+  if (!items.length) { div.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-2xl"><i class="fas fa-mug-hot text-5xl text-gray-300"></i><p class="text-gray-500 mt-2">No items.</p></div>`; return; }
+  div.innerHTML = items.map(item => `
+    <div class="bg-white rounded-2xl shadow-sm border flex flex-col md:flex-row overflow-hidden hover:shadow-md transition">
+      <div class="md:w-1/3 h-36 md:h-auto"><img src="${item.image}" class="w-full h-full object-cover"></div>
+      <div class="p-5 flex-1"><h4 class="font-bold">${item.name}</h4><p class="text-gray-500 text-sm line-clamp-2">${item.description || ''}</p><div class="mt-2 text-green-600 font-bold text-xl">$${item.price.toFixed(2)}</div><button onclick="addToCart(${item.id})" class="mt-3 bg-green-50 hover:bg-green-500 hover:text-white text-green-700 font-medium py-2 rounded-xl w-full transition">➕ Add to Cart</button></div>
+    </div>`).join('');
+}
+
+function setExplorerCategory(cat) { activeCategory = cat; updateExplorerCategoryUI(); renderExplorerMenuItems(); }
+function updateExplorerCategoryUI() {
+  document.querySelectorAll('.explorer-cat-btn').forEach(btn => {
+    const cat = btn.getAttribute('data-category');
+    if (cat === activeCategory) { btn.classList.add('bg-amber-500', 'text-white', 'shadow-md'); btn.classList.remove('bg-white', 'text-gray-700'); }
+    else { btn.classList.remove('bg-amber-500', 'text-white', 'shadow-md'); btn.classList.add('bg-white', 'text-gray-700'); }
+  });
+}
+
+// ============================================================
+// CART
+// ============================================================
+function addToCart(itemId) {
+  let item = null;
+  if (currentRestaurant && restaurants[currentRestaurant]) {
+    const menu = restaurants[currentRestaurant].menu;
+    for (const cat in menu) { const f = menu[cat].find(i => i.id === itemId); if (f) { item = f; break; } }
+  }
+  if (!item) return;
+  const ex = cart.find(c => c.id === itemId);
+  if (ex) ex.quantity += 1; else cart.push({ ...item, quantity: 1 });
+  updateCart();
+  showNotification(`✓ Added to cart`, 'success');
+}
+
+function removeFromCart(itemId) {
+  const ex = cart.find(c => c.id === itemId);
+  if (ex && ex.quantity > 1) ex.quantity -= 1; else cart = cart.filter(c => c.id !== itemId);
+  updateCart();
+}
+
+function updateCart() {
+  const total = cart.reduce((s, i) => s + i.quantity, 0);
+  document.getElementById('cartCount').textContent = total;
+  document.getElementById('cartCount').classList.toggle('hidden', total === 0);
+  const itemsDiv = document.getElementById('cartItems'), summary = document.getElementById('cartSummary');
+  if (!cart.length) {
+    itemsDiv.innerHTML = '<div class="text-center py-6 text-gray-500"><i class="fas fa-coffee text-3xl mb-2"></i><p>Your cart is empty</p></div>';
+    summary.classList.add('hidden'); return;
+  }
+  itemsDiv.innerHTML = '';
+  cart.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'flex items-center justify-between p-2 bg-gray-50 rounded-lg';
+    el.innerHTML = `<div class="flex-1"><h4 class="font-semibold text-sm">${item.name}</h4><p class="text-primary font-medium text-sm">$${(item.price * item.quantity).toFixed(2)}</p></div><div class="flex items-center space-x-1"><button onclick="removeFromCart(${item.id})" class="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200"><i class="fas fa-minus text-xs"></i></button><span class="font-semibold w-6 text-center text-sm">${item.quantity}</span><button onclick="addToCart(${item.id})" class="p-1 rounded-full bg-green-100 text-green-600 hover:bg-green-200"><i class="fas fa-plus text-xs"></i></button></div>`;
+    itemsDiv.appendChild(el);
+  });
+  const t = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+  document.getElementById('totalPrice').textContent = `$${t.toFixed(2)}`;
+  document.getElementById('paymentTotal').textContent = `$${t.toFixed(2)}`;
+  summary.classList.remove('hidden');
+}
+
+function toggleCart() { cartVisible = !cartVisible; document.getElementById('cartWindow').classList.toggle('visible', cartVisible); }
+
+function makeCartDraggable() {
+  const header = document.querySelector('.cart-header');
+  const win = document.getElementById('cartWindow');
+  header.addEventListener('mousedown', e => {
+    dragState.isDragging = true;
+    const r = win.getBoundingClientRect();
+    dragState.offsetX = e.clientX - r.left; dragState.offsetY = e.clientY - r.top;
+  });
+  document.addEventListener('mousemove', e => {
+    if (dragState.isDragging) {
+      win.style.left = Math.max(0, Math.min(e.clientX - dragState.offsetX, window.innerWidth - win.offsetWidth)) + 'px';
+      win.style.top = Math.max(0, Math.min(e.clientY - dragState.offsetY, window.innerHeight - win.offsetHeight)) + 'px';
+      win.style.bottom = 'auto'; win.style.right = 'auto';
+    }
+  });
+  document.addEventListener('mouseup', () => dragState.isDragging = false);
+}
+
+// ============================================================
+// CHECKOUT (Replaces Delivery Form)
+// ============================================================
+function openCheckout() {
+  if (!cart.length) { showNotification('Please add items', 'error'); return; }
+  
+  document.getElementById('cartWindow').classList.remove('visible');
+  cartVisible = false;
+  
+  // Update checkout summary
+  const itemCount = cart.reduce((s, i) => s + i.quantity, 0);
+  const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+  document.getElementById('checkoutItemCount').textContent = `${itemCount} item${itemCount > 1 ? 's' : ''}`;
+  document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
+  
+  // Display customer location
+  document.getElementById('customerLocationDisplay').textContent = customerLocationName || 'Your Location';
+  if (customerLocation) {
+    document.getElementById('customerCoordsDisplay').textContent = `${customerLocation.lat.toFixed(4)}°N, ${customerLocation.lng.toFixed(4)}°E`;
+  }
+  
+  // Reset delivery method
+  selectedDeliveryMethod = null;
+  document.getElementById('bikeOption').classList.remove('selected');
+  document.getElementById('taxiOption').classList.remove('selected');
+  document.getElementById('deliveryMethod').value = '';
+  document.getElementById('vehicleSelectionContainer').classList.add('hidden');
+  selectedVehicleId = null;
+  
+  // Show modal
+  document.getElementById('checkoutModal').classList.add('active');
+}
+
+function closeCheckout() {
+  document.getElementById('checkoutModal').classList.remove('active');
+  document.getElementById('cartWindow').classList.add('visible');
+  cartVisible = true;
+}
+
+function selectDeliveryMethod(method) {
+  selectedDeliveryMethod = method;
+  document.getElementById('deliveryMethod').value = method;
+  document.getElementById('bikeOption').classList.toggle('selected', method === 'bike');
+  document.getElementById('taxiOption').classList.toggle('selected', method === 'taxi');
+  
+  // Find nearest available vehicle
+  const rest = restaurants[currentRestaurant];
+  const restLat = rest?.lat || 9.56, restLng = rest?.lng || 44.06;
+  const nearest = getClosestVehicleOfType(method, restLat, restLng);
+  
+  const container = document.getElementById('vehicleSelectionContainer');
+  const display = document.getElementById('assignedVehicleDisplay');
+  const input = document.getElementById('selectedVehicleId');
+  container.classList.remove('hidden');
+  
+  if (nearest) {
+    selectedVehicleId = nearest.id;
+    input.value = nearest.id;
+    const dist = calculateDistance(restLat, restLng, nearest.lat, nearest.lng).toFixed(1);
+    display.innerHTML = `<div class="flex items-center"><div class="bg-green-100 p-3 rounded-lg mr-4"><i class="fas fa-${method === 'bike' ? 'motorcycle' : 'car'} text-xl text-primary"></i></div><div class="flex-1"><div class="font-semibold">${nearest.driverName}</div><div class="text-sm text-gray-600">Plate: ${nearest.plateNumber}</div><div class="text-xs text-gray-500"><i class="fas fa-location-arrow mr-1"></i>${dist} km from restaurant</div></div><div class="vehicle-available px-3 py-1 rounded-full text-xs font-semibold">Assigned</div></div>`;
+  } else {
+    input.value = '';
+    display.innerHTML = `<div class="text-center py-4 text-red-500"><i class="fas fa-exclamation-circle text-2xl mb-2"></i><p class="text-sm font-semibold">No ${method === 'bike' ? 'motorcycles' : 'taxis'} available right now</p><p class="text-xs mt-1">Please try the other option or wait</p></div>`;
+  }
+}
+
+function proceedToPayment() {
+  const name = document.getElementById('checkoutName').value.trim();
+  const phone = document.getElementById('checkoutPhone').value.trim();
+  const address = document.getElementById('checkoutAddress').value.trim();
+  const method = document.getElementById('deliveryMethod').value;
+  const vehId = document.getElementById('selectedVehicleId').value;
+  
+  if (!name || !phone || !address) { showNotification('Please fill all fields', 'error'); return; }
+  if (!method) { showNotification('Please select delivery method', 'error'); return; }
+  if (!vehId) { showNotification('No vehicle available for selected method', 'error'); return; }
+  
+  deliveryInfo = { name, phone, area: customerLocationName, address, method, vehicleId: vehId };
+  
+  document.getElementById('checkoutModal').classList.remove('active');
+  document.getElementById('paymentForm').classList.remove('hidden');
+  initPaymentSection();
+}
+
+function backToCheckout() {
+  document.getElementById('paymentForm').classList.add('hidden');
+  document.getElementById('checkoutModal').classList.add('active');
+}
+
+async function submitDeliveryOrder() {
+  const paymentMethod = document.getElementById('paymentMethod').value;
+  const paymentPhone = document.getElementById('paymentPhone').value.trim();
+  if (paymentMethod !== 'cash' && (!paymentPhone || !validatePhone(paymentPhone))) {
+    showPhoneError(); showNotification('Valid 7-digit phone required', 'error'); return;
+  }
+  
+  paymentInfo = { method: paymentMethod, phone: paymentMethod === 'cash' ? '' : `+252 ${document.querySelector('.payment-option.selected').dataset.prefix}${paymentPhone}` };
+  const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+  const vehicle = vehicles.find(v => v.id == deliveryInfo.vehicleId);
+  
+  const orderData = {
+    type: 'delivery', customer: deliveryInfo, payment: paymentInfo, items: [...cart], total,
+    status: 'pending',
+    coordinates: customerLocation || { lat: 9.56, lng: 44.065 },
+    restaurant: currentRestaurant,
+    vehicle: vehicle ? { id: vehicle.id, ...vehicle } : null,
+    statusHistory: [{ status: 'pending', time: new Date().toISOString() }]
+  };
+  
+  const orderId = await addOrderToDB(orderData);
+  if (vehicle) await updateVehicleInDB(vehicle.id, { status: 'delivering' });
+  
+  cart = []; updateCart();
+  document.getElementById('checkoutForm').reset();
+  document.getElementById('paymentPhone').value = '';
+  document.getElementById('selectedVehicleId').value = '';
+  document.getElementById('paymentForm').classList.add('hidden');
+  
+  showNotification(`🎉 Order placed! Track it live.`, 'success');
+  
+  setTimeout(() => {
+    currentTrackedOrder = orderId;
+    openTrackingModal();
+  }, 1500);
+}
+
+function handlePaymentSelection(opt) {
+  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+  opt.classList.add('selected');
+  selectedPayment = opt.dataset.value;
+  document.getElementById('paymentMethod').value = selectedPayment;
+  if (selectedPayment === 'cash') { paymentPhoneContainer.style.display = 'none'; document.getElementById('paymentPhone').required = false; }
+  else { paymentPhoneContainer.style.display = 'block'; document.getElementById('paymentPhone').required = true; phonePrefix.textContent = `+252 ${opt.dataset.prefix}`; }
+  clearPhoneError(); if (phoneInput) phoneInput.value = '';
+}
+
+function validatePhone(p) { return /^\d{7}$/.test(p); }
+function showPhoneError() { phoneError.classList.remove('hidden'); phoneInputWrapper.style.borderColor = '#ef4444'; }
+function clearPhoneError() { phoneError.classList.add('hidden'); phoneInputWrapper.style.borderColor = ''; }
+
+// ============================================================
+// MANAGEMENT
+// ============================================================
+function showManagementLoginForm() { document.getElementById('loginForm').classList.remove('hidden'); }
+function closeLoginForm() { document.getElementById('loginForm').classList.add('hidden'); }
+
+function login() {
+  const u = document.getElementById('username').value, p = document.getElementById('password').value;
+  if (u === 'admin' && p === 'admin123') {
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('homepageContainer').style.display = 'none';
+    document.getElementById('restaurantExplorerContainer').style.display = 'none';
+    document.getElementById('managementView').classList.remove('hidden');
+    currentView = 'management';
+    document.getElementById('managementLoginForm').reset();
+  } else showNotification('Invalid credentials', 'error');
+}
+
+function logout() {
+  document.getElementById('managementView').classList.add('hidden');
+  document.getElementById('homepageContainer').style.display = 'block';
+  currentView = 'customer';
+}
+
+function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); loadSettingsToUI(); }
+function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
+
+function showSettingsTab(name) {
+  document.querySelectorAll('.settings-tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.settings-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(name + 'Tab').classList.add('active');
+  const btn = document.getElementById('tab' + name.charAt(0).toUpperCase() + name.slice(1));
+  if (btn) btn.classList.add('active');
+}
+
+function loadSettingsToUI() {
+  if (settings.system) {
+    document.getElementById('businessName').value = settings.system.businessName || 'Go!Point';
+    document.getElementById('businessAddress').value = settings.system.businessAddress || '';
+    document.getElementById('businessPhone').value = settings.system.businessPhone || '';
+    document.getElementById('businessEmail').value = settings.system.businessEmail || '';
+    document.getElementById('mainTitle').textContent = settings.system.businessName || 'Go!Point';
+  }
+}
+
+function saveSystemSettings() {
+  const n = document.getElementById('businessName').value.trim();
+  const a = document.getElementById('businessAddress').value.trim();
+  const p = document.getElementById('businessPhone').value.trim();
+  const e = document.getElementById('businessEmail').value.trim();
+  if (!n || !a || !p || !e) { showNotification('Fill all fields', 'error'); return; }
+  settings.system = { businessName: n, businessAddress: a, businessPhone: p, businessEmail: e };
+  saveSettingsToDB().then(() => { document.getElementById('mainTitle').textContent = n; showNotification('Settings saved!', 'success'); });
+}
+
+async function registerVehicle() {
+  const t = document.getElementById('vehicleType').value;
+  const pl = document.getElementById('plateNumber').value.trim();
+  const d = document.getElementById('driverName').value.trim();
+  const ph = document.getElementById('driverPhone').value.trim().replace(/\D/g, '');
+  if (!t || !pl || !d || !ph) { showNotification('Fill all fields', 'error'); return; }
+  const fmt = ph.startsWith('252') ? '+' + ph : '+252' + ph;
+  await addVehicleToDB({ type: t, plateNumber: pl, driverName: d, driverPhone: fmt, status: 'available', lat: 9.56 + (Math.random() - 0.5) * 0.02, lng: 44.06 + (Math.random() - 0.5) * 0.02 });
+  document.getElementById('vehicleRegistrationForm').reset();
+  showNotification('Vehicle registered!', 'success');
+}
+
+async function registerRestaurant(e) {
+  e.preventDefault();
+  const name = document.getElementById('newRestaurantName').value.trim();
+  const addr = document.getElementById('newRestaurantAddress').value.trim();
+  const lat = parseFloat(document.getElementById('newRestaurantLat').value);
+  const lng = parseFloat(document.getElementById('newRestaurantLng').value);
+  const phone = document.getElementById('newRestaurantPhone').value.trim();
+  const email = document.getElementById('newRestaurantEmail').value.trim();
+  const logo = document.getElementById('newRestaurantLogo').value.trim();
+  
+  if (!name || !addr || !phone || isNaN(lat) || isNaN(lng)) {
+    showNotification('Fill required fields including coordinates', 'error'); return;
+  }
+  
+  let key = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  let s = 1; const base = key;
+  while (restaurants[key]) { key = base + s; s++; }
+  
+  await addRestaurantToDB(key, {
+    name, address: addr, phone, email, logo: logo || '', lat, lng,
+    rating: 4.5, deliveryTime: '20 min', deliveryFee: '$2', cuisine: 'Various',
+    menu: {
+      coffee: [{ id: Date.now(), name: 'Sample Coffee', price: 3.00, description: 'Delicious coffee', image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop' }],
+      food: [{ id: Date.now() + 1, name: 'Sample Food', price: 8.00, description: 'Delicious food', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop' }],
+      dessert: [{ id: Date.now() + 2, name: 'Sample Dessert', price: 5.00, description: 'Sweet treat', image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=200&h=200&fit=crop' }]
+    }
+  });
+  document.getElementById('restaurantRegistrationForm').reset();
+  document.getElementById('newRestaurantLat').value = '9.5600';
+  document.getElementById('newRestaurantLng').value = '44.0650';
+  showNotification(`"${name}" registered!`, 'success');
+}
+
+function renderVehicles() {
+  const list = document.getElementById('vehiclesList'); list.innerHTML = '';
+  if (!vehicles.length) { list.innerHTML = '<p class="text-gray-500 col-span-3">No vehicles</p>'; return; }
+  vehicles.forEach(v => {
+    const el = document.createElement('div');
+    el.className = 'border rounded-lg p-4 bg-gray-50';
+    el.innerHTML = `<div class="flex justify-between items-start"><div class="flex items-center"><i class="fas fa-${v.type === 'bike' ? 'motorcycle' : 'car'} text-2xl mr-3 text-primary"></i><div><h3 class="font-bold">${v.driverName}</h3><p class="text-gray-600 text-sm">${v.plateNumber}</p><p class="text-xs text-gray-500">${v.driverPhone}</p></div></div><div class="text-right"><div class="vehicle-${v.status} px-2 py-1 rounded text-xs font-semibold">${v.status}</div><button onclick="toggleVehicleStatus('${v.id}')" class="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded mt-2">Toggle</button></div></div>`;
+    list.appendChild(el);
+  });
+}
+
+async function toggleVehicleStatus(vid) {
+  const v = vehicles.find(v => v.id == vid); if (!v) return;
+  await updateVehicleInDB(vid, { status: v.status === 'available' ? 'unavailable' : 'available' });
+}
+
+// ============================================================
+// STATS & ORDERS
+// ============================================================
+function updateStats() {
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  document.getElementById('todayOrders').textContent = orders.filter(o => new Date(o.timestamp) >= todayStart).length;
+  document.getElementById('monthlyOrders').textContent = orders.filter(o => new Date(o.timestamp) >= monthStart).length;
+  document.getElementById('totalRevenue').textContent = `$${orders.filter(o => o.status === 'completed').reduce((s, o) => s + (o.total || 0), 0).toFixed(2)}`;
+  document.getElementById('deliveryOrders').textContent = orders.filter(o => o.status === 'out_for_delivery').length;
+  document.getElementById('totalOrders').textContent = orders.length;
+}
+
+function renderOrders() { renderActiveOrders(); renderCompletedOrders(); }
+
+function renderActiveOrders() {
+  const active = orders.filter(o => ['pending', 'preparing', 'ready', 'out_for_delivery'].includes(o.status));
+  const list = document.getElementById('pendingOrdersList');
+  if (!active.length) { list.innerHTML = '<div class="text-center py-8 text-gray-500"><i class="fas fa-inbox text-3xl mb-2"></i><p>No active orders</p></div>'; return; }
+  list.innerHTML = '';
+  const so = { pending: 0, preparing: 1, ready: 2, out_for_delivery: 3 };
+  active.sort((a, b) => (so[a.status] || 0) - (so[b.status] || 0));
+  active.forEach(o => {
+    const r = restaurants[o.restaurant] || { name: 'Unknown' };
+    const st = o.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const card = document.createElement('div');
+    card.className = 'border rounded-lg p-4 shadow-sm bg-white';
+    card.innerHTML = `<div class="flex justify-between items-start mb-2"><h3 class="font-bold text-lg">Order #${String(o.id).slice(-6)}</h3><span class="px-2 py-1 rounded-full text-xs font-semibold status-${o.status}">${st}</span></div><p class="text-xs text-gray-500 mb-2"><i class="far fa-clock mr-1"></i>${new Date(o.timestamp).toLocaleString()}</p><p class="text-sm text-gray-600 mb-1"><i class="fas fa-store mr-2 text-primary"></i>${r.name}</p><p class="text-sm text-gray-600 mb-1"><i class="fas fa-user mr-2 text-primary"></i>${o.customer?.name || 'Walk-in'}</p><p class="text-sm text-gray-600 mb-1"><i class="fas fa-list mr-2 text-primary"></i>${o.items.map(i => `${i.name} x${i.quantity}`).join(', ')}</p><p class="text-sm text-gray-600 mb-1"><i class="fas fa-map-marker-alt mr-2 text-primary"></i>${o.customer?.address || ''}</p><div class="flex justify-between items-center mt-3 pt-3 border-t"><span class="font-bold text-primary text-lg">$${o.total.toFixed(2)}</span><div class="space-x-1 flex flex-wrap gap-1">${getOrderActionButtons(o)}</div></div>`;
+    list.appendChild(card);
+  });
+}
+
+function getOrderActionButtons(o) {
+  let b = '';
+  if (o.status === 'pending') b += `<button onclick="updateOrderStatus('${o.id}', 'preparing')" class="text-xs bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"><i class="fas fa-check mr-1"></i>Accept</button><button onclick="updateOrderStatus('${o.id}', 'cancelled')" class="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"><i class="fas fa-times mr-1"></i>Cancel</button>`;
+  else if (o.status === 'preparing') b += `<button onclick="updateOrderStatus('${o.id}', 'ready')" class="text-xs bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded"><i class="fas fa-utensils mr-1"></i>Ready</button>`;
+  else if (o.status === 'ready') b += `<button onclick="updateOrderStatus('${o.id}', 'out_for_delivery')" class="text-xs bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded"><i class="fas fa-shipping-fast mr-1"></i>Dispatch</button>`;
+  else if (o.status === 'out_for_delivery') b += `<button onclick="updateOrderStatus('${o.id}', 'completed')" class="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"><i class="fas fa-check-double mr-1"></i>Delivered</button>`;
+  b += `<button onclick="showBill('${o.id}')" class="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded"><i class="fas fa-receipt mr-1"></i>View</button>`;
+  return b;
+}
+
+function renderCompletedOrders() {
+  const c = orders.filter(o => o.status === 'completed' || o.status === 'cancelled');
+  const list = document.getElementById('completedOrdersList');
+  if (!c.length) { list.innerHTML = '<div class="text-center py-8 text-gray-500"><i class="fas fa-check-circle text-3xl mb-2"></i><p>No completed orders</p></div>'; return; }
+  list.innerHTML = '';
+  c.slice(-10).reverse().forEach(o => {
+    const st = o.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const card = document.createElement('div');
+    card.className = 'border rounded-lg p-4 shadow-sm bg-gray-50';
+    card.innerHTML = `<div class="flex justify-between items-start mb-2"><h3 class="font-bold text-lg">Order #${String(o.id).slice(-6)}</h3><span class="px-2 py-1 rounded-full text-xs font-semibold status-${o.status}">${st}</span></div><p class="text-xs text-gray-500 mb-2"><i class="far fa-clock mr-1"></i>${new Date(o.timestamp).toLocaleString()}</p><p class="text-sm text-gray-600 mb-1"><i class="fas fa-list mr-2 text-primary"></i>${o.items.map(i => `${i.name} x${i.quantity}`).join(', ')}</p><div class="flex justify-between items-center mt-3 pt-3 border-t"><span class="font-bold text-primary text-lg">$${o.total.toFixed(2)}</span><button onclick="showBill('${o.id}')" class="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded">View</button></div>`;
+    list.appendChild(card);
+  });
+}
+
+async function updateOrderStatus(oid, ns) {
+  const o = orders.find(o => o.id === oid); if (!o) return;
+  if (ns === 'out_for_delivery' && o.vehicle?.id) await updateVehicleInDB(o.vehicle.id, { status: 'delivering' });
+  if (ns === 'completed' && o.vehicle?.id) await updateVehicleInDB(o.vehicle.id, { status: 'available' });
+  const hist = o.statusHistory || [];
+  hist.push({ status: ns, time: new Date().toISOString() });
+  await updateOrderInDB(oid, { status: ns, statusHistory: hist });
+  if (ns === 'completed') showBill(oid);
+  showNotification(`Order #${String(oid).slice(-6)} → ${ns}`, 'success');
+}
+
+// ============================================================
+// BILL
+// ============================================================
+function showBill(oid) {
+  const o = orders.find(o => o.id == oid); if (!o) return;
+  currentBillOrder = o;
+  const r = restaurants[o.restaurant] || { name: 'Go!Point', address: '', phone: '' };
+  document.getElementById('billOrderNumber').textContent = String(o.id).slice(-6);
+  document.getElementById('billDateTime').textContent = new Date(o.timestamp).toLocaleString();
+  document.getElementById('billRestaurantName').textContent = settings.system.businessName;
+  document.getElementById('billRestaurantAddress').textContent = r.address || '';
+  document.getElementById('billRestaurantPhone').textContent = `Phone: ${r.phone || ''}`;
+  document.getElementById('billCustomerInfo').textContent = `Customer: ${o.customer?.name || ''}`;
+  document.getElementById('billDeliveryInfo').innerHTML = `<div class="mt-1"><div><i class="fas fa-phone mr-1"></i>${o.customer?.phone || ''}</div><div><i class="fas fa-map-marker-alt mr-1"></i>${o.customer?.address || ''}</div><div><i class="fas fa-wallet mr-1"></i>${o.payment?.method?.toUpperCase() || 'Cash'}</div></div>`;
+  document.getElementById('billVehicleInfo').innerHTML = o.vehicle ? `<div class="mt-2 pt-2 border-t"><div class="font-semibold">Driver:</div><div>${o.vehicle.driverName} • ${o.vehicle.plateNumber}</div><div>${o.vehicle.driverPhone || ''}</div></div>` : '';
+  document.getElementById('billTotal').textContent = `$${o.total.toFixed(2)}`;
+  const bi = document.getElementById('billItems'); bi.innerHTML = '';
+  o.items.forEach(i => { const el = document.createElement('div'); el.className = 'flex justify-between mb-2'; el.innerHTML = `<span>${i.name} x${i.quantity}</span><span>$${(i.price * i.quantity).toFixed(2)}</span>`; bi.appendChild(el); });
+  const qc = document.getElementById('qrcode-container');
+  if (o.coordinates) {
+    const url = `https://www.google.com/maps?q=${o.coordinates.lat},${o.coordinates.lng}`;
+    if (qrcode) { qrcode.clear(); qc.innerHTML = ''; }
+    qrcode = new QRCode(qc, { text: url, width: 128, height: 128 });
+  } else qc.innerHTML = '';
+  document.getElementById('billModal').classList.remove('hidden');
+}
+
+function closeBill() { document.getElementById('billModal').classList.add('hidden'); currentBillOrder = null; }
+function printBill() { window.print(); }
+
+// ============================================================
+// VEHICLE DISTANCE
+// ============================================================
+function calculateDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180, dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function getClosestVehicleOfType(type, lat, lng) {
+  let closest = null, minDist = Infinity;
+  for (const v of vehicles) {
+    if (v.status === 'available' && v.type === type) {
+      const d = calculateDistance(lat, lng, v.lat || 9.56, v.lng || 44.06);
+      if (d < minDist) { minDist = d; closest = v; }
+    }
+  }
+  return closest;
+}
+
+// ============================================================
+// KICKI DROP STYLE TRACKING
+// ============================================================
+function updateTrackButtonVisibility() {
+  const active = orders.find(o => ['pending', 'preparing', 'ready', 'out_for_delivery'].includes(o.status));
+  const btn = document.getElementById('trackOrderBtn');
+  const txt = document.getElementById('trackBtnText');
+  if (active) {
+    btn.classList.remove('hidden');
+    currentTrackedOrder = active.id;
+    txt.textContent = `Track #${String(active.id).slice(-6)}`;
+  } else {
+    btn.classList.add('hidden');
+    currentTrackedOrder = null;
+  }
+}
+
+function openTrackingModal() {
+  const order = orders.find(o => o.id == currentTrackedOrder) || orders.find(o => ['pending', 'preparing', 'ready', 'out_for_delivery'].includes(o.status));
+  if (!order) { showNotification('No active orders to track', 'info'); return; }
+  currentTrackedOrder = order.id;
+  
+  document.getElementById('trackingModal').classList.add('active');
+  document.getElementById('trackingOrderId').textContent = `#${String(order.id).slice(-6)}`;
+  
+  renderKickiTracking(order);
+  setTimeout(() => initTrackingMap(order), 250);
+  startDriverSimulation(order);
+}
+
+function renderKickiTracking(order) {
+  const statusOrder = ['pending', 'preparing', 'ready', 'out_for_delivery', 'completed'];
+  const currentIdx = statusOrder.indexOf(order.status);
+  const progressPercent = ((currentIdx + 1) / statusOrder.length) * 100;
+  
+  // Update progress bar
+  document.getElementById('kickiProgressFill').style.width = `${progressPercent}%`;
+  
+  // Update status text
+  const statusMessages = {
+    pending: 'Your order has been received',
+    preparing: 'Restaurant is preparing your food',
+    ready: 'Food is ready, waiting for driver',
+    out_for_delivery: 'Driver is on the way to you',
+    completed: 'Enjoy your meal!'
+  };
+  document.getElementById('kickiCurrentStatus').textContent = order.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+  document.getElementById('kickiStatusMessage').textContent = statusMessages[order.status] || 'Processing...';
+  
+  // ETA calculation
+  const etaMinutes = order.status === 'completed' ? 0 : order.status === 'out_for_delivery' ? 8 : order.status === 'ready' ? 15 : order.status === 'preparing' ? 20 : 25;
+  document.getElementById('kickiEtaTime').textContent = order.status === 'completed' ? 'Delivered!' : `${etaMinutes} min`;
+  
+  // Timeline
+  const stages = [
+    { key: 'pending', label: 'Order Placed', icon: 'fa-receipt' },
+    { key: 'preparing', label: 'Preparing', icon: 'fa-utensils' },
+    { key: 'ready', label: 'Ready', icon: 'fa-box' },
+    { key: 'out_for_delivery', label: 'On the Way', icon: 'fa-motorcycle' },
+    { key: 'completed', label: 'Delivered', icon: 'fa-check-circle' }
+  ];
+  
+  const timeline = document.getElementById('kickiTimeline');
+  timeline.innerHTML = stages.map((s, i) => {
+    let cls = '';
+    if (i < currentIdx) cls = 'completed';
+    else if (i === currentIdx) cls = 'active';
+    return `<div class="kicki-timeline-item ${cls}"><div class="kicki-timeline-dot"></div><div><p class="font-semibold ${cls === 'active' ? 'text-primary' : cls === 'completed' ? 'text-green-700' : 'text-gray-400'}">${s.label}</p></div></div>`;
+  }).join('');
+  
+  // Driver card
+  const driverCard = document.getElementById('kickiDriverCard');
+  if (order.vehicle && ['out_for_delivery', 'ready', 'preparing'].includes(order.status)) {
+    driverCard.style.display = 'flex';
+    document.getElementById('kickiDriverName').textContent = order.vehicle.driverName;
+    document.getElementById('kickiDriverPlate').textContent = `Plate: ${order.vehicle.plateNumber}`;
+  } else {
+    driverCard.style.display = 'none';
+  }
+}
+
+function initTrackingMap(order) {
+  if (trackingMap) { trackingMap.remove(); trackingMap = null; }
+  
+  const rest = restaurants[order.restaurant] || {};
+  const restLat = rest.lat || 9.56, restLng = rest.lng || 44.065;
+  const custLat = order.coordinates?.lat || customerLocation?.lat || 9.56;
+  const custLng = order.coordinates?.lng || customerLocation?.lng || 44.065;
+  const vehLat = order.vehicle?.lat || restLat, vehLng = order.vehicle?.lng || restLng;
+  
+  trackingMap = L.map('trackingMap', { zoomControl: false }).setView([(restLat + custLat) / 2, (restLng + custLng) / 2], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' }).addTo(trackingMap);
+  
+  const restIcon = L.divIcon({ html: '<div class="custom-marker" style="background:#22c55e;width:36px;height:36px;"><i class="fas fa-store"></i></div>', className: '', iconSize: [36, 36], iconAnchor: [18, 18] });
+  const custIcon = L.divIcon({ html: '<div class="custom-marker" style="background:#f59e0b;width:36px;height:36px;"><i class="fas fa-home"></i></div>', className: '', iconSize: [36, 36], iconAnchor: [18, 18] });
+  const vehIcon = L.divIcon({ html: '<div class="custom-marker driver-pulse" style="background:#3b82f6;width:40px;height:40px;"><i class="fas fa-motorcycle"></i></div>', className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
+  
+  L.marker([restLat, restLng], { icon: restIcon }).addTo(trackingMap).bindPopup(`<b>🍽️ ${rest.name || 'Restaurant'}</b>`);
+  L.marker([custLat, custLng], { icon: custIcon }).addTo(trackingMap).bindPopup(`<b>🏠 You</b>`);
+  
+  if (order.vehicle && ['out_for_delivery', 'ready', 'preparing'].includes(order.status)) {
+    driverMarker = L.marker([vehLat, vehLng], { icon: vehIcon }).addTo(trackingMap).bindPopup(`<b>🛵 ${order.vehicle.driverName}</b>`);
+  }
+  
+  const routeCoords = order.vehicle && ['out_for_delivery'].includes(order.status)
+    ? [[restLat, restLng], [vehLat, vehLng], [custLat, custLng]]
+    : [[restLat, restLng], [custLat, custLng]];
+  L.polyline(routeCoords, { color: '#22c55e', weight: 4, opacity: 0.8, dashArray: '8, 8' }).addTo(trackingMap);
+  
+  const bounds = L.latLngBounds(routeCoords);
+  trackingMap.fitBounds(bounds, { padding: [40, 40] });
+}
+
+function startDriverSimulation(order) {
+  if (driverSimulationInterval) clearInterval(driverSimulationInterval);
+  if (!order.vehicle || order.status !== 'out_for_delivery' || !driverMarker) return;
+  
+  const targetLat = order.coordinates?.lat || customerLocation?.lat || 9.56;
+  const targetLng = order.coordinates?.lng || customerLocation?.lng || 44.065;
+  let curLat = order.vehicle.lat || 9.56;
+  let curLng = order.vehicle.lng || 44.065;
+  
+  driverSimulationInterval = setInterval(() => {
+    curLat += (targetLat - curLat) * 0.08;
+    curLng += (targetLng - curLng) * 0.08;
+    driverMarker.setLatLng([curLat, curLng]);
+    if (order.vehicle) { order.vehicle.lat = curLat; order.vehicle.lng = curLng; }
+    if (calculateDistance(curLat, curLng, targetLat, targetLng) < 0.05) clearInterval(driverSimulationInterval);
+  }, 2000);
+}
+
+function refreshTracking() {
+  if (!currentTrackedOrder) return;
+  const o = orders.find(o => o.id == currentTrackedOrder);
+  if (o) {
+    renderKickiTracking(o);
+    initTrackingMap(o);
+    startDriverSimulation(o);
+  }
+}
+
+function closeTrackingModal() {
+  document.getElementById('trackingModal').classList.remove('active');
+  if (trackingMap) { trackingMap.remove(); trackingMap = null; }
+  if (driverSimulationInterval) { clearInterval(driverSimulationInterval); driverSimulationInterval = null; }
+}
+
+function callDriver() {
+  if (!currentTrackedOrder) return;
+  const o = orders.find(o => o.id == currentTrackedOrder);
+  if (o?.vehicle?.driverPhone) window.open(`tel:${o.vehicle.driverPhone}`);
+  else showNotification('No driver phone available', 'error');
+}
+
+function whatsappDriver() {
+  if (!currentTrackedOrder) return;
+  const o = orders.find(o => o.id == currentTrackedOrder);
+  if (!o?.vehicle?.driverPhone) { showNotification('No driver phone', 'error'); return; }
+  let ph = o.vehicle.driverPhone.replace(/\D/g, '');
+  if (!ph.startsWith('252')) ph = '252' + ph;
+  const msg = `Hi ${o.vehicle.driverName}, tracking order #${String(o.id).slice(-6)}`;
+  window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+function showNotification(msg, type = 'info') {
+  const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500', warning: 'bg-amber-500' };
+  const n = document.createElement('div');
+  n.className = `fixed top-20 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-[1100] flex items-center animate-fade-in`;
+  n.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>${msg}`;
+  document.body.appendChild(n);
+  setTimeout(() => { n.style.opacity = '0'; n.style.transform = 'translateY(-10px)'; setTimeout(() => n.remove(), 300); }, 3000);
+}
+
+// Start with location permission screen
+// App will initialize after location is granted
+</script>
 </body>
 </html>
