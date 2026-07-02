@@ -1,0 +1,3823 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Go!point - Fast delivery anywhere. Order from your favorite stores and get it delivered by our Go!point Bikers.">
+<meta name="keywords" content="delivery, food delivery, grocery delivery, Go!point, Go!point Biker">
+<title>Go!point — Delivery Anywhere, Anytime</title>
+<link href="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/css2_i1xS.css" rel="stylesheet">
+<link rel="stylesheet" href="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/all.min_i1xS.css">
+<script src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/qrcode.min_i1xS.js"></script>
+<link rel="stylesheet" href="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/leaflet_i1xS.css">
+<script src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/leaflet_i1xS.js"></script>
+<script src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/supabase-js@2_i1xS"></script>
+
+<style>
+/* ═══════════════════════════════════════════
+   FRONT PAGE VARIABLES & BASE
+═══════════════════════════════════════════ */
+:root {
+    --theme: #FF6B00;
+    --theme-dark: #E55A00;
+    --theme-light: #FF8533;
+    --theme-glow: rgba(255, 107, 0, 0.3);
+    --black: #1a1a1a;
+    --white: #ffffff;
+    --light-gray: #f8f9fa;
+    --footer-bg: #0f0f0f;
+    --footer-font: #ffffff;
+    --glass-bg: rgba(255, 255, 255, 0.12);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.2);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* App theme */
+    --primary: #22c55e;
+    --primary-dark: #16a34a;
+    --bg: #f5f7fa;
+    --text: #0f172a;
+    --gray: #64748b;
+    --light-gray-app: #e2e8f0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    font-family: 'Inter', 'Poppins', sans-serif;
+    background-color: var(--light-gray);
+    color: #333;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════
+   FRONT PAGE STYLES
+═══════════════════════════════════════════ */
+#frontPageContainer {
+    position: relative;
+    min-height: 100vh;
+    background: var(--light-gray);
+}
+
+.fp-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 12px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    transition: var(--transition);
+}
+.fp-header.scrolled {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 10px 30px;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+}
+.fp-logo { display: flex; align-items: center; gap: 10px; }
+.fp-logo-text {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: -0.5px;
+}
+.fp-logo-text span { color: var(--theme); }
+.fp-nav ul { display: flex; list-style: none; gap: 8px; align-items: center; }
+.fp-nav ul li a {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+.fp-nav ul li a:hover { background: var(--glass-bg); }
+.fp-nav .fp-login-btn {
+    background-color: var(--theme) !important;
+    color: var(--white) !important;
+    font-weight: 600 !important;
+    border: 2px solid var(--theme);
+}
+.fp-nav .fp-login-btn:hover {
+    background-color: var(--theme-dark) !important;
+    border-color: var(--theme-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px var(--theme-glow);
+}
+.fp-hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+}
+.fp-hamburger span {
+    width: 24px; height: 2.5px;
+    background: var(--white);
+    border-radius: 2px;
+    transition: var(--transition);
+}
+.fp-mobile-menu {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100vh;
+    background: rgba(0, 0, 0, 0.97);
+    backdrop-filter: blur(20px);
+    z-index: 999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+.fp-mobile-menu.active { display: flex; opacity: 1; }
+.fp-mobile-menu a {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: 600;
+    padding: 12px 30px;
+    border-radius: var(--radius-md);
+}
+
+/* Login Modal */
+.fp-login-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+.fp-login-modal.active { opacity: 1; visibility: visible; }
+.fp-login-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    width: 90%;
+    max-width: 400px;
+    padding: 32px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.fp-login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 6px;
+    background: linear-gradient(90deg, var(--theme), var(--theme-dark));
+}
+.fp-login-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: none; border: none;
+    font-size: 24px; color: #777;
+    cursor: pointer;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+}
+.fp-login-close:hover { background: #f0f0f0; color: var(--theme); }
+.fp-login-logo { text-align: center; margin-bottom: 24px; }
+.fp-login-logo h2 { font-size: 24px; font-weight: 800; color: var(--black); margin-top: 12px; }
+.fp-login-logo p { font-size: 14px; color: #777; margin-top: 6px; }
+.fp-form-group { margin-bottom: 20px; }
+.fp-form-label {
+    display: block;
+    font-size: 14px; font-weight: 500;
+    color: #555; margin-bottom: 8px;
+}
+.fp-country-select { display: flex; gap: 12px; align-items: center; }
+.fp-country-code {
+    width: 110px;
+    padding: 14px 12px;
+    border: 1px solid #e5e5e5;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    background: var(--light-gray);
+    outline: none;
+    cursor: pointer;
+}
+.fp-phone-input {
+    flex: 1;
+    padding: 14px 16px;
+    border: 1px solid #e5e5e5;
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    outline: none;
+    transition: var(--transition);
+    font-family: inherit;
+}
+.fp-phone-input:focus {
+    border-color: var(--theme);
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2);
+}
+.fp-login-options { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+.fp-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+}
+.fp-btn-whatsapp {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: white;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+.fp-btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
+.fp-btn-gmail {
+    background: white;
+    color: #333;
+    border: 2px solid #e5e5e5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.fp-btn-gmail:hover { border-color: #4285F4; transform: translateY(-2px); }
+.fp-btn-gmail img { width: 20px; height: 20px; }
+.fp-divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+}
+.fp-divider::before, .fp-divider::after {
+    content: ''; flex: 1; height: 1px; background: #e5e5e5;
+}
+.fp-divider span { padding: 0 12px; font-size: 13px; color: #999; }
+.fp-otp-section { display: none; margin-top: 24px; }
+.fp-otp-inputs { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+.fp-otp-digit {
+    width: 46px; height: 52px;
+    border: 2px solid #e5e5e5;
+    border-radius: var(--radius-md);
+    font-size: 22px;
+    text-align: center;
+    font-weight: 600;
+    outline: none;
+    transition: var(--transition);
+}
+.fp-otp-digit:focus {
+    border-color: var(--theme);
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2);
+}
+.fp-resend-otp {
+    text-align: center;
+    font-size: 14px;
+    color: var(--theme);
+    cursor: pointer;
+    font-weight: 500;
+    padding: 8px;
+}
+.fp-resend-otp.disabled { color: #ccc; cursor: not-allowed; }
+.fp-timer { font-size: 13px; color: #777; margin-top: 8px; text-align: center; }
+.fp-skip-text {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #999;
+}
+.fp-skip-text a {
+    color: var(--theme);
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* Hero */
+.fp-hero-bg {
+    background-image:
+        linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.7) 100%),
+        url('https://images.unsplash.com/photo-1526367790999-0150786686a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+.fp-hero-setup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+.fp-hero-logo-text {
+    font-size: clamp(48px, 8vw, 72px);
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: -2px;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    margin-bottom: 16px;
+}
+.fp-hero-logo-text span { color: var(--theme); }
+.fp-tagline h1 {
+    color: var(--white);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    letter-spacing: -0.5px;
+}
+.fp-tagline p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 17px;
+    font-weight: 400;
+    margin-bottom: 40px;
+    max-width: 600px;
+}
+.fp-search-container { width: 100%; max-width: 620px; margin-bottom: 24px; }
+.fp-input-group {
+    display: flex;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+    align-items: center;
+    border: 2px solid transparent;
+    transition: var(--transition);
+}
+.fp-input-group:focus-within {
+    border-color: var(--theme);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25), 0 0 0 4px rgba(255, 107, 0, 0.15);
+}
+.fp-input-group .fp-map-icon {
+    padding: 0 16px;
+    color: var(--theme);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+}
+.fp-input-group input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 18px 10px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #1b1b1b;
+    background: transparent;
+    min-width: 0;
+}
+.fp-input-group .fp-locate-btn {
+    background: transparent;
+    border: none;
+    border-left: 2px solid #e5e5e5;
+    padding: 0 18px;
+    height: 56px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #555;
+    font-weight: 500;
+    font-size: 13px;
+    font-family: inherit;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+.fp-input-group .fp-locate-btn:hover { background: #f5f5f5; color: var(--theme); }
+.fp-go-btn {
+    background: linear-gradient(135deg, var(--theme) 0%, var(--theme-dark) 100%);
+    color: var(--white);
+    border: none;
+    padding: 18px 50px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    box-shadow: 0 6px 25px var(--theme-glow);
+    transition: var(--transition);
+    width: 100%;
+    max-width: 340px;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.fp-go-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 35px rgba(255, 107, 0, 0.55);
+}
+
+/* Footer */
+.fp-footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-font);
+    padding: 60px 30px 20px;
+}
+.fp-footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 50px;
+}
+.fp-footer-logo-text {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--white);
+    margin-bottom: 12px;
+}
+.fp-footer-logo-text span { color: var(--theme); }
+.fp-footer-brand-text {
+    color: #999;
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 300px;
+}
+.fp-footer-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+.fp-column h4 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--white);
+}
+.fp-column p, .fp-column a {
+    font-size: 14px;
+    line-height: 2.2;
+    color: #999;
+    text-decoration: none;
+    display: block;
+    transition: var(--transition);
+}
+.fp-column a:hover { color: var(--theme); }
+.fp-copyright {
+    max-width: 1200px;
+    margin: 40px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    font-size: 12px;
+    color: #555;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════
+   APP STYLES (Marketplace)
+═══════════════════════════════════════════ */
+#appContainer { display: none; }
+#appContainer.active { display: block; }
+
+.app-navbar {
+    background: #fff;
+    height: 70px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+}
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.app-nav-left { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+.app-merchant-logo {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-weight: 700; font-size: 1.3rem; color: var(--primary);
+}
+.app-search-box {
+    display: flex; align-items: center; background: #f0f0f0;
+    border-radius: 30px; padding: 6px 16px; min-width: 260px; gap: 10px;
+}
+.app-search-box input {
+    border: none; background: transparent; outline: none;
+    width: 100%; font-size: 0.95rem; font-family: inherit;
+}
+.app-nav-right { display: flex; align-items: center; gap: 0.8rem; }
+.app-nav-right ul { display: flex; gap: 0.5rem; list-style: none; align-items: center; }
+.app-nav-right ul li {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 30px;
+    transition: 0.2s;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+.app-nav-right ul li:hover { background: rgba(34, 197, 94, 0.08); }
+.app-nav-right ul li i { color: var(--primary); font-size: 1rem; }
+
+.user-avatar-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px 6px 6px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white !important;
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: var(--transition);
+}
+.user-avatar-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
+.user-avatar-btn .avatar-circle {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: white;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+.user-avatar-btn .user-name { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.user-dropdown {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    min-width: 220px;
+    padding: 8px;
+    display: none;
+    z-index: 100;
+}
+.user-dropdown.active { display: block; }
+.user-dropdown-header {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 8px;
+}
+.user-dropdown-header .user-email {
+    font-size: 0.8rem;
+    color: #777;
+    word-break: break-all;
+}
+.user-dropdown-header .user-name-big {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #333;
+}
+.user-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    transition: var(--transition);
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+}
+.user-dropdown-item:hover { background: #f5f5f5; }
+.user-dropdown-item.danger { color: #ef4444; }
+.user-dropdown-item.danger:hover { background: #fef2f2; }
+
+.cart-badge {
+    background: #ef4444; color: white; font-size: 10px; font-weight: 700;
+    min-width: 18px; height: 18px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; padding: 0 4px;
+}
+
+/* Banner */
+.app-banner { margin-top: 70px; padding: 1rem 2rem; }
+.app-multiBanners { border-radius: 16px; overflow: hidden; background: #2a3b56; }
+.app-carouselDiv { position: relative; }
+.app-carousel-inner { display: flex; transition: transform 0.6s ease; }
+.app-carousel-item { min-width: 100%; position: relative; }
+.app-carousel-item img { width: 100%; height: 280px; object-fit: cover; }
+.app-gradientClass {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+}
+.app-carousel-indicators {
+    position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 10px;
+}
+.app-carousel-indicators button {
+    width: 10px; height: 10px; border-radius: 50%; border: none;
+    background: rgba(255, 255, 255, 0.4); cursor: pointer;
+}
+.app-carousel-indicators button.active { background: #fff; width: 28px; border-radius: 6px; }
+
+/* Categories */
+.app-categories-page {
+    background: #fff; margin: 1rem 2rem 0; border-radius: 16px;
+    padding: 1.5rem 0; position: relative;
+}
+.app-categories-carousel {
+    display: flex; gap: 1.5rem; overflow-x: auto;
+    padding: 0 2rem 0.5rem; scrollbar-width: none;
+}
+.app-categories-carousel::-webkit-scrollbar { display: none; }
+.app-category-view {
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer; min-width: 80px; transition: 0.2s;
+}
+.app-category-view:hover { transform: translateY(-4px); }
+.app-category-view img {
+    width: 70px; height: 70px; border-radius: 50%; object-fit: cover;
+    border: 3px solid transparent; background: #f0f0f0;
+}
+.app-category-view.selected img {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+.app-category-view .nameDiv {
+    margin-top: 8px; font-size: 0.8rem; font-weight: 600;
+    color: var(--gray); text-align: center; white-space: nowrap;
+}
+.app-category-view.selected .nameDiv { color: var(--primary); }
+
+/* Sticky Filter */
+.app-sticky-top {
+    position: sticky; top: 70px; background: #fff; z-index: 100;
+    padding: 0.8rem 2rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.app-filter-triggers {
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 1400px; margin: 0 auto;
+}
+.app-cat-name {
+    border-left: 4px solid var(--primary); padding-left: 12px;
+    font-weight: 600; font-size: 1.1rem;
+}
+.app-viewmaplist { display: flex; gap: 0.8rem; }
+.app-viewmp {
+    display: flex; align-items: center; gap: 6px; padding: 8px 16px;
+    border-radius: 30px; cursor: pointer; border: 1px solid #e2e8f0;
+    background: transparent; font-weight: 500;
+}
+.app-viewmp.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+.app-viewmp.selected i { color: #fff; }
+
+/* Map */
+#appMapView { padding: 0 2rem 1rem; }
+#appMap { height: 500px; width: 100%; border-radius: 16px; z-index: 1; }
+
+/* Restaurant Cards */
+.app-container { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem; }
+.app-row-eq-height {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+.app-card {
+    background: #fff; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    transition: 0.3s; border: 1px solid #e2e8f0; cursor: pointer;
+}
+.app-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    border-color: var(--primary);
+}
+.app-card_inner { display: flex; flex-direction: column; padding: 16px; gap: 12px; }
+.app-card_image_view {
+    width: 100%; height: 180px; object-fit: cover; border-radius: 12px;
+}
+.app-card_heading { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.app-card_description {
+    font-size: 0.9rem; color: var(--gray);
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+}
+.app-bottom-div {
+    display: flex; justify-content: space-between; align-items: center; margin-top: 6px;
+}
+.app-bottom-div1 {
+    display: flex; gap: 10px; align-items: center; font-size: 0.8rem; color: var(--gray);
+}
+.app-dot { width: 4px; height: 4px; background: #bbb; border-radius: 50%; }
+.app-store_rating {
+    background: var(--primary); color: #fff; padding: 2px 10px;
+    border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+    display: flex; align-items: center; gap: 4px;
+}
+.app-view-menu {
+    color: var(--primary); font-weight: 600; font-size: 0.9rem;
+    cursor: pointer; border: none; background: none;
+}
+.app-view-menu:hover { text-decoration: underline; }
+.app-distance-badge {
+    background: rgba(59, 130, 246, 0.15); color: #3b82f6;
+    padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;
+    font-weight: 600; display: inline-flex; align-items: center; gap: 3px;
+}
+
+/* Footer */
+.app-footer-container {
+    background: #0f172a; color: #ddd; padding: 3rem 2rem 1rem; margin-top: 3rem;
+}
+.app-footer-container .app-container { max-width: 1200px; }
+.app-top-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 2rem; margin-bottom: 2rem;
+}
+.app-column-row { margin: 6px 0; font-size: 0.9rem; }
+.app-column-row:first-child { font-weight: 700; color: #fff; margin-bottom: 12px; font-size: 1rem; }
+.app-column-row a { color: #ccc; transition: 0.2s; text-decoration: none; }
+.app-column-row a:hover { color: var(--primary); }
+.app-copyright {
+    text-align: center; margin-top: 2rem; padding-top: 1rem;
+    font-size: 0.85rem; color: #777; border-top: 1px solid #3a3a4a;
+}
+
+/* Restaurant Explorer (Menu) */
+.app-explorer { min-height: 100vh; background: #f8fafc; margin-top: 70px; padding-bottom: 80px; display: none; }
+.app-explorer.active { display: block; }
+
+/* Compact Menu Grid */
+.app-compact-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+@media (min-width: 640px) { .app-compact-menu-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } }
+@media (min-width: 1024px) { .app-compact-menu-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+.app-menu-item-card {
+    background: white; border: 1px solid #e5e7eb;
+    border-radius: 12px; padding: 8px;
+    display: flex; flex-direction: column;
+    transition: all 0.2s; position: relative; overflow: hidden;
+}
+.app-menu-item-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(34,197,94,0.15);
+    transform: translateY(-2px);
+}
+.app-menu-item-img-wrap {
+    width: 100%; height: 90px; border-radius: 8px;
+    overflow: hidden; margin-bottom: 8px; background: #f3f4f6;
+}
+.app-menu-item-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.app-menu-item-name {
+    font-size: 0.85rem; font-weight: 600; color: #0f172a;
+    margin-bottom: 2px; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.app-menu-item-desc {
+    font-size: 0.7rem; color: #64748b;
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+    margin-bottom: 6px; line-height: 1.3;
+}
+.app-menu-item-bottom {
+    display: flex; justify-content: space-between; align-items: center; margin-top: auto;
+}
+.app-menu-item-price { font-size: 0.95rem; font-weight: 700; color: var(--primary); }
+.app-menu-item-add-btn {
+    background: var(--primary); color: white; border: none;
+    width: 28px; height: 28px; border-radius: 50%;
+    cursor: pointer; font-size: 0.9rem;
+    display: flex; align-items: center; justify-content: center;
+}
+.app-menu-item-add-btn:hover { background: var(--primary-dark); transform: scale(1.1); }
+
+/* Mini Cart Bar */
+.app-mini-cart-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white; padding: 12px 20px;
+    display: none; justify-content: space-between; align-items: center;
+    z-index: 900; box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    cursor: pointer;
+}
+.app-mini-cart-bar.visible { display: flex; }
+.app-mini-cart-info { display: flex; align-items: center; gap: 12px; }
+.app-mini-cart-count {
+    background: rgba(255,255,255,0.25);
+    padding: 4px 10px; border-radius: 20px;
+    font-weight: 700; font-size: 0.9rem;
+}
+.app-mini-cart-total { font-size: 1.2rem; font-weight: 700; }
+.app-mini-cart-view {
+    background: white; color: var(--primary);
+    padding: 8px 20px; border-radius: 30px;
+    font-weight: 700; font-size: 0.9rem;
+}
+
+/* Cart Window */
+.app-cart-window {
+    position: fixed; bottom: 80px; right: 20px;
+    width: 340px; max-height: 80vh;
+    z-index: 1000; box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+    border-radius: 22px; overflow: hidden; display: none;
+    background: white;
+}
+.app-cart-window.visible { display: block; }
+.app-cart-header { cursor: move; }
+.app-cart-content { max-height: 60vh; overflow-y: auto; }
+
+/* Modals & Forms */
+.app-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2000;
+}
+.app-modal-overlay.hidden { display: none; }
+.app-modal-card {
+    background: white; border-radius: 16px;
+    width: 90%; max-width: 500px;
+    max-height: 90vh; overflow-y: auto;
+    padding: 24px; position: relative;
+}
+.app-modal-close {
+    position: absolute; top: 12px; right: 16px;
+    background: none; border: none; font-size: 24px;
+    color: #777; cursor: pointer;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+}
+.app-modal-close:hover { background: #f0f0f0; color: var(--primary); }
+
+.app-glovo-button {
+    background: var(--primary); color: white;
+    border-radius: 10px; padding: 12px 24px;
+    font-weight: 600; border: none; cursor: pointer;
+    font-family: inherit; font-size: 0.95rem;
+    transition: var(--transition);
+}
+.app-glovo-button:hover { background: var(--primary-dark); }
+.app-glovo-input, .app-glovo-select {
+    border: 2px solid #e5e7eb; border-radius: 10px;
+    padding: 12px 16px; width: 100%; font-family: inherit;
+    outline: none; transition: var(--transition);
+}
+.app-glovo-input:focus, .app-glovo-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.app-step-indicator { display: flex; justify-content: space-between; margin-bottom: 2rem; }
+.app-step { flex: 1; text-align: center; padding: 0.5rem; position: relative; }
+.app-step:not(:last-child):after {
+    content: ''; position: absolute; top: 50%; right: 0;
+    transform: translateY(-50%); height: 2px; width: 100%;
+    background-color: #ddd; z-index: 1;
+}
+.app-step.active .app-step-number { background: #f59e0b; color: white; }
+.app-step.completed .app-step-number { background: var(--primary); color: white; }
+.app-step-number {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #e5e7eb; color: #6B7280;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 0.5rem; position: relative; z-index: 2; font-weight: 600;
+}
+
+.app-payment-option {
+    border: 2px solid #e5e7eb; border-radius: 1rem;
+    padding: 1.25rem 0.5rem; text-align: center;
+    cursor: pointer; transition: all 0.3s;
+    background: white; position: relative;
+}
+.app-payment-option:hover { border-color: var(--primary); transform: translateY(-3px); }
+.app-payment-option.selected {
+    border-color: var(--primary);
+    background: rgba(34,197,94,0.08);
+}
+.app-payment-option.selected::after {
+    content: '✓'; position: absolute; top: 0.75rem; right: 0.75rem;
+    background: var(--primary); color: white;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: bold;
+}
+
+.app-phone-input {
+    display: flex; border: 2px solid #e5e7eb;
+    border-radius: 0.75rem; overflow: hidden; background: white;
+}
+.app-phone-prefix {
+    background: #f0fdf4; padding: 0.875rem 1rem;
+    border-right: 2px solid #e5e7eb;
+    font-weight: 600; color: #0f172a;
+    display: flex; align-items: center;
+}
+.app-phone-number {
+    flex: 1; border: none; padding: 0.875rem 1rem;
+    font-size: 1rem; outline: none; background: transparent;
+    text-align: center; font-weight: 500; font-family: inherit;
+}
+
+.app-delivery-method-btn {
+    padding: 1.25rem; border: 2px solid #e5e7eb;
+    border-radius: 1rem; cursor: pointer;
+    transition: all 0.3s; background: white;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px; position: relative;
+}
+.app-delivery-method-btn:hover { border-color: var(--primary); transform: translateY(-3px); }
+.app-delivery-method-btn.selected {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(22,163,74,0.08));
+}
+.app-delivery-method-btn.selected::after {
+    content: '✓'; position: absolute; top: 8px; right: 8px;
+    background: var(--primary); color: white;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: bold;
+}
+
+.app-detect-location-btn {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white; padding: 12px 20px; border-radius: 10px;
+    border: none; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; width: 100%; font-family: inherit;
+}
+.app-detect-location-btn:hover { transform: translateY(-2px); }
+.app-location-status {
+    margin-top: 8px; padding: 8px 12px; border-radius: 8px;
+    font-size: 0.875rem; text-align: center;
+}
+.app-location-status.success { background: #d1fae5; color: #065f46; }
+.app-location-status.error { background: #fee2e2; color: #991b1b; }
+.app-location-status.loading { background: #dbeafe; color: #1e40af; }
+
+.app-vehicle-available { background: var(--primary); color: white; }
+
+/* Tracking */
+.app-tracking-timeline { position: relative; padding-left: 30px; }
+.app-tracking-timeline::before {
+    content: ''; position: absolute; left: 10px; top: 0; bottom: 0;
+    width: 2px; background: #e5e7eb;
+}
+.app-timeline-item { position: relative; padding-bottom: 20px; }
+.app-timeline-item::before {
+    content: ''; position: absolute; left: -25px; top: 4px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #e5e7eb; border: 3px solid white;
+    box-shadow: 0 0 0 2px #e5e7eb;
+}
+.app-timeline-item.active::before { background: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+.app-timeline-item.completed::before { background: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+
+.app-custom-marker {
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; color: white; font-size: 14px;
+    border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* Status badges */
+.app-status-pending { background: #fef3c7; color: #92400e; }
+.app-status-preparing { background: #dbeafe; color: #1e40af; }
+.app-status-ready { background: #e9d5ff; color: #6b21a8; }
+.app-status-out_for_delivery { background: #c7d2fe; color: #3730a3; }
+.app-status-completed { background: #d1fae5; color: #065f46; }
+.app-status-cancelled { background: #fee2e2; color: #991b1b; }
+
+/* Driver Portal */
+.app-driver-portal {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white; padding: 20px; display: none;
+}
+.app-driver-portal.active { display: block; }
+.app-driver-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; padding-bottom: 15px;
+    border-bottom: 1px solid #334155; flex-wrap: wrap; gap: 10px;
+}
+.app-driver-status-card {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    padding: 20px; border-radius: 16px; margin-bottom: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.app-driver-status-card.offline { background: linear-gradient(135deg, #64748b, #475569); }
+.app-driver-order-card {
+    background: #1e293b; border: 2px solid #334155;
+    border-radius: 16px; padding: 20px;
+    transition: all 0.3s; position: relative; overflow: hidden;
+    margin-bottom: 15px;
+}
+.app-driver-order-card.ringing {
+    border-color: #f59e0b;
+    animation: appRingPulse 1s infinite;
+}
+@keyframes appRingPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+    50% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
+}
+.app-driver-order-card.accepted {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(22,163,74,0.05));
+}
+.app-driver-btn {
+    flex: 1; padding: 12px; border: none;
+    border-radius: 10px; font-weight: 600;
+    cursor: pointer; font-family: inherit; font-size: 0.9rem;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; color: white;
+}
+.app-driver-btn-accept { background: var(--primary); }
+.app-driver-btn-reject { background: #ef4444; }
+.app-driver-btn-call { background: #3b82f6; }
+.app-driver-btn-wa { background: #25D366; }
+.app-driver-btn-navigate { background: #8b5cf6; }
+
+.app-ring-indicator {
+    position: absolute; top: 10px; right: 10px;
+    background: #f59e0b; color: white;
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 700;
+    animation: appBlink 1s infinite;
+}
+@keyframes appBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.app-driver-login-box {
+    max-width: 400px; margin: 100px auto;
+    background: #1e293b; padding: 40px;
+    border-radius: 20px; border: 1px solid #334155;
+    text-align: center;
+}
+.app-driver-login-box h2 { font-size: 1.8rem; margin-bottom: 10px; color: var(--primary); }
+.app-driver-login-box p { color: #94a3b8; margin-bottom: 25px; }
+.app-driver-login-box input {
+    width: 100%; padding: 14px;
+    border: 2px solid #334155; background: #0f172a;
+    color: white; border-radius: 10px;
+    margin-bottom: 15px; font-size: 1rem;
+    text-align: center; font-family: inherit;
+}
+
+/* Sync indicator */
+.app-sync-indicator {
+    position: fixed; top: 70px; right: 20px; z-index: 999;
+    background: white; border-radius: 20px; padding: 6px 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 0.75rem; display: flex; align-items: center; gap: 6px;
+}
+.app-sync-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--primary); animation: appPulse 2s infinite;
+}
+.app-sync-dot.offline { background: #ef4444; animation: none; }
+@keyframes appPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* Management */
+.app-stats-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .fp-header { padding: 10px 15px; }
+    .fp-nav { display: none; }
+    .fp-hamburger { display: flex; }
+    .fp-footer-container { grid-template-columns: 1fr; gap: 30px; }
+    .fp-footer-columns { grid-template-columns: 1fr 1fr; }
+    .fp-input-group .fp-locate-btn span { display: none; }
+    .app-navbar { padding: 0 1rem; height: auto; min-height: 60px; flex-wrap: wrap; }
+    .app-header { flex-wrap: wrap; gap: 0.5rem; padding: 8px 0; }
+    .app-nav-left { width: 100%; justify-content: space-between; }
+    .app-search-box { min-width: 140px; flex: 1; }
+    .app-nav-right { width: 100%; justify-content: flex-end; }
+    .app-nav-right ul li span { display: none; }
+    .app-banner { padding: 0.5rem; margin-top: 110px; }
+    .app-categories-page { margin: 0.5rem; }
+    .app-sticky-top { padding: 0.5rem 1rem; top: 110px; }
+    .app-container { padding: 1rem; }
+    .app-row-eq-height { grid-template-columns: 1fr; }
+    #appMap { height: 350px; }
+    .app-cart-window { width: 90%; right: 5%; }
+    .user-avatar-btn .user-name { display: none; }
+}
+@media (max-width: 480px) {
+    .fp-hero-logo-text { font-size: 48px; }
+    .fp-login-card { padding: 24px 20px; }
+    .fp-otp-digit { width: 42px; height: 48px; font-size: 20px; }
+    .fp-footer-columns { grid-template-columns: 1fr; }
+}
+
+/* Toast */
+.app-toast {
+    position: fixed; bottom: 100px; left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2a; color: #fff;
+    padding: 12px 24px; border-radius: 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    z-index: 3000; opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    font-size: 0.9rem;
+}
+.app-toast.show { opacity: 1; }
+
+/* Transition */
+.fade-in { animation: appFadeIn 0.4s ease-out; }
+@keyframes appFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body style="">
+
+<!-- ═══════════════════════════════════════════
+     FRONT PAGE (Splash / Landing)
+═══════════════════════════════════════════ -->
+<div id="frontPageContainer" style="display: block;">
+
+    <!-- Header -->
+    <header class="fp-header" id="fpHeader">
+        <div class="fp-logo">
+            <div class="fp-logo-text">Go<span>!</span>point</div>
+        </div>
+        <nav class="fp-nav">
+            <ul>
+                <li><a onclick="openFrontLogin()"><i class="fas fa-user"></i> <span>Login</span></a></li>
+                <li><a onclick="goToMarketplace()"><i class="fas fa-store"></i> <span>Marketplace</span></a></li>
+                <li><a><i class="fas fa-globe"></i> <span>EN</span></a></li>
+            </ul>
+        </nav>
+        <div class="fp-hamburger" id="fpHamburger" onclick="toggleFpMobileMenu()">
+            <span></span><span></span><span></span>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="fp-mobile-menu" id="fpMobileMenu">
+        <a onclick="openFrontLogin(); toggleFpMobileMenu();"><i class="fas fa-user"></i> Login</a>
+        <a onclick="goToMarketplace(); toggleFpMobileMenu();"><i class="fas fa-store"></i> Marketplace</a>
+        <a><i class="fas fa-globe"></i> English</a>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="fp-login-modal" id="fpLoginModal">
+        <div class="fp-login-card">
+            <button class="fp-login-close" onclick="closeFrontLogin()">×</button>
+            <div class="fp-login-logo">
+                <div style="font-size: 3rem;">🛵</div>
+                <h2>Welcome to Go!point</h2>
+                <p>Sign in to order from your favorite stores</p>
+            </div>
+
+            <!-- Phone Input -->
+            <div id="fpPhoneStep" style="display: block;">
+                <div class="fp-form-group">
+                    <label class="fp-form-label">Phone Number</label>
+                    <div class="fp-country-select">
+                        <select class="fp-country-code" id="fpCountryCode">
+                            <option value="+252" selected="selected">🇸🇴 +252</option>
+                            <option value="+254">🇰🇪 +254</option>
+                            <option value="+234">🇳🇬 +234</option>
+                            <option value="+255">🇹🇿 +255</option>
+                            <option value="+233">🇬🇭 +233</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                        </select>
+                        <input type="tel" class="fp-phone-input" id="fpPhoneNumber" placeholder="Enter phone number" maxlength="15">
+                    </div>
+                </div>
+
+                <div class="fp-login-options">
+                    <button class="fp-btn fp-btn-whatsapp" onclick="loginWithWhatsApp()">
+                        <i class="fab fa-whatsapp" style="font-size: 1.3rem;"></i>
+                        Continue with WhatsApp
+                    </button>
+
+                    <div class="fp-divider"><span>or</span></div>
+
+                    <button class="fp-btn fp-btn-gmail" onclick="loginWithGmail()">
+                        <svg style="width:20px;height:20px;" viewBox="0 0 48 48">
+                            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                            <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+                            <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+                            <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                        </svg>
+                        Continue with Gmail
+                    </button>
+                </div>
+
+                <div class="fp-skip-text">
+                    Just browsing? <a onclick="goToMarketplace()">Go to marketplace →</a>
+                </div>
+            </div>
+
+            <!-- OTP Step -->
+            <div class="fp-otp-section" id="fpOtpSection" style="display: none;">
+                <p style="text-align: center; margin-bottom: 20px; color: #555; font-size: 14px;">
+                    Enter the 6-digit code sent to your WhatsApp
+                </p>
+                <div class="fp-otp-inputs">
+                    <input type="text" class="fp-otp-digit" maxlength="1" data-index="0">
+                    <input type="text" class="fp-otp-digit" maxlength="1" data-index="1">
+                    <input type="text" class="fp-otp-digit" maxlength="1" data-index="2">
+                    <input type="text" class="fp-otp-digit" maxlength="1" data-index="3">
+                    <input type="text" class="fp-otp-digit" maxlength="1" data-index="4">
+                    <input type="text" class="fp-otp-digit" maxlength="1" data-index="5">
+                </div>
+                <div class="fp-resend-otp" id="fpResendOtp" onclick="resendOtp()">Resend code</div>
+                <div class="fp-timer" id="fpTimer">Resend in <span id="fpCountdown">60</span>s</div>
+                <button class="fp-btn fp-btn-whatsapp" style="margin-top: 16px;" onclick="verifyOtp()">
+                    <i class="fas fa-check-circle"></i> Verify &amp; Continue
+                </button>
+                <button class="fp-btn fp-btn-gmail" style="margin-top: 8px;" onclick="backToPhoneStep()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="fp-hero-bg">
+        <div class="fp-hero-setup">
+            <div class="fp-hero-logo-text">Go<span>!</span>point</div>
+            <div class="fp-tagline">
+                <h1>Delivered at the Speed of Now</h1>
+                <p>Your Go!point Biker is ready. Fast, reliable delivery to your doorstep — anytime, anywhere.</p>
+            </div>
+
+            <div class="fp-search-container">
+                <div class="fp-input-group">
+                    <div class="fp-map-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <input type="text" id="fpAddressInput" placeholder="Enter your delivery address...">
+                    <button class="fp-locate-btn" onclick="detectFrontLocation()">
+                        <i class="fas fa-location-crosshairs" style="color: var(--theme);"></i>
+                        <span>Locate Me</span>
+                    </button>
+                </div>
+            </div>
+
+            <button class="fp-go-btn" onclick="goToMarketplace()">
+                <i class="fas fa-store"></i>
+                Go to marketplace
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="fp-footer">
+        <div class="fp-footer-container">
+            <div>
+                <div class="fp-footer-logo-text">Go<span>!</span>point</div>
+                <p class="fp-footer-brand-text">Your one-stop delivery app. From food to groceries, our Go!point Bikers bring it all — fast and fresh.</p>
+            </div>
+            <div class="fp-footer-columns">
+                <div class="fp-column">
+                    <h4>Contact</h4>
+                    <a href="mailto:support@gopoint.so">support@gopoint.so</a>
+                    <a href="tel:+252610000000">+252 61 000 0000</a>
+                </div>
+                <div class="fp-column">
+                    <h4>Company</h4>
+                    <a href="#">About Us</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Blog</a>
+                </div>
+                <div class="fp-column">
+                    <h4>Legal</h4>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Help Center</a>
+                </div>
+            </div>
+        </div>
+        <div class="fp-copyright">© 2025 Go!point — ONE APP TO RULE THEM ALL</div>
+    </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MAIN APP (Marketplace)
+═══════════════════════════════════════════ -->
+<div id="appContainer" class="">
+
+    <div id="appSyncIndicator" class="app-sync-indicator">
+        <div id="appSyncDot" class="app-sync-dot offline"></div>
+        <span id="appSyncText">Local Mode</span>
+    </div>
+
+    <!-- App Navbar -->
+    <nav class="app-navbar">
+        <div class="app-header">
+            <div class="app-nav-left">
+                <div class="app-merchant-logo">
+                    <span id="appMainTitle">Go!point</span>
+                </div>
+                <div class="app-search-box">
+                    <input type="text" placeholder="Search restaurants..." id="appHomeSearchInput">
+                    <div style="cursor:pointer; color: var(--primary); font-weight: 500; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; white-space: nowrap;" onclick="detectAppLocation()">
+                        <i class="fa fa-location-dot"></i>
+                        <span>Locate</span>
+                    </div>
+                </div>
+            </div>
+            <div class="app-nav-right">
+                <ul>
+                    <li id="appTrackOrderBtn" style="display:none; cursor:pointer;" onclick="openTrackingModal()">
+                        <i class="fa fa-map-marked-alt"></i><span id="appTrackBtnText">Track</span>
+                    </li>
+                    <li onclick="showDriverLogin()" style="cursor:pointer;" title="Driver Portal">
+                        <i class="fa fa-motorcycle"></i><span>Driver</span>
+                    </li>
+                    <li onclick="showManagementLoginForm()" style="cursor:pointer;">
+                        <i class="fa fa-user-shield"></i><span>Admin</span>
+                    </li>
+                    <li onclick="toggleCart()" style="cursor:pointer;">
+                        <i class="fa fa-shopping-cart"></i>
+                        <span id="appCartCount" class="cart-badge" style="display:none;">0</span>
+                    </li>
+                    <!-- User Avatar (shown when logged in) -->
+                    <li id="appUserArea" style="display: block; position: relative;">
+                        <button class="user-avatar-btn" onclick="toggleUserDropdown(event)">
+                            <div class="avatar-circle" id="appUserAvatar">G</div>
+                            <span class="user-name" id="appUserName">Google User</span>
+                        </button>
+                        <div class="user-dropdown" id="appUserDropdown">
+                            <div class="user-dropdown-header">
+                                <div class="user-name-big" id="appUserDropdownName">Google User</div>
+                                <div class="user-email" id="appUserDropdownEmail">user@gmail.com</div>
+                            </div>
+                            <button class="user-dropdown-item" onclick="alert('Profile feature coming soon!')">
+                                <i class="fas fa-user"></i> My Profile
+                            </button>
+                            <button class="user-dropdown-item" onclick="alert('Orders feature coming soon!')">
+                                <i class="fas fa-receipt"></i> My Orders
+                            </button>
+                            <button class="user-dropdown-item" onclick="alert('Addresses feature coming soon!')">
+                                <i class="fas fa-map-marker-alt"></i> Saved Addresses
+                            </button>
+                            <button class="user-dropdown-item danger" onclick="logoutUser()">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Homepage -->
+    <div id="appHomepageContainer">
+        <section class="app-banner">
+            <div class="app-multiBanners">
+                <div class="app-carouselDiv">
+                    <div class="app-carousel-inner" id="appBannerCarousel" style="transform: translateX(-100%);">
+                        <div class="app-carousel-item">
+                            <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1504674900247-0877df9cc836_i1xS.jpeg" alt="Banner 1">
+                            <div class="app-gradientClass"></div>
+                        </div>
+                        <div class="app-carousel-item">
+                            <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1565299624946-b28f40a0ae38_002_i1xS.jpeg" alt="Banner 2">
+                            <div class="app-gradientClass"></div>
+                        </div>
+                        <div class="app-carousel-item">
+                            <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1544025162-d76694265947_i1xS.jpeg" alt="Banner 3">
+                            <div class="app-gradientClass"></div>
+                        </div>
+                    </div>
+                    <div class="app-carousel-indicators">
+                        <button class="" onclick="appGoToSlide(0)"></button>
+                        <button onclick="appGoToSlide(1)" class="active"></button>
+                        <button onclick="appGoToSlide(2)" class=""></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="app-categories-page">
+            <div class="app-categories-carousel" id="appCategoriesCarousel">
+                <div class="app-category-view selected" onclick="appSelectCategory(this, 'All')">
+                    <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1550547660-d9450f859349_i1xS.jpeg" alt="All">
+                    <div class="nameDiv">All</div>
+                </div>
+                <div class="app-category-view" onclick="appSelectCategory(this, 'Italian')">
+                    <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1565299624946-b28f40a0ae38_003_i1xS.jpeg" alt="Italian">
+                    <div class="nameDiv">Italian</div>
+                </div>
+                <div class="app-category-view" onclick="appSelectCategory(this, 'Fast Food')">
+                    <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1568901346375-23c9450c58cd_i1xS.jpeg" alt="Fast Food">
+                    <div class="nameDiv">Fast Food</div>
+                </div>
+                <div class="app-category-view" onclick="appSelectCategory(this, 'Cafe')">
+                    <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1514432324607-a09d9b4aefdd_i1xS.jpeg" alt="Cafe">
+                    <div class="nameDiv">Cafe</div>
+                </div>
+                <div class="app-category-view" onclick="appSelectCategory(this, 'Mediterranean')">
+                    <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1551183053-bf91a1d81141_i1xS.jpeg" alt="Mediterranean">
+                    <div class="nameDiv">Mediterranean</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="app-sticky-top">
+            <div class="app-filter-triggers">
+                <div>
+                    <span class="app-cat-name"><b id="appCategoryLabel">All Restaurants</b></span>
+                </div>
+                <div class="app-viewmaplist">
+                    <div class="app-viewmp selected" onclick="appSwitchView('list')">
+                        <i class="fa fa-list"></i> <span>List</span>
+                    </div>
+                    <div class="app-viewmp" onclick="appSwitchView('map')">
+                        <i class="fa fa-map"></i> <span>Map</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="appMapView" style="display: none;">
+            <div id="appMap" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" style="position: relative;" tabindex="0"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(0px, 0px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 18; transform: translate3d(0px, 0px, 0px) scale(1);"><img alt="" src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/3877_i1xS.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-185px, -113px, 0px); opacity: 1;"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"></div><div class="leaflet-pane leaflet-shadow-pane"><img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/marker-shadow_i1xS.png" class="leaflet-marker-shadow leaflet-zoom-animated" style="margin-left: -12px; margin-top: -41px; width: 41px; height: 41px; transform: translate3d(0px, 0px, 0px);" alt=""><img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/marker-shadow_i1xS.png" class="leaflet-marker-shadow leaflet-zoom-animated" style="margin-left: -12px; margin-top: -41px; width: 41px; height: 41px; transform: translate3d(18px, -12px, 0px);" alt=""><img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/marker-shadow_i1xS.png" class="leaflet-marker-shadow leaflet-zoom-animated" style="margin-left: -12px; margin-top: -41px; width: 41px; height: 41px; transform: translate3d(-17px, 12px, 0px);" alt=""><img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/marker-shadow_i1xS.png" class="leaflet-marker-shadow leaflet-zoom-animated" style="margin-left: -12px; margin-top: -41px; width: 41px; height: 41px; transform: translate3d(29px, -24px, 0px);" alt=""></div><div class="leaflet-pane leaflet-marker-pane"><img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/marker-icon_i1xS.png" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" style="margin-left: -12px; margin-top: -41px; width: 25px; height: 41px; transform: translate3d(0px, 0px, 0px); z-index: 0;" alt="Marker" tabindex="0" role="button"><img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/marker-icon_i1xS.png" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" style="margin-left: -12px; margin-top: -41px; width: 25px; height: 41px; transform: translate3d(18px, -12px, 0px); z-index: -12;" alt="Marker" tabindex="0" role="button"><img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/marker-icon_i1xS.png" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" style="margin-left: -12px; margin-top: -41px; width: 25px; height: 41px; transform: translate3d(-17px, 12px, 0px); z-index: 12;" alt="Marker" tabindex="0" role="button"><img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/marker-icon_i1xS.png" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" style="margin-left: -12px; margin-top: -41px; width: 25px; height: 41px; transform: translate3d(29px, -24px, 0px); z-index: -24;" alt="Marker" tabindex="0" role="button"></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(1305270px, 992625px, 0px) scale(4096);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"><div class="leaflet-control-attribution leaflet-control"><a href="https://leafletjs.com/" title="A JavaScript library for interactive maps"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"></path><path fill="#FFD500" d="M0 4h12v3H0z"></path><path fill="#E0BC00" d="M0 7h12v1H0z"></path></svg> Leaflet</a> <span aria-hidden="true">|</span> © OpenStreetMap</div></div></div></div>
+        </div>
+
+        <div class="app-container" id="appListView">
+            <div class="app-row-eq-height" id="appRestaurantList"><div class="app-card">
+            <div class="app-card_inner">
+                <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1517248135467-4c7edcad34c4_i1xS.jpeg" alt="Damal Restaurant" class="app-card_image_view" loading="lazy">
+                <div>
+                    <div class="app-card_heading">Damal Restaurant</div>
+                    <div class="app-card_description">Mediterranean • Downtown, Hargeisa</div>
+                    <div class="app-bottom-div">
+                        <div class="app-bottom-div1">
+                            <span class="app-store_rating"><i class="fa fa-star"></i> 4.8</span>
+                            <span class="app-dot"></span>
+                            <span>25 min</span>
+                            
+                        </div>
+                        <button class="app-view-menu" data-key="damal-restaurant">View Menu</button>
+                    </div>
+                </div>
+            </div>
+        </div><div class="app-card">
+            <div class="app-card_inner">
+                <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1565299624946-b28f40a0ae38_i1xS.jpeg" alt="Hiddo Dhowr Pizza" class="app-card_image_view" loading="lazy">
+                <div>
+                    <div class="app-card_heading">Hiddo Dhowr Pizza</div>
+                    <div class="app-card_description">Italian • Main Street, Hargeisa</div>
+                    <div class="app-bottom-div">
+                        <div class="app-bottom-div1">
+                            <span class="app-store_rating"><i class="fa fa-star"></i> 4.9</span>
+                            <span class="app-dot"></span>
+                            <span>20 min</span>
+                            
+                        </div>
+                        <button class="app-view-menu" data-key="hiddo-dhowr-pizza">View Menu</button>
+                    </div>
+                </div>
+            </div>
+        </div><div class="app-card">
+            <div class="app-card_inner">
+                <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1550547660-d9450f859349_002_i1xS.jpeg" alt="Burger House" class="app-card_image_view" loading="lazy">
+                <div>
+                    <div class="app-card_heading">Burger House</div>
+                    <div class="app-card_description">Fast Food • Central Market, Hargeisa</div>
+                    <div class="app-bottom-div">
+                        <div class="app-bottom-div1">
+                            <span class="app-store_rating"><i class="fa fa-star"></i> 4.7</span>
+                            <span class="app-dot"></span>
+                            <span>18 min</span>
+                            
+                        </div>
+                        <button class="app-view-menu" data-key="burger-house">View Menu</button>
+                    </div>
+                </div>
+            </div>
+        </div><div class="app-card">
+            <div class="app-card_inner">
+                <img src="Go!point%20%E2%80%94%20Delivery%20Anywhere,%20Anytime_files/photo-1600891964599-f61ba0e24092_i1xS.jpeg" alt="Som Coffee" class="app-card_image_view" loading="lazy">
+                <div>
+                    <div class="app-card_heading">Som Coffee</div>
+                    <div class="app-card_description">Cafe • University Road, Hargeisa</div>
+                    <div class="app-bottom-div">
+                        <div class="app-bottom-div1">
+                            <span class="app-store_rating"><i class="fa fa-star"></i> 4.9</span>
+                            <span class="app-dot"></span>
+                            <span>15 min</span>
+                            
+                        </div>
+                        <button class="app-view-menu" data-key="som-coffee">View Menu</button>
+                    </div>
+                </div>
+            </div>
+        </div></div>
+        </div>
+
+        <footer class="app-footer-container">
+            <div class="app-container">
+                <div class="app-top-row">
+                    <div>
+                        <p class="app-column-row" style="font-size:1.5rem; color:var(--primary);">Go!Point</p>
+                        <p class="app-column-row">Fast • Reliable • Somaliland</p>
+                    </div>
+                    <div>
+                        <p class="app-column-row">CONTACT US</p>
+                        <p class="app-column-row">support@gopoint.so</p>
+                    </div>
+                    <div>
+                        <p class="app-column-row">COMPANY</p>
+                        <p class="app-column-row"><a href="#">About Us</a></p>
+                        <p class="app-column-row"><a href="#">FAQs</a></p>
+                    </div>
+                    <div>
+                        <p class="app-column-row">HELP &amp; LEGAL</p>
+                        <p class="app-column-row"><a href="#">Terms</a></p>
+                        <p class="app-column-row"><a href="#">Privacy</a></p>
+                    </div>
+                </div>
+                <div class="app-copyright">ONE APP TO RULE THEM ALL – Go!Point Delivery © 2025</div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Restaurant Explorer (Menu View) -->
+    <div id="appExplorerContainer" class="app-explorer">
+        <div style="padding: 1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:10px;">
+                <button onclick="appBackToRestaurants()" style="display:flex; align-items:center; gap:8px; background:white; border:1px solid #e5e7eb; padding:8px 16px; border-radius:30px; cursor:pointer; font-weight:600; color:var(--primary);">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <div style="background:white; padding:8px 16px; border-radius:30px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                    <span style="font-size:0.85rem; color:#666;">Now serving:</span>
+                    <span id="appSelectedRestaurantName" style="font-weight:700; color:#333; margin-left:6px;"></span>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-bottom:1rem; overflow-x:auto; padding-bottom:8px;">
+                <button data-category="coffee" class="app-explorer-cat-btn" style="background:#f59e0b; color:white; border:none; padding:8px 16px; border-radius:30px; cursor:pointer; font-weight:600; white-space:nowrap;">☕ Coffee</button>
+                <button data-category="food" class="app-explorer-cat-btn" style="background:white; color:#333; border:1px solid #e5e7eb; padding:8px 16px; border-radius:30px; cursor:pointer; font-weight:600; white-space:nowrap;">🍽️ Food</button>
+                <button data-category="dessert" class="app-explorer-cat-btn" style="background:white; color:#333; border:1px solid #e5e7eb; padding:8px 16px; border-radius:30px; cursor:pointer; font-weight:600; white-space:nowrap;">🍰 Dessert</button>
+            </div>
+
+            <div id="appExplorerMenuItems" class="app-compact-menu-grid"></div>
+        </div>
+    </div>
+
+    <!-- Mini Cart Bar -->
+    <div id="appMiniCartBar" class="app-mini-cart-bar" onclick="toggleCart()">
+        <div class="app-mini-cart-info">
+            <i class="fas fa-shopping-bag" style="font-size:1.3rem;"></i>
+            <div>
+                <div class="app-mini-cart-count"><span id="appMiniCartCount">0</span> items</div>
+                <div style="font-size:0.75rem; opacity:0.9;">Tap to view cart</div>
+            </div>
+        </div>
+        <div class="app-mini-cart-total">$<span id="appMiniCartTotal">0.00</span></div>
+        <div class="app-mini-cart-view">View Cart →</div>
+    </div>
+
+    <!-- Delivery Form Modal -->
+    <div id="appDeliveryForm" class="app-modal-overlay hidden">
+        <div class="app-modal-card">
+            <button class="app-modal-close" onclick="closeDeliveryForm()">×</button>
+            <h3 style="font-size:1.5rem; font-weight:700; color:var(--primary); margin-bottom:20px;">🚚 Delivery Information</h3>
+            <div class="app-step-indicator">
+                <div class="app-step completed"><div class="app-step-number">1</div><div>Order</div></div>
+                <div class="app-step active"><div class="app-step-number">2</div><div>Delivery</div></div>
+                <div class="app-step"><div class="app-step-number">3</div><div>Payment</div></div>
+            </div>
+            <form id="appDeliveryInfoForm" onsubmit="event.preventDefault(); showPaymentForm();">
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-weight:500; margin-bottom:6px;">Full Name *</label>
+                    <input type="text" id="appDeliveryName" class="app-glovo-input" required="">
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-weight:500; margin-bottom:6px;">Phone Number *</label>
+                    <input type="tel" id="appDeliveryPhone" class="app-glovo-input" required="">
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-weight:500; margin-bottom:6px;">📍 Delivery Location</label>
+                    <button type="button" onclick="detectAppLocation()" class="app-detect-location-btn">
+                        <i class="fas fa-location-crosshairs"></i>
+                        <span id="appDetectBtnText">Detect My Location</span>
+                    </button>
+                    <div id="appLocationStatusBox" class="app-location-status" style="display:none;"></div>
+                    <input type="text" id="appDetectedLocation" class="app-glovo-input" style="margin-top:8px;" placeholder="Area name" required="">
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-weight:500; margin-bottom:6px;">Detailed Address *</label>
+                    <textarea id="appDeliveryAddress" rows="2" class="app-glovo-input" placeholder="Street, Building..." required=""></textarea>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-weight:500; margin-bottom:10px;">🚚 Delivery Method *</label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <button type="button" onclick="appSelectDeliveryMethod('bike')" id="appBikeOption" class="app-delivery-method-btn">
+                            <i class="fas fa-motorcycle" style="font-size:1.8rem; color:var(--primary);"></i>
+                            <span style="font-weight:600;">Motorcycle</span>
+                            <small style="color:#666;">Fast delivery</small>
+                        </button>
+                        <button type="button" onclick="appSelectDeliveryMethod('taxi')" id="appTaxiOption" class="app-delivery-method-btn">
+                            <i class="fas fa-car" style="font-size:1.8rem; color:var(--primary);"></i>
+                            <span style="font-weight:600;">Taxi</span>
+                            <small style="color:#666;">Safe delivery</small>
+                        </button>
+                    </div>
+                    <input type="hidden" id="appDeliveryMethod" required="">
+                </div>
+                <div style="margin-bottom:16px; display:none;" id="appVehicleSelectionContainer">
+                    <label style="display:block; font-weight:500; margin-bottom:6px;">Assigned Vehicle</label>
+                    <div id="appAssignedVehicleDisplay" style="padding:16px; background:#f0fdf4; border:2px solid #bbf7d0; border-radius:10px;"></div>
+                    <input type="hidden" id="appSelectedVehicleId" required="">
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" onclick="closeDeliveryForm()" style="flex:1; background:#e5e7eb; color:#333; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Back</button>
+                    <button type="submit" class="app-glovo-button" style="flex:1;">Continue to Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Form Modal -->
+    <div id="appPaymentForm" class="app-modal-overlay hidden">
+        <div class="app-modal-card">
+            <button class="app-modal-close" onclick="backToDelivery()">×</button>
+            <h3 style="font-size:1.5rem; font-weight:700; color:var(--primary); margin-bottom:20px;"><i class="fas fa-credit-card"></i> Payment Method</h3>
+            <div class="app-step-indicator">
+                <div class="app-step completed"><div class="app-step-number">1</div><div>Order</div></div>
+                <div class="app-step completed"><div class="app-step-number">2</div><div>Delivery</div></div>
+                <div class="app-step active"><div class="app-step-number">3</div><div>Payment</div></div>
+            </div>
+            <div style="padding:16px; background:linear-gradient(to right, #f0fdf4, #ecfdf5); border-radius:16px; border:1px solid #bbf7d0; margin-bottom:24px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:1.1rem; font-weight:600;"><i class="fas fa-receipt" style="color:var(--primary); margin-right:8px;"></i>Total:</span>
+                    <span id="appPaymentTotal" style="font-size:1.5rem; font-weight:700; color:var(--primary);">$0.00</span>
+                </div>
+            </div>
+            <div style="margin-bottom:24px;">
+                <label style="display:block; font-weight:600; margin-bottom:12px; text-align:center;">Payment Method *</label>
+                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+                    <div class="app-payment-option selected" data-value="telesom" data-prefix="63" onclick="appHandlePaymentSelection(this)">
+                        <i class="fas fa-mobile-alt" style="font-size:1.5rem; color:var(--primary); display:block; margin-bottom:8px;"></i>
+                        <div style="font-weight:600;">Telesom</div>
+                        <small style="color:#666;">63 + 7 digits</small>
+                    </div>
+                    <div class="app-payment-option" data-value="edahab" data-prefix="65" onclick="appHandlePaymentSelection(this)">
+                        <i class="fas fa-wallet" style="font-size:1.5rem; color:#f59e0b; display:block; margin-bottom:8px;"></i>
+                        <div style="font-weight:600;">E-Dahab</div>
+                        <small style="color:#666;">65 + 7 digits</small>
+                    </div>
+                    <div class="app-payment-option" data-value="cash" data-prefix="" onclick="appHandlePaymentSelection(this)">
+                        <i class="fas fa-hand-holding-usd" style="font-size:1.5rem; color:var(--primary); display:block; margin-bottom:8px;"></i>
+                        <div style="font-weight:600;">Cash</div>
+                        <small style="color:#666;">On Delivery</small>
+                    </div>
+                </div>
+                <input type="hidden" id="appPaymentMethod" value="telesom">
+            </div>
+            <div style="margin-bottom:24px;" id="appPaymentPhoneContainer">
+                <label style="display:block; font-weight:600; margin-bottom:12px; text-align:center;">Phone Number *</label>
+                <div class="app-phone-input">
+                    <div class="app-phone-prefix" id="appPhonePrefix">+252 63</div>
+                    <input type="tel" id="appPaymentPhone" class="app-phone-number" placeholder="XXX XXXX" maxlength="7">
+                </div>
+                <div id="appPhoneError" style="color:#ef4444; margin-top:8px; font-size:0.85rem; display:none;">Enter a valid 7-digit phone number</div>
+            </div>
+            <div style="display:flex; gap:12px;">
+                <button type="button" onclick="backToDelivery()" style="flex:1; background:#e5e7eb; color:#333; padding:14px; border:none; border-radius:10px; cursor:pointer; font-weight:600;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button type="button" onclick="submitDeliveryOrder()" class="app-glovo-button" style="flex:1;">
+                    <i class="fas fa-lock"></i> Place Order
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Window -->
+    <div id="appCartWindow" class="app-cart-window">
+        <div class="app-cart-header" style="background:var(--primary); color:white; padding:16px; display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="font-weight:700;"><i class="fas fa-shopping-cart" style="margin-right:8px;"></i>Your Order</h3>
+            <button onclick="toggleCart()" style="background:none; border:none; color:white; font-size:1.3rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="app-cart-content" style="padding:16px;">
+            <div id="appCartItems">
+                <div style="text-align:center; padding:24px; color:#666;">
+                    <i class="fas fa-coffee" style="font-size:2rem; margin-bottom:8px; display:block;"></i>
+                    <p>Your cart is empty</p>
+                </div>
+            </div>
+            <div id="appCartSummary" style="border-top:1px solid #e5e7eb; padding-top:16px; margin-top:16px; display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <span style="font-size:1.1rem; font-weight:600;">Total:</span>
+                    <span id="appTotalPrice" style="font-size:1.3rem; font-weight:700; color:var(--primary);">$0.00</span>
+                </div>
+                <button onclick="proceedToDelivery()" style="width:100%; background:#f59e0b; color:white; font-weight:700; padding:12px; border:none; border-radius:10px; cursor:pointer;">
+                    Proceed to Delivery
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tracking Modal -->
+    <div id="appTrackingModal" class="app-modal-overlay hidden">
+        <div class="app-modal-card" style="max-width:900px;">
+            <div style="padding:16px; background:linear-gradient(to right, #2563eb, #1e40af); color:white; border-radius:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h3 style="font-size:1.2rem; font-weight:700;"><i class="fas fa-map-marked-alt" style="margin-right:8px;"></i>Live Order Tracking</h3>
+                    <p style="font-size:0.85rem; opacity:0.9;" id="appTrackingOrderId">Order #------</p>
+                </div>
+                <button onclick="closeTrackingModal()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:1.2rem;">×</button>
+            </div>
+            <div id="appTrackingMap" style="height:400px; width:100%; border-radius:12px; margin-bottom:16px;"></div>
+            <div class="app-tracking-timeline" id="appTrackingTimeline" style="margin-bottom:16px;"></div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;">
+                <div style="background:#f0fdf4; padding:12px; border-radius:10px; border:1px solid #bbf7d0;">
+                    <h4 style="font-weight:700; color:#065f46; margin-bottom:6px;"><i class="fas fa-store" style="margin-right:6px;"></i>Restaurant</h4>
+                    <p id="appTrackRestName" style="font-size:0.9rem; font-weight:600;">-</p>
+                </div>
+                <div style="background:#eff6ff; padding:12px; border-radius:10px; border:1px solid #bfdbfe;">
+                    <h4 style="font-weight:700; color:#1e40af; margin-bottom:6px;"><i class="fas fa-motorcycle" style="margin-right:6px;"></i>Driver</h4>
+                    <p id="appTrackDriverName" style="font-size:0.9rem; font-weight:600;">-</p>
+                    <p id="appTrackDriverPhone" style="font-size:0.8rem; color:#666;">-</p>
+                </div>
+                <div style="background:#fffbeb; padding:12px; border-radius:10px; border:1px solid #fde68a;">
+                    <h4 style="font-weight:700; color:#92400e; margin-bottom:6px;"><i class="fas fa-home" style="margin-right:6px;"></i>Delivering To</h4>
+                    <p id="appTrackCustomerName" style="font-size:0.9rem; font-weight:600;">-</p>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button onclick="callDriver()" style="flex:1; min-width:120px; background:var(--primary); color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;">
+                    <i class="fas fa-phone"></i> Call Driver
+                </button>
+                <button onclick="whatsappDriver()" style="flex:1; min-width:120px; background:#25D366; color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
+                <button onclick="refreshTracking()" style="flex:1; min-width:120px; background:#3b82f6; color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Login -->
+    <div id="appLoginForm" class="app-modal-overlay hidden">
+        <div class="app-modal-card" style="max-width:400px;">
+            <button class="app-modal-close" onclick="closeLoginForm()">×</button>
+            <div style="text-align:center; margin-bottom:20px;"><div style="font-size:3rem;">🔐</div></div>
+            <h3 style="font-size:1.5rem; font-weight:700; color:var(--primary); margin-bottom:16px; text-align:center;">Management Login</h3>
+            <p style="text-align:center; color:#666; font-size:0.85rem; margin-bottom:16px;">Username: <b>admin</b> | Password: <b>admin123</b></p>
+            <form id="appManagementLoginForm" onsubmit="event.preventDefault(); login();">
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; font-weight:500; margin-bottom:6px;">Username</label>
+                    <input type="text" id="appUsername" class="app-glovo-input" required="">
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-weight:500; margin-bottom:6px;">Password</label>
+                    <input type="password" id="appPassword" class="app-glovo-input" required="">
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" onclick="closeLoginForm()" style="flex:1; background:#e5e7eb; color:#333; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Cancel</button>
+                    <button type="submit" class="app-glovo-button" style="flex:1;">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Management View -->
+    <div id="appManagementView" style="display:none; padding:20px; margin-top:70px;">
+        <div style="max-width:1400px; margin:0 auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h1 style="font-size:1.8rem; font-weight:700; color:var(--primary); margin-bottom:4px;">Management Dashboard</h1>
+                    <p style="color:#666;">Manage orders and view analytics</p>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="openSettingsModal()" class="app-glovo-button"><i class="fas fa-cog"></i> Settings</button>
+                    <button onclick="logout()" style="background:#ef4444; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-weight:600;">Logout</button>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:24px;">
+                <div class="app-stats-card" style="background:white; padding:16px;">
+                    <p style="color:#666; font-size:0.8rem;">Today</p>
+                    <p id="appTodayOrders" style="font-size:1.5rem; font-weight:700;">0</p>
+                </div>
+                <div class="app-stats-card" style="background:white; padding:16px;">
+                    <p style="color:#666; font-size:0.8rem;">Month</p>
+                    <p id="appMonthlyOrders" style="font-size:1.5rem; font-weight:700;">0</p>
+                </div>
+                <div class="app-stats-card" style="background:white; padding:16px;">
+                    <p style="color:#666; font-size:0.8rem;">Revenue</p>
+                    <p id="appTotalRevenue" style="font-size:1.5rem; font-weight:700;">$0.00</p>
+                </div>
+                <div class="app-stats-card" style="background:white; padding:16px;">
+                    <p style="color:#666; font-size:0.8rem;">Active</p>
+                    <p id="appDeliveryOrders" style="font-size:1.5rem; font-weight:700;">0</p>
+                </div>
+                <div class="app-stats-card" style="background:white; padding:16px;">
+                    <p style="color:#666; font-size:0.8rem;">All Time</p>
+                    <p id="appTotalOrders" style="font-size:1.5rem; font-weight:700;">0</p>
+                </div>
+            </div>
+
+            <div style="background:white; border-radius:12px; padding:20px; margin-bottom:24px;">
+                <h2 style="font-size:1.2rem; font-weight:700; margin-bottom:16px;"><i class="fas fa-cogs" style="margin-right:8px;"></i>Fleet Management</h2>
+                <div id="appVehiclesList" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:12px;"><div style="border: 1px solid rgb(229, 231, 235); border-radius: 10px; padding: 16px; background: rgb(249, 250, 251);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="display:flex;align-items:center;">
+                    <i class="fas fa-motorcycle" style="font-size:1.5rem;margin-right:12px;color:var(--primary);"></i>
+                    <div>
+                        <h3 style="font-weight:700;">Ahmed Ali</h3>
+                        <p style="color:#666;font-size:0.85rem;">B1234</p>
+                        <p style="color:#888;font-size:0.75rem;">+252631112222</p>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="background:#22c55e;color:white;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600;">available</div>
+                    <button onclick="appToggleVehicleStatus('1')" style="font-size:0.75rem;background:#e5e7eb;padding:4px 8px;border:none;border-radius:6px;margin-top:6px;cursor:pointer;">Toggle</button>
+                </div>
+            </div>
+        </div><div style="border: 1px solid rgb(229, 231, 235); border-radius: 10px; padding: 16px; background: rgb(249, 250, 251);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="display:flex;align-items:center;">
+                    <i class="fas fa-car" style="font-size:1.5rem;margin-right:12px;color:var(--primary);"></i>
+                    <div>
+                        <h3 style="font-weight:700;">Mohamed Hassan</h3>
+                        <p style="color:#666;font-size:0.85rem;">T5678</p>
+                        <p style="color:#888;font-size:0.75rem;">+252653334444</p>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="background:#22c55e;color:white;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600;">available</div>
+                    <button onclick="appToggleVehicleStatus('2')" style="font-size:0.75rem;background:#e5e7eb;padding:4px 8px;border:none;border-radius:6px;margin-top:6px;cursor:pointer;">Toggle</button>
+                </div>
+            </div>
+        </div><div style="border: 1px solid rgb(229, 231, 235); border-radius: 10px; padding: 16px; background: rgb(249, 250, 251);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="display:flex;align-items:center;">
+                    <i class="fas fa-motorcycle" style="font-size:1.5rem;margin-right:12px;color:var(--primary);"></i>
+                    <div>
+                        <h3 style="font-weight:700;">Abdi Karim</h3>
+                        <p style="color:#666;font-size:0.85rem;">B9012</p>
+                        <p style="color:#888;font-size:0.75rem;">+252635556666</p>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="background:#3b82f6;color:white;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600;">delivering</div>
+                    <button onclick="appToggleVehicleStatus('3')" style="font-size:0.75rem;background:#e5e7eb;padding:4px 8px;border:none;border-radius:6px;margin-top:6px;cursor:pointer;">Toggle</button>
+                </div>
+            </div>
+        </div><div style="border: 1px solid rgb(229, 231, 235); border-radius: 10px; padding: 16px; background: rgb(249, 250, 251);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="display:flex;align-items:center;">
+                    <i class="fas fa-car" style="font-size:1.5rem;margin-right:12px;color:var(--primary);"></i>
+                    <div>
+                        <h3 style="font-weight:700;">Fatima Omar</h3>
+                        <p style="color:#666;font-size:0.85rem;">T2468</p>
+                        <p style="color:#888;font-size:0.75rem;">+252657778888</p>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="background:#22c55e;color:white;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600;">available</div>
+                    <button onclick="appToggleVehicleStatus('4')" style="font-size:0.75rem;background:#e5e7eb;padding:4px 8px;border:none;border-radius:6px;margin-top:6px;cursor:pointer;">Toggle</button>
+                </div>
+            </div>
+        </div></div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;">
+                <div style="background:white; border-radius:12px; padding:20px;">
+                    <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:16px;"><i class="fas fa-bolt" style="color:var(--primary); margin-right:8px;"></i>Active Orders</h2>
+                    <div id="appPendingOrdersList" style="max-height:500px; overflow-y:auto;"><p style="text-align:center;color:#666;padding:20px;"><i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:8px;"></i>No active orders</p></div>
+                </div>
+                <div style="background:white; border-radius:12px; padding:20px;">
+                    <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:16px;"><i class="fas fa-check-circle" style="color:var(--primary); margin-right:8px;"></i>Completed</h2>
+                    <div id="appCompletedOrdersList" style="max-height:500px; overflow-y:auto;"><p style="text-align:center;color:#666;padding:20px;"><i class="fas fa-check-circle" style="font-size:2rem;display:block;margin-bottom:8px;"></i>No completed orders</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Driver Login -->
+    <div id="appDriverLoginForm" class="app-modal-overlay hidden">
+        <div class="app-driver-login-box" style="margin:0;">
+            <div style="font-size:3rem; margin-bottom:10px;">🛵</div>
+            <h2>Driver Portal</h2>
+            <p>Enter your credentials</p>
+            <form onsubmit="event.preventDefault(); loginDriver();">
+                <input type="text" id="appDriverLoginPhone" placeholder="Phone Number" required="">
+                <input type="password" id="appDriverLoginPin" placeholder="PIN" required="">
+                <button type="submit" class="app-glovo-button" style="width:100%; margin-top:10px;">Login as Driver</button>
+                <button type="button" onclick="closeDriverLogin()" style="width:100%; background:#64748b; color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; margin-top:8px; font-weight:600;">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Driver Portal -->
+    <div id="appDriverPortal" class="app-driver-portal">
+        <div class="app-driver-header">
+            <div>
+                <h1 style="font-size:1.5rem; font-weight:700; color:var(--primary);">🛵 Driver Portal</h1>
+                <p id="appDriverWelcomeMsg" style="font-size:0.9rem; color:#94a3b8;">Welcome, Driver</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button onclick="toggleDriverStatus()" class="app-driver-btn app-driver-btn-accept" style="flex:0; padding:10px 20px;">
+                    <i class="fas fa-toggle-on"></i> <span id="appDriverStatusText">Online</span>
+                </button>
+                <button onclick="logoutDriver()" class="app-driver-btn app-driver-btn-reject" style="flex:0; padding:10px 20px;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="app-driver-status-card" id="appDriverStatusCard">
+            <div>
+                <h3 style="font-size:1.1rem; font-weight:700;">You are <span id="appDriverStatusDisplay">Online</span></h3>
+                <p style="font-size:0.85rem; opacity:0.9;" id="appDriverStatsMsg">Ready to receive orders</p>
+            </div>
+            <div style="font-size:2.5rem;" id="appDriverStatusIcon">🟢</div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:15px;">
+                <i class="fas fa-bell" style="color:#f59e0b;"></i> Incoming Orders
+                <span id="appNewOrderCount" class="cart-badge" style="background:#ef4444; margin-left:6px;">0</span>
+            </h3>
+            <div id="appDriverOrdersList">
+                <div style="text-align:center; padding:40px; color:#64748b;">
+                    <i class="fas fa-inbox" style="font-size:3rem; margin-bottom:10px; display:block;"></i>
+                    <p>No incoming orders</p>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:15px;">
+                <i class="fas fa-history" style="color:var(--primary);"></i> My Active Deliveries
+            </h3>
+            <div id="appDriverActiveDeliveries">
+                <div style="text-align:center; padding:30px; color:#64748b;"><p>No active deliveries</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="appSettingsModal" class="app-modal-overlay hidden">
+        <div class="app-modal-card" style="max-width:700px;">
+            <button class="app-modal-close" onclick="closeSettingsModal()">×</button>
+            <h2 style="font-size:1.5rem; font-weight:700; color:var(--primary); margin-bottom:20px;"><i class="fas fa-cog"></i> Settings</h2>
+            <div style="display:flex; gap:8px; border-bottom:2px solid #e5e7eb; margin-bottom:20px; overflow-x:auto;">
+                <button onclick="appShowSettingsTab('system')" class="app-settings-tab active" style="padding:10px 20px; border:none; background:none; cursor:pointer; font-weight:500; color:#666; border-bottom:3px solid transparent; margin-bottom:-2px;">System</button>
+                <button onclick="appShowSettingsTab('registerRestaurant')" class="app-settings-tab" style="padding:10px 20px; border:none; background:none; cursor:pointer; font-weight:500; color:#666; border-bottom:3px solid transparent; margin-bottom:-2px;">Add Restaurant</button>
+                <button onclick="appShowSettingsTab('registerVehicle')" class="app-settings-tab" style="padding:10px 20px; border:none; background:none; cursor:pointer; font-weight:500; color:#666; border-bottom:3px solid transparent; margin-bottom:-2px;">Register Vehicle</button>
+            </div>
+
+            <div id="appSystemSettingsTab">
+                <h3 style="font-size:1.1rem; font-weight:600; margin-bottom:16px;">General Settings</h3>
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; font-weight:500; margin-bottom:6px;">Business Name</label>
+                    <input type="text" id="appBusinessName" class="app-glovo-input" value="Go!Point">
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; font-weight:500; margin-bottom:6px;">Address</label>
+                    <textarea id="appBusinessAddress" rows="2" class="app-glovo-input">Hargeisa, Somaliland</textarea>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+                    <div>
+                        <label style="display:block; font-weight:500; margin-bottom:6px;">Phone</label>
+                        <input type="tel" id="appBusinessPhone" class="app-glovo-input" value="+252 61 XXX XXXX">
+                    </div>
+                    <div>
+                        <label style="display:block; font-weight:500; margin-bottom:6px;">Email</label>
+                        <input type="email" id="appBusinessEmail" class="app-glovo-input" value="info@gopoint.com">
+                    </div>
+                </div>
+                <button onclick="saveSystemSettings()" class="app-glovo-button"><i class="fas fa-save"></i> Save</button>
+            </div>
+
+            <div id="appRegisterRestaurantTab" style="display:none;">
+                <h3 style="font-size:1.1rem; font-weight:600; margin-bottom:16px;">Add New Restaurant</h3>
+                <form onsubmit="event.preventDefault(); registerRestaurant();">
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-weight:500; margin-bottom:6px;">Name *</label>
+                        <input type="text" id="appNewRestaurantName" class="app-glovo-input" required="">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-weight:500; margin-bottom:6px;">Address *</label>
+                        <input type="text" id="appNewRestaurantAddress" class="app-glovo-input" required="">
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+                        <div>
+                            <label style="display:block; font-weight:500; margin-bottom:6px;">Latitude *</label>
+                            <input type="number" step="any" id="appNewRestaurantLat" class="app-glovo-input" value="9.5600" required="">
+                        </div>
+                        <div>
+                            <label style="display:block; font-weight:500; margin-bottom:6px;">Longitude *</label>
+                            <input type="number" step="any" id="appNewRestaurantLng" class="app-glovo-input" value="44.0650" required="">
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+                        <div>
+                            <label style="display:block; font-weight:500; margin-bottom:6px;">Phone *</label>
+                            <input type="tel" id="appNewRestaurantPhone" class="app-glovo-input" required="">
+                        </div>
+                        <div>
+                            <label style="display:block; font-weight:500; margin-bottom:6px;">Email</label>
+                            <input type="email" id="appNewRestaurantEmail" class="app-glovo-input">
+                        </div>
+                    </div>
+                    <button type="submit" class="app-glovo-button" style="width:100%;"><i class="fas fa-plus"></i> Register Restaurant</button>
+                </form>
+            </div>
+
+            <div id="appRegisterVehicleTab" style="display:none;">
+                <h3 style="font-size:1.1rem; font-weight:600; margin-bottom:16px;">Register New Vehicle</h3>
+                <form onsubmit="event.preventDefault(); registerVehicle();">
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-weight:500; margin-bottom:6px;">Type *</label>
+                        <select id="appVehicleType" class="app-glovo-select" required="">
+                            <option value="" selected="selected">Select</option>
+                            <option value="bike">Motorcycle</option>
+                            <option value="taxi">Taxi</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-weight:500; margin-bottom:6px;">Plate Number *</label>
+                        <input type="text" id="appPlateNumber" class="app-glovo-input" required="">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-weight:500; margin-bottom:6px;">Driver Name *</label>
+                        <input type="text" id="appDriverName" class="app-glovo-input" required="">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-weight:500; margin-bottom:6px;">Driver Phone *</label>
+                        <input type="tel" id="appDriverPhone" class="app-glovo-input" required="">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-weight:500; margin-bottom:6px;">Driver PIN *</label>
+                        <input type="text" id="appDriverPin" class="app-glovo-input" placeholder="4-6 digits" required="">
+                    </div>
+                    <button type="submit" class="app-glovo-button" style="width:100%;"><i class="fas fa-plus"></i> Register Vehicle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="app-toast" id="appToast">👋 Logged out successfully</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// SUPABASE CONFIG
+// ═══════════════════════════════════════════
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+let supabaseClient = null;
+let useSupabase = false;
+
+try {
+    if (SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && window.supabase) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        useSupabase = true;
+        updateAppSyncStatus(true, "Synced");
+    } else {
+        updateAppSyncStatus(false, "Local Mode");
+    }
+} catch (e) {
+    updateAppSyncStatus(false, "Offline");
+}
+
+function updateAppSyncStatus(online, text) {
+    const dot = document.getElementById('appSyncDot'), txt = document.getElementById('appSyncText');
+    if (dot && txt) { dot.className = online ? 'app-sync-dot' : 'app-sync-dot offline'; txt.textContent = text; }
+}
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentUser = null; // { name, email, phone, provider }
+let currentView = 'customer';
+let activeCategory = 'coffee';
+let cart = [], cartVisible = false;
+let deliveryInfo = {}, paymentInfo = {};
+let detectedCoordinates = null;
+let customerLocation = null;
+let selectedVehicleId = null;
+let currentBillOrder = null, currentRestaurant = null;
+let selectedPayment = 'telesom';
+let trackingMap = null, driverMarker = null, driverSimulationInterval = null;
+let currentTrackedOrder = null;
+let selectedDeliveryMethod = null;
+
+let restaurants = {}, vehicles = [], orders = [];
+let settings = { system: { businessName: 'Go!Point', businessAddress: 'Hargeisa, Somaliland', businessPhone: '+252 61 XXX XXXX', businessEmail: 'info@gopoint.com' } };
+
+// Driver state
+let currentDriver = null;
+let driverOnline = true;
+let ringingOrderIds = new Set();
+
+// App state
+let appMap = null;
+let appMarkers = [];
+let appCustomerMarker = null;
+let appCurrentSlide = 0;
+let appBannerInterval = null;
+let appCurrentCategory = 'All';
+
+const restaurantImages = [
+    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=350&fit=crop',
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&h=350&fit=crop',
+    'https://images.unsplash.com/photo-1550547660-d9450f859349?w=500&h=350&fit=crop',
+    'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=500&h=350&fit=crop',
+    'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&h=350&fit=crop',
+    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&h=350&fit=crop'
+];
+
+const defaultRestaurants = {
+    'damal-restaurant': {
+        name: 'Damal Restaurant', address: 'Downtown, Hargeisa', phone: '+252 61 1234567',
+        lat: 9.5600, lng: 44.0650, rating: 4.8, deliveryTime: '25 min', deliveryFee: '$2', cuisine: 'Mediterranean',
+        menu: {
+            coffee: [
+                { id: 1, name: 'Espresso', price: 3.50, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Rich & bold single shot' },
+                { id: 2, name: 'Cappuccino', price: 4.25, image: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=200&h=200&fit=crop', description: 'Espresso with steamed milk foam' },
+                { id: 3, name: 'Latte', price: 4.50, image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', description: 'Smooth espresso with milk' }
+            ],
+            food: [
+                { id: 4, name: 'Signature Burger', price: 12.90, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop', description: 'Grilled beef, cheddar, fresh veggies' },
+                { id: 5, name: 'Truffle Pasta', price: 14.50, image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200&h=200&fit=crop', description: 'Creamy mushroom truffle sauce' },
+                { id: 6, name: 'Grilled Chicken', price: 11.00, image: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=200&h=200&fit=crop', description: 'Juicy grilled chicken' }
+            ],
+            dessert: [
+                { id: 7, name: 'New York Cheesecake', price: 6.50, image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=200&h=200&fit=crop', description: 'Creamy classic cheesecake' },
+                { id: 8, name: 'Chocolate Brownie', price: 5.50, image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=200&h=200&fit=crop', description: 'Rich chocolate brownie' }
+            ]
+        }
+    },
+    'hiddo-dhowr-pizza': {
+        name: 'Hiddo Dhowr Pizza', address: 'Main Street, Hargeisa', phone: '+252 61 2345678',
+        lat: 9.5620, lng: 44.0680, rating: 4.9, deliveryTime: '20 min', deliveryFee: '$1.5', cuisine: 'Italian',
+        menu: {
+            coffee: [
+                { id: 10, name: 'Italian Espresso', price: 3.00, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Authentic Italian roast' }
+            ],
+            food: [
+                { id: 12, name: 'Margherita Pizza', price: 10.50, image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop', description: 'Classic tomato, mozzarella, basil' },
+                { id: 13, name: 'Pepperoni Pizza', price: 12.90, image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=200&h=200&fit=crop', description: 'Loaded with pepperoni' },
+                { id: 14, name: 'Pasta Carbonara', price: 11.50, image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200&h=200&fit=crop', description: 'Creamy Italian pasta' }
+            ],
+            dessert: [
+                { id: 15, name: 'Tiramisu', price: 7.25, image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=200&h=200&fit=crop', description: 'Classic Italian dessert' }
+            ]
+        }
+    },
+    'burger-house': {
+        name: 'Burger House', address: 'Central Market, Hargeisa', phone: '+252 61 3456789',
+        lat: 9.5580, lng: 44.0620, rating: 4.7, deliveryTime: '18 min', deliveryFee: '$2', cuisine: 'Fast Food',
+        menu: {
+            coffee: [
+                { id: 17, name: 'Americano', price: 3.75, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Espresso with hot water' }
+            ],
+            food: [
+                { id: 18, name: 'Classic Burger', price: 9.90, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop', description: 'Beef patty, lettuce, tomato' },
+                { id: 19, name: 'Double Cheese Burger', price: 13.50, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=200&h=200&fit=crop', description: 'Double patty with extra cheese' },
+                { id: 20, name: 'Chicken Burger', price: 10.50, image: 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=200&h=200&fit=crop', description: 'Crispy chicken burger' }
+            ],
+            dessert: [
+                { id: 21, name: 'Milkshake', price: 5.50, image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=200&h=200&fit=crop', description: 'Vanilla, chocolate, or strawberry' }
+            ]
+        }
+    },
+    'som-coffee': {
+        name: 'Som Coffee', address: 'University Road, Hargeisa', phone: '+252 61 4567890',
+        lat: 9.5640, lng: 44.0700, rating: 4.9, deliveryTime: '15 min', deliveryFee: '$1', cuisine: 'Cafe',
+        menu: {
+            coffee: [
+                { id: 22, name: 'Somali Spiced Coffee', price: 4.00, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Traditional cardamom & clove' },
+                { id: 23, name: 'Iced Latte', price: 4.50, image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', description: 'Cold espresso with milk' },
+                { id: 24, name: 'Mocha', price: 5.00, image: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=200&h=200&fit=crop', description: 'Chocolate & espresso' }
+            ],
+            food: [
+                { id: 25, name: 'Croissant', price: 3.25, image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200&h=200&fit=crop', description: 'Buttery French pastry' }
+            ],
+            dessert: [
+                { id: 27, name: 'Baklava', price: 4.50, image: 'https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=200&h=200&fit=crop', description: 'Layers of filo with nuts & honey' }
+            ]
+        }
+    }
+};
+
+const defaultVehicles = [
+    { type: 'bike', plateNumber: 'B1234', driverName: 'Ahmed Ali', driverPhone: '+252631112222', driverPin: '1234', status: 'available', lat: 9.5650, lng: 44.0700 },
+    { type: 'taxi', plateNumber: 'T5678', driverName: 'Mohamed Hassan', driverPhone: '+252653334444', driverPin: '2345', status: 'available', lat: 9.5550, lng: 44.0550 },
+    { type: 'bike', plateNumber: 'B9012', driverName: 'Abdi Karim', driverPhone: '+252635556666', driverPin: '3456', status: 'delivering', lat: 9.5700, lng: 44.0600 },
+    { type: 'taxi', plateNumber: 'T2468', driverName: 'Fatima Omar', driverPhone: '+252657778888', driverPin: '4567', status: 'available', lat: 9.5610, lng: 44.0660 }
+];
+
+// ═══════════════════════════════════════════
+// FRONT PAGE LOGIC
+// ═══════════════════════════════════════════
+
+// Check if user is already logged in on page load
+window.addEventListener('DOMContentLoaded', () => {
+    const savedUser = localStorage.getItem('gopoint_user');
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+            goToMarketplace();
+        } catch (e) {
+            localStorage.removeItem('gopoint_user');
+        }
+    }
+
+    // Front page header scroll effect
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('fpHeader');
+        if (header) {
+            if (window.scrollY > 50) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+        }
+    });
+
+    // OTP input handling
+    const otpInputs = document.querySelectorAll('.fp-otp-digit');
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (/^\d*$/.test(value) && value.length <= 1) {
+                if (value && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            } else {
+                e.target.value = e.target.value.replace(/\D/g, '').substring(0, 1);
+            }
+        });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !input.value && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
+    });
+
+    // Initialize app
+    initApp();
+});
+
+function openFrontLogin() {
+    document.getElementById('fpLoginModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('fpPhoneNumber').focus(), 100);
+}
+
+function closeFrontLogin() {
+    document.getElementById('fpLoginModal').classList.remove('active');
+    document.body.style.overflow = '';
+    document.getElementById('fpOtpSection').style.display = 'none';
+    document.getElementById('fpPhoneStep').style.display = 'block';
+    document.querySelectorAll('.fp-otp-digit').forEach(el => el.value = '');
+}
+
+function toggleFpMobileMenu() {
+    document.getElementById('fpMobileMenu').classList.toggle('active');
+}
+
+function loginWithWhatsApp() {
+    const phone = document.getElementById('fpPhoneNumber').value.trim();
+    const code = document.getElementById('fpCountryCode').value;
+    if (!phone || phone.length < 7) {
+        showAppToast('⚠️ Please enter a valid phone number');
+        return;
+    }
+    // Show OTP section
+    document.getElementById('fpPhoneStep').style.display = 'none';
+    document.getElementById('fpOtpSection').style.display = 'block';
+    startFpCountdown();
+    setTimeout(() => document.querySelector('.fp-otp-digit').focus(), 100);
+    showAppToast('📱 Code sent to WhatsApp');
+}
+
+function loginWithGmail() {
+    // Simulate Gmail login
+    showAppToast('🔐 Connecting to Google...');
+    setTimeout(() => {
+        const mockUser = {
+            name: 'Google User',
+            email: 'user@gmail.com',
+            phone: '',
+            provider: 'gmail'
+        };
+        completeLogin(mockUser);
+    }, 1200);
+}
+
+function verifyOtp() {
+    const otpInputs = document.querySelectorAll('.fp-otp-digit');
+    let otp = '';
+    otpInputs.forEach(input => otp += input.value);
+    if (otp.length !== 6) {
+        showAppToast('⚠️ Please enter the 6-digit code');
+        return;
+    }
+    // Simulate verification
+    showAppToast('✅ Verifying...');
+    setTimeout(() => {
+        const phone = document.getElementById('fpPhoneNumber').value.trim();
+        const code = document.getElementById('fpCountryCode').value;
+        const user = {
+            name: 'User ' + phone.slice(-4),
+            email: '',
+            phone: code + phone,
+            provider: 'whatsapp'
+        };
+        completeLogin(user);
+    }, 800);
+}
+
+function backToPhoneStep() {
+    document.getElementById('fpOtpSection').style.display = 'none';
+    document.getElementById('fpPhoneStep').style.display = 'block';
+}
+
+let fpCountdownInterval;
+let fpTimeLeft = 60;
+
+function startFpCountdown() {
+    clearInterval(fpCountdownInterval);
+    fpTimeLeft = 60;
+    document.getElementById('fpCountdown').textContent = fpTimeLeft;
+    document.getElementById('fpTimer').style.display = 'block';
+    document.getElementById('fpResendOtp').classList.add('disabled');
+    fpCountdownInterval = setInterval(() => {
+        fpTimeLeft--;
+        document.getElementById('fpCountdown').textContent = fpTimeLeft;
+        if (fpTimeLeft <= 0) {
+            clearInterval(fpCountdownInterval);
+            document.getElementById('fpResendOtp').classList.remove('disabled');
+        }
+    }, 1000);
+}
+
+function resendOtp() {
+    if (document.getElementById('fpResendOtp').classList.contains('disabled')) return;
+    startFpCountdown();
+    showAppToast('✅ New code sent');
+}
+
+function completeLogin(user) {
+    currentUser = user;
+    localStorage.setItem('gopoint_user', JSON.stringify(user));
+    closeFrontLogin();
+    showAppToast('✅ Welcome, ' + user.name + '!');
+    setTimeout(() => goToMarketplace(), 500);
+}
+
+function goToMarketplace() {
+    document.getElementById('frontPageContainer').style.display = 'none';
+    document.getElementById('appContainer').classList.add('active');
+    window.scrollTo({ top: 0 });
+    updateUserUI();
+    // Initialize app components
+    setTimeout(() => {
+        if (appMap) appMap.invalidateSize();
+        appRenderRestaurantList();
+    }, 100);
+}
+
+function logoutUser() {
+    if (!confirm('Are you sure you want to logout?')) return;
+    currentUser = null;
+    localStorage.removeItem('gopoint_user');
+    document.getElementById('appContainer').classList.remove('active');
+    document.getElementById('frontPageContainer').style.display = 'block';
+    document.getElementById('appUserDropdown').classList.remove('active');
+    window.scrollTo({ top: 0 });
+    showAppToast('👋 Logged out successfully');
+}
+
+function updateUserUI() {
+    const userArea = document.getElementById('appUserArea');
+    if (!currentUser) {
+        userArea.style.display = 'none';
+        return;
+    }
+    userArea.style.display = 'block';
+    const initial = (currentUser.name || 'U').charAt(0).toUpperCase();
+    document.getElementById('appUserAvatar').textContent = initial;
+    document.getElementById('appUserName').textContent = currentUser.name || 'User';
+    document.getElementById('appUserDropdownName').textContent = currentUser.name || 'User';
+    document.getElementById('appUserDropdownEmail').textContent =
+        currentUser.email || currentUser.phone || (currentUser.provider + ' user');
+}
+
+function toggleUserDropdown(event) {
+    event.stopPropagation();
+    document.getElementById('appUserDropdown').classList.toggle('active');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('appUserDropdown');
+    if (dropdown && !e.target.closest('#appUserArea')) {
+        dropdown.classList.remove('active');
+    }
+});
+
+function detectFrontLocation() {
+    const input = document.getElementById('fpAddressInput');
+    if (!navigator.geolocation) {
+        showAppToast('⚠️ Geolocation not supported');
+        return;
+    }
+    showAppToast('📍 Detecting location...');
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude, lng = pos.coords.longitude;
+        customerLocation = { lat, lng, area: 'Detecting...' };
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
+            const data = await res.json();
+            const area = data.address?.suburb || data.address?.neighbourhood || data.address?.city || 'Detected Location';
+            customerLocation.area = area;
+            input.value = area;
+            showAppToast('✅ Location: ' + area);
+        } catch (e) {
+            input.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            showAppToast('✅ GPS captured');
+        }
+    }, (err) => {
+        showAppToast('⚠️ Location permission denied');
+    }, { enableHighAccuracy: true, timeout: 15000 });
+}
+
+// ═══════════════════════════════════════════
+// APP INITIALIZATION
+// ═══════════════════════════════════════════
+function initApp() {
+    loadFromLocalStorage();
+    appInitMap();
+    appStartBannerCarousel();
+    setupAppEventListeners();
+    appRenderRestaurantList();
+    appRenderVehicles();
+    appRenderOrders();
+    appUpdateStats();
+}
+
+function setupAppEventListeners() {
+    document.getElementById('appHomeSearchInput')?.addEventListener('input', appRenderRestaurantList);
+    document.querySelectorAll('.app-explorer-cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => appSetExplorerCategory(btn.getAttribute('data-category')));
+    });
+    const paymentPhone = document.getElementById('appPaymentPhone');
+    if (paymentPhone) {
+        paymentPhone.addEventListener('input', e => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7);
+        });
+    }
+}
+
+// ═══════════════════════════════════════════
+// DATA LAYER (LocalStorage + Supabase)
+// ═══════════════════════════════════════════
+function loadFromLocalStorage() {
+    const sr = localStorage.getItem('gopoint_restaurants');
+    restaurants = sr ? JSON.parse(sr) : { ...defaultRestaurants };
+    const sv = localStorage.getItem('gopoint_vehicles');
+    vehicles = sv ? JSON.parse(sv) : defaultVehicles.map((v, i) => ({ ...v, id: String(i + 1) }));
+    const so = localStorage.getItem('gopoint_orders');
+    orders = so ? JSON.parse(so).map(o => ({ ...o, timestamp: new Date(o.timestamp) })) : [];
+    const ss = localStorage.getItem('gopointSettings');
+    if (ss) settings = JSON.parse(ss);
+}
+
+function saveLocalData() {
+    if (useSupabase) return;
+    localStorage.setItem('gopoint_restaurants', JSON.stringify(restaurants));
+    localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles));
+    localStorage.setItem('gopoint_orders', JSON.stringify(orders));
+    localStorage.setItem('gopointSettings', JSON.stringify(settings));
+}
+
+async function addOrderToDB(orderData) {
+    const id = String(Date.now());
+    orders.push({ ...orderData, id, timestamp: new Date(), created_at: new Date().toISOString() });
+    saveLocalData();
+    appRenderOrders();
+    appUpdateStats();
+    appUpdateTrackButtonVisibility();
+    return id;
+}
+
+async function updateOrderInDB(orderId, updates) {
+    const idx = orders.findIndex(o => o.id === orderId);
+    if (idx !== -1) {
+        orders[idx] = { ...orders[idx], ...updates };
+        saveLocalData();
+        appRenderOrders();
+        appUpdateStats();
+        appUpdateTrackButtonVisibility();
+    }
+}
+
+async function addVehicleToDB(vd) {
+    vd.id = String(Date.now());
+    vehicles.push(vd);
+    saveLocalData();
+    appRenderVehicles();
+}
+
+async function updateVehicleInDB(vid, updates) {
+    const idx = vehicles.findIndex(v => v.id == vid);
+    if (idx !== -1) {
+        vehicles[idx] = { ...vehicles[idx], ...updates };
+        saveLocalData();
+        appRenderVehicles();
+    }
+}
+
+async function addRestaurantToDB(key, data) {
+    restaurants[key] = data;
+    saveLocalData();
+    appRenderRestaurantList();
+}
+
+// ═══════════════════════════════════════════
+// APP MAP & RESTAURANTS
+// ═══════════════════════════════════════════
+function appInitMap() {
+    if (!appMap) {
+        appMap = L.map('appMap').setView([9.56, 44.065], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(appMap);
+    }
+    appUpdateMapMarkers(appGetFilteredRestaurants());
+}
+
+function appUpdateMapMarkers(restaurantsToShow) {
+    if (!appMap) return;
+    appMarkers.forEach(m => appMap.removeLayer(m));
+    appMarkers = [];
+    Object.keys(restaurantsToShow).forEach((key, i) => {
+        const r = restaurantsToShow[key];
+        const lat = r.lat || 9.56, lng = r.lng || 44.065;
+        const distance = customerLocation ? appCalculateDistance(customerLocation.lat, customerLocation.lng, lat, lng).toFixed(1) : null;
+        const popupContent = `
+            <div style="min-width:200px;">
+                <h4 style="margin:0 0 6px;color:#22c55e;">${r.name}</h4>
+                <p style="margin:0 0 4px;font-size:0.9rem;">${r.cuisine || ''}</p>
+                <p style="margin:0 0 6px;font-size:0.8rem;color:#555;">${r.address || ''}</p>
+                <div>
+                    <span style="background:#22c55e;color:#fff;padding:2px 10px;border-radius:20px;font-size:0.75rem;">
+                        <i class="fa fa-star"></i> ${r.rating || '4.5'}
+                    </span>
+                    ${distance ? `<span style="margin-left:8px;background:#dbeafe;color:#1e40af;padding:2px 10px;border-radius:20px;font-size:0.75rem;"><i class="fa fa-location-arrow"></i> ${distance} km</span>` : ''}
+                </div>
+                <button style="margin-top:8px;background:#22c55e;color:#fff;border:none;padding:4px 12px;border-radius:30px;cursor:pointer;"
+                        onclick="appOpenRestaurantMenu('${key}')">View Menu</button>
+            </div>
+        `;
+        const marker = L.marker([lat, lng]).addTo(appMap).bindPopup(popupContent, { maxWidth: 300 });
+        appMarkers.push(marker);
+    });
+    appUpdateCustomerMarker();
+}
+
+function appUpdateCustomerMarker() {
+    if (!appMap) return;
+    if (appCustomerMarker) {
+        appMap.removeLayer(appCustomerMarker);
+        appCustomerMarker = null;
+    }
+    if (customerLocation) {
+        const custIcon = L.divIcon({
+            html: '<div class="app-custom-marker" style="background:#3b82f6;width:44px;height:44px;"><i class="fas fa-user"></i></div>',
+            className: '', iconSize: [44, 44], iconAnchor: [22, 22]
+        });
+        appCustomerMarker = L.marker([customerLocation.lat, customerLocation.lng], { icon: custIcon })
+            .addTo(appMap)
+            .bindPopup(`<b>📍 Your Location</b><br>${customerLocation.area || 'Detected'}`);
+    }
+}
+
+function appRenderRestaurantList() {
+    const listContainer = document.getElementById('appRestaurantList');
+    if (!listContainer) return;
+    listContainer.innerHTML = '';
+    const filtered = appGetFilteredRestaurants();
+
+    if (Object.keys(filtered).length === 0) {
+        listContainer.innerHTML = `<p style="grid-column:1/-1;text-align:center;padding:2rem;color:#666;">No restaurants found.</p>`;
+        appUpdateMapMarkers(filtered);
+        return;
+    }
+
+    Object.keys(filtered).forEach((key, i) => {
+        const r = filtered[key];
+        const img = restaurantImages[i % restaurantImages.length];
+        const distance = customerLocation ? appCalculateDistance(customerLocation.lat, customerLocation.lng, r.lat, r.lng).toFixed(1) : null;
+        const card = document.createElement('div');
+        card.className = 'app-card';
+        card.innerHTML = `
+            <div class="app-card_inner">
+                <img src="${img}" alt="${r.name}" class="app-card_image_view" loading="lazy" />
+                <div>
+                    <div class="app-card_heading">${r.name}</div>
+                    <div class="app-card_description">${r.cuisine || 'Restaurant'} • ${r.address || ''}</div>
+                    <div class="app-bottom-div">
+                        <div class="app-bottom-div1">
+                            <span class="app-store_rating"><i class="fa fa-star"></i> ${r.rating || '4.5'}</span>
+                            <span class="app-dot"></span>
+                            <span>${r.deliveryTime || '20 min'}</span>
+                            ${distance ? `<span class="app-distance-badge"><i class="fa fa-location-arrow"></i> ${distance} km</span>` : ''}
+                        </div>
+                        <button class="app-view-menu" data-key="${key}">View Menu</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        card.querySelector('.app-view-menu').addEventListener('click', (e) => {
+            e.stopPropagation();
+            appOpenRestaurantMenu(key);
+        });
+        card.addEventListener('click', () => appOpenRestaurantMenu(key));
+        listContainer.appendChild(card);
+    });
+    appUpdateMapMarkers(filtered);
+}
+
+function appGetFilteredRestaurants() {
+    let filtered = { ...restaurants };
+    if (appCurrentCategory !== 'All') {
+        const categoryMap = {
+            'Italian': ['Italian'],
+            'Fast Food': ['Fast Food', 'American'],
+            'Cafe': ['Cafe'],
+            'Mediterranean': ['Mediterranean']
+        };
+        const allowed = categoryMap[appCurrentCategory] || [appCurrentCategory];
+        filtered = Object.fromEntries(
+            Object.entries(filtered).filter(([k, r]) => allowed.includes(r.cuisine))
+        );
+    }
+    const term = document.getElementById('appHomeSearchInput')?.value.toLowerCase().trim() || '';
+    if (term) {
+        filtered = Object.fromEntries(
+            Object.entries(filtered).filter(([k, r]) =>
+                r.name.toLowerCase().includes(term) ||
+                (r.cuisine && r.cuisine.toLowerCase().includes(term)) ||
+                (r.address && r.address.toLowerCase().includes(term))
+            )
+        );
+    }
+    return filtered;
+}
+
+function appSelectCategory(el, cat) {
+    document.querySelectorAll('.app-category-view').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    appCurrentCategory = cat;
+    document.getElementById('appCategoryLabel').textContent = cat === 'All' ? 'All Restaurants' : cat + ' Restaurants';
+    appRenderRestaurantList();
+}
+
+function appSwitchView(view) {
+    const listView = document.getElementById('appListView');
+    const mapView = document.getElementById('appMapView');
+    const btns = document.querySelectorAll('.app-viewmp');
+    btns.forEach(b => b.classList.remove('selected'));
+    if (view === 'map') {
+        listView.style.display = 'none';
+        mapView.style.display = 'block';
+        btns[1].classList.add('selected');
+        if (appMap) setTimeout(() => appMap.invalidateSize(), 300);
+    } else {
+        listView.style.display = 'block';
+        mapView.style.display = 'none';
+        btns[0].classList.add('selected');
+    }
+}
+
+function appStartBannerCarousel() {
+    if (appBannerInterval) clearInterval(appBannerInterval);
+    appBannerInterval = setInterval(() => {
+        appCurrentSlide = (appCurrentSlide + 1) % 3;
+        appGoToSlide(appCurrentSlide);
+    }, 5000);
+}
+
+function appGoToSlide(index) {
+    appCurrentSlide = index;
+    const inner = document.getElementById('appBannerCarousel');
+    if (inner) inner.style.transform = `translateX(-${index * 100}%)`;
+    document.querySelectorAll('.app-carousel-indicators button').forEach((b, i) => {
+        b.classList.toggle('active', i === index);
+    });
+}
+
+// ═══════════════════════════════════════════
+// MENU VIEW
+// ═══════════════════════════════════════════
+function appOpenRestaurantMenu(key) {
+    if (!restaurants[key]) return;
+    currentRestaurant = key;
+    document.getElementById('appSelectedRestaurantName').innerText = restaurants[key].name;
+    activeCategory = 'coffee';
+    appUpdateExplorerCategoryUI();
+    appRenderExplorerMenuItems();
+    document.getElementById('appHomepageContainer').style.display = 'none';
+    document.getElementById('appExplorerContainer').classList.add('active');
+    appUpdateMiniCartBar();
+    window.scrollTo({ top: 0 });
+}
+
+function appBackToRestaurants() {
+    document.getElementById('appExplorerContainer').classList.remove('active');
+    document.getElementById('appHomepageContainer').style.display = 'block';
+    document.getElementById('appMiniCartBar').classList.remove('visible');
+    currentRestaurant = null;
+    window.scrollTo({ top: 0 });
+}
+
+function appRenderExplorerMenuItems() {
+    if (!currentRestaurant || !restaurants[currentRestaurant]) return;
+    const items = restaurants[currentRestaurant].menu[activeCategory] || [];
+    const div = document.getElementById('appExplorerMenuItems');
+    if (!items.length) {
+        div.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;background:white;border-radius:12px;"><i class="fas fa-mug-hot" style="font-size:3rem;color:#ccc;"></i><p style="color:#666;margin-top:10px;">No items.</p></div>`;
+        return;
+    }
+    div.innerHTML = items.map(item => `
+        <div class="app-menu-item-card">
+            <div class="app-menu-item-img-wrap">
+                <img src="${item.image}" alt="${item.name}" loading="lazy">
+            </div>
+            <div class="app-menu-item-name">${item.name}</div>
+            <div class="app-menu-item-desc">${item.description || ''}</div>
+            <div class="app-menu-item-bottom">
+                <div class="app-menu-item-price">$${item.price.toFixed(2)}</div>
+                <button class="app-menu-item-add-btn" onclick="appAddToCart(${item.id})" title="Add to cart">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function appSetExplorerCategory(cat) {
+    activeCategory = cat;
+    appUpdateExplorerCategoryUI();
+    appRenderExplorerMenuItems();
+}
+
+function appUpdateExplorerCategoryUI() {
+    document.querySelectorAll('.app-explorer-cat-btn').forEach(btn => {
+        const cat = btn.getAttribute('data-category');
+        if (cat === activeCategory) {
+            btn.style.background = '#f59e0b';
+            btn.style.color = 'white';
+        } else {
+            btn.style.background = 'white';
+            btn.style.color = '#333';
+        }
+    });
+}
+
+// ═══════════════════════════════════════════
+// CART
+// ═══════════════════════════════════════════
+function appAddToCart(itemId) {
+    let item = null;
+    if (currentRestaurant && restaurants[currentRestaurant]) {
+        const menu = restaurants[currentRestaurant].menu;
+        for (const cat in menu) {
+            const f = menu[cat].find(i => i.id === itemId);
+            if (f) { item = f; break; }
+        }
+    }
+    if (!item) return;
+    const ex = cart.find(c => c.id === itemId);
+    if (ex) ex.quantity += 1;
+    else cart.push({ ...item, quantity: 1 });
+    appUpdateCart();
+    showAppToast(`✓ Added ${item.name}`);
+}
+
+function appRemoveFromCart(itemId) {
+    const ex = cart.find(c => c.id === itemId);
+    if (ex && ex.quantity > 1) ex.quantity -= 1;
+    else cart = cart.filter(c => c.id !== itemId);
+    appUpdateCart();
+}
+
+function appUpdateCart() {
+    const total = cart.reduce((s, i) => s + i.quantity, 0);
+    const countEl = document.getElementById('appCartCount');
+    countEl.textContent = total;
+    countEl.style.display = total > 0 ? 'flex' : 'none';
+
+    const itemsDiv = document.getElementById('appCartItems');
+    const summary = document.getElementById('appCartSummary');
+    if (!cart.length) {
+        itemsDiv.innerHTML = '<div style="text-align:center;padding:24px;color:#666;"><i class="fas fa-coffee" style="font-size:2rem;margin-bottom:8px;display:block;"></i><p>Your cart is empty</p></div>';
+        summary.style.display = 'none';
+    } else {
+        itemsDiv.innerHTML = '';
+        cart.forEach(item => {
+            const el = document.createElement('div');
+            el.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px;background:#f9fafb;border-radius:8px;margin-bottom:8px;';
+            el.innerHTML = `
+                <div style="flex:1;">
+                    <h4 style="font-size:0.9rem;font-weight:600;">${item.name}</h4>
+                    <p style="color:var(--primary);font-weight:600;font-size:0.85rem;">$${(item.price * item.quantity).toFixed(2)}</p>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <button onclick="appRemoveFromCart(${item.id})" style="width:26px;height:26px;border-radius:50%;background:#fee2e2;color:#ef4444;border:none;cursor:pointer;"><i class="fas fa-minus" style="font-size:0.7rem;"></i></button>
+                    <span style="font-weight:600;min-width:20px;text-align:center;">${item.quantity}</span>
+                    <button onclick="appAddToCart(${item.id})" style="width:26px;height:26px;border-radius:50%;background:#d1fae5;color:var(--primary);border:none;cursor:pointer;"><i class="fas fa-plus" style="font-size:0.7rem;"></i></button>
+                </div>
+            `;
+            itemsDiv.appendChild(el);
+        });
+        summary.style.display = 'block';
+    }
+    const t = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+    document.getElementById('appTotalPrice').textContent = `$${t.toFixed(2)}`;
+    document.getElementById('appPaymentTotal').textContent = `$${t.toFixed(2)}`;
+    appUpdateMiniCartBar();
+}
+
+function appUpdateMiniCartBar() {
+    const miniBar = document.getElementById('appMiniCartBar');
+    const inMenuView = document.getElementById('appExplorerContainer').classList.contains('active');
+    if (inMenuView && cart.length > 0) {
+        miniBar.classList.add('visible');
+        const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+        const count = cart.reduce((s, i) => s + i.quantity, 0);
+        document.getElementById('appMiniCartCount').textContent = count;
+        document.getElementById('appMiniCartTotal').textContent = total.toFixed(2);
+    } else {
+        miniBar.classList.remove('visible');
+    }
+}
+
+function toggleCart() {
+    cartVisible = !cartVisible;
+    document.getElementById('appCartWindow').classList.toggle('visible', cartVisible);
+}
+
+// ═══════════════════════════════════════════
+// LOCATION DETECTION
+// ═══════════════════════════════════════════
+async function detectAppLocation() {
+    const statusBox = document.getElementById('appLocationStatusBox');
+    const btnText = document.getElementById('appDetectBtnText');
+    const input = document.getElementById('appDetectedLocation');
+
+    if (btnText) btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
+    if (statusBox) {
+        statusBox.style.display = 'block';
+        statusBox.className = 'app-location-status loading';
+        statusBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Requesting GPS...';
+    }
+
+    if (!navigator.geolocation) {
+        if (statusBox) statusBox.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Not supported';
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        detectedCoordinates = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        customerLocation = { lat: detectedCoordinates.lat, lng: detectedCoordinates.lng, area: 'Detecting...' };
+
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${detectedCoordinates.lat}&lon=${detectedCoordinates.lng}&addressdetails=1`);
+            const data = await res.json();
+            const area = data.address?.suburb || data.address?.neighbourhood || data.address?.city || 'Detected Location';
+            customerLocation.area = area;
+            if (input) input.value = area;
+            if (statusBox) {
+                statusBox.className = 'app-location-status success';
+                statusBox.innerHTML = `<i class="fas fa-check-circle"></i> Location: <b>${area}</b>`;
+            }
+            showAppToast('📍 ' + area);
+        } catch (e) {
+            if (input) input.value = `${detectedCoordinates.lat.toFixed(4)}, ${detectedCoordinates.lng.toFixed(4)}`;
+            if (statusBox) {
+                statusBox.className = 'app-location-status success';
+                statusBox.innerHTML = '<i class="fas fa-check-circle"></i> GPS captured';
+            }
+        }
+
+        if (appMap) {
+            appMap.setView([detectedCoordinates.lat, detectedCoordinates.lng], 14);
+            appUpdateCustomerMarker();
+            appUpdateMapMarkers(appGetFilteredRestaurants());
+        }
+        appRenderRestaurantList();
+
+        if (btnText) btnText.innerHTML = '<i class="fas fa-location-crosshairs"></i> Detect My Location';
+    }, (err) => {
+        if (statusBox) {
+            statusBox.className = 'app-location-status error';
+            statusBox.innerHTML = '<i class="fas fa-ban"></i> Permission denied';
+        }
+        if (btnText) btnText.innerHTML = '<i class="fas fa-location-crosshairs"></i> Detect My Location';
+    }, { enableHighAccuracy: true, timeout: 15000 });
+}
+
+// ═══════════════════════════════════════════
+// DELIVERY & PAYMENT
+// ═══════════════════════════════════════════
+function proceedToDelivery() {
+    if (!cart.length) { showAppToast('⚠️ Please add items'); return; }
+    document.getElementById('appCartWindow').classList.remove('visible');
+    cartVisible = false;
+    document.getElementById('appDeliveryForm').classList.remove('hidden');
+
+    if (detectedCoordinates) {
+        const input = document.getElementById('appDetectedLocation');
+        if (input && !input.value) input.value = `${detectedCoordinates.lat.toFixed(4)}, ${detectedCoordinates.lng.toFixed(4)}`;
+    }
+
+    // Pre-fill name/phone from user if logged in
+    if (currentUser) {
+        const nameInput = document.getElementById('appDeliveryName');
+        const phoneInput = document.getElementById('appDeliveryPhone');
+        if (nameInput && !nameInput.value) nameInput.value = currentUser.name || '';
+        if (phoneInput && !phoneInput.value) phoneInput.value = currentUser.phone || '';
+    }
+
+    selectedDeliveryMethod = null;
+    document.getElementById('appBikeOption').classList.remove('selected');
+    document.getElementById('appTaxiOption').classList.remove('selected');
+    document.getElementById('appDeliveryMethod').value = '';
+    document.getElementById('appVehicleSelectionContainer').style.display = 'none';
+}
+
+function closeDeliveryForm() {
+    document.getElementById('appDeliveryForm').classList.add('hidden');
+    document.getElementById('appCartWindow').classList.add('visible');
+    cartVisible = true;
+}
+
+function appSelectDeliveryMethod(method) {
+    selectedDeliveryMethod = method;
+    document.getElementById('appDeliveryMethod').value = method;
+    document.getElementById('appBikeOption').classList.toggle('selected', method === 'bike');
+    document.getElementById('appTaxiOption').classList.toggle('selected', method === 'taxi');
+
+    const rest = restaurants[currentRestaurant];
+    const restLat = rest?.lat || 9.56, restLng = rest?.lng || 44.06;
+    const nearest = appGetClosestVehicleOfType(method, restLat, restLng);
+
+    const container = document.getElementById('appVehicleSelectionContainer');
+    const display = document.getElementById('appAssignedVehicleDisplay');
+    const input = document.getElementById('appSelectedVehicleId');
+    container.style.display = 'block';
+
+    if (nearest) {
+        selectedVehicleId = nearest.id;
+        input.value = nearest.id;
+        const dist = appCalculateDistance(restLat, restLng, nearest.lat, nearest.lng).toFixed(1);
+        display.innerHTML = `
+            <div style="display:flex;align-items:center;">
+                <div style="background:#d1fae5;padding:12px;border-radius:8px;margin-right:12px;">
+                    <i class="fas fa-${method === 'bike' ? 'motorcycle' : 'car'}" style="font-size:1.3rem;color:var(--primary);"></i>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-weight:600;">${nearest.driverName}</div>
+                    <div style="font-size:0.85rem;color:#666;">Plate: ${nearest.plateNumber}</div>
+                    <div style="font-size:0.75rem;color:#888;"><i class="fas fa-location-arrow"></i> ${dist} km away</div>
+                </div>
+                <div class="app-vehicle-available" style="padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;">Assigned</div>
+            </div>
+        `;
+    } else {
+        input.value = '';
+        display.innerHTML = `<div style="text-align:center;padding:16px;color:#ef4444;"><i class="fas fa-exclamation-circle" style="font-size:1.5rem;margin-bottom:6px;display:block;"></i><p style="font-size:0.9rem;">No ${method === 'bike' ? 'motorcycles' : 'taxis'} available</p></div>`;
+    }
+}
+
+function showPaymentForm() {
+    const name = document.getElementById('appDeliveryName').value.trim();
+    const phone = document.getElementById('appDeliveryPhone').value.trim();
+    const area = document.getElementById('appDetectedLocation').value.trim();
+    const address = document.getElementById('appDeliveryAddress').value.trim();
+    const method = document.getElementById('appDeliveryMethod').value;
+    const vehId = document.getElementById('appSelectedVehicleId').value;
+
+    if (!name || !phone || !area || !address) { showAppToast('⚠️ Please fill all fields'); return; }
+    if (!method) { showAppToast('⚠️ Please select delivery method'); return; }
+    if (!vehId) { showAppToast('⚠️ No vehicle available'); return; }
+
+    deliveryInfo = { name, phone, area, address, method, vehicleId: vehId };
+    document.getElementById('appDeliveryForm').classList.add('hidden');
+    document.getElementById('appPaymentForm').classList.remove('hidden');
+}
+
+function backToDelivery() {
+    document.getElementById('appPaymentForm').classList.add('hidden');
+    document.getElementById('appDeliveryForm').classList.remove('hidden');
+}
+
+async function submitDeliveryOrder() {
+    const paymentMethod = document.getElementById('appPaymentMethod').value;
+    const paymentPhone = document.getElementById('appPaymentPhone').value.trim();
+    if (paymentMethod !== 'cash' && (!paymentPhone || !/^\d{7}$/.test(paymentPhone))) {
+        document.getElementById('appPhoneError').style.display = 'block';
+        showAppToast('⚠️ Valid 7-digit phone required');
+        return;
+    }
+    document.getElementById('appPhoneError').style.display = 'none';
+
+    const selectedOpt = document.querySelector('.app-payment-option.selected');
+    paymentInfo = {
+        method: paymentMethod,
+        phone: paymentMethod === 'cash' ? '' : `+252 ${selectedOpt.dataset.prefix}${paymentPhone}`
+    };
+    const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+    const vehicle = vehicles.find(v => v.id == deliveryInfo.vehicleId);
+
+    const orderData = {
+        type: 'delivery',
+        customer: deliveryInfo,
+        payment: paymentInfo,
+        items: [...cart],
+        total,
+        status: 'pending',
+        coordinates: detectedCoordinates || { lat: 9.56, lng: 44.065 },
+        restaurant: currentRestaurant,
+        vehicle: null,
+        vehicleId: vehicle ? vehicle.id : null,
+        statusHistory: [{ status: 'pending', time: new Date().toISOString() }],
+        created_at: new Date().toISOString()
+    };
+
+    const orderId = await addOrderToDB(orderData);
+
+    cart = [];
+    appUpdateCart();
+    document.getElementById('appDeliveryInfoForm').reset();
+    document.getElementById('appPaymentPhone').value = '';
+    document.getElementById('appSelectedVehicleId').value = '';
+    document.getElementById('appPaymentForm').classList.add('hidden');
+    detectedCoordinates = null;
+    selectedDeliveryMethod = null;
+    document.getElementById('appMiniCartBar').classList.remove('visible');
+
+    showAppToast('🎉 Order placed! A driver will accept soon.');
+
+    setTimeout(() => {
+        currentTrackedOrder = orderId;
+        openTrackingModal();
+    }, 1500);
+}
+
+function appHandlePaymentSelection(opt) {
+    document.querySelectorAll('.app-payment-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    selectedPayment = opt.dataset.value;
+    document.getElementById('appPaymentMethod').value = selectedPayment;
+    const container = document.getElementById('appPaymentPhoneContainer');
+    if (selectedPayment === 'cash') {
+        container.style.display = 'none';
+    } else {
+        container.style.display = 'block';
+        document.getElementById('appPhonePrefix').textContent = `+252 ${opt.dataset.prefix}`;
+    }
+}
+
+// ═══════════════════════════════════════════
+// MANAGEMENT
+// ═══════════════════════════════════════════
+function showManagementLoginForm() {
+    document.getElementById('appLoginForm').classList.remove('hidden');
+}
+function closeLoginForm() {
+    document.getElementById('appLoginForm').classList.add('hidden');
+}
+
+function login() {
+    const u = document.getElementById('appUsername').value;
+    const p = document.getElementById('appPassword').value;
+    if (u === 'admin' && p === 'admin123') {
+        document.getElementById('appLoginForm').classList.add('hidden');
+        document.getElementById('appHomepageContainer').style.display = 'none';
+        document.getElementById('appExplorerContainer').classList.remove('active');
+        document.getElementById('appManagementView').style.display = 'block';
+        currentView = 'management';
+        document.getElementById('appManagementLoginForm').reset();
+    } else {
+        showAppToast('⚠️ Invalid credentials');
+    }
+}
+
+function logout() {
+    document.getElementById('appManagementView').style.display = 'none';
+    document.getElementById('appHomepageContainer').style.display = 'block';
+    currentView = 'customer';
+}
+
+function openSettingsModal() {
+    document.getElementById('appSettingsModal').classList.remove('hidden');
+    document.getElementById('appBusinessName').value = settings.system.businessName || 'Go!Point';
+    document.getElementById('appBusinessAddress').value = settings.system.businessAddress || '';
+    document.getElementById('appBusinessPhone').value = settings.system.businessPhone || '';
+    document.getElementById('appBusinessEmail').value = settings.system.businessEmail || '';
+}
+
+function closeSettingsModal() {
+    document.getElementById('appSettingsModal').classList.add('hidden');
+}
+
+function appShowSettingsTab(name) {
+    document.querySelectorAll('.app-settings-tab').forEach(b => {
+        b.style.borderBottomColor = 'transparent';
+        b.style.color = '#666';
+    });
+    document.getElementById('appSystemSettingsTab').style.display = 'none';
+    document.getElementById('appRegisterRestaurantTab').style.display = 'none';
+    document.getElementById('appRegisterVehicleTab').style.display = 'none';
+
+    const tabMap = {
+        'system': 'appSystemSettingsTab',
+        'registerRestaurant': 'appRegisterRestaurantTab',
+        'registerVehicle': 'appRegisterVehicleTab'
+    };
+    document.getElementById(tabMap[name]).style.display = 'block';
+    event.target.style.borderBottomColor = 'var(--primary)';
+    event.target.style.color = 'var(--primary)';
+}
+
+function saveSystemSettings() {
+    const n = document.getElementById('appBusinessName').value.trim();
+    const a = document.getElementById('appBusinessAddress').value.trim();
+    const p = document.getElementById('appBusinessPhone').value.trim();
+    const e = document.getElementById('appBusinessEmail').value.trim();
+    if (!n || !a || !p || !e) { showAppToast('⚠️ Fill all fields'); return; }
+    settings.system = { businessName: n, businessAddress: a, businessPhone: p, businessEmail: e };
+    saveLocalData();
+    document.getElementById('appMainTitle').textContent = n;
+    showAppToast('✅ Settings saved!');
+}
+
+async function registerVehicle() {
+    const t = document.getElementById('appVehicleType').value;
+    const pl = document.getElementById('appPlateNumber').value.trim();
+    const d = document.getElementById('appDriverName').value.trim();
+    const ph = document.getElementById('appDriverPhone').value.trim().replace(/\D/g, '');
+    const pin = document.getElementById('appDriverPin').value.trim();
+    if (!t || !pl || !d || !ph || !pin) { showAppToast('⚠️ Fill all fields'); return; }
+    const fmt = ph.startsWith('252') ? '+' + ph : '+252' + ph;
+    await addVehicleToDB({
+        type: t, plateNumber: pl, driverName: d, driverPhone: fmt, driverPin: pin,
+        status: 'available',
+        lat: 9.56 + (Math.random() - 0.5) * 0.02,
+        lng: 44.06 + (Math.random() - 0.5) * 0.02
+    });
+    document.querySelector('#appRegisterVehicleTab form').reset();
+    showAppToast('✅ Vehicle registered!');
+}
+
+async function registerRestaurant() {
+    const name = document.getElementById('appNewRestaurantName').value.trim();
+    const addr = document.getElementById('appNewRestaurantAddress').value.trim();
+    const lat = parseFloat(document.getElementById('appNewRestaurantLat').value);
+    const lng = parseFloat(document.getElementById('appNewRestaurantLng').value);
+    const phone = document.getElementById('appNewRestaurantPhone').value.trim();
+    const email = document.getElementById('appNewRestaurantEmail').value.trim();
+
+    if (!name || !addr || !phone || isNaN(lat) || isNaN(lng)) {
+        showAppToast('⚠️ Fill required fields'); return;
+    }
+
+    let key = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    let s = 1; const base = key;
+    while (restaurants[key]) { key = base + s; s++; }
+
+    await addRestaurantToDB(key, {
+        name, address: addr, phone, email, logo: '', lat, lng,
+        rating: 4.5, deliveryTime: '20 min', deliveryFee: '$2', cuisine: 'Various',
+        menu: {
+            coffee: [{ id: Date.now(), name: 'Sample Coffee', price: 3.00, description: 'Delicious coffee', image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop' }],
+            food: [{ id: Date.now() + 1, name: 'Sample Food', price: 8.00, description: 'Delicious food', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop' }],
+            dessert: [{ id: Date.now() + 2, name: 'Sample Dessert', price: 5.00, description: 'Sweet treat', image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=200&h=200&fit=crop' }]
+        }
+    });
+    document.querySelector('#appRegisterRestaurantTab form').reset();
+    document.getElementById('appNewRestaurantLat').value = '9.5600';
+    document.getElementById('appNewRestaurantLng').value = '44.0650';
+    showAppToast(`✅ "${name}" registered!`);
+}
+
+function appRenderVehicles() {
+    const list = document.getElementById('appVehiclesList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!vehicles.length) { list.innerHTML = '<p style="color:#666;">No vehicles</p>'; return; }
+    vehicles.forEach(v => {
+        const el = document.createElement('div');
+        el.style.cssText = 'border:1px solid #e5e7eb;border-radius:10px;padding:16px;background:#f9fafb;';
+        const statusColor = v.status === 'available' ? '#22c55e' : v.status === 'delivering' ? '#3b82f6' : '#ef4444';
+        el.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="display:flex;align-items:center;">
+                    <i class="fas fa-${v.type === 'bike' ? 'motorcycle' : 'car'}" style="font-size:1.5rem;margin-right:12px;color:var(--primary);"></i>
+                    <div>
+                        <h3 style="font-weight:700;">${v.driverName}</h3>
+                        <p style="color:#666;font-size:0.85rem;">${v.plateNumber}</p>
+                        <p style="color:#888;font-size:0.75rem;">${v.driverPhone}</p>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="background:${statusColor};color:white;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600;">${v.status}</div>
+                    <button onclick="appToggleVehicleStatus('${v.id}')" style="font-size:0.75rem;background:#e5e7eb;padding:4px 8px;border:none;border-radius:6px;margin-top:6px;cursor:pointer;">Toggle</button>
+                </div>
+            </div>
+        `;
+        list.appendChild(el);
+    });
+}
+
+async function appToggleVehicleStatus(vid) {
+    const v = vehicles.find(v => v.id == vid);
+    if (!v) return;
+    await updateVehicleInDB(vid, { status: v.status === 'available' ? 'unavailable' : 'available' });
+}
+
+// ═══════════════════════════════════════════
+// STATS & ORDERS
+// ═══════════════════════════════════════════
+function appUpdateStats() {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    document.getElementById('appTodayOrders').textContent = orders.filter(o => new Date(o.timestamp) >= todayStart).length;
+    document.getElementById('appMonthlyOrders').textContent = orders.filter(o => new Date(o.timestamp) >= monthStart).length;
+    document.getElementById('appTotalRevenue').textContent = `$${orders.filter(o => o.status === 'completed').reduce((s, o) => s + (o.total || 0), 0).toFixed(2)}`;
+    document.getElementById('appDeliveryOrders').textContent = orders.filter(o => o.status === 'out_for_delivery').length;
+    document.getElementById('appTotalOrders').textContent = orders.length;
+}
+
+function appRenderOrders() {
+    appRenderActiveOrders();
+    appRenderCompletedOrders();
+}
+
+function appRenderActiveOrders() {
+    const active = orders.filter(o => ['pending', 'preparing', 'ready', 'out_for_delivery'].includes(o.status));
+    const list = document.getElementById('appPendingOrdersList');
+    if (!list) return;
+    if (!active.length) {
+        list.innerHTML = '<p style="text-align:center;color:#666;padding:20px;"><i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:8px;"></i>No active orders</p>';
+        return;
+    }
+    list.innerHTML = '';
+    const so = { pending: 0, preparing: 1, ready: 2, out_for_delivery: 3 };
+    active.sort((a, b) => (so[a.status] || 0) - (so[b.status] || 0));
+    active.forEach(o => {
+        const r = restaurants[o.restaurant] || { name: 'Unknown' };
+        const st = o.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const card = document.createElement('div');
+        card.style.cssText = 'border:1px solid #e5e7eb;border-radius:10px;padding:16px;background:white;margin-bottom:12px;';
+        card.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                <h3 style="font-weight:700;">Order #${String(o.id).slice(-6)}</h3>
+                <span class="app-status-${o.status}" style="padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;">${st}</span>
+            </div>
+            <p style="font-size:0.8rem;color:#666;margin-bottom:4px;"><i class="far fa-clock"></i> ${new Date(o.timestamp).toLocaleString()}</p>
+            <p style="font-size:0.9rem;margin-bottom:4px;"><i class="fas fa-store" style="color:var(--primary);margin-right:6px;"></i>${r.name}</p>
+            <p style="font-size:0.9rem;margin-bottom:4px;"><i class="fas fa-user" style="color:var(--primary);margin-right:6px;"></i>${o.customer?.name || 'Walk-in'}</p>
+            <p style="font-size:0.85rem;color:#666;margin-bottom:8px;"><i class="fas fa-list" style="color:var(--primary);margin-right:6px;"></i>${o.items.map(i => `${i.name} x${i.quantity}`).join(', ')}</p>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid #e5e7eb;">
+                <span style="font-weight:700;color:var(--primary);font-size:1.1rem;">$${o.total.toFixed(2)}</span>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;">${appGetOrderActionButtons(o)}</div>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+function appGetOrderActionButtons(o) {
+    let b = '';
+    if (o.status === 'pending') {
+        b += `<button onclick="appUpdateOrderStatus('${o.id}', 'preparing')" style="font-size:0.75rem;background:#3b82f6;color:white;padding:4px 10px;border:none;border-radius:6px;cursor:pointer;"><i class="fas fa-check"></i> Accept</button>`;
+        b += `<button onclick="appUpdateOrderStatus('${o.id}', 'cancelled')" style="font-size:0.75rem;background:#ef4444;color:white;padding:4px 10px;border:none;border-radius:6px;cursor:pointer;"><i class="fas fa-times"></i></button>`;
+    } else if (o.status === 'preparing') {
+        b += `<button onclick="appUpdateOrderStatus('${o.id}', 'ready')" style="font-size:0.75rem;background:#8b5cf6;color:white;padding:4px 10px;border:none;border-radius:6px;cursor:pointer;"><i class="fas fa-utensils"></i> Ready</button>`;
+    } else if (o.status === 'ready') {
+        b += `<button onclick="appUpdateOrderStatus('${o.id}', 'out_for_delivery')" style="font-size:0.75rem;background:#6366f1;color:white;padding:4px 10px;border:none;border-radius:6px;cursor:pointer;"><i class="fas fa-shipping-fast"></i> Dispatch</button>`;
+    } else if (o.status === 'out_for_delivery') {
+        b += `<button onclick="appUpdateOrderStatus('${o.id}', 'completed')" style="font-size:0.75rem;background:var(--primary);color:white;padding:4px 10px;border:none;border-radius:6px;cursor:pointer;"><i class="fas fa-check-double"></i> Delivered</button>`;
+    }
+    return b;
+}
+
+function appRenderCompletedOrders() {
+    const c = orders.filter(o => o.status === 'completed' || o.status === 'cancelled');
+    const list = document.getElementById('appCompletedOrdersList');
+    if (!list) return;
+    if (!c.length) {
+        list.innerHTML = '<p style="text-align:center;color:#666;padding:20px;"><i class="fas fa-check-circle" style="font-size:2rem;display:block;margin-bottom:8px;"></i>No completed orders</p>';
+        return;
+    }
+    list.innerHTML = '';
+    c.slice(-10).reverse().forEach(o => {
+        const st = o.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const card = document.createElement('div');
+        card.style.cssText = 'border:1px solid #e5e7eb;border-radius:10px;padding:16px;background:#f9fafb;margin-bottom:12px;';
+        card.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                <h3 style="font-weight:700;">Order #${String(o.id).slice(-6)}</h3>
+                <span class="app-status-${o.status}" style="padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;">${st}</span>
+            </div>
+            <p style="font-size:0.8rem;color:#666;margin-bottom:4px;">${new Date(o.timestamp).toLocaleString()}</p>
+            <p style="font-size:0.85rem;color:#666;margin-bottom:8px;">${o.items.map(i => `${i.name} x${i.quantity}`).join(', ')}</p>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid #e5e7eb;">
+                <span style="font-weight:700;color:var(--primary);">$${o.total.toFixed(2)}</span>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+async function appUpdateOrderStatus(oid, ns) {
+    const o = orders.find(o => o.id === oid);
+    if (!o) return;
+    if (ns === 'out_for_delivery' && o.vehicle?.id) await updateVehicleInDB(o.vehicle.id, { status: 'delivering' });
+    if (ns === 'completed' && o.vehicle?.id) await updateVehicleInDB(o.vehicle.id, { status: 'available' });
+    const hist = o.statusHistory || [];
+    hist.push({ status: ns, time: new Date().toISOString() });
+    await updateOrderInDB(oid, { status: ns, statusHistory: hist });
+    showAppToast(`Order #${String(oid).slice(-6)} → ${ns}`);
+}
+
+// ═══════════════════════════════════════════
+// LIVE TRACKING
+// ═══════════════════════════════════════════
+function appUpdateTrackButtonVisibility() {
+    const active = orders.find(o => ['pending', 'preparing', 'ready', 'out_for_delivery'].includes(o.status));
+    const btn = document.getElementById('appTrackOrderBtn');
+    const txt = document.getElementById('appTrackBtnText');
+    if (active) {
+        btn.style.display = 'flex';
+        currentTrackedOrder = active.id;
+        txt.textContent = `Track #${String(active.id).slice(-6)}`;
+    } else {
+        btn.style.display = 'none';
+        currentTrackedOrder = null;
+    }
+}
+
+function openTrackingModal() {
+    const order = orders.find(o => o.id == currentTrackedOrder) || orders.find(o => ['pending', 'preparing', 'ready', 'out_for_delivery'].includes(o.status));
+    if (!order) { showAppToast('ℹ️ No active orders'); return; }
+    currentTrackedOrder = order.id;
+
+    document.getElementById('appTrackingModal').classList.remove('hidden');
+    document.getElementById('appTrackingOrderId').textContent = `Order #${String(order.id).slice(-6)}`;
+
+    const rest = restaurants[order.restaurant] || {};
+    document.getElementById('appTrackRestName').textContent = rest.name || 'Unknown';
+    document.getElementById('appTrackDriverName').textContent = order.vehicle?.driverName || 'Pending Driver';
+    document.getElementById('appTrackDriverPhone').textContent = order.vehicle?.driverPhone || '-';
+    document.getElementById('appTrackCustomerName').textContent = order.customer?.name || '';
+
+    appRenderTrackingTimeline(order);
+    setTimeout(() => appInitTrackingMap(order), 250);
+    appStartDriverSimulation(order);
+}
+
+function appRenderTrackingTimeline(order) {
+    const tl = document.getElementById('appTrackingTimeline');
+    const stages = [
+        { key: 'pending', label: 'Order Placed', icon: 'fa-receipt' },
+        { key: 'preparing', label: 'Preparing', icon: 'fa-utensils' },
+        { key: 'ready', label: 'Ready for Pickup', icon: 'fa-box' },
+        { key: 'out_for_delivery', label: 'Out for Delivery', icon: 'fa-motorcycle' },
+        { key: 'completed', label: 'Delivered', icon: 'fa-check-circle' }
+    ];
+    const statusOrder = ['pending', 'preparing', 'ready', 'out_for_delivery', 'completed'];
+    const currentIdx = statusOrder.indexOf(order.status);
+
+    tl.innerHTML = stages.map((s, i) => {
+        let cls = '';
+        if (i < currentIdx) cls = 'completed';
+        else if (i === currentIdx) cls = 'active';
+        return `
+            <div class="app-timeline-item ${cls}">
+                <div style="display:flex;align-items:flex-start;gap:10px;">
+                    <i class="fas ${s.icon}" style="color:${cls === 'active' ? 'var(--primary)' : cls === 'completed' ? 'var(--primary)' : '#ccc'};margin-top:2px;"></i>
+                    <div style="flex:1;">
+                        <h5 style="font-weight:700;color:${cls === 'active' ? 'var(--primary)' : cls === 'completed' ? '#065f46' : '#666'};">${s.label}</h5>
+                    </div>
+                    ${cls === 'active' ? '<span style="background:var(--primary);color:white;padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;">NOW</span>' : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function appInitTrackingMap(order) {
+    if (trackingMap) { trackingMap.remove(); trackingMap = null; }
+    const rest = restaurants[order.restaurant] || {};
+    const restLat = rest.lat || 9.56, restLng = rest.lng || 44.065;
+    const custLat = order.coordinates?.lat || 9.56, custLng = order.coordinates?.lng || 44.065;
+
+    trackingMap = L.map('appTrackingMap').setView([(restLat + custLat) / 2, (restLng + custLng) / 2], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(trackingMap);
+
+    const restIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#22c55e;width:40px;height:40px;"><i class="fas fa-store"></i></div>', className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
+    const custIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#f59e0b;width:40px;height:40px;"><i class="fas fa-home"></i></div>', className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
+
+    L.marker([restLat, restLng], { icon: restIcon }).addTo(trackingMap).bindPopup(`<b>🍽️ ${rest.name || 'Restaurant'}</b>`);
+    L.marker([custLat, custLng], { icon: custIcon }).addTo(trackingMap).bindPopup(`<b>🏠 Delivery Address</b>`);
+
+    const vehLat = order.vehicle?.lat || restLat, vehLng = order.vehicle?.lng || restLng;
+    if (order.vehicle && ['out_for_delivery', 'ready', 'preparing'].includes(order.status)) {
+        const vehIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#3b82f6;width:44px;height:44px;"><i class="fas fa-motorcycle"></i></div>', className: '', iconSize: [44, 44], iconAnchor: [22, 22] });
+        driverMarker = L.marker([vehLat, vehLng], { icon: vehIcon }).addTo(trackingMap).bindPopup(`<b>🛵 ${order.vehicle.driverName}</b>`);
+    }
+
+    const routeCoords = order.vehicle && ['out_for_delivery'].includes(order.status)
+        ? [[restLat, restLng], [vehLat, vehLng], [custLat, custLng]]
+        : [[restLat, restLng], [custLat, custLng]];
+    L.polyline(routeCoords, { color: '#3b82f6', weight: 4, opacity: 0.7, dashArray: '10, 10' }).addTo(trackingMap);
+    trackingMap.fitBounds(L.latLngBounds(routeCoords), { padding: [60, 60] });
+}
+
+function appStartDriverSimulation(order) {
+    if (driverSimulationInterval) clearInterval(driverSimulationInterval);
+    if (!order.vehicle || order.status !== 'out_for_delivery' || !driverMarker) return;
+    const rest = restaurants[order.restaurant] || {};
+    const targetLat = order.coordinates?.lat || 9.56;
+    const targetLng = order.coordinates?.lng || 44.065;
+    let curLat = order.vehicle.lat || rest.lat || 9.56;
+    let curLng = order.vehicle.lng || rest.lng || 44.065;
+    driverSimulationInterval = setInterval(() => {
+        curLat += (targetLat - curLat) * 0.08;
+        curLng += (targetLng - curLng) * 0.08;
+        driverMarker.setLatLng([curLat, curLng]);
+        if (order.vehicle) { order.vehicle.lat = curLat; order.vehicle.lng = curLng; }
+        if (appCalculateDistance(curLat, curLng, targetLat, targetLng) < 0.05) clearInterval(driverSimulationInterval);
+    }, 2000);
+}
+
+function refreshTracking() {
+    if (!currentTrackedOrder) return;
+    const o = orders.find(o => o.id == currentTrackedOrder);
+    if (o) {
+        appRenderTrackingTimeline(o);
+        appInitTrackingMap(o);
+        appStartDriverSimulation(o);
+        showAppToast('✅ Tracking refreshed');
+    }
+}
+
+function closeTrackingModal() {
+    document.getElementById('appTrackingModal').classList.add('hidden');
+    if (trackingMap) { trackingMap.remove(); trackingMap = null; }
+    if (driverSimulationInterval) { clearInterval(driverSimulationInterval); driverSimulationInterval = null; }
+}
+
+function callDriver() {
+    if (!currentTrackedOrder) return;
+    const o = orders.find(o => o.id == currentTrackedOrder);
+    if (o?.vehicle?.driverPhone) window.open(`tel:${o.vehicle.driverPhone}`);
+    else showAppToast('⚠️ No driver phone');
+}
+
+function whatsappDriver() {
+    if (!currentTrackedOrder) return;
+    const o = orders.find(o => o.id == currentTrackedOrder);
+    if (!o?.vehicle?.driverPhone) { showAppToast('⚠️ No driver phone'); return; }
+    let ph = o.vehicle.driverPhone.replace(/\D/g, '');
+    if (!ph.startsWith('252')) ph = '252' + ph;
+    const msg = `Hi ${o.vehicle.driverName}, I'm tracking my order #${String(o.id).slice(-6)}.`;
+    window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ═══════════════════════════════════════════
+// DRIVER PORTAL
+// ═══════════════════════════════════════════
+function showDriverLogin() {
+    document.getElementById('appDriverLoginForm').classList.remove('hidden');
+}
+function closeDriverLogin() {
+    document.getElementById('appDriverLoginForm').classList.add('hidden');
+}
+
+function loginDriver() {
+    const phone = document.getElementById('appDriverLoginPhone').value.trim();
+    const pin = document.getElementById('appDriverLoginPin').value.trim();
+    const driver = vehicles.find(v => v.driverPhone === phone && v.driverPin === pin);
+    if (!driver) {
+        showAppToast('⚠️ Invalid credentials');
+        return;
+    }
+    currentDriver = driver;
+    driverOnline = true;
+    document.getElementById('appDriverLoginForm').classList.add('hidden');
+    document.getElementById('appHomepageContainer').style.display = 'none';
+    document.getElementById('appExplorerContainer').classList.remove('active');
+    document.getElementById('appDriverPortal').classList.add('active');
+    document.getElementById('appDriverWelcomeMsg').textContent = `${driver.driverName} • ${driver.plateNumber}`;
+    appUpdateDriverStatusUI();
+    appRenderDriverOrders();
+    showAppToast(`✅ Welcome, ${driver.driverName}!`);
+}
+
+function logoutDriver() {
+    currentDriver = null;
+    document.getElementById('appDriverPortal').classList.remove('active');
+    document.getElementById('appHomepageContainer').style.display = 'block';
+    showAppToast('👋 Logged out');
+}
+
+function toggleDriverStatus() {
+    driverOnline = !driverOnline;
+    appUpdateDriverStatusUI();
+    if (driverOnline) appRenderDriverOrders();
+}
+
+function appUpdateDriverStatusUI() {
+    const card = document.getElementById('appDriverStatusCard');
+    const text = document.getElementById('appDriverStatusText');
+    const display = document.getElementById('appDriverStatusDisplay');
+    const icon = document.getElementById('appDriverStatusIcon');
+    const stats = document.getElementById('appDriverStatsMsg');
+    if (driverOnline) {
+        card.classList.remove('offline');
+        text.textContent = 'Online';
+        display.textContent = 'Online';
+        icon.textContent = '🟢';
+        stats.textContent = 'Ready to receive orders';
+    } else {
+        card.classList.add('offline');
+        text.textContent = 'Offline';
+        display.textContent = 'Offline';
+        icon.textContent = '⚫';
+        stats.textContent = 'Not receiving orders';
+    }
+}
+
+function appRenderDriverOrders() {
+    if (!currentDriver) return;
+    const pendingOrders = orders.filter(o => o.status === 'pending');
+    const incomingList = document.getElementById('appDriverOrdersList');
+    document.getElementById('appNewOrderCount').textContent = pendingOrders.length;
+
+    if (!pendingOrders.length) {
+        incomingList.innerHTML = `<div style="text-align:center;padding:40px;color:#64748b;"><i class="fas fa-inbox" style="font-size:3rem;margin-bottom:10px;display:block;"></i><p>No incoming orders</p></div>`;
+    } else {
+        incomingList.innerHTML = pendingOrders.map(o => {
+            const r = restaurants[o.restaurant] || { name: 'Unknown' };
+            const distance = currentDriver.lat ? appCalculateDistance(currentDriver.lat, currentDriver.lng, o.coordinates?.lat || 9.56, o.coordinates?.lng || 44.065).toFixed(1) : '?';
+            const isNew = !ringingOrderIds.has(o.id);
+            if (isNew) {
+                ringingOrderIds.add(o.id);
+                setTimeout(() => ringingOrderIds.delete(o.id), 30000);
+            }
+            return `
+                <div class="app-driver-order-card ${isNew ? 'ringing' : ''}">
+                    ${isNew ? '<div class="app-ring-indicator"><i class="fas fa-bell"></i> NEW</div>' : ''}
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <div style="font-size:1.1rem;font-weight:700;color:#f59e0b;">Order #${String(o.id).slice(-6)}</div>
+                        <div style="font-size:0.8rem;color:#94a3b8;">${new Date(o.timestamp).toLocaleTimeString()}</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.05);padding:12px;border-radius:10px;margin-bottom:12px;">
+                        <h4 style="font-size:1rem;margin-bottom:6px;"><i class="fas fa-user"></i> ${o.customer?.name || 'Customer'}</h4>
+                        <p style="font-size:0.85rem;color:#cbd5e1;margin:3px 0;"><i class="fas fa-phone"></i> ${o.customer?.phone || '-'}</p>
+                        <p style="font-size:0.85rem;color:#cbd5e1;margin:3px 0;"><i class="fas fa-map-marker-alt"></i> ${o.customer?.address || '-'}</p>
+                        <p style="font-size:0.85rem;color:#cbd5e1;margin:3px 0;"><i class="fas fa-location-arrow"></i> ${distance} km away</p>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:10px;margin-bottom:12px;">
+                        <h5 style="font-size:0.9rem;color:#94a3b8;margin-bottom:8px;"><i class="fas fa-store"></i> ${r.name}</h5>
+                        <ul style="list-style:none;padding:0;">
+                            ${o.items.map(i => `<li style="font-size:0.85rem;color:#e2e8f0;padding:3px 0;display:flex;justify-content:space-between;"><span>${i.name} x${i.quantity}</span><span>$${(i.price * i.quantity).toFixed(2)}</span></li>`).join('')}
+                        </ul>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid #334155;font-weight:700;font-size:1.1rem;">
+                        <span>Total:</span>
+                        <span style="color:var(--primary);">$${o.total.toFixed(2)}</span>
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:15px;">
+                        <button onclick="driverAcceptOrder('${o.id}')" class="app-driver-btn app-driver-btn-accept">
+                            <i class="fas fa-check"></i> Accept
+                        </button>
+                        <button onclick="driverRejectOrder('${o.id}')" class="app-driver-btn app-driver-btn-reject">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Active deliveries
+    const myDeliveries = orders.filter(o =>
+        o.vehicle?.id == currentDriver.id &&
+        ['preparing', 'ready', 'out_for_delivery'].includes(o.status)
+    );
+    const activeList = document.getElementById('appDriverActiveDeliveries');
+    if (!myDeliveries.length) {
+        activeList.innerHTML = `<div style="text-align:center;padding:30px;color:#64748b;"><p>No active deliveries</p></div>`;
+    } else {
+        activeList.innerHTML = myDeliveries.map(o => {
+            const r = restaurants[o.restaurant] || { name: 'Unknown' };
+            const st = o.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const nextStatus = { 'preparing': 'ready', 'ready': 'out_for_delivery', 'out_for_delivery': 'completed' }[o.status];
+            const nextLabel = { 'preparing': 'Mark Ready', 'ready': 'Start Delivery', 'out_for_delivery': 'Mark Delivered' }[o.status];
+            const nextIcon = { 'preparing': 'fa-utensils', 'ready': 'fa-shipping-fast', 'out_for_delivery': 'fa-check-double' }[o.status];
+            return `
+                <div class="app-driver-order-card accepted">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <div style="font-size:1.1rem;font-weight:700;color:var(--primary);">Order #${String(o.id).slice(-6)}</div>
+                        <span class="app-status-${o.status}" style="padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;">${st}</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.05);padding:12px;border-radius:10px;margin-bottom:12px;">
+                        <h4 style="font-size:1rem;margin-bottom:6px;"><i class="fas fa-user"></i> ${o.customer?.name || 'Customer'}</h4>
+                        <p style="font-size:0.85rem;color:#cbd5e1;margin:3px 0;"><i class="fas fa-phone"></i> ${o.customer?.phone || '-'}</p>
+                        <p style="font-size:0.85rem;color:#cbd5e1;margin:3px 0;"><i class="fas fa-map-marker-alt"></i> ${o.customer?.address || '-'}</p>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid #334155;font-weight:700;font-size:1.1rem;">
+                        <span>Total:</span>
+                        <span style="color:var(--primary);">$${o.total.toFixed(2)}</span>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:15px;flex-wrap:wrap;">
+                        <a href="tel:${o.customer?.phone}" class="app-driver-btn app-driver-btn-call" style="flex:1;min-width:100px;text-decoration:none;">
+                            <i class="fas fa-phone"></i> Call
+                        </a>
+                        <a href="https://wa.me/${(o.customer?.phone || '').replace(/\D/g, '')}" target="_blank" class="app-driver-btn app-driver-btn-wa" style="flex:1;min-width:100px;text-decoration:none;">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${o.coordinates?.lat},${o.coordinates?.lng}" target="_blank" class="app-driver-btn app-driver-btn-navigate" style="flex:1;min-width:100px;text-decoration:none;">
+                            <i class="fas fa-directions"></i> Navigate
+                        </a>
+                        <button onclick="driverUpdateStatus('${o.id}', '${nextStatus}')" class="app-driver-btn app-driver-btn-accept" style="flex:1;min-width:100px;">
+                            <i class="fas ${nextIcon}"></i> ${nextLabel}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+async function driverAcceptOrder(orderId) {
+    const o = orders.find(x => x.id === orderId);
+    if (!o) return;
+    const vehicleInfo = {
+        id: currentDriver.id,
+        driverName: currentDriver.driverName,
+        driverPhone: currentDriver.driverPhone,
+        plateNumber: currentDriver.plateNumber,
+        type: currentDriver.type,
+        lat: currentDriver.lat || 9.56,
+        lng: currentDriver.lng || 44.065
+    };
+    const hist = o.statusHistory || [];
+    hist.push({ status: 'preparing', time: new Date().toISOString() });
+    await updateOrderInDB(orderId, {
+        status: 'preparing',
+        vehicle: vehicleInfo,
+        vehicleId: currentDriver.id,
+        statusHistory: hist
+    });
+    await updateVehicleInDB(currentDriver.id, { status: 'delivering' });
+    showAppToast(`✅ Order #${String(orderId).slice(-6)} accepted!`);
+    appRenderDriverOrders();
+}
+
+async function driverRejectOrder(orderId) {
+    showAppToast('ℹ️ Order rejected');
+    appRenderDriverOrders();
+}
+
+async function driverUpdateStatus(orderId, newStatus) {
+    const o = orders.find(x => x.id === orderId);
+    if (!o) return;
+    const hist = o.statusHistory || [];
+    hist.push({ status: newStatus, time: new Date().toISOString() });
+    await updateOrderInDB(orderId, { status: newStatus, statusHistory: hist });
+    if (newStatus === 'out_for_delivery') await updateVehicleInDB(currentDriver.id, { status: 'delivering' });
+    else if (newStatus === 'completed') await updateVehicleInDB(currentDriver.id, { status: 'available' });
+    showAppToast(`✅ Order → ${newStatus}`);
+    appRenderDriverOrders();
+}
+
+// ═══════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════
+function appCalculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function appGetClosestVehicleOfType(type, lat, lng) {
+    let closest = null, minDist = Infinity;
+    for (const v of vehicles) {
+        if (v.status === 'available' && v.type === type) {
+            const d = appCalculateDistance(lat, lng, v.lat || 9.56, v.lng || 44.06);
+            if (d < minDist) { minDist = d; closest = v; }
+        }
+    }
+    return closest;
+}
+
+function showAppToast(msg) {
+    const toast = document.getElementById('appToast');
+    if (!toast) {
+        // Fallback for front page
+        const t = document.createElement('div');
+        t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:30px;box-shadow:0 4px 20px rgba(0,0,0,0.4);z-index:10000;font-size:14px;font-weight:500;';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => {
+            t.style.opacity = '0';
+            t.style.transition = 'opacity 0.4s';
+            setTimeout(() => document.body.removeChild(t), 400);
+        }, 3000);
+        return;
+    }
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// Close modals on Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeFrontLogin();
+        const modals = ['appLoginForm', 'appDriverLoginForm', 'appSettingsModal', 'appTrackingModal', 'appDeliveryForm', 'appPaymentForm'];
+        modals.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        });
+    }
+});
+</script>
+
+
+</body></html>
