@@ -1,0 +1,9 @@
+﻿File,Description
+index.html,"Landing page with hero section, features, login/register modals"
+home.html,"Main app view with restaurant listings, user menu, cart bar"
+profile.html,User profile with editable form and quick links
+orders.html,Order history with filter tabs and tracking modal
+addresses.html,Saved addresses with add/edit modal and location detection
+explorer.html,Restaurant explorer with menu modal and cart functionality
+management.html,"Admin dashboard with login, stats, fleet management, settings"
+driver.html,"Driver portal with login, online toggle, incoming orders"

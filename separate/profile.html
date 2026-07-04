@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go!point - Profile</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; padding-bottom: 80px; }
+        .header { background: #ff6b35; padding: 15px 20px; color: white; position: sticky; top: 0; z-index: 100; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        .back-btn { background: none; border: none; color: white; font-size: 18px; cursor: pointer; }
+        .logo { font-size: 20px; font-weight: bold; }
+        .main-content { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .profile-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 3px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .profile-header { text-align: center; margin-bottom: 25px; }
+        .avatar { width: 80px; height: 80px; background: #ff6b35; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; color: white; margin: 0 auto 15px; }
+        .profile-name { font-size: 22px; font-weight: 600; color: #333; }
+        .profile-form .form-group { margin-bottom: 20px; }
+        .profile-form label { display: block; margin-bottom: 8px; font-weight: 500; color: #333; }
+        .profile-form input { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; transition: border-color 0.3s; }
+        .profile-form input:focus { outline: none; border-color: #ff6b35; }
+        .btn-group { display: flex; gap: 10px; margin-top: 25px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
+        .btn-primary { background: #ff6b35; color: white; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .quick-links { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 3px 15px rgba(0,0,0,0.1); }
+        .quick-links h3 { margin-bottom: 15px; color: #333; }
+        .link-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0; text-decoration: none; color: #333; }
+        .link-item:last-child { border-bottom: none; }
+        .link-item:hover { color: #ff6b35; }
+        .link-icon { font-size: 20px; margin-right: 10px; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-around; z-index: 100; }
+        .nav-item { text-align: center; color: #888; text-decoration: none; padding: 8px 15px; }
+        .nav-item.active { color: #ff6b35; }
+        .nav-item span { display: block; font-size: 20px; }
+        .nav-item p { font-size: 11px; margin-top: 3px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-top">
+            <button class="back-btn" onclick="window.history.back()">← Back</button>
+            <div class="logo">🛵 Go!point</div>
+            <div style="width: 40px;"></div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="avatar">👤</div>
+                <div class="profile-name">Gguuleed</div>
+            </div>
+            
+            <form class="profile-form">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" value="guuleed" id="username">
+                </div>
+                <div class="form-group">
+                    <label>User</label>
+                    <input type="text" value="Gguuleed" id="user">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" value="+252 61 1234567" id="phone">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" value="user@example.com" id="email">
+                </div>
+                
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary">Edit</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="quick-links">
+            <h3>Quick Links</h3>
+            <a href="orders.html" class="link-item">
+                <span><span class="link-icon">📦</span>My Orders</span>
+                <span>→</span>
+            </a>
+            <a href="addresses.html" class="link-item">
+                <span><span class="link-icon">📍</span>Saved Addresses</span>
+                <span>→</span>
+            </a>
+            <a href="#" class="link-item">
+                <span><span class="link-icon">💳</span>Payment Methods</span>
+                <span>→</span>
+            </a>
+            <a href="#" class="link-item">
+                <span><span class="link-icon">⚙️</span>Settings</span>
+                <span>→</span>
+            </a>
+            <a href="index.html" class="link-item">
+                <span><span class="link-icon">🚪</span>Logout</span>
+                <span>→</span>
+            </a>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="home.html" class="nav-item">
+            <span>🏠</span>
+            <p>Home</p>
+        </a>
+        <a href="explorer.html" class="nav-item">
+            <span>🔍</span>
+            <p>Explore</p>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <span>📦</span>
+            <p>Orders</p>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <span>👤</span>
+            <p>Profile</p>
+        </a>
+    </nav>
+
+    <script>
+        document.querySelector('.profile-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Profile saved successfully!');
+        });
+    </script>
+</body>
+</html>

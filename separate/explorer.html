@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go!point - Explorer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; padding-bottom: 80px; }
+        .header { background: #ff6b35; padding: 15px 20px; color: white; position: sticky; top: 0; z-index: 100; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        .back-btn { background: none; border: none; color: white; font-size: 18px; cursor: pointer; }
+        .logo { font-size: 20px; font-weight: bold; }
+        .search-bar { background: white; padding: 10px 15px; border-radius: 20px; display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .search-bar input { border: none; outline: none; flex: 1; font-size: 14px; }
+        .main-content { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .categories { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; }
+        .category { padding: 8px 16px; border: 2px solid #ddd; border-radius: 20px; background: white; white-space: nowrap; cursor: pointer; font-size: 14px; }
+        .category.active { border-color: #ff6b35; background: #ff6b35; color: white; }
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #333; }
+        .restaurant-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .restaurant-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 3px 15px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
+        .restaurant-card:hover { transform: translateY(-5px); }
+        .restaurant-info { padding: 15px; }
+        .restaurant-name { font-size: 16px; font-weight: 600; margin-bottom: 5px; }
+        .restaurant-details { font-size: 13px; color: #666; margin-bottom: 10px; }
+        .restaurant-meta { display: flex; justify-content: space-between; align-items: center; }
+        .rating { background: #4caf50; color: white; padding: 3px 8px; border-radius: 5px; font-size: 12px; font-weight: bold; }
+        .delivery-info { font-size: 13px; color: #888; }
+        .view-menu { color: #ff6b35; font-size: 13px; font-weight: 500; text-decoration: none; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-around; z-index: 100; }
+        .nav-item { text-align: center; color: #888; text-decoration: none; padding: 8px 15px; }
+        .nav-item.active { color: #ff6b35; }
+        .nav-item span { display: block; font-size: 20px; }
+        .nav-item p { font-size: 11px; margin-top: 3px; }
+        .menu-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; overflow-y: auto; }
+        .menu-modal.active { display: block; }
+        .menu-header { background: #ff6b35; color: white; padding: 20px; position: sticky; top: 0; z-index: 10; }
+        .menu-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .close-menu { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .menu-restaurant-name { font-size: 20px; font-weight: bold; }
+        .menu-restaurant-details { font-size: 14px; opacity: 0.9; }
+        .menu-categories { display: flex; gap: 10px; overflow-x: auto; padding: 10px 20px; background: white; position: sticky; top: 80px; z-index: 9; }
+        .menu-category { padding: 8px 16px; border: 2px solid #ddd; border-radius: 20px; background: white; white-space: nowrap; cursor: pointer; font-size: 13px; }
+        .menu-category.active { border-color: #ff6b35; background: #ff6b35; color: white; }
+        .menu-items { padding: 20px; }
+        .menu-section { margin-bottom: 25px; }
+        .menu-section-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #333; }
+        .menu-item { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
+        .menu-item-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 5px; }
+        .menu-item-info p { font-size: 12px; color: #666; margin-bottom: 8px; }
+        .menu-item-price { font-size: 15px; font-weight: 600; color: #ff6b35; }
+        .add-btn { background: #ff6b35; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; }
+        .cart-bar { position: fixed; bottom: 70px; left: 20px; right: 20px; background: #333; color: white; padding: 15px 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .cart-items { display: flex; align-items: center; gap: 10px; }
+        .cart-count { background: #ff6b35; padding: 3px 10px; border-radius: 10px; font-size: 12px; }
+        .view-cart { background: #ff6b35; color: white; padding: 8px 20px; border-radius: 20px; text-decoration: none; font-size: 14px; }
+        .service-tags { display: flex; gap: 8px; margin-top: 10px; }
+        .service-tag { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 10px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-top">
+            <button class="back-btn" onclick="window.location.href='home.html'">← Back</button>
+            <div class="logo">🔍 Explorer</div>
+            <div style="width: 40px;"></div>
+        </div>
+        <div class="search-bar">
+            <span>🔍</span>
+            <input type="text" placeholder="Search restaurants, dishes...">
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="categories">
+            <div class="category active">All</div>
+            <div class="category">🍕 Italian</div>
+            <div class="category">🍔 Fast Food</div>
+            <div class="category">☕ Cafe</div>
+            <div class="category">🥗 Mediterranean</div>
+        </div>
+
+        <h2 class="section-title">All Restaurants</h2>
+        
+        <div class="restaurant-grid">
+            <div class="restaurant-card" onclick="openMenu('Damal Restaurant', 'Mediterranean • Downtown, Hargeisa', '⭐ 4.8 • 25 min • 4.2 km')">
+                <div class="restaurant-info">
+                    <div class="restaurant-name">Damal Restaurant</div>
+                    <div class="restaurant-details">Mediterranean • Downtown, Hargeisa</div>
+                    <div class="restaurant-meta">
+                        <span class="rating">⭐ 4.8</span>
+                        <span class="delivery-info">25 min • 4.2 km</span>
+                        <span class="view-menu">View Menu →</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-card" onclick="openMenu('Hiddo Dhowr Pizza', 'Italian • Main Street, Hargeisa', '⭐ 4.9 • 20 min • 4.4 km')">
+                <div class="restaurant-info">
+                    <div class="restaurant-name">Hiddo Dhowr Pizza</div>
+                    <div class="restaurant-details">Italian • Main Street, Hargeisa</div>
+                    <div class="restaurant-meta">
+                        <span class="rating">⭐ 4.9</span>
+                        <span class="delivery-info">20 min • 4.4 km</span>
+                        <span class="view-menu">View Menu →</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-card" onclick="openMenu('Burger House', 'Fast Food • Central Market, Hargeisa', '⭐ 4.7 • 18 min • 4.1 km')">
+                <div class="restaurant-info">
+                    <div class="restaurant-name">Burger House</div>
+                    <div class="restaurant-details">Fast Food • Central Market, Hargeisa</div>
+                    <div class="restaurant-meta">
+                        <span class="rating">⭐ 4.7</span>
+                        <span class="delivery-info">18 min • 4.1 km</span>
+                        <span class="view-menu">View Menu →</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-card" onclick="openMenu('Som Coffee', 'Cafe • University Road, Hargeisa', '⭐ 4.9 • 15 min • 4.4 km')">
+                <div class="restaurant-info">
+                    <div class="restaurant-name">Som Coffee</div>
+                    <div class="restaurant-details">Cafe • University Road, Hargeisa</div>
+                    <div class="restaurant-meta">
+                        <span class="rating">⭐ 4.9</span>
+                        <span class="delivery-info">15 min • 4.4 km</span>
+                        <span class="view-menu">View Menu →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Modal -->
+    <div class="menu-modal" id="menuModal">
+        <div class="menu-header">
+            <div class="menu-header-top">
+                <button class="close-menu" onclick="closeMenu()">&times;</button>
+                <div class="menu-restaurant-name" id="menuRestaurantName">Restaurant Name</div>
+            </div>
+            <div class="menu-restaurant-details" id="menuRestaurantDetails">Details</div>
+            <div class="service-tags">
+                <span class="service-tag">☕ Coffee</span>
+                <span class="service-tag">🍽️ Food</span>
+                <span class="service-tag">🍰 Dessert</span>
+            </div>
+        </div>
+
+        <div class="menu-categories">
+            <div class="menu-category active">All</div>
+            <div class="menu-category">Popular</div>
+            <div class="menu-category">Main Course</div>
+            <div class="menu-category">Drinks</div>
+            <div class="menu-category">Desserts</div>
+        </div>
+
+        <div class="menu-items">
+            <div class="menu-section">
+                <div class="menu-section-title">🔥 Popular Items</div>
+                
+                <div class="menu-item">
+                    <div class="menu-item-info">
+                        <h4>Signature Burger</h4>
+                        <p>Beef patty, cheese, lettuce, tomato, special sauce</p>
+                        <div class="menu-item-price">$8.99</div>
+                    </div>
+                    <button class="add-btn" onclick="addToCart()">Add +</button>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-item-info">
+                        <h4>Margherita Pizza</h4>
+                        <p>Fresh mozzarella, tomato sauce, basil</p>
+                        <div class="menu-item-price">$12.50</div>
+                    </div>
+                    <button class="add-btn" onclick="addToCart()">Add +</button>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-item-info">
+                        <h4>Chicken Wrap</h4>
+                        <p>Grilled chicken, veggies, creamy dressing</p>
+                        <div class="menu-item-price">$7.50</div>
+                    </div>
+                    <button class="add-btn" onclick="addToCart()">Add +</button>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-section-title">🍔 Burgers</div>
+                
+                <div class="menu-item">
+                    <div class="menu-item-info">
+                        <h4>Classic Burger</h4>
+                        <p>Beef patty, lettuce, tomato, onion</p>
+                        <div class="menu-item-price">$6.99</div>
+                    </div>
+                    <button class="add-btn" onclick="addToCart()">Add +</button>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-item-info">
+                        <h4>Double Cheese Burger</h4>
+                        <p>Double beef patty, double cheese, pickles</p>
+                        <div class="menu-item-price">$9.99</div>
+                    </div>
+                    <button class="add-btn" onclick="addToCart()">Add +</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart-bar" id="cartBar" style="display: none;">
+        <div class="cart-items">
+            <span>🛒</span>
+            <span id="cartItemCount">0 items</span>
+            <span class="cart-count">Tap to view cart</span>
+        </div>
+        <div>
+            <span style="margin-right: 15px;" id="cartTotal">$0.00</span>
+            <a href="#" class="view-cart">View Cart →</a>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="home.html" class="nav-item">
+            <span>🏠</span>
+            <p>Home</p>
+        </a>
+        <a href="explorer.html" class="nav-item active">
+            <span>🔍</span>
+            <p>Explore</p>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <span>📦</span>
+            <p>Orders</p>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <span>👤</span>
+            <p>Profile</p>
+        </a>
+    </nav>
+
+    <script>
+        let cartCount = 0;
+        let cartTotal = 0;
+
+        function openMenu(name, details, meta) {
+            document.getElementById('menuRestaurantName').textContent = name;
+            document.getElementById('menuRestaurantDetails').textContent = details + ' • ' + meta;
+            document.getElementById('menuModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            document.getElementById('menuModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function addToCart() {
+            cartCount++;
+            cartTotal += 8.99;
+            document.getElementById('cartItemCount').textContent = cartCount + ' items';
+            document.getElementById('cartTotal').textContent = '$' + cartTotal.toFixed(2);
+            document.getElementById('cartBar').style.display = 'flex';
+        }
+
+        // Category filtering
+        document.querySelectorAll('.category').forEach(cat => {
+            cat.addEventListener('click', () => {
+                document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
+                cat.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.menu-category').forEach(cat => {
+            cat.addEventListener('click', () => {
+                document.querySelectorAll('.menu-category').forEach(c => c.classList.remove('active'));
+                cat.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

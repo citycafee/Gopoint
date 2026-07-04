@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go!point - Orders</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; padding-bottom: 80px; }
+        .header { background: #ff6b35; padding: 15px 20px; color: white; position: sticky; top: 0; z-index: 100; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        .back-btn { background: none; border: none; color: white; font-size: 18px; cursor: pointer; }
+        .logo { font-size: 20px; font-weight: bold; }
+        .main-content { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #333; }
+        .orders-container { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 3px 15px rgba(0,0,0,0.1); }
+        .empty-state { text-align: center; padding: 40px 20px; color: #888; }
+        .empty-state-icon { font-size: 48px; margin-bottom: 15px; }
+        .order-card { background: #f9f9f9; border-radius: 15px; padding: 15px; margin-bottom: 15px; }
+        .order-card:last-child { margin-bottom: 0; }
+        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .order-id { font-weight: 600; color: #333; }
+        .order-status { background: #4caf50; color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px; }
+        .order-date { font-size: 12px; color: #888; margin-bottom: 8px; }
+        .order-items { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .order-total { font-weight: 600; color: #ff6b35; font-size: 16px; }
+        .track-btn { background: #ff6b35; color: white; padding: 8px 20px; border: none; border-radius: 20px; font-size: 13px; cursor: pointer; margin-top: 10px; }
+        .filter-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .filter-tab { padding: 8px 20px; border: 2px solid #ddd; border-radius: 20px; background: white; cursor: pointer; font-size: 14px; }
+        .filter-tab.active { border-color: #ff6b35; background: #ff6b35; color: white; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-around; z-index: 100; }
+        .nav-item { text-align: center; color: #888; text-decoration: none; padding: 8px 15px; }
+        .nav-item.active { color: #ff6b35; }
+        .nav-item span { display: block; font-size: 20px; }
+        .nav-item p { font-size: 11px; margin-top: 3px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; max-width: 400px; width: 90%; }
+        .modal-content h3 { margin-bottom: 20px; }
+        .tracking-steps { display: flex; flex-direction: column; gap: 15px; }
+        .step { display: flex; gap: 15px; align-items: flex-start; }
+        .step-icon { width: 30px; height: 30px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .step-icon.active { background: #4caf50; color: white; }
+        .step-text { flex: 1; }
+        .step-text h4 { font-size: 14px; margin-bottom: 3px; }
+        .step-text p { font-size: 12px; color: #888; }
+        .close-modal { background: #ff6b35; color: white; padding: 10px 30px; border: none; border-radius: 20px; margin-top: 20px; cursor: pointer; width: 100%; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-top">
+            <button class="back-btn" onclick="window.history.back()">← Back</button>
+            <div class="logo">📦 My Orders</div>
+            <div style="width: 40px;"></div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="filter-tabs">
+            <button class="filter-tab active">All</button>
+            <button class="filter-tab">Active</button>
+            <button class="filter-tab">Completed</button>
+        </div>
+
+        <h2 class="section-title">My Orders</h2>
+        
+        <div class="orders-container">
+            <div class="empty-state">
+                <div class="empty-state-icon">📦</div>
+                <p>No orders yet.</p>
+                <p style="font-size: 13px; margin-top: 10px;">Start ordering from your favorite restaurants!</p>
+            </div>
+        </div>
+
+        <!-- Sample Completed Orders (Hidden by default, shown when filter changes) -->
+        <div class="orders-container" style="display: none; margin-top: 20px;" id="completedOrders">
+            <div class="order-card">
+                <div class="order-header">
+                    <span class="order-id">Order #860189</span>
+                    <span class="order-status">Completed</span>
+                </div>
+                <div class="order-date">7/2/2026, 4:44:20 PM</div>
+                <div class="order-items">Chicken Burger x1, Classic Burger x1, Double Cheese Burger x1</div>
+                <div class="order-total">$33.90</div>
+                <button class="track-btn" onclick="openTracking('#860189')">Reorder</button>
+            </div>
+
+            <div class="order-card">
+                <div class="order-header">
+                    <span class="order-id">Order #102563</span>
+                    <span class="order-status">Completed</span>
+                </div>
+                <div class="order-date">7/2/2026, 4:31:42 PM</div>
+                <div class="order-items">Truffle Pasta x1</div>
+                <div class="order-total">$14.50</div>
+                <button class="track-btn" onclick="openTracking('#102563')">Reorder</button>
+            </div>
+
+            <div class="order-card">
+                <div class="order-header">
+                    <span class="order-id">Order #147564</span>
+                    <span class="order-status">Completed</span>
+                </div>
+                <div class="order-date">7/2/2026, 3:09:07 PM</div>
+                <div class="order-items">Margherita Pizza x1, Pepperoni Pizza x1, Pasta Carbonara x1</div>
+                <div class="order-total">$34.90</div>
+                <button class="track-btn" onclick="openTracking('#147564')">Reorder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tracking Modal -->
+    <div class="modal" id="trackingModal">
+        <div class="modal-content">
+            <h3>📍 Live Order Tracking</h3>
+            <p style="margin-bottom: 20px; color: #666;" id="trackingOrderId">Order #------</p>
+            
+            <div class="tracking-steps">
+                <div class="step">
+                    <div class="step-icon active">✓</div>
+                    <div class="step-text">
+                        <h4>Order Confirmed</h4>
+                        <p>Restaurant has accepted your order</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">🍳</div>
+                    <div class="step-text">
+                        <h4>Preparing</h4>
+                        <p>Restaurant is preparing your food</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">🛵</div>
+                    <div class="step-text">
+                        <h4>On the Way</h4>
+                        <p>Driver is delivering your order</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">🏠</div>
+                    <div class="step-text">
+                        <h4>Delivered</h4>
+                        <p>Order delivered to your location</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <p style="font-size: 14px; margin-bottom: 10px;"><strong>Restaurant:</strong> <span id="trackingRestaurant">-</span></p>
+                <p style="font-size: 14px; margin-bottom: 10px;"><strong>Driver:</strong> <span id="trackingDriver">-</span></p>
+                <p style="font-size: 14px;"><strong>Delivering To:</strong> <span id="trackingAddress">-</span></p>
+                
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button style="flex: 1; padding: 10px; border: 2px solid #ff6b35; background: white; color: #ff6b35; border-radius: 20px; cursor: pointer;">📞 Call Driver</button>
+                    <button style="flex: 1; padding: 10px; border: 2px solid #25d366; background: white; color: #25d366; border-radius: 20px; cursor: pointer;">💬 WhatsApp</button>
+                </div>
+            </div>
+
+            <button class="close-modal" onclick="closeTracking()">Close</button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="home.html" class="nav-item">
+            <span>🏠</span>
+            <p>Home</p>
+        </a>
+        <a href="explorer.html" class="nav-item">
+            <span>🔍</span>
+            <p>Explore</p>
+        </a>
+        <a href="orders.html" class="nav-item active">
+            <span>📦</span>
+            <p>Orders</p>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <span>👤</span>
+            <p>Profile</p>
+        </a>
+    </nav>
+
+    <script>
+        function openTracking(orderId) {
+            document.getElementById('trackingOrderId').textContent = 'Order ' + orderId;
+            document.getElementById('trackingModal').classList.add('active');
+        }
+        function closeTracking() {
+            document.getElementById('trackingModal').classList.remove('active');
+        }
+        document.getElementById('trackingModal').addEventListener('click', (e) => {
+            if (e.target.id === 'trackingModal') closeTracking();
+        });
+        
+        // Filter tabs
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                if (tab.textContent === 'Completed') {
+                    document.querySelector('.orders-container').style.display = 'none';
+                    document.getElementById('completedOrders').style.display = 'block';
+                } else {
+                    document.querySelector('.orders-container').style.display = 'block';
+                    document.getElementById('completedOrders').style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
