@@ -9,6 +9,7 @@
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* ─── BASE & THEME VARIABLES ─── */
         :root {
@@ -4635,8 +4636,8 @@
         }
 
         // ─── DATA ───
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const SUPABASE_URL = 'https://jynjoiidearebmpsisom.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_vwUSZCVzXy3FeNpKhayFAQ_LZ08abDX';
         let supabaseClient = null,
             useSupabase = false;
         try {
@@ -4849,17 +4850,17 @@
         ];
 
         // ─── FRONT PAGE FUNCTIONS ───
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedUser = localStorage.getItem('gopoint_user');
-            if (savedUser) { try { currentUser = JSON.parse(savedUser);
-                    goToMarketplace(); } catch (e) { localStorage.removeItem('gopoint_user'); } }
+        window.addEventListener('DOMContentLoaded', async () => {
+            const savedUser = DB.getUser();
+            if (savedUser) { try { currentUser = savedUser;
+                    goToMarketplace(); } catch (e) { DB.setUser(null); } }
             window.addEventListener('scroll', () => {
                 const header = document.getElementById('fpHeader');
                 if (header) { if (window.scrollY > 50) header.classList.add('scrolled');
                     else header.classList.remove('scrolled'); }
             });
-            initApp();
-            if (localStorage.getItem('admin_auth') === 'true') {
+            await initApp();
+            if (DB.getAdminAuth()) {
                 document.getElementById('appAdminLink').style.display = 'flex';
             }
             dpLoadData();
@@ -4880,19 +4881,17 @@
                 ];
                 const NAMES = ['Yusuf Ahmed','Hodan Abdi','Liban Farah','Sahra Ismail','Khadar Warsame','Asma Noor','Ifrah Hassan'];
 
-                function readFleet() {
+                async function readFleet() {
                     try {
-                        const raw = localStorage.getItem('gopoint_drivers');
-                        if (!raw) return DEFAULT_FLEET.slice();
-                        const parsed = JSON.parse(raw);
-                        return Array.isArray(parsed) && parsed.length ? parsed : DEFAULT_FLEET.slice();
+                        const fleet = await DB.getDrivers();
+                        return (Array.isArray(fleet) && fleet.length) ? fleet : DEFAULT_FLEET.slice();
                     } catch (e) { return DEFAULT_FLEET.slice(); }
                 }
-                function writeFleet(fleet) {
-                    try { localStorage.setItem('gopoint_drivers', JSON.stringify(fleet)); } catch (e) {}
+                async function writeFleet(fleet) {
+                    try { await DB.saveDrivers(fleet); } catch (e) {}
                 }
-                function refreshBadge() {
-                    const fleet = readFleet();
+                async function refreshBadge() {
+                    const fleet = await readFleet();
                     const available = fleet.filter(d => (d.status || 'available') === 'available').length;
                     const badge = document.getElementById('gsbFleetBadge');
                     if (badge) badge.textContent = available + ' of ' + fleet.length + ' available';
@@ -4908,8 +4907,8 @@
                 }
                 const btn = document.getElementById('gsbBtn');
                 if (btn) {
-                    btn.addEventListener('click', function() {
-                        const fleet = readFleet();
+                    btn.addEventListener('click', async function() {
+                        const fleet = await readFleet();
                         const name = NAMES[Math.floor(Math.random() * NAMES.length)];
                         const isTaxi = fleet.length % 2 === 0;
                         const newDriver = {
@@ -4920,7 +4919,7 @@
                             status: 'available'
                         };
                         fleet.push(newDriver);
-                        writeFleet(fleet);
+                        await writeFleet(fleet);
                         refreshBadge();
                         // brief visual feedback
                         btn.style.transform = 'scale(0.95)';
@@ -4959,10 +4958,10 @@
         function showUsernameLogin() { document.getElementById('fpPhoneStep').style.display = 'none';
             document.getElementById('fpUsernameStep').style.display = 'block'; }
 
-        function loginWithUsername() {
+        async function loginWithUsername() {
             const u = document.getElementById('fpLoginUsername').value.trim(),
                 p = document.getElementById('fpLoginPassword').value;
-            const users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+            const users = await DB.getUsers();
             let found = null;
             for (let k in users) { if (users[k].username === u && users[k].password === p) found = users[k]; }
             if (found) { completeLogin({ name: found.username, phone: found.phone, provider: 'username' }); } else { showAppToast(
@@ -5005,7 +5004,7 @@
                 completeLogin(mockUser); }, 1200);
         }
 
-        function registerUser() {
+        async function registerUser() {
             const name = document.getElementById('fpRegisterName').value.trim(),
                 username = document.getElementById('fpRegisterUsername').value.trim(),
                 password = document.getElementById('fpRegisterPassword').value,
@@ -5016,10 +5015,8 @@
             if (!username || username.length < 3) { showAppToast('⚠️ Username must be at least 3 characters'); return; }
             if (password.length < 4) { showAppToast('⚠️ Password must be at least 4 characters'); return; }
             if (password !== confirm) { showAppToast('⚠️ Passwords do not match'); return; }
-            const fullPhone = code + phone,
-                users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
-            users[fullPhone] = { name, username, password, phone: fullPhone };
-            localStorage.setItem('gopoint_users', JSON.stringify(users));
+            const fullPhone = code + phone;
+            await DB.saveUser({ id: fullPhone, username: username, name, password, phone: fullPhone });
             const user = { name, username, phone: fullPhone, provider: 'whatsapp' };
             completeLogin(user);
         }
@@ -5029,7 +5026,7 @@
             document.getElementById('fpPhoneStep').style.display = 'block'; }
 
         function completeLogin(user) { currentUser = user;
-            localStorage.setItem('gopoint_user', JSON.stringify(user));
+            DB.setUser(user);
             closeFrontLogin();
             showAppToast('✅ Welcome, ' + user.name + '!');
             setTimeout(() => goToMarketplace(), 500); }
@@ -5045,7 +5042,7 @@
         function logoutUser() {
             if (!confirm('Are you sure you want to logout?')) return;
             currentUser = null;
-            localStorage.removeItem('gopoint_user');
+            DB.setUser(null);
             document.getElementById('appContainer').classList.remove('active');
             document.getElementById('frontPageContainer').style.display = 'block';
             document.getElementById('appUserDropdown').classList.remove('active');
@@ -5067,7 +5064,7 @@
             document.getElementById('appUserDropdownName').textContent = currentUser.name || 'User';
             document.getElementById('appUserDropdownEmail').textContent = currentUser.email || currentUser.phone || (currentUser
                 .provider + ' user');
-            if (adminLink) adminLink.style.display = localStorage.getItem('admin_auth') === 'true' ? 'flex' : 'none';
+            if (adminLink) adminLink.style.display = DB.getAdminAuth() ? 'flex' : 'none';
             if (document.getElementById('appProfileView').classList.contains('active')) renderProfileView();
             if (document.getElementById('appOrdersView').classList.contains('active')) renderOrdersView();
             if (document.getElementById('appAddressesView').classList.contains('active')) renderAddressesView();
@@ -5165,9 +5162,10 @@
              }).join('');
         }
 
-        function renderAddressesView() {
+        async function renderAddressesView() {
             const container = document.getElementById('appAddressesList');
-            const addresses = JSON.parse(localStorage.getItem('gopoint_addresses') || '[]');
+            const userId = currentUser ? (currentUser.phone || currentUser.username || 'default') : 'default';
+            const addresses = await DB.getAddresses(userId);
             if (!addresses.length) { container.innerHTML =
                     '<p style="grid-column:1/-1; text-align:center; color:#666; padding:2rem;">No saved addresses.</p>';
                 return; }
@@ -5176,18 +5174,21 @@
             ).join('');
         }
 
-        function addNewAddress() { const area = prompt('Enter area name:'); if (!area) return; const address = prompt(
+        async function addNewAddress() { const area = prompt('Enter area name:'); if (!area) return; const address = prompt(
                 'Enter full address:'); if (!address) return; const label = prompt('Enter a label (e.g., Home, Work):') ||
-                'Address'; const addresses = JSON.parse(localStorage.getItem('gopoint_addresses') || '[]');
+                'Address';
+            const userId = currentUser ? (currentUser.phone || currentUser.username || 'default') : 'default';
+            const addresses = await DB.getAddresses(userId);
             addresses.push({ label, area, address });
-            localStorage.setItem('gopoint_addresses', JSON.stringify(addresses));
+            await DB.saveAddresses(userId, addresses);
             renderAddressesView();
             showAppToast('✅ Address saved'); }
 
-        function deleteAddress(index) { if (!confirm('Delete this address?')) return; const addresses = JSON.parse(
-                localStorage.getItem('gopoint_addresses') || '[]');
+        async function deleteAddress(index) { if (!confirm('Delete this address?')) return;
+            const userId = currentUser ? (currentUser.phone || currentUser.username || 'default') : 'default';
+            const addresses = await DB.getAddresses(userId);
             addresses.splice(index, 1);
-            localStorage.setItem('gopoint_addresses', JSON.stringify(addresses));
+            await DB.saveAddresses(userId, addresses);
             renderAddressesView();
             showAppToast('🗑️ Address deleted'); }
 
@@ -5223,14 +5224,14 @@
             currentUser.name = name;
             currentUser.phone = phone || currentUser.phone;
             currentUser.email = email || currentUser.email;
-            localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
+            DB.setUser(currentUser);
             updateUserUI();
             showAppToast('✅ Profile updated');
             cancelProfileEdit();
         }
 
         // ─── APP INIT ───
-        function initApp() { loadFromLocalStorage();
+        async function initApp() { await loadFromLocalStorage();
             appInitMap();
             appStartBannerCarousel();
             setupAppEventListeners();
@@ -5255,37 +5256,243 @@
                         /\D/g, '').slice(0, 7); }); }
         }
 
-        // ─── DATA LAYER ───
-        function loadFromLocalStorage() {
-            const sr = localStorage.getItem('gopoint_restaurants');
-            restaurants = sr ? JSON.parse(sr) : JSON.parse(JSON.stringify(defaultRestaurants));
-            const sv = localStorage.getItem('gopoint_vehicles');
-            const rawVehicles = sv ? JSON.parse(sv) : [];
-            const drivers = JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
-            vehicles = rawVehicles.map((v, i) => {
-                const driver = drivers.find(d => d.id === v.driverId);
-                return {
-                    ...v,
-                    id: v.id || String(i + 1),
-                    driverName: driver ? driver.name : (v.driverName || 'Unknown'),
-                    driverPhone: driver ? driver.phone : (v.driverPhone || ''),
-                    driverPin: v.driverPin || (driver ? driver.pin : '') || '',
-                    plateNumber: v.plate || v.plateNumber || ''
+        // ─── SUPABASE DATA ACCESS LAYER (DB) ───
+        const DB = {
+            // ── DRIVERS ──
+            async getDrivers() {
+                if (!useSupabase) return JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
+                const { data, error } = await supabaseClient.from('drivers').select('*');
+                if (error) { console.error('DB.getDrivers:', error); return []; }
+                return data.map(d => ({ id: d.id, name: d.name, phone: d.phone, license: d.license, pin: d.pin, status: d.status, lat: d.lat, lng: d.lng }));
+            },
+            async saveDrivers(drivers) {
+                if (!useSupabase) { localStorage.setItem('gopoint_drivers', JSON.stringify(drivers)); return; }
+                const { error } = await supabaseClient.from('drivers').upsert(drivers.map(d => ({
+                    id: d.id, name: d.name, phone: d.phone || '', license: d.license || '', pin: d.pin || '', status: d.status || 'available', lat: d.lat || 9.56, lng: d.lng || 44.065
+                })), { onConflict: 'id' });
+                if (error) console.error('DB.saveDrivers:', error);
+            },
+            async deleteDriver(id) {
+                if (!useSupabase) return;
+                const { error } = await supabaseClient.from('drivers').delete().eq('id', id);
+                if (error) console.error('DB.deleteDriver:', error);
+            },
+            // ── VEHICLES ──
+            async getVehicles() {
+                if (!useSupabase) return JSON.parse(localStorage.getItem('gopoint_vehicles') || '[]');
+                const { data, error } = await supabaseClient.from('vehicles').select('*');
+                if (error) { console.error('DB.getVehicles:', error); return []; }
+                return data.map(v => ({ id: v.id, type: v.type, plate: v.plate, model: v.model, driverId: v.driver_id, status: v.status, lat: v.lat, lng: v.lng }));
+            },
+            async saveVehicles(vehicles) {
+                if (!useSupabase) { localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles)); return; }
+                const { error } = await supabaseClient.from('vehicles').upsert(vehicles.map(v => ({
+                    id: v.id, type: v.type || 'bike', plate: v.plate || '', model: v.model || '', driver_id: v.driverId || v.driver_id || '', status: v.status || 'available', lat: v.lat || 9.56, lng: v.lng || 44.065
+                })), { onConflict: 'id' });
+                if (error) console.error('DB.saveVehicles:', error);
+            },
+            async deleteVehicle(id) {
+                if (!useSupabase) return;
+                const { error } = await supabaseClient.from('vehicles').delete().eq('id', id);
+                if (error) console.error('DB.deleteVehicle:', error);
+            },
+            // ── RESTAURANTS ──
+            async getRestaurants() {
+                if (!useSupabase) return null;
+                const { data, error } = await supabaseClient.from('restaurants').select('*');
+                if (error) { console.error('DB.getRestaurants:', error); return null; }
+                const result = {};
+                data.forEach(r => {
+                    result[r.key] = { name: r.name, address: r.address, phone: r.phone, lat: r.lat, lng: r.lng,
+                        rating: r.rating, deliveryTime: r.delivery_time, deliveryFee: r.delivery_fee,
+                        cuisine: r.cuisine, image: r.image, active: r.active !== false, menu: r.menu || {} };
+                });
+                return Object.keys(result).length ? result : null;
+            },
+            async saveRestaurants(restaurants) {
+                if (!useSupabase) { localStorage.setItem('gopoint_restaurants', JSON.stringify(restaurants)); return; }
+                const rows = Object.entries(restaurants).map(([key, r]) => ({
+                    key, name: r.name, address: r.address || '', phone: r.phone || '',
+                    lat: r.lat || 9.56, lng: r.lng || 44.065, rating: r.rating || 4.5,
+                    delivery_time: r.deliveryTime || '30 min', delivery_fee: r.deliveryFee || '$2',
+                    cuisine: r.cuisine || 'Various', image: r.image || '', active: r.active !== false,
+                    menu: r.menu || {}
+                }));
+                const { error } = await supabaseClient.from('restaurants').upsert(rows, { onConflict: 'key' });
+                if (error) console.error('DB.saveRestaurants:', error);
+            },
+            async deleteRestaurant(key) {
+                if (!useSupabase) return;
+                const { error } = await supabaseClient.from('restaurants').delete().eq('key', key);
+                if (error) console.error('DB.deleteRestaurant:', error);
+            },
+            // ── ORDERS ──
+            async getOrders() {
+                if (!useSupabase) return JSON.parse(localStorage.getItem('gopoint_orders') || '[]');
+                const { data, error } = await supabaseClient.from('orders').select('*').order('timestamp', { ascending: false });
+                if (error) { console.error('DB.getOrders:', error); return []; }
+                return data.map(o => ({
+                    id: o.id, restaurant: o.restaurant, customer: o.customer, items: o.items || [],
+                    total: o.total, status: o.status, vehicleId: o.vehicle_id, vehicle: o.vehicle,
+                    coordinates: o.coordinates, paymentMethod: o.payment_method, deliveryMethod: o.delivery_method,
+                    phone: o.phone, address: o.address, notes: o.notes, timestamp: new Date(o.timestamp)
+                }));
+            },
+            async saveOrders(orders) {
+                if (!useSupabase) { localStorage.setItem('gopoint_orders', JSON.stringify(orders)); return; }
+                const rows = orders.map(o => ({
+                    id: o.id, restaurant: o.restaurant, customer: o.customer || {}, items: o.items || [],
+                    total: o.total || 0, status: o.status, vehicle_id: o.vehicleId || o.vehicle_id || '',
+                    vehicle: o.vehicle || {}, coordinates: o.coordinates || {},
+                    payment_method: o.paymentMethod || o.payment_method || '',
+                    delivery_method: o.deliveryMethod || o.delivery_method || '',
+                    phone: o.phone || '', address: o.address || '', notes: o.notes || '',
+                    timestamp: o.timestamp instanceof Date ? o.timestamp.toISOString() : o.timestamp
+                }));
+                const { error } = await supabaseClient.from('orders').upsert(rows, { onConflict: 'id' });
+                if (error) console.error('DB.saveOrders:', error);
+            },
+            async saveOrder(order) {
+                if (!useSupabase) return;
+                const row = {
+                    id: order.id, restaurant: order.restaurant, customer: order.customer || {}, items: order.items || [],
+                    total: order.total || 0, status: order.status, vehicle_id: order.vehicleId || order.vehicle_id || '',
+                    vehicle: order.vehicle || {}, coordinates: order.coordinates || {},
+                    payment_method: order.paymentMethod || '', delivery_method: order.deliveryMethod || '',
+                    phone: order.phone || '', address: order.address || '', notes: order.notes || '',
+                    timestamp: order.timestamp instanceof Date ? order.timestamp.toISOString() : order.timestamp
                 };
-            });
-            if (!vehicles.length) { vehicles = JSON.parse(JSON.stringify(defaultVehicles)); }
-            const so = localStorage.getItem('gopoint_orders');
-            orders = so ? JSON.parse(so).map(o => ({ ...o, timestamp: new Date(o.timestamp) })) : [];
-            const ss = localStorage.getItem('gopointSettings');
-            if (ss) settings = JSON.parse(ss);
+                const { error } = await supabaseClient.from('orders').upsert([row], { onConflict: 'id' });
+                if (error) console.error('DB.saveOrder:', error);
+            },
+            async deleteOrder(id) {
+                if (!useSupabase) return;
+                const { error } = await supabaseClient.from('orders').delete().eq('id', id);
+                if (error) console.error('DB.deleteOrder:', error);
+            },
+            // ── SETTINGS ──
+            async getSetting(key) {
+                if (!useSupabase) return JSON.parse(localStorage.getItem(key) || 'null');
+                const { data, error } = await supabaseClient.from('app_settings').select('value').eq('key', key).single();
+                if (error || !data) return null;
+                return data.value;
+            },
+            async setSetting(key, value) {
+                if (!useSupabase) { localStorage.setItem(key, JSON.stringify(value)); return; }
+                const { error } = await supabaseClient.from('app_settings').upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+                if (error) console.error('DB.setSetting:', error);
+            },
+            // ── USER ACCOUNTS ──
+            async getUsers() {
+                if (!useSupabase) return JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+                const { data, error } = await supabaseClient.from('user_accounts').select('*');
+                if (error) { console.error('DB.getUsers:', error); return {}; }
+                const result = {};
+                data.forEach(u => { result[u.username] = { username: u.username, password: u.password, name: u.name, phone: u.phone, email: u.email, provider: u.provider }; });
+                return result;
+            },
+            async saveUser(userData) {
+                if (!useSupabase) {
+                    const users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+                    users[userData.username] = userData;
+                    localStorage.setItem('gopoint_users', JSON.stringify(users));
+                    return;
+                }
+                const { error } = await supabaseClient.from('user_accounts').upsert({
+                    id: userData.id || userData.username, username: userData.username, password: userData.password || '',
+                    name: userData.name || '', phone: userData.phone || '', email: userData.email || '', provider: userData.provider || ''
+                }, { onConflict: 'username' });
+                if (error) console.error('DB.saveUser:', error);
+            },
+            // ── ADDRESSES ──
+            async getAddresses(userId) {
+                if (!useSupabase) return JSON.parse(localStorage.getItem('gopoint_addresses') || '[]');
+                const { data, error } = await supabaseClient.from('user_addresses').select('*').eq('user_id', userId);
+                if (error) { console.error('DB.getAddresses:', error); return []; }
+                return data.map(a => ({ id: a.id, label: a.label, area: a.area, address: a.address }));
+            },
+            async saveAddresses(userId, addresses) {
+                if (!useSupabase) { localStorage.setItem('gopoint_addresses', JSON.stringify(addresses)); return; }
+                await supabaseClient.from('user_addresses').delete().eq('user_id', userId);
+                if (addresses.length) {
+                    const rows = addresses.map(a => ({ user_id: userId, label: a.label || '', area: a.area || '', address: a.address || '' }));
+                    const { error } = await supabaseClient.from('user_addresses').insert(rows);
+                    if (error) console.error('DB.saveAddresses:', error);
+                }
+            },
+            // ── SESSION (keep in localStorage) ──
+            getUser() { return JSON.parse(localStorage.getItem('gopoint_user') || 'null'); },
+            setUser(user) { if (user) localStorage.setItem('gopoint_user', JSON.stringify(user)); else localStorage.removeItem('gopoint_user'); },
+            getAdminAuth() { return localStorage.getItem('admin_auth') === 'true'; },
+            setAdminAuth(v) { if (v) localStorage.setItem('admin_auth', 'true'); else localStorage.removeItem('admin_auth'); },
+            getDriverSession() { const s = localStorage.getItem('gopoint_driver_session'); return s ? JSON.parse(s) : null; },
+            setDriverSession(s) { if (s) localStorage.setItem('gopoint_driver_session', JSON.stringify(s)); else localStorage.removeItem('gopoint_driver_session'); }
+        };
+
+        // ─── DATA LAYER ───
+        async function loadFromLocalStorage() {
+            if (useSupabase) {
+                // Load from Supabase
+                const [dbRestaurants, dbDrivers, dbVehicles, dbOrders, dbSysSettings, dbDelSettings] = await Promise.all([
+                    DB.getRestaurants(), DB.getDrivers(), DB.getVehicles(), DB.getOrders(),
+                    DB.getSetting('gopoint_system_settings'), DB.getSetting('gopoint_delivery_settings')
+                ]);
+                restaurants = dbRestaurants || JSON.parse(JSON.stringify(defaultRestaurants));
+                const rawVehicles = dbVehicles || [];
+                const driversList = dbDrivers || [];
+                vehicles = rawVehicles.map((v, i) => {
+                    const driver = driversList.find(d => d.id === v.driverId);
+                    return {
+                        ...v, id: v.id || String(i + 1),
+                        driverName: driver ? driver.name : (v.driverName || 'Unknown'),
+                        driverPhone: driver ? driver.phone : (v.driverPhone || ''),
+                        driverPin: v.driverPin || (driver ? driver.pin : '') || '',
+                        plateNumber: v.plate || v.plateNumber || ''
+                    };
+                });
+                if (!vehicles.length) vehicles = JSON.parse(JSON.stringify(defaultVehicles));
+                orders = dbOrders || [];
+                if (dbSysSettings) settings.system = dbSysSettings;
+                if (dbDelSettings) settings.delivery = dbDelSettings;
+            } else {
+                // Fallback to localStorage
+                const sr = localStorage.getItem('gopoint_restaurants');
+                restaurants = sr ? JSON.parse(sr) : JSON.parse(JSON.stringify(defaultRestaurants));
+                const sv = localStorage.getItem('gopoint_vehicles');
+                const rawVehicles = sv ? JSON.parse(sv) : [];
+                const driversList = JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
+                vehicles = rawVehicles.map((v, i) => {
+                    const driver = driversList.find(d => d.id === v.driverId);
+                    return {
+                        ...v, id: v.id || String(i + 1),
+                        driverName: driver ? driver.name : (v.driverName || 'Unknown'),
+                        driverPhone: driver ? driver.phone : (v.driverPhone || ''),
+                        driverPin: v.driverPin || (driver ? driver.pin : '') || '',
+                        plateNumber: v.plate || v.plateNumber || ''
+                    };
+                });
+                if (!vehicles.length) vehicles = JSON.parse(JSON.stringify(defaultVehicles));
+                const so = localStorage.getItem('gopoint_orders');
+                orders = so ? JSON.parse(so).map(o => ({ ...o, timestamp: new Date(o.timestamp) })) : [];
+                const ss = localStorage.getItem('gopointSettings');
+                if (ss) settings = JSON.parse(ss);
+            }
         }
 
-        function saveLocalData() {
-            if (useSupabase) return;
-            localStorage.setItem('gopoint_restaurants', JSON.stringify(restaurants));
-            localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles));
-            localStorage.setItem('gopoint_orders', JSON.stringify(orders));
-            localStorage.setItem('gopointSettings', JSON.stringify(settings));
+        async function saveLocalData() {
+            if (useSupabase) {
+                await Promise.all([
+                    DB.saveRestaurants(restaurants),
+                    DB.saveVehicles(vehicles),
+                    DB.saveOrders(orders),
+                    DB.setSetting('gopointSettings', settings)
+                ]);
+            } else {
+                localStorage.setItem('gopoint_restaurants', JSON.stringify(restaurants));
+                localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles));
+                localStorage.setItem('gopoint_orders', JSON.stringify(orders));
+                localStorage.setItem('gopointSettings', JSON.stringify(settings));
+            }
         }
 
         async function addOrderToDB(orderData) { const id = String(Date.now());
@@ -5894,7 +6101,7 @@
             dpRenderBrowse();
         }
 
-        function dpRenderDriverList() {
+        async function dpRenderDriverList() {
             const c = document.getElementById('dpDriverList');
             if (!c) return; // legacy: no longer used (login is now username + PIN)
             if (!vehicles.length) {
@@ -5905,7 +6112,7 @@
                 </div>`;
                 return;
             }
-            const drivers = JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
+            const drivers = await DB.getDrivers();
             c.innerHTML = vehicles.map(v => {
                 const driver = drivers.find(d => d.id === v.driverId);
                 const driverName = driver ? driver.name : (v.driverName || 'Unknown Driver');
@@ -5977,7 +6184,7 @@
             const navbar = document.querySelector('#appContainer .app-navbar');
             if (navbar) navbar.style.display = '';
             document.getElementById('appHomeView').style.display = 'block';
-            localStorage.removeItem('gopoint_driver_session');
+            DB.setDriverSession(null);
         }
 
         function dpGoBackToSelect() {
@@ -5990,7 +6197,7 @@
             const p = document.getElementById('dpLoginPin');
             if (u) u.value = '';
             if (p) p.value = '';
-            localStorage.removeItem('gopoint_driver_session');
+            DB.setDriverSession(null);
         }
 
         function dpToggleOnline() {
@@ -6149,11 +6356,11 @@
             return { total, appFee, driverEarn: total - appFee };
         }
 
-        function dpAccept(id) {
+        async function dpAccept(id) {
             const i = orders.findIndex(x => x.id === id);
             if (i === -1) return;
             const o = orders[i];
-            const drivers = JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
+            const drivers = await DB.getDrivers();
             const driver = drivers.find(d => d.id === dpDriver.driverId);
             const driverName = driver ? driver.name : (dpDriver.driverName || 'Unknown');
             const driverPhone = driver ? driver.phone : (dpDriver.driverPhone || '');
@@ -6658,13 +6865,13 @@
         }
 
         // ─── DRIVER LOGIN (username + PIN) ───
-        function dpLoginSubmit() {
+        async function dpLoginSubmit() {
             const username = (document.getElementById('dpLoginUsername').value || '').trim().toLowerCase();
             const pin = (document.getElementById('dpLoginPin').value || '').trim();
             if (!username || !pin) { dpToast('⚠️ Enter username and PIN', 'error'); return; }
-            loadFromLocalStorage();
-            const drivers = JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
-            const rawVehicles = JSON.parse(localStorage.getItem('gopoint_vehicles') || '[]');
+            await loadFromLocalStorage();
+            const drivers = await DB.getDrivers();
+            const rawVehicles = await DB.getVehicles();
             const localVehicles = rawVehicles.map(v => {
                 const d = drivers.find(dd => dd.id === v.driverId);
                 return {
@@ -6687,7 +6894,7 @@
             }
             dpDriver = vehicle;
             dpOnline = true;
-            localStorage.setItem('gopoint_driver_session', JSON.stringify({ id: vehicle.id, ts: Date.now() }));
+            DB.setDriverSession({ id: vehicle.id, ts: Date.now() });
             document.getElementById('dpScreenSelect').style.display = 'none';
             document.getElementById('dpScreenPortal').style.display = 'block';
             document.getElementById('dpWelcomeMsg').textContent = `${dpDriver.driverName} • ${dpDriver.plateNumber}`;
@@ -6768,7 +6975,7 @@
             if (!o || o.status !== 'pending') { dpToast('⚠️ Order no longer available', 'error'); return; }
             o.vehicle = { id: dpDriver.id, driverName: dpDriver.driverName, plateNumber: dpDriver.plateNumber };
             o.status = 'preparing';
-            try { localStorage.setItem('gopoint_orders', JSON.stringify(orders.map(x => ({...x, timestamp: new Date(x.timestamp).toISOString()})))); } catch(_) {}
+            DB.saveOrder(o).catch(e => console.error(e));
             dpStopRingtone();
             dpRefresh();
             dpRenderBrowse();
@@ -6781,7 +6988,7 @@
             const username = document.getElementById('adminUsername').value.trim(),
                 password = document.getElementById('adminPassword').value.trim();
             if (username === 'admin' && password === 'admin123') {
-                localStorage.setItem('admin_auth', 'true');
+                DB.setAdminAuth(true);
                 closeFrontLogin();
                 showAppToast('✅ Admin access granted');
                 setTimeout(() => { loadAdminDashboard(); }, 500);
@@ -6791,33 +6998,55 @@
         // ─── ADMIN DASHBOARD ───
         let adminRestaurants = {},
             adminVehicles = [],
-            adminOrders = [];
+            adminOrders = [],
+            adminDrivers = [];
         let adminSettings = { system: { businessName: 'Go!Point', businessAddress: 'Hargeisa, Somaliland',
                 businessPhone: '+252 61 XXX XXXX', businessEmail: 'info@gopoint.com' } };
         let adminCurrentTab = 'dashboard';
 
-        function adminLoadData() {
-            try { adminRestaurants = JSON.parse(localStorage.getItem('gopoint_restaurants')) || JSON.parse(JSON.stringify(
-                    defaultRestaurants)); } catch (_) { adminRestaurants = JSON.parse(JSON.stringify(
-                    defaultRestaurants)); }
-            try { adminVehicles = JSON.parse(localStorage.getItem('gopoint_vehicles')) || JSON.parse(JSON.stringify(
-                    defaultVehicles)); } catch (_) { adminVehicles = JSON.parse(JSON.stringify(defaultVehicles)); }
-            try { adminOrders = JSON.parse(localStorage.getItem('gopoint_orders')) || []; } catch (_) { adminOrders = []; }
-            try { adminSettings = JSON.parse(localStorage.getItem('gopointSettings')) || adminSettings; } catch (_) {}
+        async function adminLoadData() {
+            if (useSupabase) {
+                const [dbRestaurants, dbVehicles, dbOrders, dbSettings, dbDrivers] = await Promise.all([
+                    DB.getRestaurants(), DB.getVehicles(), DB.getOrders(), DB.getSetting('gopointSettings'), DB.getDrivers()
+                ]);
+                adminRestaurants = dbRestaurants || JSON.parse(JSON.stringify(defaultRestaurants));
+                adminVehicles = dbVehicles.length ? dbVehicles : JSON.parse(JSON.stringify(defaultVehicles));
+                adminOrders = dbOrders || [];
+                adminDrivers = dbDrivers || [];
+                if (dbSettings) adminSettings = dbSettings;
+            } else {
+                try { adminRestaurants = JSON.parse(localStorage.getItem('gopoint_restaurants')) || JSON.parse(JSON.stringify(
+                        defaultRestaurants)); } catch (_) { adminRestaurants = JSON.parse(JSON.stringify(
+                        defaultRestaurants)); }
+                try { adminVehicles = JSON.parse(localStorage.getItem('gopoint_vehicles')) || JSON.parse(JSON.stringify(
+                        defaultVehicles)); } catch (_) { adminVehicles = JSON.parse(JSON.stringify(defaultVehicles)); }
+                try { adminOrders = JSON.parse(localStorage.getItem('gopoint_orders')) || []; } catch (_) { adminOrders = []; }
+                try { adminDrivers = JSON.parse(localStorage.getItem('gopoint_drivers')) || []; } catch (_) { adminDrivers = []; }
+                try { adminSettings = JSON.parse(localStorage.getItem('gopointSettings')) || adminSettings; } catch (_) {}
+            }
             adminOrders = adminOrders.map(o => ({ ...o, timestamp: new Date(o.timestamp) }));
         }
 
-        function adminSaveData() {
-            localStorage.setItem('gopoint_restaurants', JSON.stringify(adminRestaurants));
-            localStorage.setItem('gopoint_vehicles', JSON.stringify(adminVehicles));
-            localStorage.setItem('gopoint_orders', JSON.stringify(adminOrders));
-            localStorage.setItem('gopointSettings', JSON.stringify(adminSettings));
+        async function adminSaveData() {
+            if (useSupabase) {
+                await Promise.all([
+                    DB.saveRestaurants(adminRestaurants),
+                    DB.saveVehicles(adminVehicles),
+                    DB.saveOrders(adminOrders),
+                    DB.setSetting('gopointSettings', adminSettings)
+                ]);
+            } else {
+                localStorage.setItem('gopoint_restaurants', JSON.stringify(adminRestaurants));
+                localStorage.setItem('gopoint_vehicles', JSON.stringify(adminVehicles));
+                localStorage.setItem('gopoint_orders', JSON.stringify(adminOrders));
+                localStorage.setItem('gopointSettings', JSON.stringify(adminSettings));
+            }
             restaurants = { ...adminRestaurants };
             vehicles = [...adminVehicles];
             orders = adminOrders.map(o => ({ ...o, timestamp: new Date(o.timestamp) }));
         }
 
-        function loadAdminDashboard() {
+        async function loadAdminDashboard() {
             document.getElementById('frontPageContainer').style.display = 'none';
             document.getElementById('appContainer').style.display = 'none';
             let adminDiv = document.getElementById('adminDashboardContainer');
@@ -6827,7 +7056,7 @@
                 document.body.appendChild(adminDiv); }
             adminDiv.innerHTML = getAdminDashboardHTML();
             adminDiv.style.display = 'block';
-            adminLoadData();
+            await adminLoadData();
             adminRenderAll();
             updateAdminLinkVisibility();
             const loginOverlay = document.getElementById('adminLoginOverlay');
@@ -7189,7 +7418,7 @@
                     '<p style="color:#888;text-align:center;padding:20px;grid-column:1/-1;">No vehicles registered</p>';
                 return;
             }
-            const drivers = JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
+            const drivers = adminDrivers;
             list.innerHTML = adminVehicles.map(v => {
                 const driver = drivers.find(d => d.id === v.driverId);
                 const driverName = driver ? driver.name : 'Unknown Driver';
@@ -7412,7 +7641,7 @@
             let totalDistance = 0,
                 totalDeliveryCharge = 0,
                 totalServiceCharge = 0;
-            const drivers = JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
+            const drivers = adminDrivers;
             todayDeliveries.forEach(o => {
                 const rest = adminRestaurants[o.restaurant] || {};
                 const restLat = rest.lat || 9.56;
@@ -7528,11 +7757,11 @@
         let adminEditingRestaurant = null;
         let adminEditingCombined = null;
 
-        function adminOpenSettingsModal() {
+        async function adminOpenSettingsModal() {
             document.getElementById('adminSettingsModal').classList.add('active');
             adminRenderSettingsRestaurantsList();
             adminRenderSettingsCombinedList();
-            adminLoadSettingsValues();
+            await adminLoadSettingsValues();
         }
 
         function adminCloseSettingsModal() {
@@ -7550,8 +7779,8 @@
             if (content) content.classList.add('active');
         }
 
-        function adminLoadSettingsValues() {
-            const ds = JSON.parse(localStorage.getItem('gopoint_delivery_settings') || '{"motorcycleDelivery":true,"taxiDelivery":true,"maxDistance":10,"baseFee":2.50,"perKmFee":0.50,"startTime":"08:00","endTime":"22:00"}');
+        async function adminLoadSettingsValues() {
+            const ds = await DB.getSetting('gopoint_delivery_settings') || {"motorcycleDelivery":true,"taxiDelivery":true,"maxDistance":10,"baseFee":2.50,"perKmFee":0.50,"startTime":"08:00","endTime":"22:00"};
             document.getElementById('settingsMotorcycleDelivery').checked = ds.motorcycleDelivery !== undefined ? ds
                 .motorcycleDelivery : true;
             document.getElementById('settingsTaxiDelivery').checked = ds.taxiDelivery !== undefined ? ds.taxiDelivery : true;
@@ -7560,7 +7789,7 @@
             document.getElementById('settingsPerKmFee').value = ds.perKmFee || 0.50;
             document.getElementById('settingsStartTime').value = ds.startTime || '08:00';
             document.getElementById('settingsEndTime').value = ds.endTime || '22:00';
-            const sys = JSON.parse(localStorage.getItem('gopoint_system_settings') || '{"businessName":"Go!Point","businessAddress":"Hargeisa, Somaliland","businessPhone":"+252 61 XXX XXXX","businessEmail":"info@gopoint.com","minOrder":10.00,"defaultOrder":"delivery"}');
+            const sys = await DB.getSetting('gopoint_system_settings') || {"businessName":"Go!Point","businessAddress":"Hargeisa, Somaliland","businessPhone":"+252 61 XXX XXXX","businessEmail":"info@gopoint.com","minOrder":10.00,"defaultOrder":"delivery"};
             document.getElementById('settingsBizName').value = sys.businessName || 'Go!Point';
             document.getElementById('settingsBizAddress').value = sys.businessAddress || 'Hargeisa, Somaliland';
             document.getElementById('settingsBizPhone').value = sys.businessPhone || '+252 61 XXX XXXX';
@@ -7569,7 +7798,7 @@
             document.getElementById('settingsDefaultOrder').value = sys.defaultOrder || 'delivery';
         }
 
-        function adminSaveDeliverySettings() {
+        async function adminSaveDeliverySettings() {
             const settings = {
                 motorcycleDelivery: document.getElementById('settingsMotorcycleDelivery').checked,
                 taxiDelivery: document.getElementById('settingsTaxiDelivery').checked,
@@ -7579,11 +7808,11 @@
                 startTime: document.getElementById('settingsStartTime').value || '08:00',
                 endTime: document.getElementById('settingsEndTime').value || '22:00'
             };
-            localStorage.setItem('gopoint_delivery_settings', JSON.stringify(settings));
+            await DB.setSetting('gopoint_delivery_settings', settings);
             adminShowToast('✅ Delivery settings saved!');
         }
 
-        function adminSaveSystemSettings() {
+        async function adminSaveSystemSettings() {
             const settings = {
                 businessName: document.getElementById('settingsBizName').value.trim() || 'Go!Point',
                 businessAddress: document.getElementById('settingsBizAddress').value.trim() || 'Hargeisa, Somaliland',
@@ -7592,7 +7821,7 @@
                 minOrder: parseFloat(document.getElementById('settingsMinOrder').value) || 10.00,
                 defaultOrder: document.getElementById('settingsDefaultOrder').value || 'delivery'
             };
-            localStorage.setItem('gopoint_system_settings', JSON.stringify(settings));
+            await DB.setSetting('gopoint_system_settings', settings);
             adminShowToast('✅ System settings saved!');
         }
 
@@ -7796,8 +8025,8 @@
         function adminRenderSettingsCombinedList() {
             const list = document.getElementById('adminCombinedList');
             if (!list) return;
-            const drivers = JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
-            const vehicles = JSON.parse(localStorage.getItem('gopoint_vehicles') || '[]');
+            const drivers = adminDrivers;
+            const vehicles = adminVehicles;
             if (!drivers.length) {
                 list.innerHTML = '<p class="text-gray-500">No drivers and vehicles registered yet.</p>';
                 return;
@@ -7824,8 +8053,8 @@
         }
 
         function adminEditCombined(driverId) {
-            const drivers = JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
-            const vehicles = JSON.parse(localStorage.getItem('gopoint_vehicles') || '[]');
+            const drivers = adminDrivers;
+            const vehicles = adminVehicles;
             const d = drivers.find(drv => drv.id === driverId);
             if (!d) return;
             const v = vehicles.find(ve => ve.driverId === driverId);
@@ -7848,14 +8077,14 @@
             document.getElementById('adminCombinedFormModal').classList.remove('active');
         }
 
-        function adminDeleteCombined(driverId) {
+        async function adminDeleteCombined(driverId) {
             if (!confirm('Delete this driver and their vehicle?')) return;
-            let drivers = JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
-            let vehicles = JSON.parse(localStorage.getItem('gopoint_vehicles') || '[]');
+            let drivers = adminDrivers;
+            let vehicles = adminVehicles;
             drivers = drivers.filter(d => d.id !== driverId);
             vehicles = vehicles.filter(v => v.driverId !== driverId);
-            localStorage.setItem('gopoint_drivers', JSON.stringify(drivers));
-            localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles));
+            await DB.saveDrivers(drivers); adminDrivers = drivers;
+            await DB.saveVehicles(vehicles); adminVehicles = vehicles;
             adminVehicles = vehicles;
             adminSaveData();
             adminRenderSettingsCombinedList();
@@ -7863,7 +8092,7 @@
             adminShowToast('🗑️ Driver deleted');
         }
 
-        function adminSubmitCombined() {
+        async function adminSubmitCombined() {
             const name = document.getElementById('adminCombinedName').value.trim();
             const phone = document.getElementById('adminCombinedPhone').value.trim();
             const license = document.getElementById('adminCombinedLicense').value.trim();
@@ -7873,8 +8102,8 @@
             const model = document.getElementById('adminCombinedModel').value.trim();
             const status = document.getElementById('adminCombinedStatus').value;
             if (!name || !phone || !license || !plate) { adminShowToast('⚠️ All required fields must be filled'); return; }
-            let drivers = JSON.parse(localStorage.getItem('gopoint_drivers') || '[]');
-            let vehicles = JSON.parse(localStorage.getItem('gopoint_vehicles') || '[]');
+            let drivers = adminDrivers;
+            let vehicles = adminVehicles;
             if (adminEditingCombined) {
                 const dIdx = drivers.findIndex(d => d.id === adminEditingCombined);
                 if (dIdx !== -1) drivers[dIdx] = { id: adminEditingCombined, name, phone, license, pin };
@@ -7890,9 +8119,8 @@
                 vehicles.push({ id: Date.now().toString(), type, plate, model, driverId: newId, status });
                 adminShowToast('✅ Driver & Vehicle registered!');
             }
-            localStorage.setItem('gopoint_drivers', JSON.stringify(drivers));
-            localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles));
-            adminVehicles = vehicles;
+            await DB.saveDrivers(drivers); adminDrivers = drivers;
+            await DB.saveVehicles(vehicles); adminVehicles = vehicles;
             adminSaveData();
             adminRenderSettingsCombinedList();
             adminRenderFleetDashboard();
@@ -7908,7 +8136,7 @@
             const u = document.getElementById('adminLoginUsername').value.trim();
             const p = document.getElementById('adminLoginPassword').value.trim();
             if (u === 'admin' && p === 'admin123') {
-                localStorage.setItem('admin_auth', 'true');
+                DB.setAdminAuth(true);
                 document.getElementById('adminLoginOverlay').classList.remove('active');
                 adminShowToast('✅ Welcome, Admin!');
                 loadAdminDashboard();
@@ -7921,7 +8149,7 @@
 
         function adminLogout() {
             if (!confirm('Logout from Admin Dashboard?')) return;
-            localStorage.removeItem('admin_auth');
+            DB.setAdminAuth(false);
             const adminDiv = document.getElementById('adminDashboardContainer');
             if (adminDiv) adminDiv.style.display = 'none';
             document.getElementById('frontPageContainer').style.display = 'block';
@@ -7945,17 +8173,17 @@
 
         function updateAdminLinkVisibility() {
             const adminLink = document.getElementById('appAdminLink');
-            const isAdmin = localStorage.getItem('admin_auth') === 'true';
+            const isAdmin = DB.getAdminAuth();
             if (adminLink) { adminLink.style.display = isAdmin ? 'flex' : 'none'; }
         }
 
         // ─── STORAGE SYNC ───
-        window.addEventListener('storage', (e) => {
+        window.addEventListener('storage', async (e) => {
             if (['gopoint_orders', 'gopoint_restaurants', 'gopoint_vehicles', 'gopoint_drivers'].includes(e.key)) {
-                if (document.getElementById('appContainer')?.classList.contains('active')) { loadFromLocalStorage();
+                if (document.getElementById('appContainer')?.classList.contains('active')) { await loadFromLocalStorage();
                     appRenderRestaurantList();
                     appUpdateTrackButtonVisibility(); }
-                if (document.getElementById('adminDashboardContainer')?.style.display === 'block') { adminLoadData();
+                if (document.getElementById('adminDashboardContainer')?.style.display === 'block') { await adminLoadData();
                     adminRenderAll(); }
                 if (document.getElementById('appDriverPortal').style.display === 'block') {
                     dpLoadData();
