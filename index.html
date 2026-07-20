@@ -762,7 +762,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <ul>
 <li><a onclick="openFrontLogin()"><i class="fas fa-user"></i> <span>Login</span></a></li>
 <li><a onclick="goToMarketplace()"><i class="fas fa-store"></i> <span>Marketplace</span></a></li>
-<li><a onclick="openAdminLogin()"><i class="fas fa-shield-halved"></i> <span>Admin</span></a></li>
+
 <li><a><i class="fas fa-globe"></i> <span>EN</span></a></li>
 </ul>
 </nav>
@@ -857,13 +857,9 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <a onclick="switchLoginTab('customer')">← Back to Customer Login</a>
 </div>
 <div class="fp-driver-demo-box">
-<strong><i class="fas fa-info-circle"></i> Demo Driver Credentials:</strong>
+<strong><i class="fas fa-info-circle"></i> welcome:</strong>
 <div style="margin-top:6px; line-height:1.8;">
-Username: <code>Ahmed Ali</code> or <code>+252631112222</code><br>
-PIN: <code>1234</code>
-</div>
-<div style="margin-top:8px; font-size:0.75rem; color:#065f46;">
-<i class="fas fa-lightbulb"></i> Tip: Press <b>Enter</b> in the PIN field to sign in quickly.
+
 </div>
 </div>
 </div>
@@ -890,10 +886,8 @@ PIN: <code>1234</code>
 <a onclick="switchLoginTab('customer')">← Back to Customer Login</a>
 </div>
 <div class="fp-driver-demo-box">
-<strong><i class="fas fa-info-circle"></i> Demo Credentials:</strong>
+<strong><i class="fas fa-info-circle"></i> welcome:</strong>
 <div style="margin-top:6px; line-height:1.8;">
-Username: <code>admin</code><br>
-Password: <code>admin123</code>
 </div>
 <div style="margin-top:8px; font-size:0.75rem; color:#065f46;">
 <i class="fas fa-lightbulb"></i> Tip: Press <b>Enter</b> in the password field to sign in quickly.
@@ -2342,7 +2336,7 @@ detectFrontLocation();
 setTimeout(() => {
 const activeTab = document.querySelector('.fp-login-tab.active');
 if (activeTab && activeTab.id === 'tabDriver') {
-document.getElementById('fpDriverUsername').focus();
+document.getElementById('fpDriverPin').focus();
 } else {
 document.getElementById('fpLoginUsername').focus();
 }
@@ -2366,13 +2360,11 @@ document.getElementById('fpCustomerLoginSection').style.display = type === 'cust
 document.getElementById('fpDriverLoginSection').style.display = type === 'driver' ? 'block' : 'none';
 document.getElementById('fpAdminLoginSection').style.display = type === 'admin' ? 'block' : 'none';
 
-// Clear driver login form when switching to driver tab and focus username
+// Clear driver login form when switching to driver tab and focus pin
 if (type === 'driver') {
-const usernameInput = document.getElementById('fpDriverUsername');
 const pinInput = document.getElementById('fpDriverPin');
-if (usernameInput) usernameInput.value = '';
 if (pinInput) pinInput.value = '';
-setTimeout(() => { if (usernameInput) usernameInput.focus(); }, 100);
+setTimeout(() => { if (pinInput) pinInput.focus(); }, 100);
 }
 
 // Focus admin username when switching to admin tab
