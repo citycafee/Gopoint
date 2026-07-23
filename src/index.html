@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Go!point â€” Delivery Anywhere, Anytime</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<!-- â”€â”€â”€ SYNC INDICATOR â”€â”€â”€ -->
+<div class="app-sync-indicator" id="appSyncIndicator">
+<span class="app-sync-dot" id="appSyncDot"></span>
+<span id="appSyncText">Connecting...</span>
+</div>
+
+
+<div id="frontPageContainer" style="display:block;">
+<header class="fp-header" id="fpHeader">
+<div class="fp-logo"><div class="fp-logo-text">Go<span>!</span>point</div></div>
+<nav class="fp-nav">
+<ul>
+<li><a onclick="openFrontLogin()"><i class="fas fa-user"></i> <span>Login</span></a></li>
+<li><a onclick="goToMarketplace()"><i class="fas fa-store"></i> <span>Marketplace</span></a></li>
+
+
+<li><a><i class="fas fa-globe"></i> <span>EN</span></a></li>
+</ul>
+</nav>
+<div class="fp-hamburger" id="fpHamburger" onclick="toggleFpMobileMenu()"><span></span><span></span><span></span></div>
+</header>
+<div class="fp-mobile-menu" id="fpMobileMenu">
+<a onclick="openFrontLogin(); toggleFpMobileMenu();"><i class="fas fa-user"></i> Login</a>
+<a onclick="goToMarketplace(); toggleFpMobileMenu();"><i class="fas fa-store"></i> Marketplace</a>
+<a onclick="openAdminLogin(); toggleFpMobileMenu();"><i class="fas fa-shield-halved"></i> Admin</a>
+<a><i class="fas fa-globe"></i> English</a>
+</div>
+
+
+<!-- Login Modal -->
+<div class="fp-login-modal" id="fpLoginModal">
+<div class="fp-login-card">
+<button class="fp-login-close" onclick="closeFrontLogin()">Ã—</button>
+<div class="fp-login-logo">
+<div style="font-size:3rem;">ðŸ›µ</div>
+<h2>Welcome to Go!point</h2>
+<p>Sign in to order or manage deliveries</p>
+</div>
+<div class="fp-login-tabs">
+<div class="fp-login-tab active" onclick="switchLoginTab('customer')" id="tabCustomer">👤 Customer</div>
+<div class="fp-login-tab" onclick="switchLoginTab('driver')" id="tabDriver">🛵 Driver</div>
+<div class="fp-login-tab" onclick="switchLoginTab('admin')" id="tabAdmin">🛡️ Admin</div>
+</div>
+
+<!-- Customer Login Section -->
+<div id="fpCustomerLoginSection">
+<div id="fpLoginStep" style="display:block;">
+<div class="fp-form-group"><label class="fp-form-label">Username</label><input type="text" class="fp-phone-input" id="fpLoginUsername" placeholder="Enter username"></div>
+<div class="fp-form-group"><label class="fp-form-label">Password</label><input type="password" class="fp-phone-input" id="fpLoginPassword" placeholder="Enter password"></div>
+<button class="fp-btn fp-btn-whatsapp" onclick="loginWithUsername()"><i class="fas fa-sign-in-alt"></i> Login</button>
+<div class="fp-skip-text" style="margin-top:14px;">Don't have an account? <a onclick="showRegisterStep()">Sign up here</a></div>
+<div class="fp-divider"><span>or continue with</span></div>
+<div class="fp-login-options">
+<button class="fp-btn fp-btn-whatsapp" onclick="loginWithWhatsApp()"><i class="fab fa-whatsapp" style="font-size:1.3rem;"></i> WhatsApp</button>
+<button class="fp-btn fp-btn-gmail" onclick="loginWithGmail()">
+<svg style="width:20px;height:20px;" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg> Gmail
+</button>
+</div>
+<div class="fp-skip-text" style="margin-top:14px;">Just browsing? <a onclick="goToMarketplace()">Go to marketplace â†’</a></div>
+</div>
+<div id="fpRegisterSection" style="display:none;">
+<p style="text-align:center; margin-bottom:16px; color:#555; font-size:14px;">Create your account to continue</p>
+<div class="fp-form-group"><label class="fp-form-label">Full Name *</label><input type="text" class="fp-phone-input" id="fpRegisterName" placeholder="Enter your full name" required></div>
+<div class="fp-form-group"><label class="fp-form-label">Email Address *</label><input type="email" class="fp-phone-input" id="fpRegisterEmail" placeholder="Enter your email" required></div>
+<div class="fp-form-group">
+<label class="fp-form-label">Password *</label>
+<input type="password" class="fp-phone-input" id="fpRegisterPassword" placeholder="Create a password" required oninput="checkPasswordStrength()">
+<div id="fpPasswordHint" style="font-size:0.75rem; color:#888; margin-top:4px;">At least 8 characters. Use a mix of letters, numbers & symbols.</div>
+<div id="fpPasswordStrength" style="display:none; margin-top:6px;">
+<div style="display:flex; gap:4px; margin-bottom:4px;">
+<div id="fpStr1" style="flex:1; height:4px; border-radius:2px; background:#e5e7eb;"></div>
+<div id="fpStr2" style="flex:1; height:4px; border-radius:2px; background:#e5e7eb;"></div>
+<div id="fpStr3" style="flex:1; height:4px; border-radius:2px; background:#e5e7eb;"></div>
+</div>
+<span id="fpStrLabel" style="font-size:0.7rem; font-weight:600;"></span>
+</div>
+</div>
+<div class="fp-form-group"><label class="fp-form-label">Confirm Password *</label><input type="password" class="fp-phone-input" id="fpRegisterConfirm" placeholder="Confirm your password" required></div>
+<label style="display:flex; align-items:flex-start; gap:8px; margin-bottom:16px; font-size:0.8rem; color:#555; cursor:pointer; line-height:1.4;">
+<input type="checkbox" id="fpTermsCheck" style="margin-top:3px; accent-color:var(--theme); flex-shrink:0;">
+<span>I agree to the <a href="#" style="color:var(--theme); font-weight:600;">Terms of Service</a> and <a href="#" style="color:var(--theme); font-weight:600;">Privacy Policy</a>.</span>
+</label>
+<button class="fp-btn fp-btn-whatsapp" onclick="registerUser()"><i class="fas fa-user-plus"></i> Sign Up</button>
+<div class="fp-skip-text" style="margin-top:14px;">Already have an account? <a onclick="showLoginStep()">Log in</a></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- DRIVER LOGIN SECTION - UPDATED WITH USERNAME + PIN FORM  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="fpDriverLoginSection" style="display:none;">
+<div style="text-align:center; margin-bottom:20px; color:#666; font-size:0.9rem;">
+<i class="fas fa-motorcycle" style="color:var(--primary); font-size:1.5rem;"></i>
+<p style="margin-top:8px; font-weight:600;">Driver Sign In</p>
+<p style="font-size:0.8rem; color:#999; margin-top:4px;">Enter your credentials to access the Driver Portal</p>
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-user" style="color:var(--primary);"></i> Username or Phone</label>
+<input type="text" class="fp-phone-input" id="fpDriverUsername" placeholder="e.g. Ahmed Ali or +252631112222" autocomplete="off">
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-lock" style="color:var(--primary);"></i> PIN (4 digits)</label>
+<input type="password" class="fp-phone-input fp-pin-input" id="fpDriverPin" placeholder="••••" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" autocomplete="off">
+</div>
+<button class="fp-btn fp-btn-whatsapp" onclick="driverLoginWithPin()" style="margin-top:8px;">
+<i class="fas fa-sign-in-alt"></i> Sign In to Driver Portal
+</button>
+<div class="fp-skip-text" style="margin-top:14px;">
+<a onclick="switchLoginTab('customer')">← Back to Customer Login</a>
+</div>
+<div class="fp-driver-demo-box">
+<strong><i class="fas fa-info-circle"></i> Demo Credentials:</strong>
+<div style="margin-top:6px; line-height:1.8;">
+Ahmed Ali: <code>1234</code> · Mohamed Hassan: <code>2345</code><br>
+Abdi Karim: <code>3456</code> · Fatima Omar: <code>4567</code> · Hanad: <code>1111</code>
+</div>
+</div>
+</div>
+
+<!-- Admin Login Section -->
+<div id="fpAdminLoginSection" style="display:none;">
+<div style="text-align:center; margin-bottom:20px; color:#666; font-size:0.9rem;">
+<i class="fas fa-shield-halved" style="color:var(--primary); font-size:1.5rem;"></i>
+<p style="margin-top:8px; font-weight:600;">Admin Sign In</p>
+<p style="font-size:0.8rem; color:#999; margin-top:4px;">Access the Management Dashboard</p>
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-user" style="color:var(--primary);"></i> Username</label>
+<input type="text" class="fp-phone-input" id="fpAdminUsername" placeholder="Enter admin username" autocomplete="off">
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-lock" style="color:var(--primary);"></i> Password</label>
+<input type="password" class="fp-phone-input" id="fpAdminPassword" placeholder="Enter admin password" autocomplete="off">
+</div>
+<button class="fp-btn fp-btn-whatsapp" onclick="adminLoginFromModal()" style="margin-top:8px;">
+<i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+</button>
+<div class="fp-skip-text" style="margin-top:14px;">
+<a onclick="switchLoginTab('customer')">← Back to Customer Login</a>
+</div>
+<div class="fp-driver-demo-box">
+<strong><i class="fas fa-info-circle"></i> Demo Credentials:</strong>
+<div style="margin-top:6px; line-height:1.8;">
+Username: <code>admin</code> · Password: <code>admin123</code>
+</div>
+<div style="margin-top:8px; font-size:0.75rem; color:#065f46;">
+<i class="fas fa-lightbulb"></i> Tip: Press <b>Enter</b> in the password field to sign in quickly.
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+
+<section class="fp-hero-bg">
+<div class="fp-hero-setup">
+<div class="fp-hero-logo-text">Go<span>!</span>point</div>
+<div class="fp-tagline">
+<h1>Delivered at the Speed of Now</h1>
+<p>Your Go!point Biker is ready. Fast, reliable delivery to your doorstep â€” anytime, anywhere.</p>
+</div>
+<button class="fp-go-btn" onclick="openFrontLogin()"><i class="fas fa-store"></i> Get Started</button>
+</div>
+</section>
+<footer class="fp-footer">
+<div class="fp-footer-container">
+<div>
+<div class="fp-footer-logo-text">Go<span>!</span>point</div>
+<p class="fp-footer-brand-text">Your one-stop delivery app. From food to groceries, our Go!point Bikers bring it all â€” fast and fresh.</p>
+</div>
+<div class="fp-footer-columns">
+<div class="fp-column"><h4>Contact</h4><a href="mailto:support@gopoint.so">support@gopoint.so</a><a href="tel:+252610000000">+252 61 000 0000</a></div>
+<div class="fp-column"><h4>Company</h4><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a></div>
+<div class="fp-column"><h4>Legal</h4><a href="#">Terms of Service</a><a href="#">Privacy Policy</a><a href="#">Help Center</a></div>
+</div>
+</div>
+<div class="fp-copyright">Â© 2025 Go!point â€” ONE APP TO RULE THEM ALL</div>
+</footer>
+</div>
+
+
+<div id="appContainer">
+<!-- â”€â”€â”€ DRIVER PORTAL â”€â”€â”€ -->
+<nav class="app-navbar">
+<div class="app-header">
+<div class="app-nav-left">
+<div class="app-merchant-logo"><span id="appMainTitle">Go!point</span></div>
+<div class="app-search-box">
+<input type="text" placeholder="Search restaurants..." id="appHomeSearchInput">
+<div style="cursor:pointer; color:var(--primary); font-weight:500; font-size:0.85rem; display:flex; align-items:center; gap:6px; white-space:nowrap;" onclick="detectAppLocation()"><i class="fa fa-location-dot"></i><span>Locate</span></div>
+</div>
+</div>
+<div class="app-nav-right">
+<ul>
+<li id="appTrackOrderBtn" style="display:none; cursor:pointer;" onclick="openTrackingModal()"><i class="fa fa-map-marked-alt"></i><span id="appTrackBtnText">Track</span></li>
+<li id="appHomeLink" class="active-nav" style="cursor:pointer;" onclick="navigateToView('home')"><i class="fa fa-home"></i><span>Home</span></li>
+<li id="appOrdersLink" style="cursor:pointer;" onclick="navigateToView('orders')"><i class="fa fa-receipt"></i><span>Orders</span></li>
+<li onclick="toggleCart()" style="cursor:pointer;"><i class="fa fa-shopping-cart"></i><span id="appCartCount" class="cart-badge" style="display:none;">0</span><span>Cart</span></li>
+<li id="appUserArea" style="display:block; position:relative;">
+<button class="user-avatar-btn" onclick="toggleUserDropdown(event)"><div class="avatar-circle" id="appUserAvatar">G</div><span class="user-name" id="appUserName">Google User</span></button>
+<div class="user-dropdown" id="appUserDropdown">
+<div class="user-dropdown-header"><div class="user-name-big" id="appUserDropdownName">Google User</div><div class="user-email" id="appUserDropdownEmail">user@gmail.com</div></div>
+<button class="user-dropdown-item" onclick="navigateToView('home')"><i class="fas fa-home"></i> Home</button>
+<button class="user-dropdown-item" onclick="window.location.href='d:\\myapp\\OneDrive\\Desktop\\gg\\customer_profile.html'"><i class="fas fa-user"></i> My Profile</button>
+<button class="user-dropdown-item" onclick="openTrackingModal()"><i class="fas fa-map-marked-alt"></i> Track Order</button>
+<button class="user-dropdown-item" onclick="openAdminLoginFromApp()"><i class="fas fa-shield-halved"></i> Admin Dashboard</button>
+<button class="user-dropdown-item danger" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+
+<!-- Home View -->
+<div id="appHomeView" class="app-view active">
+<div class="app-sticky-top">
+<div class="app-filter-triggers">
+<div><span class="app-cat-name"><b id="appCategoryLabel">All Restaurants</b></span></div>
+</div>
+</div>
+<section class="app-banner">
+<div class="app-multiBanners"><div class="app-carouselDiv">
+<div class="app-carousel-inner" id="appBannerCarousel" style="transform:translateX(-200%);">
+<div class="app-carousel-item"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=400&fit=crop" alt="Banner 1"><div class="app-gradientClass"></div></div>
+<div class="app-carousel-item"><img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&h=400&fit=crop" alt="Banner 2"><div class="app-gradientClass"></div></div>
+<div class="app-carousel-item"><img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=800&h=400&fit=crop" alt="Banner 3"><div class="app-gradientClass"></div></div>
+</div>
+<div class="app-carousel-indicators"><button onclick="appGoToSlide(0)"></button><button onclick="appGoToSlide(1)"></button><button onclick="appGoToSlide(2)" class="active"></button></div>
+</div></div>
+</section>
+<section class="app-categories-page">
+<div class="app-categories-carousel" id="appCategoriesCarousel">
+<div class="app-category-view selected" onclick="appSelectCategory(this, 'All')"><img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=100&h=100&fit=crop" alt="All"><div class="nameDiv">All</div></div>
+<div class="app-category-view" onclick="appSelectCategory(this, 'Italian')"><img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=100&h=100&fit=crop" alt="Italian"><div class="nameDiv">Italian</div></div>
+<div class="app-category-view" onclick="appSelectCategory(this, 'Fast Food')"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=100&h=100&fit=crop" alt="Fast Food"><div class="nameDiv">Fast Food</div></div>
+<div class="app-category-view" onclick="appSelectCategory(this, 'Cafe')"><img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=100&h=100&fit=crop" alt="Cafe"><div class="nameDiv">Cafe</div></div>
+<div class="app-category-view" onclick="appSelectCategory(this, 'Mediterranean')"><img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=100&h=100&fit=crop" alt="Mediterranean"><div class="nameDiv">Mediterranean</div></div>
+</div>
+</section>
+<div id="appMapView"><div id="appMap"></div></div>
+<div class="app-container" id="appListView"><div class="app-row-eq-height" id="appRestaurantList"></div></div>
+<footer class="app-footer-container">
+<div class="app-container">
+<div class="app-top-row">
+<div><p class="app-column-row" style="font-size:1.5rem; color:var(--primary);">Go!Point</p><p class="app-column-row">Fast â€¢ Reliable â€¢ Somaliland</p></div>
+<div><p class="app-column-row">CONTACT US</p><p class="app-column-row">support@gopoint.so</p></div>
+<div><p class="app-column-row">COMPANY</p><p class="app-column-row"><a href="#">About Us</a></p><p class="app-column-row"><a href="#">FAQs</a></p></div>
+<div><p class="app-column-row">HELP & LEGAL</p><p class="app-column-row"><a href="#">Terms</a></p><p class="app-column-row"><a href="#">Privacy</a></p></div>
+</div>
+<div class="app-copyright">ONE APP TO RULE THEM ALL â€“ Go!Point Delivery Â© 2025</div>
+</div>
+</footer>
+</div>
+
+
+<!-- Profile View -->
+<div id="appProfileView" class="app-view">
+<div class="app-profile-card">
+<div class="profile-avatar" id="profileAvatar">U</div>
+<div class="profile-field"><label>Username</label><div class="value" id="profileUsername">User</div></div>
+<div class="profile-field"><label>Phone</label><div class="value" id="profilePhone">+252 61 1234567</div></div>
+<div class="profile-field"><label>Email</label><div class="value" id="profileEmail">user@example.com</div></div>
+<div class="profile-actions">
+<button class="btn-edit" onclick="toggleProfileEdit()"><i class="fas fa-edit"></i> Edit</button>
+<button class="btn-save" id="profileSaveBtn" style="display:none;" onclick="saveProfile()"><i class="fas fa-save"></i> Save</button>
+</div>
+</div>
+</div>
+
+
+<!-- Orders View -->
+<div id="appOrdersView" class="app-view">
+<h2 style="margin-bottom:1.5rem;"><i class="fas fa-receipt" style="color:var(--primary);"></i> My Orders</h2>
+<div id="appOrdersList" class="app-orders-list"><p style="grid-column:1/-1; text-align:center; color:#666; padding:2rem;">No orders yet.</p></div>
+</div>
+
+
+<!-- Addresses View -->
+<div id="appAddressesView" class="app-view">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+<h2><i class="fas fa-map-marker-alt" style="color:var(--primary);"></i> Saved Addresses</h2>
+<button class="btn-add-address" onclick="addNewAddress()"><i class="fas fa-plus"></i> Add Address</button>
+</div>
+<div id="appAddressesList" class="app-addresses-list"><p style="grid-column:1/-1; text-align:center; color:#666; padding:2rem;">No saved addresses.</p></div>
+</div>
+
+
+<!-- Explorer Menu View -->
+<div id="appExplorerContainer" class="app-explorer">
+<div style="padding:1rem; max-width:1400px; margin:0 auto;">
+<button onclick="appBackToRestaurants()" style="display:flex; align-items:center; gap:8px; background:white; border:1px solid #e5e7eb; padding:8px 16px; border-radius:30px; cursor:pointer; font-weight:600; color:var(--primary); margin-bottom:1rem;"><i class="fas fa-arrow-left"></i> Back</button>
+<div id="appExplorerRestHeader" class="app-explorer-rest-card"></div>
+<div id="appExplorerCatTabs" class="app-explorer-cat-tabs"></div>
+<div id="appExplorerMenuItems"></div>
+</div>
+</div>
+
+
+<!-- Mini Cart Bar -->
+<div id="appMiniCartBar" class="app-mini-cart-bar" onclick="toggleCart()">
+<div class="app-mini-cart-info"><i class="fas fa-shopping-bag" style="font-size:1.3rem;"></i><div><div class="app-mini-cart-count"><span id="appMiniCartCount">0</span> items</div><div style="font-size:0.75rem; opacity:0.9;">Tap to view cart</div></div></div>
+<div class="app-mini-cart-total">$<span id="appMiniCartTotal">0.00</span></div>
+<div class="app-mini-cart-view">View Cart â†’</div>
+</div>
+
+
+<!-- Delivery Form -->
+<div id="appDeliveryForm" class="app-modal-overlay hidden">
+<div class="app-modal-card">
+<button class="app-modal-close" onclick="closeDeliveryForm()">Ã—</button>
+<h3 style="font-size:1.5rem; font-weight:700; color:var(--primary); margin-bottom:20px; display:flex; align-items:center; gap:10px;"><i class="fas fa-truck"></i> Delivery Information</h3>
+<div class="app-step-indicator">
+<div class="app-step completed"><div class="app-step-number"><i class="fas fa-check" style="font-size:0.8rem;"></i></div><div>Order</div></div>
+<div class="app-step active"><div class="app-step-number">2</div><div>Delivery</div></div>
+<div class="app-step"><div class="app-step-number">3</div><div>Payment</div></div>
+</div>
+<form id="appDeliveryInfoForm" onsubmit="event.preventDefault(); showPaymentForm();">
+<div style="margin-bottom:16px;"><label style="display:block; font-weight:500; margin-bottom:6px;">Full Name *</label><input type="text" id="appDeliveryName" class="app-glovo-input" placeholder="Enter your full name" required></div>
+<div style="margin-bottom:16px;"><label style="display:block; font-weight:500; margin-bottom:6px;">Phone Number *</label><input type="tel" id="appDeliveryPhone" class="app-glovo-input" placeholder="Enter phone number" required></div>
+<div style="margin-bottom:16px;">
+<label style="display:block; font-weight:500; margin-bottom:6px;">ðŸ“ Delivery Location</label>
+<button type="button" onclick="detectAppLocation()" class="app-detect-location-btn"><i class="fas fa-location-crosshairs"></i><span id="appDetectBtnText">Detect My Location</span></button>
+<div id="appLocationStatusBox" class="app-location-status" style="display:none;"></div>
+<input type="text" id="appDetectedLocation" class="app-glovo-input" style="margin-top:8px;" placeholder="Area name" required>
+</div>
+<div style="margin-bottom:16px;"><label style="display:block; font-weight:500; margin-bottom:6px;">Detailed Address *</label><textarea id="appDeliveryAddress" rows="2" class="app-glovo-input" placeholder="Street, Building, Landmark..." required></textarea></div>
+<div style="margin-bottom:16px;">
+<label style="display:block; font-weight:500; margin-bottom:10px;">ðŸšš Delivery Mode *</label>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+<button type="button" onclick="appSelectDeliveryMethod('bike')" id="appBikeOption" class="app-delivery-method-btn"><i class="fas fa-motorcycle" style="font-size:1.8rem; color:var(--primary);"></i><span style="font-weight:600;">Motorcycle</span><small style="color:#666;">Fast delivery</small></button>
+<button type="button" onclick="appSelectDeliveryMethod('taxi')" id="appTaxiOption" class="app-delivery-method-btn"><i class="fas fa-car" style="font-size:1.8rem; color:var(--primary);"></i><span style="font-weight:600;">Taxi</span><small style="color:#666;">Safe delivery</small></button>
+</div>
+<input type="hidden" id="appDeliveryMethod" required>
+</div>
+<div id="appAssignedDriverContainer" style="display:none; margin-top:12px; padding:12px; background:linear-gradient(to right, #f0fdf4, #ecfdf5); border-radius:12px; border:1px solid #bbf7d0;">
+<div style="display:flex; align-items:center; gap:10px;">
+<i class="fas fa-user-check" style="color:#22c55e; font-size:1.2rem;"></i>
+<div>
+<div style="font-weight:600; color:#065f46; font-size:0.9rem;">Assigned Rider</div>
+<div id="appAssignedDriverName" style="font-weight:700; color:#0f172a; font-size:1rem;"></div>
+<div id="appAssignedDriverPlate" style="color:#666; font-size:0.85rem;"></div>
+</div>
+</div>
+</div>
+<div style="display:flex; gap:10px;">
+<button type="button" onclick="closeDeliveryForm()" style="flex:1; background:#e5e7eb; color:#333; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Back</button>
+<button type="submit" class="app-glovo-button" style="flex:1;"><i class="fas fa-arrow-right"></i> Continue to Payment</button>
+</div>
+</form>
+</div>
+</div>
+
+
+<!-- Payment Form -->
+<div id="appPaymentForm" class="app-modal-overlay hidden">
+<div class="app-modal-card">
+<button class="app-modal-close" onclick="backToDelivery()">Ã—</button>
+<h3 style="font-size:1.5rem; font-weight:700; color:var(--primary); margin-bottom:20px; display:flex; align-items:center; gap:10px;"><i class="fas fa-credit-card"></i> Payment Method</h3>
+<div class="app-step-indicator">
+<div class="app-step completed"><div class="app-step-number"><i class="fas fa-check" style="font-size:0.8rem;"></i></div><div>Order</div></div>
+<div class="app-step completed"><div class="app-step-number"><i class="fas fa-check" style="font-size:0.8rem;"></i></div><div>Delivery</div></div>
+<div class="app-step active"><div class="app-step-number">3</div><div>Payment</div></div>
+</div>
+<div style="padding:16px; background:linear-gradient(to right, #f0fdf4, #ecfdf5); border-radius:16px; border:1px solid #bbf7d0; margin-bottom:24px;">
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<span style="font-size:1.1rem; font-weight:600;"><i class="fas fa-receipt" style="color:var(--primary); margin-right:8px;"></i>Total:</span>
+<span id="appPaymentTotal" style="font-size:1.5rem; font-weight:700; color:var(--primary);">$0.00</span>
+</div>
+</div>
+<div style="margin-bottom:24px;">
+<label style="display:block; font-weight:600; margin-bottom:12px; text-align:center;">Payment Method *</label>
+<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+<div class="app-payment-option selected" data-value="telesom" data-prefix="63" onclick="appHandlePaymentSelection(this)"><i class="fas fa-mobile-alt" style="font-size:1.5rem; color:var(--primary); display:block; margin-bottom:8px;"></i><div style="font-weight:600;">Telesom</div><small style="color:#666;">63 + 7 digits</small></div>
+<div class="app-payment-option" data-value="edahab" data-prefix="65" onclick="appHandlePaymentSelection(this)"><i class="fas fa-wallet" style="font-size:1.5rem; color:#f59e0b; display:block; margin-bottom:8px;"></i><div style="font-weight:600;">E-Dahab</div><small style="color:#666;">65 + 7 digits</small></div>
+<div class="app-payment-option" data-value="cash" data-prefix="" onclick="appHandlePaymentSelection(this)"><i class="fas fa-hand-holding-usd" style="font-size:1.5rem; color:var(--primary); display:block; margin-bottom:8px;"></i><div style="font-weight:600;">Cash</div><small style="color:#666;">On Delivery</small></div>
+</div>
+<input type="hidden" id="appPaymentMethod" value="telesom">
+</div>
+<div style="margin-bottom:24px;" id="appPaymentPhoneContainer">
+<label style="display:block; font-weight:600; margin-bottom:12px; text-align:center;">Phone Number *</label>
+<div class="app-phone-input"><div class="app-phone-prefix" id="appPhonePrefix">+252 63</div><input type="tel" id="appPaymentPhone" class="app-phone-number" placeholder="XXX XXXX" maxlength="7"></div>
+<div id="appPhoneError" style="color:#ef4444; margin-top:8px; font-size:0.85rem; display:none;">Enter a valid 7-digit phone number</div>
+</div>
+<div style="display:flex; gap:12px;">
+<button type="button" onclick="backToDelivery()" style="flex:1; background:#e5e7eb; color:#333; padding:14px; border:none; border-radius:10px; cursor:pointer; font-weight:600;"><i class="fas fa-arrow-left"></i> Back</button>
+<button type="button" onclick="submitDeliveryOrder()" class="app-glovo-button" style="flex:1;"><i class="fas fa-lock"></i> Place Order</button>
+</div>
+</div>
+</div>
+
+
+<!-- Cart Window -->
+<div id="appCartWindow" class="app-cart-window">
+<div class="app-cart-header" style="background:var(--primary); color:white; padding:16px; display:flex; justify-content:space-between; align-items:center;">
+<h3 style="font-weight:700;"><i class="fas fa-shopping-cart" style="margin-right:8px;"></i>Your Order</h3>
+<button onclick="toggleCart()" style="background:none; border:none; color:white; font-size:1.3rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+</div>
+<div class="app-cart-content" style="padding:16px;">
+<div id="appCartItems"><div style="text-align:center; padding:24px; color:#666;"><i class="fas fa-coffee" style="font-size:2rem; margin-bottom:8px;display:block;"></i><p>Your cart is empty</p></div></div>
+<div id="appCartSummary" style="border-top:1px solid #e5e7eb; padding-top:16px; margin-top:16px; display:none;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;"><span style="font-size:1.1rem; font-weight:600;">Total:</span><span id="appTotalPrice" style="font-size:1.3rem; font-weight:700; color:var(--primary);">$0.00</span></div>
+<button onclick="proceedToDelivery()" style="width:100%; background:#f59e0b; color:white; font-weight:700; padding:12px; border:none; border-radius:10px; cursor:pointer;">Proceed to Delivery</button>
+</div>
+</div>
+</div>
+
+
+<!-- Tracking Modal -->
+<div id="appTrackingModal" class="app-modal-overlay hidden">
+<div class="app-modal-card" style="max-width:900px;">
+<div style="padding:16px; background:linear-gradient(to right, #2563eb, #1e40af); color:white; border-radius:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+<div><h3 style="font-size:1.2rem; font-weight:700;"><i class="fas fa-map-marked-alt" style="margin-right:8px;"></i>Live Order Tracking</h3><p style="font-size:0.85rem; opacity:0.9;" id="appTrackingOrderId">Order #------</p></div>
+<button onclick="closeTrackingModal()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:1.2rem;">Ã—</button>
+</div>
+<div id="appTrackingMap" style="height:400px; width:100%; border-radius:12px; margin-bottom:16px;"></div>
+<div class="app-tracking-timeline" id="appTrackingTimeline" style="margin-bottom:16px;"></div>
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;">
+<div style="background:#f0fdf4; padding:12px; border-radius:10px; border:1px solid #bbf7d0;"><h4 style="font-weight:700; color:#065f46; margin-bottom:6px;"><i class="fas fa-store" style="margin-right:6px;"></i>Restaurant</h4><p id="appTrackRestName" style="font-size:0.9rem; font-weight:600;">-</p><p id="appTrackRestDistance" style="font-size:0.8rem; color:#065f46; margin-top:4px;"><i class="fas fa-map-marker-alt"></i> <span id="appTrackRestDistanceValue">-</span></p></div>
+<div style="background:#eff6ff; padding:12px; border-radius:10px; border:1px solid #bfdbfe;"><h4 style="font-weight:700; color:#1e40af; margin-bottom:6px;"><i class="fas fa-motorcycle" style="margin-right:6px;"></i>Driver</h4><p id="appTrackDriverName" style="font-size:0.9rem; font-weight:600;">-</p><p id="appTrackDriverPhone" style="font-size:0.8rem; color:#666;">-</p></div>
+<div style="background:#fffbeb; padding:12px; border-radius:10px; border:1px solid #fde68a;"><h4 style="font-weight:700; color:#92400e; margin-bottom:6px;"><i class="fas fa-home" style="margin-right:6px;"></i>Delivering To</h4><p id="appTrackCustomerName" style="font-size:0.9rem; font-weight:600;">-</p><p id="appTrackCustomerDistance" style="font-size:0.8rem; color:#92400e; margin-top:4px;"><i class="fas fa-map-marker-alt"></i> <span id="appTrackCustomerDistanceValue">-</span></p></div>
+</div>
+<div style="background:#e0e7ff; padding:12px; border-radius:10px; border:1px solid #c7d2fe; margin-bottom:16px;">
+<h4 style="font-weight:700; color:#4338ca; margin-bottom:6px;"><i class="fas fa-route" style="margin-right:6px;"></i>Distance (Restaurant â†’ Customer)</h4>
+<p id="appTrackRestaurantToCustomerDistance" style="font-size:1.1rem; font-weight:700; color:#4338ca;">-</p>
+</div>
+<div style="display:flex; gap:10px; flex-wrap:wrap;">
+<button onclick="callDriver()" style="flex:1; min-width:120px; background:var(--primary); color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;"><i class="fas fa-phone"></i> Call Driver</button>
+<button onclick="whatsappDriver()" style="flex:1; min-width:120px; background:#25D366; color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+<button onclick="refreshTracking()" style="flex:1; min-width:120px; background:#3b82f6; color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;"><i class="fas fa-sync-alt"></i> Refresh</button>
+</div>
+</div>
+</div>
+
+
+<!-- Toast -->
+<div class="app-toast" id="appToast">ðŸ‘‹ Logged out successfully</div>
+</div>
+
+
+<script>
+
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â˜… SUPABASE CLIENT INITIALIZATION â˜…
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+const SB_URL = "https://tsuhzwqrduluzbxmdoxq.supabase.co";
+const SB_KEY = "sb_publishable_3kQN2CnO4h7ZxQbujz7eEQ_Q0jq0_Fj";
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â˜… SUPABASE DATA LAYER â˜…
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+
+async function supaLoadRestaurants() {
+  try {
+    const { data: restRows, error: rErr } = await sb.from('restaurants').select('*');
+    if (rErr) throw rErr;
+    const { data: menuRows, error: mErr } = await sb.from('menu_items').select('*').order('sort_order');
+    if (mErr) throw mErr;
+    const result = {};
+    (restRows || []).forEach(r => {
+      const rMenu = (menuRows || []).filter(m => m.restaurant_id === r.id);
+      const menu = { coffee: [], food: [], dessert: [], juices: [], softdrinks: [] };
+      rMenu.forEach(m => {
+        if (menu[m.category]) {
+          menu[m.category].push({ id: m.id, name: m.name, price: m.price, description: m.description, image: m.image_url });
+        }
+      });
+      result[r.id] = {
+        name: r.name, address: r.address, phone: r.phone, lat: r.lat, lng: r.lng,
+        rating: r.rating, deliveryTime: r.delivery_time, deliveryFee: r.delivery_fee,
+        cuisine: r.cuisine, activeCategories: r.active_categories || Object.keys(menu).filter(k => menu[k].length > 0),
+        menu, active: r.active
+      };
+    });
+    return result;
+  } catch (e) { console.error('supaLoadRestaurants error:', e); return {}; }
+}
+
+
+async function supaLoadVehicles() {
+  try {
+    const { data, error } = await sb.from('vehicles').select('*');
+    if (error) throw error;
+    return (data || []).map(v => ({
+      id: v.id, type: v.type, plateNumber: v.plate_number, model: v.model,
+      driverName: v.driver_name, driverPhone: v.driver_phone, driverPin: v.driver_pin,
+      license: v.license, status: v.status, lat: v.lat, lng: v.lng
+    }));
+  } catch (e) { console.error('supaLoadVehicles error:', e); return []; }
+}
+
+
+async function supaLoadOrders() {
+  try {
+    const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(o => ({
+      id: o.id,
+      customer: { name: o.customer_name, phone: o.customer_phone, address: o.customer_address, area: o.customer_area },
+      coordinates: o.coordinates, restaurant: o.restaurant_id, items: o.items || [],
+      total: o.total, status: o.status,
+      payment: { method: o.payment_method, phone: o.payment_phone },
+      vehicle: o.vehicle_snapshot, vehicleId: o.vehicle_id,
+      statusHistory: o.status_history || [], timestamp: new Date(o.created_at)
+    }));
+  } catch (e) { console.error('supaLoadOrders error:', e); return []; }
+}
+
+
+async function supaLoadSettings() {
+  try {
+    const { data, error } = await sb.from('settings').select('*');
+    if (error) throw error;
+    const result = {};
+    (data || []).forEach(s => { result[s.key] = s.value; });
+    return result;
+  } catch (e) { console.error('supaLoadSettings error:', e); return {}; }
+}
+
+
+async function supaSaveOrder(orderData) {
+  try {
+    const { error } = await sb.from('orders').insert({
+      id: orderData.id,
+      customer_name: orderData.customer?.name || '',
+      customer_phone: orderData.customer?.phone || '',
+      customer_address: orderData.customer?.address || '',
+      customer_area: orderData.customer?.area || '',
+      coordinates: orderData.coordinates,
+      restaurant_id: orderData.restaurant,
+      items: orderData.items,
+      total: orderData.total,
+      status: orderData.status,
+      payment_method: orderData.payment?.method || 'cash',
+      payment_phone: orderData.payment?.phone || '',
+      vehicle_id: orderData.vehicleId || null,
+      vehicle_snapshot: orderData.vehicle,
+      status_history: orderData.statusHistory || [{ status: 'pending', time: new Date().toISOString() }]
+    });
+    if (error) throw error;
+    return true;
+  } catch (e) { console.error('supaSaveOrder error:', e); return false; }
+}
+
+
+async function supaUpdateOrder(orderId, updates) {
+  try {
+    const row = {};
+    if (updates.status !== undefined) row.status = updates.status;
+    if (updates.vehicle !== undefined) row.vehicle_snapshot = updates.vehicle;
+    if (updates.vehicleId !== undefined) row.vehicle_id = updates.vehicleId;
+    if (updates.statusHistory !== undefined) row.status_history = updates.statusHistory;
+    const { error } = await sb.from('orders').update(row).eq('id', orderId);
+    if (error) throw error;
+    return true;
+  } catch (e) { console.error('supaUpdateOrder error:', e); return false; }
+}
+
+
+async function supaDeleteOrder(orderId) {
+  try {
+    const { error } = await sb.from('orders').delete().eq('id', orderId);
+    if (error) throw error;
+  } catch (e) { console.error('supaDeleteOrder error:', e); }
+}
+
+
+async function supaSaveVehicle(vehicleData) {
+  try {
+    const { error } = await sb.from('vehicles').upsert({
+      id: vehicleData.id, type: vehicleData.type, plate_number: vehicleData.plateNumber || vehicleData.plate,
+      model: vehicleData.model || '', driver_name: vehicleData.driverName,
+      driver_phone: vehicleData.driverPhone, driver_pin: vehicleData.driverPin,
+      license: vehicleData.license || '', status: vehicleData.status,
+      lat: vehicleData.lat || 9.56, lng: vehicleData.lng || 44.065
+    });
+    if (error) throw error;
+  } catch (e) { console.error('supaSaveVehicle error:', e); }
+}
+
+
+async function supaDeleteVehicle(vehicleId) {
+  try {
+    const { error } = await sb.from('vehicles').delete().eq('id', vehicleId);
+    if (error) throw error;
+  } catch (e) { console.error('supaDeleteVehicle error:', e); }
+}
+
+
+async function supaSaveRestaurant(key, restData) {
+  try {
+    const { error: rErr } = await sb.from('restaurants').upsert({
+      id: key, name: restData.name, address: restData.address || '',
+      phone: restData.phone || '', email: restData.email || '',
+      lat: restData.lat, lng: restData.lng,
+      rating: restData.rating || 4.5, delivery_time: restData.deliveryTime || '20 min',
+      delivery_fee: restData.deliveryFee || '$2', cuisine: restData.cuisine || 'Various',
+      logo_url: restData.logo || '', active_categories: restData.activeCategories || ['food','juices','softdrinks','coffee','dessert'],
+      active: restData.active !== false
+    });
+    if (rErr) throw rErr;
+    await sb.from('menu_items').delete().eq('restaurant_id', key);
+    const menuRows = [];
+    if (restData.menu) {
+      for (const cat in restData.menu) {
+        (restData.menu[cat] || []).forEach((item, idx) => {
+          menuRows.push({ restaurant_id: key, category: cat, name: item.name, price: item.price, description: item.description || '', image_url: item.image || '', sort_order: idx });
+        });
+      }
+    }
+    if (menuRows.length > 0) {
+      const { error: mErr } = await sb.from('menu_items').insert(menuRows);
+      if (mErr) throw mErr;
+    }
+    console.log('âœ… Restaurant saved to Supabase:', key);
+    return true;
+  } catch (e) { console.error('âŒ supaSaveRestaurant error:', e); return false; }
+}
+
+
+async function supaDeleteRestaurant(key) {
+  try {
+    await sb.from('menu_items').delete().eq('restaurant_id', key);
+    await sb.from('restaurants').delete().eq('id', key);
+  } catch (e) { console.error('supaDeleteRestaurant error:', e); }
+}
+
+
+async function supaSaveSettings(key, value) {
+  try {
+    const { error } = await sb.from('settings').upsert({ key, value, updated_at: new Date().toISOString() });
+    if (error) throw error;
+  } catch (e) { console.error('supaSaveSettings error:', e); }
+}
+
+
+// Supabase Auth helpers
+async function supaSignUp(email, password, fullName) {
+  try {
+    const { data, error } = await sb.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
+    if (error) throw error;
+    return data;
+  } catch (e) { console.error('supaSignUp error:', e); return null; }
+}
+
+
+async function supaSignIn(email, password) {
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+  } catch (e) { console.error('supaSignIn error:', e); return null; }
+}
+
+
+async function supaSignOut() {
+  try { await sb.auth.signOut(); } catch (e) {}
+}
+
+
+// Realtime subscription for live order updates
+function supaSubscribeToOrders(callback) {
+  return sb.channel('orders-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
+      if (callback) callback(payload);
+    })
+    .subscribe();
+}
+
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â˜… HYBRID LOAD: Supabase first, localStorage fallback â˜…
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+let supaConnected = false;
+
+
+async function initSupabaseData() {
+  try {
+    const test = await sb.from('settings').select('key').limit(1);
+    if (test.error) throw test.error;
+    supaConnected = true;
+    const [restData, vehData, ordData, setaData] = await Promise.all([
+      supaLoadRestaurants(), supaLoadVehicles(), supaLoadOrders(), supaLoadSettings()
+    ]);
+    if (Object.keys(restData).length > 0) restaurants = restData;
+    if (vehData.length > 0) vehicles = vehData;
+    if (ordData.length > 0) orders = ordData;
+    if (Object.keys(setaData).length > 0) {
+      if (setaData.system) settings.system = setaData.system;
+      if (setaData.delivery) settings.delivery = setaData.delivery;
+    }
+    updateAppSyncStatus(true, 'Supabase Connected');
+    saveLocalData();
+    console.log('ðŸŸ¢ Supabase connected â€”', Object.keys(restData).length, 'restaurants,', vehData.length, 'vehicles');
+  } catch (e) {
+    supaConnected = false;
+    console.warn('Supabase init failed, using localStorage:', e);
+    updateAppSyncStatus(false, 'Local Mode');
+  }
+}
+
+
+// â”€â”€â”€ UTILITY â”€â”€â”€
+function showAppToast(msg) {
+const toast = document.getElementById('appToast');
+if (!toast) { const t = document.createElement('div'); t.className = 'app-toast'; t.id = 'appToast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => { t.classList.add('show'); setTimeout(() => { t.classList.remove('show'); }, 2800); }, 100); return; }
+toast.textContent = msg;
+toast.classList.add('show');
+clearTimeout(toast._timer);
+toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+
+function appCalculateDistance(lat1, lng1, lat2, lng2) {
+const R = 6371;
+const dLat = ((lat2 - lat1) * Math.PI) / 180;
+const dLng = ((lng2 - lng1) * Math.PI) / 180;
+const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+
+function appGetClosestVehicleOfType(type, lat, lng) {
+let available = vehicles.filter(v => v.status === 'available' && v.type === type);
+available.sort((a, b) => {
+const dA = appCalculateDistance(lat, lng, a.lat || 9.56, a.lng || 44.06);
+const dB = appCalculateDistance(lat, lng, b.lat || 9.56, b.lng || 44.06);
+return dA - dB;
+});
+return available.slice(0, 2);
+}
+
+
+function updateAppSyncStatus(online, text) {
+const dot = document.getElementById('appSyncDot'), txt = document.getElementById('appSyncText');
+if (dot && txt) { dot.className = online ? 'app-sync-dot' : 'app-sync-dot offline'; txt.textContent = text; }
+}
+
+
+// â”€â”€â”€ DATA â”€â”€â”€
+let currentUser = null;
+let cart = [], cartVisible = false;
+let deliveryInfo = {}, paymentInfo = {};
+let detectedCoordinates = null, customerLocation = null;
+let selectedVehicleId = null, currentRestaurant = null;
+let appExplorerCurrentCategory = 'food';
+const allCategories = ['food','juices','softdrinks','coffee','dessert'];
+const categoryLabels = { food:'Food', juices:'Juices', softdrinks:'Soft Drinks', coffee:'Coffee', dessert:'Dessert' };
+let selectedPayment = 'telesom', selectedDeliveryMethod = null;
+let trackingMap = null, driverMarker = null, driverSimulationInterval = null;
+let currentTrackedOrder = null;
+let restaurants = {}, vehicles = [], orders = [];
+let settings = { system: { businessName: 'Go!Point', businessAddress: 'Hargeisa, Somaliland', businessPhone: '+252 61 XXX XXXX', businessEmail: 'info@gopoint.com' } };
+let appMap = null, appMarkers = [], appCustomerMarker = null, appCurrentSlide = 0, appBannerInterval = null, appCurrentCategory = 'All';
+let profileMiniMapInstance = null;
+
+
+// â”€â”€â”€ GLOBAL DRIVER PORTAL VARIABLES â”€â”€â”€
+let dpDriver = null, dpOnline = true, dpAdminDeactivated = false, dpRinging = new Set(), dpRingCtx = null, dpRingOsc = null, dpRingGain = null, dpRingInt = null, dpCurrentTab = 'incoming', dpHistoryFilter = 'all', dpEarningsFilter = 'all', dpDateFrom = null, dpDateTo = null;
+let dpActiveMap = null, dpActiveDriverMarker = null, dpCustomerMarker = null, dpPickupMarker = null, dpRouteLine = null, dpActiveMidLabel = null, dpActiveOrderId = null;
+let dpPickupToCustLabel = null;
+let dpCurrentCallOrderId = null;
+const DP_CONFIG = { commissionRate: 0.20, currency: '$', defaultLat: 9.56, defaultLng: 44.065 };
+
+
+const restaurantImages = ['https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=350&fit=crop', 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&h=350&fit=crop', 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=500&h=350&fit=crop', 'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=500&h=350&fit=crop'];
+
+
+const defaultRestaurants = {
+'damal-restaurant': { name: 'Damal Restaurant', address: 'Downtown, Hargeisa', phone: '+252 61 1234567', lat: 9.5600, lng: 44.0650, rating: 4.8, deliveryTime: '25 min', deliveryFee: '$2', cuisine: 'Mediterranean', activeCategories: ['food','coffee'], menu: {
+coffee: [{ id: 1, name: 'Espresso', price: 3.50, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Rich & bold single shot' }, { id: 2, name: 'Cappuccino', price: 4.25, image: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=200&h=200&fit=crop', description: 'Espresso with steamed milk foam' }],
+food: [{ id: 4, name: 'Signature Burger', price: 12.90, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop', description: 'Grilled beef, cheddar, fresh veggies' }, { id: 5, name: 'Truffle Pasta', price: 14.50, image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200&h=200&fit=crop', description: 'Creamy mushroom truffle sauce' }]
+}},
+'hiddo-dhowr-pizza': { name: 'Hiddo Dhowr Pizza', address: 'Main Street, Hargeisa', phone: '+252 61 2345678', lat: 9.5620, lng: 44.0680, rating: 4.9, deliveryTime: '20 min', deliveryFee: '$1.5', cuisine: 'Italian', activeCategories: ['food','juices','softdrinks','coffee','dessert'], menu: {
+food: [{ id: 12, name: 'Margherita Pizza', price: 10.50, image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop', description: 'Classic tomato, mozzarella, basil' }, { id: 13, name: 'Pepperoni Pizza', price: 12.90, image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=200&h=200&fit=crop', description: 'Loaded with pepperoni' }]
+}},
+'burger-house': { name: 'Burger House', address: 'Central Market, Hargeisa', phone: '+252 61 3456789', lat: 9.5580, lng: 44.0620, rating: 4.7, deliveryTime: '18 min', deliveryFee: '$2', cuisine: 'Fast Food', activeCategories: ['food','juices','softdrinks'], menu: {
+food: [{ id: 18, name: 'Classic Burger', price: 9.90, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop', description: 'Beef patty, lettuce, tomato' }, { id: 19, name: 'Double Cheese Burger', price: 13.50, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=200&h=200&fit=crop', description: 'Double patty with extra cheese' }]
+}},
+'som-coffee': { name: 'Som Coffee', address: 'University Road, Hargeisa', phone: '+252 61 4567890', lat: 9.5640, lng: 44.0700, rating: 4.9, deliveryTime: '15 min', deliveryFee: '$1', cuisine: 'Cafe', activeCategories: ['coffee','dessert','juices'], menu: {
+coffee: [{ id: 22, name: 'Somali Spiced Coffee', price: 4.00, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Traditional cardamom & clove' }, { id: 23, name: 'Iced Latte', price: 4.50, image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', description: 'Cold espresso with milk' }]
+}}
+};
+
+
+const defaultVehicles = [
+{ id: 'v1', type: 'bike', plateNumber: 'B1234', driverName: 'Ahmed Ali', driverPhone: '+252631112222', driverPin: '1234', status: 'available', lat: 9.5650, lng: 44.0700 },
+{ id: 'v2', type: 'taxi', plateNumber: 'T5678', driverName: 'Mohamed Hassan', driverPhone: '+252653334444', driverPin: '2345', status: 'available', lat: 9.5550, lng: 44.0550 },
+{ id: 'v3', type: 'bike', plateNumber: 'B9012', driverName: 'Abdi Karim', driverPhone: '+252635556666', driverPin: '3456', status: 'delivering', lat: 9.5700, lng: 44.0600 },
+{ id: 'v4', type: 'taxi', plateNumber: 'T2468', driverName: 'Fatima Omar', driverPhone: '+252657778888', driverPin: '4567', status: 'available', lat: 9.5610, lng: 44.0660 },
+{ id: 'v5', type: 'bike', plateNumber: 'B3456', driverName: 'Hanad', driverPhone: '+252610000000', driverPin: '1111', status: 'available', lat: 9.5600, lng: 44.0650 }
+];
+
+
+function setupPaymentPhoneInput() {
+const paymentPhone = document.getElementById('appPaymentPhone');
+if (paymentPhone) {
+paymentPhone.addEventListener('input', function(e) {
+e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7);
+});
+}
+}
+
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â˜… DRIVER LOGIN WITH USERNAME + PIN â˜…
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+
+
+
+
+// Focus admin username when switching to admin tab
+if (type === 'admin') {
+const adminUsername = document.getElementById('fpAdminUsername');
+const adminPassword = document.getElementById('fpAdminPassword');
+if (adminUsername) adminUsername.value = '';
+if (adminPassword) adminPassword.value = '';
+setTimeout(() => { if (adminUsername) adminUsername.focus(); }, 100);
+}
+}
+
+
+function openFrontLogin() { document.getElementById('fpLoginModal').classList.add('active'); switchLoginTab('customer'); }
+function closeFrontLogin() { document.getElementById('fpLoginModal').classList.remove('active'); }
+function toggleFpMobileMenu() { const m = document.getElementById('fpMobileMenu'), h = document.getElementById('fpHamburger'); m.classList.toggle('active'); h.classList.toggle('active'); }
+
+function switchLoginTab(type) {
+document.querySelectorAll('.fp-login-tab').forEach(t => t.classList.remove('active'));
+document.getElementById('fpCustomerLoginSection').style.display = 'none';
+document.getElementById('fpDriverLoginSection').style.display = 'none';
+document.getElementById('fpAdminLoginSection').style.display = 'none';
+if (type === 'customer') { document.getElementById('tabCustomer').classList.add('active'); document.getElementById('fpCustomerLoginSection').style.display = 'block'; }
+else if (type === 'driver') { document.getElementById('tabDriver').classList.add('active'); document.getElementById('fpDriverLoginSection').style.display = 'block'; document.getElementById('fpDriverUsername').focus(); }
+else if (type === 'admin') { document.getElementById('tabAdmin').classList.add('active'); document.getElementById('fpAdminLoginSection').style.display = 'block'; document.getElementById('fpAdminUsername').focus(); }
+}
+
+async function driverLoginWithPin() {
+const username = document.getElementById('fpDriverUsername').value.trim();
+const pin = document.getElementById('fpDriverPin').value.trim();
+if (!username) { showAppToast('⚠️ Please enter username or phone'); return; }
+if (!pin || pin.length !== 4) { showAppToast('⚠️ Please enter a 4-digit PIN'); return; }
+const allVehicles = vehicles.length > 0 ? vehicles : defaultVehicles;
+const match = allVehicles.find(v => {
+const nameMatch = v.driverName && (v.driverName.toLowerCase().includes(username.toLowerCase()) || username.toLowerCase().includes(v.driverName.toLowerCase()));
+const phoneMatch = v.driverPhone && v.driverPhone.replace(/\s/g, '').includes(username.replace(/\s/g, ''));
+return (nameMatch || phoneMatch) && v.driverPin === pin;
+});
+if (match) {
+dpDriver = match;
+localStorage.setItem('dpDriver', JSON.stringify(match));
+closeFrontLogin();
+document.getElementById('frontPageContainer').style.display = 'none';
+document.getElementById('appContainer').classList.add('active');
+document.getElementById('appContainer').classList.add('driver-active');
+document.getElementById('appDriverPortal').style.display = 'block';
+dpInitPortal();
+showAppToast('✅ Welcome, ' + match.driverName + '!');
+} else {
+showAppToast('❌ Invalid credentials. Please try again.');
+}
+}
+
+function adminLoginFromModal() {
+const u = document.getElementById('fpAdminUsername').value.trim();
+const p = document.getElementById('fpAdminPassword').value;
+if (!u || !p) { showAppToast('⚠️ Please enter username and password'); return; }
+if (u === 'admin' && p === 'admin123') {
+localStorage.setItem('admin_auth', 'true');
+closeFrontLogin();
+document.getElementById('frontPageContainer').style.display = 'none';
+document.getElementById('appContainer').classList.add('active');
+document.getElementById('appContainer').classList.add('driver-active');
+document.getElementById('appDriverPortal').style.display = 'none';
+document.getElementById('adminDashboard').classList.add('active');
+if (typeof adInit === 'function') adInit();
+showAppToast('✅ Admin logged in');
+} else {
+showAppToast('❌ Invalid admin credentials');
+}
+}
+
+function openAdminLogin() { openFrontLogin(); setTimeout(() => switchLoginTab('admin'), 100); }
+function openAdminLoginFromApp() { openFrontLogin(); setTimeout(() => switchLoginTab('admin'), 100); }
+function openAdminLoginFromDriver() { openFrontLogin(); setTimeout(() => switchLoginTab('admin'), 100); }
+function showRegisterStep() { document.getElementById('fpLoginStep').style.display = 'none'; document.getElementById('fpRegisterSection').style.display = 'block'; document.getElementById('fpRegisterName').focus(); }
+function showLoginStep() { document.getElementById('fpRegisterSection').style.display = 'none'; document.getElementById('fpLoginStep').style.display = 'block'; }
+
+
+function checkPasswordStrength() {
+const p = document.getElementById('fpRegisterPassword').value;
+const s1 = document.getElementById('fpStr1'), s2 = document.getElementById('fpStr2'), s3 = document.getElementById('fpStr3'), lbl = document.getElementById('fpStrLabel'), wrap = document.getElementById('fpPasswordStrength');
+if (!p) { wrap.style.display = 'none'; return; }
+wrap.style.display = 'block';
+let score = 0;
+if (p.length >= 8) score++;
+if (/[A-Z]/.test(p) && /[a-z]/.test(p)) score++;
+if (/[0-9]/.test(p) || /[^A-Za-z0-9]/.test(p)) score++;
+const colors = ['#ef4444', '#f59e0b', '#22c55e'];
+const labels = ['Weak', 'Fair', 'Strong'];
+s1.style.background = score >= 1 ? colors[score - 1] : '#e5e7eb';
+s2.style.background = score >= 2 ? colors[score - 1] : '#e5e7eb';
+s3.style.background = score >= 3 ? colors[2] : '#e5e7eb';
+lbl.textContent = labels[score - 1] || '';
+lbl.style.color = score >= 1 ? colors[score - 1] : '#999';
+}
+
+
+async function loginWithUsername() {
+  const u = document.getElementById('fpLoginUsername').value.trim(), p = document.getElementById('fpLoginPassword').value;
+  if (!u || !p) { showAppToast('âš ï¸ Please enter username and password'); return; }
+  if (supaConnected) {
+    const email = u.includes('@') ? u : u + '@gopoint.local';
+    const data = await supaSignIn(email, p);
+    if (data && data.user) {
+      const name = data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || u;
+      completeLogin({ name, email: data.user.email, phone: data.user.user_metadata?.phone || '', provider: 'supabase', id: data.user.id });
+    } else {
+      const users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+      let found = null;
+      for (let k in users) { if (users[k].username === u && users[k].password === p) found = users[k]; }
+      if (found) { completeLogin({ name: found.name || found.username, email: found.email, phone: found.phone || '', provider: 'username' }); }
+      else { showAppToast('âš ï¸ Invalid username or password'); }
+    }
+  } else {
+    const users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+    let found = null;
+    for (let k in users) { if (users[k].username === u && users[k].password === p) found = users[k]; }
+    if (found) { completeLogin({ name: found.name || found.username, email: found.email, phone: found.phone || '', provider: 'username' }); }
+    else { showAppToast('âš ï¸ Invalid username or password'); }
+  }
+}
+
+
+ else {
+showAppToast('âš ï¸ Invalid admin credentials');
+}
+}
+
+
+function detectFrontLocation() {
+if (!navigator.geolocation) { showAppToast('âš ï¸ Geolocation not supported'); return; }
+navigator.geolocation.getCurrentPosition(async (pos) => {
+const lat = pos.coords.latitude, lng = pos.coords.longitude;
+customerLocation = { lat, lng, area: 'Detecting...' };
+try {
+const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
+const data = await res.json();
+const a = data.address || {};
+const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
+const landmark = a.amenity || a.shop || a.tourism || a.landmark || '';
+customerLocation.area = landmark ? `${landmark}, ${area}` : area;
+customerLocation.fullAddress = data.display_name || '';
+showAppToast('ðŸ“ Location: ' + customerLocation.area);
+} catch (e) { showAppToast('ðŸ“ GPS captured'); }
+}, () => { showAppToast('âš ï¸ Location permission denied'); }, { enableHighAccuracy: true, timeout: 15000 });
+}
+
+
+function loginWithWhatsApp() { showRegisterStep(); showAppToast('ðŸ“± Create your account'); }
+function loginWithGmail() { showAppToast('ðŸ” Connecting to Google...'); setTimeout(() => { const mockUser = { name: 'Google User', email: 'user@gmail.com', phone: '', provider: 'gmail' }; completeLogin(mockUser); }, 1200); }
+
+
+async function registerUser() {
+  const name = document.getElementById('fpRegisterName').value.trim(), email = document.getElementById('fpRegisterEmail').value.trim(), password = document.getElementById('fpRegisterPassword').value, confirm = document.getElementById('fpRegisterConfirm').value, agreed = document.getElementById('fpTermsCheck').checked;
+  if (!name) { showAppToast('âš ï¸ Please enter your full name'); return; }
+  if (!email || !email.includes('@')) { showAppToast('âš ï¸ Please enter a valid email address'); return; }
+  if (password.length < 8) { showAppToast('âš ï¸ Password must be at least 8 characters'); return; }
+  if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) { showAppToast('âš ï¸ Password must include letters and numbers'); return; }
+  if (password !== confirm) { showAppToast('âš ï¸ Passwords do not match'); return; }
+  if (!agreed) { showAppToast('âš ï¸ Please agree to the Terms of Service'); return; }
+  if (supaConnected) {
+    const data = await supaSignUp(email, password, name);
+    if (data && data.user) {
+      completeLogin({ name, email, phone: '', provider: 'supabase', id: data.user.id });
+      return;
+    }
+  }
+  const users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+  const key = email.toLowerCase();
+  if (users[key]) { showAppToast('âš ï¸ An account with this email already exists'); return; }
+  users[key] = { name, username: email.split('@')[0], email, password, phone: '' };
+  localStorage.setItem('gopoint_users', JSON.stringify(users));
+  completeLogin({ name, email, phone: '', provider: 'email' });
+}
+
+
+function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); closeFrontLogin(); showAppToast('âœ… Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
+function goToMarketplace() { document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); updateUserUI(); navigateToView('home'); setTimeout(() => { if (appMap) appMap.invalidateSize(); appRenderRestaurantList(); }, 100); }
+
+
+async function logoutUser() {
+  if (!confirm('Are you sure you want to logout?')) return;
+  currentUser = null;
+  localStorage.removeItem('gopoint_user');
+  if (supaConnected) await supaSignOut();
+  document.getElementById('appContainer').classList.remove('active');
+  document.getElementById('frontPageContainer').style.display = 'block';
+  document.getElementById('appUserDropdown').classList.remove('active');
+  window.scrollTo({ top: 0 });
+  showAppToast('ðŸ‘‹ Logged out successfully');
+}
+
+
+function updateUserUI() {
+const userArea = document.getElementById('appUserArea');
+if (!currentUser) { userArea.style.display = 'none'; return; }
+userArea.style.display = 'block';
+const initial = (currentUser.name || 'U').charAt(0).toUpperCase();
+document.getElementById('appUserAvatar').textContent = initial;
+document.getElementById('appUserName').textContent = currentUser.name || 'User';
+document.getElementById('appUserDropdownName').textContent = currentUser.name || 'User';
+document.getElementById('appUserDropdownEmail').textContent = currentUser.email || currentUser.phone || (currentUser.provider + ' user');
+if (document.getElementById('appProfileView').classList.contains('active')) renderProfileView();
+if (document.getElementById('appOrdersView').classList.contains('active')) renderOrdersView();
+if (document.getElementById('appAddressesView').classList.contains('active')) renderAddressesView();
+}
+
+
+function toggleUserDropdown(event) { event.stopPropagation(); document.getElementById('appUserDropdown').classList.toggle('active'); }
+document.addEventListener('click', (e) => { const dropdown = document.getElementById('appUserDropdown'); if (dropdown && !e.target.closest('#appUserArea')) { dropdown.classList.remove('active'); } });
+
+
+function navigateToView(view) {
+document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+document.getElementById('appExplorerContainer').classList.remove('active');
+if (view === 'home') { document.getElementById('appHomeView').classList.add('active'); document.getElementById('appMiniCartBar').classList.remove('visible'); appRenderRestaurantList(); if (appMap) setTimeout(() => appMap.invalidateSize(), 100); }
+else if (view === 'profile') { window.location.href='d:\\myapp\\OneDrive\\Desktop\\gg\\customer_profile.html'; return; }
+else if (view === 'orders') { document.getElementById('appOrdersView').classList.add('active'); renderOrdersView(); }
+else if (view === 'addresses') { document.getElementById('appAddressesView').classList.add('active'); renderAddressesView(); }
+document.querySelectorAll('.app-nav-right ul li').forEach(li => li.classList.remove('active-nav'));
+const navMap = { home:'appHomeLink', profile:'appProfileLink', orders:'appOrdersLink' };
+if (navMap[view]) { const el = document.getElementById(navMap[view]); if (el) el.classList.add('active-nav'); }
+document.getElementById('appUserDropdown').classList.remove('active');
+if (cartVisible) toggleCart();
+}
+
+
+function renderProfileView() {
+if (!currentUser) return;
+document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+document.getElementById('profileUsername').textContent = currentUser.name || 'User';
+document.getElementById('profilePhone').textContent = currentUser.phone || 'Not set';
+document.getElementById('profileEmail').textContent = currentUser.email || 'Not set';
+}
+
+
+function renderOrdersView() {
+const container = document.getElementById('appOrdersList');
+if (!currentUser) { container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#666; padding:2rem;">Please log in to see your orders.</p>'; return; }
+const userOrders = orders.filter(o => o.customer?.phone === currentUser.phone || o.customer?.name === currentUser.name);
+if (!userOrders.length) { container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#666; padding:2rem;">No orders yet.</p>'; return; }
+container.innerHTML = userOrders.map(o => {
+const statusClass = 'app-status-' + o.status, statusText = o.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+return `<div class="app-order-card"><div class="order-header"><strong>#${String(o.id).slice(-6)}</strong><span class="order-status ${statusClass}">${statusText}</span></div><div class="order-items">${o.items.map(i => `${i.name} x${i.quantity}`).join(', ')}</div><div style="display:flex; justify-content:space-between; margin-top:8px;"><span style="font-size:0.85rem; color:#666;">${new Date(o.timestamp).toLocaleString()}</span><span class="order-total">$${o.total.toFixed(2)}</span></div></div>`;
+}).join('');
+}
+
+
+function renderAddressesView() {
+const container = document.getElementById('appAddressesList');
+const addresses = JSON.parse(localStorage.getItem('gopoint_addresses') || '[]');
+if (!addresses.length) { container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#666; padding:2rem;">No saved addresses.</p>'; return; }
+container.innerHTML = addresses.map((addr, idx) => `<div class="app-address-card"><div><strong>${addr.label || 'Address'}</strong></div><div style="font-size:0.9rem; color:#555; margin:6px 0;">${addr.address}</div><div style="font-size:0.85rem; color:#777;">${addr.area || ''}</div><div class="address-actions"><button class="btn-delete" onclick="deleteAddress(${idx})"><i class="fas fa-trash"></i> Delete</button></div></div>`).join('');
+}
+
+
+function addNewAddress() { const area = prompt('Enter area name:'); if (!area) return; const address = prompt('Enter full address:'); if (!address) return; const label = prompt('Enter a label (e.g., Home, Work):') || 'Address'; const addresses = JSON.parse(localStorage.getItem('gopoint_addresses') || '[]'); addresses.push({ label, area, address }); localStorage.setItem('gopoint_addresses', JSON.stringify(addresses)); renderAddressesView(); showAppToast('âœ… Address saved'); }
+function deleteAddress(index) { if (!confirm('Delete this address?')) return; const addresses = JSON.parse(localStorage.getItem('gopoint_addresses') || '[]'); addresses.splice(index, 1); localStorage.setItem('gopoint_addresses', JSON.stringify(addresses)); renderAddressesView(); showAppToast('ðŸ—‘ï¸ Address deleted'); }
+
+
+function toggleProfileEdit() {
+const saveBtn = document.getElementById('profileSaveBtn'), nameDisplay = document.getElementById('profileUsername'), phoneDisplay = document.getElementById('profilePhone'), emailDisplay = document.getElementById('profileEmail');
+if (saveBtn.style.display === 'none') {
+nameDisplay.innerHTML = `<input type="text" id="editUsername" value="${currentUser.name}" class="app-glovo-input" style="margin-top:4px;">`;
+phoneDisplay.innerHTML = `<input type="text" id="editPhone" value="${currentUser.phone || ''}" class="app-glovo-input" style="margin-top:4px;">`;
+emailDisplay.innerHTML = `<input type="email" id="editEmail" value="${currentUser.email || ''}" class="app-glovo-input" style="margin-top:4px;">`;
+saveBtn.style.display = 'block';
+document.querySelector('.btn-edit').textContent = 'Cancel';
+document.querySelector('.btn-edit').onclick = cancelProfileEdit;
+} else { cancelProfileEdit(); }
+}
+
+
+function cancelProfileEdit() { const saveBtn = document.getElementById('profileSaveBtn'); saveBtn.style.display = 'none'; document.querySelector('.btn-edit').textContent = 'Edit'; document.querySelector('.btn-edit').onclick = toggleProfileEdit; renderProfileView(); }
+
+
+async function saveProfile() {
+const name = document.getElementById('editUsername').value.trim(), phone = document.getElementById('editPhone').value.trim(), email = document.getElementById('editEmail').value.trim();
+if (!name) { showAppToast('âš ï¸ Name required'); return; }
+currentUser.name = name;
+currentUser.phone = phone || currentUser.phone;
+currentUser.email = email || currentUser.email;
+localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
+if (supaConnected && currentUser.id) {
+  await sb.from('profiles').upsert({ id: currentUser.id, full_name: name, phone: phone || '' });
+}
+updateUserUI();
+showAppToast('âœ… Profile updated');
+cancelProfileEdit();
+}
+
+
+async function initApp() {
+  loadFromLocalStorage();
+  await initSupabaseData();
+  appInitMap();
+  appStartBannerCarousel();
+  setupAppEventListeners();
+  appRenderRestaurantList();
+  supaSubscribeToOrders((payload) => {
+    loadFromLocalStorage();
+    if (document.getElementById('appContainer')?.classList.contains('active')) { appRenderRestaurantList(); appUpdateTrackButtonVisibility(); }
+    if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); }
+  });
+}
+
+
+function setupAppEventListeners() {
+document.getElementById('appHomeSearchInput')?.addEventListener('input', appRenderRestaurantList);
+const paymentPhone = document.getElementById('appPaymentPhone');
+if (paymentPhone) { paymentPhone.addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7); }); }
+}
+
+
+function loadFromLocalStorage() {
+const sr = localStorage.getItem('gopoint_restaurants');
+restaurants = sr ? JSON.parse(sr) : JSON.parse(JSON.stringify(defaultRestaurants));
+const sv = localStorage.getItem('gopoint_vehicles');
+vehicles = sv ? JSON.parse(sv) : JSON.parse(JSON.stringify(defaultVehicles));
+const so = localStorage.getItem('gopoint_orders');
+orders = so ? JSON.parse(so).map(o => ({ ...o, timestamp: new Date(o.timestamp) })) : [];
+const ss = localStorage.getItem('gopointSettings');
+if (ss) settings = JSON.parse(ss);
+}
+
+
+function saveLocalData() {
+localStorage.setItem('gopoint_restaurants', JSON.stringify(restaurants));
+localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles));
+localStorage.setItem('gopoint_orders', JSON.stringify(orders));
+localStorage.setItem('gopointSettings', JSON.stringify(settings));
+}
+
+
+async function addOrderToDB(orderData) {
+  const id = 'ord-' + Date.now();
+  const fullOrder = { ...orderData, id, timestamp: new Date(), created_at: new Date().toISOString() };
+  orders.push(fullOrder);
+  saveLocalData();
+  appUpdateTrackButtonVisibility();
+  if (supaConnected) { await supaSaveOrder(fullOrder); }
+  return id;
+}
+
+
+async function updateOrderInDB(orderId, updates) {
+  const idx = orders.findIndex(o => o.id === orderId);
+  if (idx !== -1) { orders[idx] = { ...orders[idx], ...updates }; saveLocalData(); appUpdateTrackButtonVisibility(); }
+  if (supaConnected) { await supaUpdateOrder(orderId, updates); }
+}
+
+
+function appInitMap() {
+if (!appMap) { appMap = L.map('appMap').setView([9.56, 44.065], 13); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'Â© OpenStreetMap' }).addTo(appMap); }
+appUpdateMapMarkers(appGetFilteredRestaurants());
+}
+
+
+function appUpdateMapMarkers(restaurantsToShow) {
+if (!appMap) return;
+appMarkers.forEach(m => appMap.removeLayer(m));
+appMarkers = [];
+Object.keys(restaurantsToShow).forEach((key) => {
+const r = restaurantsToShow[key], lat = r.lat || 9.56, lng = r.lng || 44.065;
+const distance = customerLocation ? appCalculateDistance(customerLocation.lat, customerLocation.lng, lat, lng).toFixed(1) : null;
+const popupContent = `<div style="min-width:200px;"><h4 style="margin:0 0 6px;color:#22c55e;">${r.name}</h4><p style="margin:0 0 4px;font-size:0.9rem;">${r.cuisine || ''}</p><p style="margin:0 0 6px;font-size:0.8rem;color:#555;">${r.address || ''}</p><div><span style="background:#22c55e;color:#fff;padding:2px 10px;border-radius:20px;font-size:0.75rem;"><i class="fa fa-star"></i> ${r.rating || '4.5'}</span>${distance ? `<span style="margin-left:8px;background:#dbeafe;color:#1e40af;padding:2px 10px;border-radius:20px;font-size:0.75rem;"><i class="fa fa-location-arrow"></i> ${distance} km</span>` : ''}</div><button style="margin-top:8px;background:#22c55e;color:#fff;border:none;padding:4px 12px;border-radius:30px;cursor:pointer;" onclick="appOpenRestaurantMenu('${key}')">View Menu</button></div>`;
+const marker = L.marker([lat, lng]).addTo(appMap).bindPopup(popupContent, { maxWidth: 300 });
+marker.on('click', function() { highlightRestaurantCard(key); });
+appMarkers.push(marker);
+});
+appUpdateCustomerMarker();
+}
+
+
+function appUpdateCustomerMarker() {
+if (!appMap) return;
+if (appCustomerMarker) { appMap.removeLayer(appCustomerMarker); appCustomerMarker = null; }
+if (customerLocation) {
+const custIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#3b82f6;width:44px;height:44px;"><i class="fas fa-user"></i></div>', className: '', iconSize: [44, 44], iconAnchor: [22, 22] });
+appCustomerMarker = L.marker([customerLocation.lat, customerLocation.lng], { icon: custIcon }).addTo(appMap).bindPopup(`<b>ðŸ“ Your Location</b><br>${customerLocation.area || 'Detected'}`);
+}
+}
+
+
+function highlightRestaurantCard(key) {
+document.querySelectorAll('.app-card').forEach(c => { c.style.borderColor = ''; c.style.transform = ''; c.style.boxShadow = ''; });
+const card = document.querySelector(`.app-card[data-key="${key}"]`);
+if (card) { card.style.borderColor = 'var(--primary)'; card.style.transform = 'scale(1.02)'; card.style.boxShadow = '0 12px 28px rgba(34,197,94,0.2)'; card.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => { card.style.transform = ''; card.style.boxShadow = ''; }, 3000); }
+}
+
+
+function appRenderRestaurantList() {
+if (!document.getElementById('appHomeView').classList.contains('active')) return;
+const listContainer = document.getElementById('appRestaurantList');
+if (!listContainer) return;
+listContainer.innerHTML = '';
+const filtered = appGetFilteredRestaurants();
+if (Object.keys(filtered).length === 0) { listContainer.innerHTML = `<p style="grid-column:1/-1;text-align:center;padding:2rem;color:#666;">No restaurants found.</p>`; appUpdateMapMarkers(filtered); return; }
+const keys = Object.keys(filtered), displayKeys = keys.slice(0, 6);
+displayKeys.forEach((key, i) => {
+const r = filtered[key], img = restaurantImages[i % restaurantImages.length];
+const distance = customerLocation ? appCalculateDistance(customerLocation.lat, customerLocation.lng, r.lat, r.lng).toFixed(1) : null;
+const card = document.createElement('div');
+card.className = 'app-card';
+card.setAttribute('data-key', key);
+card.innerHTML = `<div class="app-card_inner"><img src="${img}" alt="${r.name}" class="app-card_image_view" loading="lazy" /><div><div class="app-card_heading">${r.name}</div><div class="app-card_description">${r.cuisine || 'Restaurant'} â€¢ ${r.address || ''}</div><div class="app-restaurant-meta"><div class="app-restaurant-rating"><i class="fa fa-star"></i> ${r.rating || '4.5'}</div><div class="app-restaurant-delivery-info"><span class="app-restaurant-delivery-time"><i class="fa fa-clock"></i> ${r.deliveryTime || '20 min'}</span>${distance ? `<span class="app-restaurant-distance"><i class="fa fa-location-arrow"></i> ${distance} km</span>` : ''}</div></div><button class="app-view-menu" data-key="${key}">View Menu</button></div></div>`;
+card.querySelector('.app-view-menu').addEventListener('click', (e) => { e.stopPropagation(); appOpenRestaurantMenu(key); });
+card.addEventListener('click', () => appOpenRestaurantMenu(key));
+listContainer.appendChild(card);
+});
+appUpdateMapMarkers(filtered);
+}
+
+
+function appGetFilteredRestaurants() {
+let filtered = { ...restaurants };
+if (appCurrentCategory !== 'All') {
+const categoryMap = { 'Italian': ['Italian'], 'Fast Food': ['Fast Food', 'American'], 'Cafe': ['Cafe'], 'Mediterranean': ['Mediterranean'] };
+const allowed = categoryMap[appCurrentCategory] || [appCurrentCategory];
+filtered = Object.fromEntries(Object.entries(filtered).filter(([k, r]) => allowed.includes(r.cuisine)));
+}
+const term = document.getElementById('appHomeSearchInput')?.value.toLowerCase().trim() || '';
+if (term) { filtered = Object.fromEntries(Object.entries(filtered).filter(([k, r]) => r.name.toLowerCase().includes(term) || (r.cuisine && r.cuisine.toLowerCase().includes(term)) || (r.address && r.address.toLowerCase().includes(term)))); }
+return filtered;
+}
+
+
+function appSelectCategory(el, cat) { document.querySelectorAll('.app-category-view').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); appCurrentCategory = cat; document.getElementById('appCategoryLabel').textContent = cat === 'All' ? 'All Restaurants' : cat + ' Restaurants'; appRenderRestaurantList(); }
+function appStartBannerCarousel() { if (appBannerInterval) clearInterval(appBannerInterval); appBannerInterval = setInterval(() => { appCurrentSlide = (appCurrentSlide + 1) % 3; appGoToSlide(appCurrentSlide); }, 5000); }
+function appGoToSlide(index) { appCurrentSlide = index; const inner = document.getElementById('appBannerCarousel'); if (inner) inner.style.transform = `translateX(-${index * 100}%)`; document.querySelectorAll('.app-carousel-indicators button').forEach((b, i) => { b.classList.toggle('active', i === index); }); }
+
+
+function appOpenRestaurantMenu(key) { if (!restaurants[key]) return; currentRestaurant = key;
+const r = restaurants[key];
+const rImg = (r.menu.food && r.menu.food[0]) ? r.menu.food[0].image : (r.menu.coffee && r.menu.coffee[0]) ? r.menu.coffee[0].image : '';
+document.getElementById('appExplorerRestHeader').innerHTML = `<div class="app-explorer-rest-img" style="background-image:url('${rImg}')"></div><div class="app-explorer-rest-info"><h3>${r.name}</h3><div class="app-explorer-rest-meta"><span><i class="fas fa-utensils"></i> ${r.cuisine||''}</span><span><i class="fas fa-star" style="color:#f59e0b;"></i> ${r.rating||'4.5'}</span><span><i class="fas fa-clock"></i> ${r.deliveryTime||''}</span></div></div>`;
+const active = r.activeCategories || allCategories;
+appExplorerCurrentCategory = active.includes('food') ? 'food' : active[0] || 'food';
+document.getElementById('appExplorerCatTabs').innerHTML = allCategories.filter(c => active.includes(c)).map(c => `<div class="app-explorer-cat-tab${c===appExplorerCurrentCategory?' active':''}" data-cat="${c}" onclick="appSelectExplorerCategory('${c}')">${categoryLabels[c]}</div>`).join('');
+appRenderExplorerMenuItems();
+document.getElementById('appHomeView').style.display = 'none';
+document.getElementById('appExplorerContainer').classList.add('active');
+window.scrollTo({ top: 0 }); }
+function appBackToRestaurants() { document.getElementById('appExplorerContainer').classList.remove('active'); document.getElementById('appHomeView').style.display = 'block'; document.getElementById('appMiniCartBar').classList.remove('visible'); currentRestaurant = null; window.scrollTo({ top: 0 }); appRenderRestaurantList(); }
+
+
+function appRenderExplorerMenuItems() {
+if (!currentRestaurant || !restaurants[currentRestaurant]) return;
+const menu = restaurants[currentRestaurant].menu, div = document.getElementById('appExplorerMenuItems');
+const items = menu[appExplorerCurrentCategory] || [];
+if (!items.length) { div.innerHTML = `<div style="text-align:center;padding:3rem;background:white;border-radius:12px;"><i class="fas fa-mug-hot" style="font-size:3rem;color:#ccc;"></i><p style="color:#666;margin-top:10px;">No items in this category.</p></div>`; return; }
+div.innerHTML = items.map(item => `<div class="menu-item" data-item-id="${item.id}"><div class="cart-badge-indicator">âœ“</div><div class="item-image" style="background-image: url('${item.image}')"></div><div class="item-content"><div class="item-title">${item.name}</div><div class="item-description">${item.description || ''}</div><div class="item-footer"><span class="item-price">$${item.price.toFixed(2)}</span><button class="add-btn" onclick="appAddToCart(${item.id})"><i class="fas fa-plus"></i> Add</button></div></div></div>`).join('');
+updateExplorerCartBadges();
+}
+
+
+function appSelectExplorerCategory(cat) { appExplorerCurrentCategory = cat;
+document.querySelectorAll('.app-explorer-cat-tab').forEach(t => { t.classList.toggle('active', t.getAttribute('data-cat') === cat); });
+appRenderExplorerMenuItems(); }
+
+
+function updateExplorerCartBadges() {
+const cards = document.querySelectorAll('#appExplorerMenuItems .menu-item');
+cards.forEach(card => {
+const itemId = parseInt(card.getAttribute('data-item-id')), cartItem = cart.find(c => c.id === itemId), qty = cartItem ? cartItem.quantity : 0;
+card.classList.toggle('in-cart', qty > 0);
+const addBtn = card.querySelector('.add-btn');
+if (addBtn) { if (qty > 0) { addBtn.innerHTML = `<i class="fas fa-check"></i> In cart`; } else { addBtn.innerHTML = `<i class="fas fa-plus"></i> Add`; } }
+});
+}
+
+
+function appAddToCart(itemId) {
+let item = null;
+if (currentRestaurant && restaurants[currentRestaurant]) { const menu = restaurants[currentRestaurant].menu; for (const cat in menu) { const f = menu[cat].find(i => i.id === itemId); if (f) { item = f; break; } } }
+if (!item) return;
+const ex = cart.find(c => c.id === itemId);
+if (ex) ex.quantity += 1; else cart.push({ ...item, quantity: 1 });
+appUpdateCart();
+updateExplorerCartBadges();
+showAppToast(`âœ“ Added ${item.name}`);
+}
+
+
+function appRemoveFromCart(itemId) { const ex = cart.find(c => c.id === itemId); if (ex && ex.quantity > 1) ex.quantity -= 1; else cart = cart.filter(c => c.id !== itemId); appUpdateCart(); updateExplorerCartBadges(); }
+
+
+function appUpdateCart() {
+const total = cart.reduce((s, i) => s + i.quantity, 0), countEl = document.getElementById('appCartCount');
+countEl.textContent = total;
+countEl.style.display = total > 0 ? 'flex' : 'none';
+const itemsDiv = document.getElementById('appCartItems'), summary = document.getElementById('appCartSummary');
+if (!cart.length) {
+itemsDiv.innerHTML = '<div style="text-align:center;padding:24px;color:#666;"><i class="fas fa-coffee" style="font-size:2rem;margin-bottom:8px;display:block;"></i><p>Your cart is empty</p></div>';
+summary.style.display = 'none';
+} else {
+itemsDiv.innerHTML = '';
+cart.forEach(item => {
+const el = document.createElement('div');
+el.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px;background:#f9fafb;border-radius:8px;margin-bottom:8px;';
+el.innerHTML = `<div style="flex:1;"><h4 style="font-size:0.9rem;font-weight:600;">${item.name}</h4><p style="color:var(--primary);font-weight:600;font-size:0.85rem;">$${(item.price * item.quantity).toFixed(2)}</p></div><div style="display:flex;align-items:center;gap:6px;"><button onclick="appRemoveFromCart(${item.id})" style="width:26px;height:26px;border-radius:50%;background:#fee2e2;color:#ef4444;border:none;cursor:pointer;"><i class="fas fa-minus" style="font-size:0.7rem;"></i></button><span style="font-weight:600;min-width:20px;text-align:center;">${item.quantity}</span><button onclick="appAddToCart(${item.id})" style="width:26px;height:26px;border-radius:50%;background:#d1fae5;color:var(--primary);border:none;cursor:pointer;"><i class="fas fa-plus" style="font-size:0.7rem;"></i></button></div>`;
+itemsDiv.appendChild(el);
+});
+summary.style.display = 'block';
+}
+const t = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+document.getElementById('appTotalPrice').textContent = `$${t.toFixed(2)}`;
+document.getElementById('appPaymentTotal').textContent = `$${t.toFixed(2)}`;
+appUpdateMiniCartBar();
+}
+
+
+function appUpdateMiniCartBar() {
+const miniBar = document.getElementById('appMiniCartBar'), inMenuView = document.getElementById('appExplorerContainer').classList.contains('active');
+if (inMenuView && cart.length > 0) {
+miniBar.classList.add('visible');
+const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0), count = cart.reduce((s, i) => s + i.quantity, 0);
+document.getElementById('appMiniCartCount').textContent = count;
+document.getElementById('appMiniCartTotal').textContent = total.toFixed(2);
+} else { miniBar.classList.remove('visible'); }
+}
+
+
+function toggleCart() { cartVisible = !cartVisible; document.getElementById('appCartWindow').classList.toggle('visible', cartVisible); }
+
+
+async function detectAppLocation() {
+const statusBox = document.getElementById('appLocationStatusBox'), btnText = document.getElementById('appDetectBtnText'), input = document.getElementById('appDetectedLocation');
+if (btnText) btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
+if (statusBox) { statusBox.style.display = 'block'; statusBox.className = 'app-location-status loading'; statusBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Requesting GPS...'; }
+if (!navigator.geolocation) { if (statusBox) statusBox.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Not supported'; return; }
+navigator.geolocation.getCurrentPosition(async (pos) => {
+detectedCoordinates = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+customerLocation = { lat: detectedCoordinates.lat, lng: detectedCoordinates.lng, area: 'Detecting...' };
+try {
+const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${detectedCoordinates.lat}&lon=${detectedCoordinates.lng}&addressdetails=1`);
+const data = await res.json();
+const area = data.address?.neighbourhood || data.address?.suburb || data.address?.quarter || data.address?.city_district || data.address?.building || data.address?.road || data.address?.city || data.address?.town || data.address?.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
+const landmark = data.address?.amenity || data.address?.shop || data.address?.tourism || '';
+const fullArea = landmark ? `${landmark}, ${area}` : area;
+customerLocation.area = fullArea;
+if (input) input.value = fullArea;
+if (statusBox) { statusBox.className = 'app-location-status success'; statusBox.innerHTML = `<i class="fas fa-check-circle"></i> Location: <b>${fullArea}</b>`; }
+showAppToast('ðŸ“ ' + fullArea);
+} catch (e) { if (input) input.value = `${detectedCoordinates.lat.toFixed(4)}, ${detectedCoordinates.lng.toFixed(4)}`; if (statusBox) { statusBox.className = 'app-location-status success'; statusBox.innerHTML = '<i class="fas fa-check-circle"></i> GPS captured'; } }
+if (appMap) { appMap.setView([detectedCoordinates.lat, detectedCoordinates.lng], 14); appUpdateCustomerMarker(); appUpdateMapMarkers(appGetFilteredRestaurants()); }
+appRenderRestaurantList();
+if (btnText) btnText.innerHTML = '<i class="fas fa-location-crosshairs"></i> Detect My Location';
+}, (err) => { if (statusBox) { statusBox.className = 'app-location-status error'; statusBox.innerHTML = '<i class="fas fa-ban"></i> Permission denied'; } if (btnText) btnText.innerHTML = '<i class="fas fa-location-crosshairs"></i> Detect My Location'; }, { enableHighAccuracy: true, timeout: 15000 });
+}
+
+
+function proceedToDelivery() {
+if (!cart.length) { showAppToast('âš ï¸ Please add items'); return; }
+document.getElementById('appCartWindow').classList.remove('visible');
+cartVisible = false;
+document.getElementById('appDeliveryForm').classList.remove('hidden');
+if (currentUser) { const nameInput = document.getElementById('appDeliveryName'), phoneInput = document.getElementById('appDeliveryPhone'); if (nameInput && !nameInput.value) nameInput.value = currentUser.name || ''; if (phoneInput && !phoneInput.value) phoneInput.value = currentUser.phone || ''; }
+if (customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...') { const input = document.getElementById('appDetectedLocation'); if (input && !input.value) input.value = customerLocation.area; } else if (detectedCoordinates) { const input = document.getElementById('appDetectedLocation'); if (input && !input.value) input.value = `${detectedCoordinates.lat.toFixed(4)}, ${detectedCoordinates.lng.toFixed(4)}`; }
+if (!customerLocation && !detectedCoordinates) detectAppLocation();
+selectedDeliveryMethod = null;
+document.getElementById('appBikeOption').classList.remove('selected');
+document.getElementById('appTaxiOption').classList.remove('selected');
+document.getElementById('appDeliveryMethod').value = '';
+document.getElementById('appAssignedDriverContainer').style.display = 'none';
+}
+
+
+function closeDeliveryForm() { document.getElementById('appDeliveryForm').classList.add('hidden'); document.getElementById('appCartWindow').classList.add('visible'); cartVisible = true; }
+
+
+function appSelectDeliveryMethod(method) {
+selectedDeliveryMethod = method;
+document.getElementById('appDeliveryMethod').value = method;
+document.getElementById('appBikeOption').classList.toggle('selected', method === 'bike');
+document.getElementById('appTaxiOption').classList.toggle('selected', method === 'taxi');
+
+
+// Find closest vehicle to restaurant
+const rest = restaurants[currentRestaurant];
+const restLat = rest?.lat || 9.56;
+const restLng = rest?.lng || 44.06;
+const closest = appGetClosestVehicleOfType(method, restLat, restLng);
+
+
+const container = document.getElementById('appAssignedDriverContainer');
+const nameEl = document.getElementById('appAssignedDriverName');
+const plateEl = document.getElementById('appAssignedDriverPlate');
+
+
+if (closest.length > 0) {
+const v = closest[0];
+const dist = appCalculateDistance(restLat, restLng, v.lat || 9.56, v.lng || 44.06);
+selectedVehicleId = v.id;
+nameEl.textContent = v.driverName;
+plateEl.textContent = (v.plateNumber || 'N/A') + ' â€¢ ' + dist.toFixed(1) + ' km away';
+container.style.display = 'block';
+} else {
+selectedVehicleId = null;
+nameEl.textContent = 'No driver available';
+plateEl.textContent = 'Waiting for driver...';
+container.style.display = 'block';
+}
+}
+
+
+function showPaymentForm() {
+const name = document.getElementById('appDeliveryName').value.trim(), phone = document.getElementById('appDeliveryPhone').value.trim(), area = document.getElementById('appDetectedLocation').value.trim(), address = document.getElementById('appDeliveryAddress').value.trim(), method = document.getElementById('appDeliveryMethod').value;
+if (!name || !phone || !area || !address) { showAppToast('âš ï¸ Please fill all fields'); return; }
+if (!method) { showAppToast('âš ï¸ Please select delivery mode'); return; }
+const vehicle = vehicles.find(v => v.id === selectedVehicleId);
+deliveryInfo = { name, phone, area, address, method, vehicleId: selectedVehicleId || null, driverName: vehicle?.driverName || null, plateNumber: vehicle?.plateNumber || null };
+document.getElementById('appDeliveryForm').classList.add('hidden');
+document.getElementById('appPaymentForm').classList.remove('hidden');
+document.querySelectorAll('.app-payment-option').forEach(o => o.classList.remove('selected'));
+document.querySelector('.app-payment-option[data-value="telesom"]').classList.add('selected');
+document.getElementById('appPaymentMethod').value = 'telesom';
+document.getElementById('appPaymentPhone').value = '';
+document.getElementById('appPaymentPhoneContainer').style.display = 'block';
+document.getElementById('appPhonePrefix').textContent = '+252 63';
+document.getElementById('appPhoneError').style.display = 'none';
+selectedPayment = 'telesom';
+}
+
+
+function backToDelivery() { document.getElementById('appPaymentForm').classList.add('hidden'); document.getElementById('appDeliveryForm').classList.remove('hidden'); }
+
+
+async function submitDeliveryOrder() {
+const paymentMethod = document.getElementById('appPaymentMethod').value, paymentPhone = document.getElementById('appPaymentPhone').value.trim();
+if (paymentMethod !== 'cash' && (!paymentPhone || !/^\d{7}$/.test(paymentPhone))) { document.getElementById('appPhoneError').style.display = 'block'; showAppToast('âš ï¸ Valid 7-digit phone required'); return; }
+document.getElementById('appPhoneError').style.display = 'none';
+const selectedOpt = document.querySelector('.app-payment-option.selected');
+paymentInfo = { method: paymentMethod, phone: paymentMethod === 'cash' ? '' : `+252 ${selectedOpt.dataset.prefix}${paymentPhone}` };
+const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+const vehicle = vehicles.find(v => v.id === deliveryInfo.vehicleId);
+const assignedVehicle = vehicle ? { id: vehicle.id, driverName: vehicle.driverName, driverPhone: vehicle.driverPhone, plateNumber: vehicle.plateNumber, type: vehicle.type } : null;
+const orderData = {
+type: 'delivery', customer: deliveryInfo, payment: paymentInfo, items: [...cart], total, status: 'pending',
+coordinates: detectedCoordinates || { lat: 9.56, lng: 44.065 }, restaurant: currentRestaurant,
+vehicle: assignedVehicle, vehicleId: deliveryInfo.vehicleId || null,
+statusHistory: [{ status: 'pending', time: new Date().toISOString() }],
+created_at: new Date().toISOString()
+};
+const orderId = await addOrderToDB(orderData);
+cart = [];
+appUpdateCart();
+document.getElementById('appDeliveryInfoForm').reset();
+document.getElementById('appPaymentPhone').value = '';
+document.getElementById('appPaymentForm').classList.add('hidden');
+detectedCoordinates = null;
+selectedDeliveryMethod = null;
+document.getElementById('appMiniCartBar').classList.remove('visible');
+showAppToast('ðŸŽ‰ Order placed! A driver will accept soon.');
+setTimeout(() => { currentTrackedOrder = orderId; openTrackingModal(); }, 1500);
+}
+
+
+function appHandlePaymentSelection(opt) { document.querySelectorAll('.app-payment-option').forEach(o => o.classList.remove('selected')); opt.classList.add('selected'); selectedPayment = opt.dataset.value; document.getElementById('appPaymentMethod').value = selectedPayment; const container = document.getElementById('appPaymentPhoneContainer'); if (selectedPayment === 'cash') { container.style.display = 'none'; } else { container.style.display = 'block'; document.getElementById('appPhonePrefix').textContent = `+252 ${opt.dataset.prefix}`; } }
+
+
+function appUpdateTrackButtonVisibility() { const active = orders.find(o => ['pending', 'preparing', 'ready', 'out_for_delivery'].includes(o.status)), btn = document.getElementById('appTrackOrderBtn'), txt = document.getElementById('appTrackBtnText'); if (active) { btn.style.display = 'flex'; currentTrackedOrder = active.id; txt.textContent = `Track #${String(active.id).slice(-6)}`; } else { btn.style.display = 'none'; currentTrackedOrder = null; } }
+function openTrackingModalForOrder(orderId) { currentTrackedOrder = orderId; openTrackingModal(); }
+
+
+function openTrackingModal() {
+const order = orders.find(o => o.id == currentTrackedOrder) || orders.find(o => ['pending', 'preparing', 'ready', 'out_for_delivery'].includes(o.status));
+if (!order) { showAppToast('â„¹ï¸ No active orders'); return; }
+currentTrackedOrder = order.id;
+document.getElementById('appTrackingModal').classList.remove('hidden');
+document.getElementById('appTrackingOrderId').textContent = `Order #${String(order.id).slice(-6)}`;
+const rest = restaurants[order.restaurant] || {};
+document.getElementById('appTrackRestName').textContent = rest.name || 'Unknown';
+document.getElementById('appTrackDriverName').textContent = order.vehicle?.driverName || 'Pending Driver';
+document.getElementById('appTrackDriverPhone').textContent = order.vehicle?.driverPhone || '-';
+document.getElementById('appTrackCustomerName').textContent = order.customer?.name || '';
+if (rest.lat && rest.lng && order.coordinates?.lat && order.coordinates?.lng) {
+const restToCustomerDist = appCalculateDistance(rest.lat, rest.lng, order.coordinates.lat, order.coordinates.lng).toFixed(1);
+document.getElementById('appTrackRestaurantToCustomerDistance').textContent = `${restToCustomerDist} km`;
+}
+appRenderTrackingTimeline(order);
+setTimeout(() => appInitTrackingMap(order), 250);
+appStartDriverSimulation(order);
+}
+
+
+function appRenderTrackingTimeline(order) {
+const tl = document.getElementById('appTrackingTimeline');
+const stages = [{ key: 'pending', label: 'Order Placed', icon: 'fa-receipt' }, { key: 'preparing', label: 'Preparing', icon: 'fa-utensils' }, { key: 'ready', label: 'Ready for Pickup', icon: 'fa-box' }, { key: 'out_for_delivery', label: 'Out for Delivery', icon: 'fa-motorcycle' }, { key: 'completed', label: 'Delivered', icon: 'fa-check-circle' }];
+const statusOrder = ['pending', 'preparing', 'ready', 'out_for_delivery', 'completed'], currentIdx = statusOrder.indexOf(order.status);
+tl.innerHTML = stages.map((s, i) => {
+let cls = '';
+if (i < currentIdx) cls = 'completed';
+else if (i === currentIdx) cls = 'active';
+return `<div class="app-timeline-item ${cls}"><div style="display:flex;align-items:flex-start;gap:10px;"><i class="fas ${s.icon}" style="color:${cls === 'active' ? 'var(--primary)' : cls === 'completed' ? 'var(--primary)' : '#ccc'};margin-top:2px;"></i><div style="flex:1;"><h5 style="font-weight:700;color:${cls === 'active' ? 'var(--primary)' : cls === 'completed' ? '#065f46' : '#666'};">${s.label}</h5></div>${cls === 'active' ? '<span style="background:var(--primary);color:white;padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;">NOW</span>' : ''}</div></div>`;
+}).join('');
+}
+
+
+function appInitTrackingMap(order) {
+if (trackingMap) { trackingMap.remove(); trackingMap = null; }
+const rest = restaurants[order.restaurant] || {}, restLat = rest.lat || 9.56, restLng = rest.lng || 44.065;
+const custLat = order.coordinates?.lat || 9.56, custLng = order.coordinates?.lng || 44.065;
+trackingMap = L.map('appTrackingMap').setView([(restLat + custLat) / 2, (restLng + custLng) / 2], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'Â© OpenStreetMap' }).addTo(trackingMap);
+const restIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#22c55e;width:40px;height:40px;"><i class="fas fa-store"></i></div>', className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
+const custIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#f59e0b;width:40px;height:40px;"><i class="fas fa-home"></i></div>', className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
+L.marker([restLat, restLng], { icon: restIcon }).addTo(trackingMap).bindPopup(`<b>ðŸ½ï¸ ${rest.name || 'Restaurant'}</b>`);
+L.marker([custLat, custLng], { icon: custIcon }).addTo(trackingMap).bindPopup(`<b>ðŸ  Delivery Address</b>`);
+const vehLat = order.vehicle?.lat || restLat, vehLng = order.vehicle?.lng || restLng;
+if (order.vehicle && ['out_for_delivery', 'ready', 'preparing'].includes(order.status)) {
+const vehIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#3b82f6;width:44px;height:44px;"><i class="fas fa-motorcycle"></i></div>', className: '', iconSize: [44, 44], iconAnchor: [22, 22] });
+driverMarker = L.marker([vehLat, vehLng], { icon: vehIcon }).addTo(trackingMap).bindPopup(`<b>ðŸ›µ ${order.vehicle.driverName}</b>`);
+}
+const routeCoords = order.vehicle && ['out_for_delivery'].includes(order.status) ? [[restLat, restLng], [vehLat, vehLng], [custLat, custLng]] : [[restLat, restLng], [custLat, custLng]];
+L.polyline(routeCoords, { color: '#3b82f6', weight: 4, opacity: 0.7, dashArray: '10, 10' }).addTo(trackingMap);
+trackingMap.fitBounds(L.latLngBounds(routeCoords), { padding: [60, 60] });
+}
+
+
+function appStartDriverSimulation(order) {
+if (driverSimulationInterval) clearInterval(driverSimulationInterval);
+if (!order.vehicle || order.status !== 'out_for_delivery' || !driverMarker) return;
+const rest = restaurants[order.restaurant] || {}, targetLat = order.coordinates?.lat || 9.56, targetLng = order.coordinates?.lng || 44.065;
+let curLat = order.vehicle.lat || rest.lat || 9.56, curLng = order.vehicle.lng || rest.lng || 44.065;
+driverSimulationInterval = setInterval(() => {
+curLat += (targetLat - curLat) * 0.08;
+curLng += (targetLng - curLng) * 0.08;
+driverMarker.setLatLng([curLat, curLng]);
+if (order.vehicle) { order.vehicle.lat = curLat; order.vehicle.lng = curLng; }
+if (appCalculateDistance(curLat, curLng, targetLat, targetLng) < 0.05) clearInterval(driverSimulationInterval);
+}, 2000);
+}
+
+
+function refreshTracking() { if (!currentTrackedOrder) return; const o = orders.find(o => o.id == currentTrackedOrder); if (o) { appRenderTrackingTimeline(o); appInitTrackingMap(o); appStartDriverSimulation(o); showAppToast('âœ… Tracking refreshed'); } }
+function closeTrackingModal() { document.getElementById('appTrackingModal').classList.add('hidden'); if (trackingMap) { trackingMap.remove(); trackingMap = null; } if (driverSimulationInterval) { clearInterval(driverSimulationInterval); driverSimulationInterval = null; } }
+function callDriver() { if (!currentTrackedOrder) return; const o = orders.find(o => o.id == currentTrackedOrder); if (o?.vehicle?.driverPhone) window.open(`tel:${o.vehicle.driverPhone}`); else showAppToast('âš ï¸ No driver phone'); }
+function whatsappDriver() { if (!currentTrackedOrder) return; const o = orders.find(o => o.id == currentTrackedOrder); if (!o?.vehicle?.driverPhone) { showAppToast('âš ï¸ No driver phone'); return; } let ph = o.vehicle.driverPhone.replace(/\D/g, ''); if (!ph.startsWith('252')) ph = '252' + ph; const msg = `Hi ${o.vehicle.driverName}, I'm tracking my order #${String(o.id).slice(-6)}.`; window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`, '_blank'); }
+
+
+window.addEventListener('storage', (e) => {
+if (['gopoint_orders', 'gopoint_restaurants', 'gopoint_vehicles', 'gopoint_drivers'].includes(e.key)) {
+if (document.getElementById('appContainer')?.classList.contains('active')) { loadFromLocalStorage(); appRenderRestaurantList(); appUpdateTrackButtonVisibility(); }
+}
+});
+
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+
+window.addEventListener('DOMContentLoaded', async () => {
+  setupPaymentPhoneInput();
+  const savedUser = localStorage.getItem('gopoint_user');
+  if (savedUser) { try { currentUser = JSON.parse(savedUser); goToMarketplace(); } catch (e) { localStorage.removeItem('gopoint_user'); } }
+  window.addEventListener('scroll', () => {
+    const header = document.getElementById('fpHeader');
+    if (header) { if (window.scrollY > 50) header.classList.add('scrolled'); else header.classList.remove('scrolled'); }
+  });
+  await initSupabaseData();
+  initApp();
+  appInitMap();
+  appStartBannerCarousel();
+});
+
+
+console.log("Go!point customer page loaded.");
+</script>
+</body>
+</html>
+

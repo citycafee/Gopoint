@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Go!point — Driver Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="styles.css" />
+<style>
+/* ─── BASE & THEME VARIABLES ─── */
+:root {
+--theme: #FF6B00;
+--theme-dark: #E55A00;
+--theme-light: #FF8533;
+--theme-glow: rgba(255, 107, 0, 0.3);
+--black: #1a1a1a;
+--white: #ffffff;
+--light-gray: #f8f9fa;
+--footer-bg: #0f0f0f;
+--footer-font: #ffffff;
+--glass-bg: rgba(241, 207, 207, 0.12);
+--glass-border: rgba(248, 168, 168, 0.18);
+--shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.12);
+--shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.2);
+--radius-sm: 8px;
+--radius-md: 12px;
+--radius-lg: 16px;
+--radius-xl: 24px;
+--transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+--primary: #22c55e;
+--primary-dark: #16a34a;
+--bg: #f5f7fa;
+--text: #0f172a;
+--gray: #64748b;
+--light-gray-app: #e2e8f0;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', 'Poppins', sans-serif; background-color: var(--light-gray); color: #333; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+/* ─── NAV BAR ─── */
+.dp-top-nav {
+position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.dp-top-nav a {
+color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 600;
+padding: 6px 14px; border-radius: 8px; transition: all 0.2s;
+}
+.dp-top-nav a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.dp-top-nav .brand { color: var(--primary); font-weight: 800; font-size: 1rem; }
+
+/* ─── STANDALONE LOGIN ─── */
+.dp-login-screen {
+min-height: 100dvh; display: flex; align-items: center; justify-content: center;
+background: #0f172a; padding: 20px; padding-top: 60px;
+}
+.dp-login-card {
+background: #1e293b; border: 2px solid #334155; border-radius: 20px;
+padding: clamp(24px, 5vw, 40px); width: 100%; max-width: 420px;
+text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.dp-login-card .logo { font-size: 3rem; margin-bottom: 12px; display: inline-block; }
+.dp-login-card h2 { color: #f8fafc; font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; }
+.dp-login-card .sub { color: #94a3b8; font-size: 0.9rem; margin-bottom: 24px; }
+.dp-login-card input {
+width: 100%; padding: 14px 16px; background: #0f172a; border: 2px solid #334155;
+border-radius: 10px; color: #f8fafc; font-size: 1rem; outline: none;
+margin-bottom: 14px; transition: border-color 0.3s; font-family: inherit;
+}
+.dp-login-card input:focus { border-color: var(--primary); }
+.dp-login-card input.fp-pin-input {
+letter-spacing: 10px; text-align: center; font-size: 1.4rem !important;
+font-weight: 700; font-family: 'Courier New', monospace;
+}
+.dp-login-card input.fp-pin-input::placeholder {
+letter-spacing: 10px; text-align: center; font-size: 1rem;
+font-weight: 400; color: #64748b;
+}
+.dp-login-card button.dp-login-btn {
+width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+color: #fff; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700;
+cursor: pointer; font-family: inherit; transition: all 0.3s;
+display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.dp-login-card button.dp-login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,0.3); }
+.dp-login-card .fp-driver-demo-box {
+margin-top: 18px; padding: 14px; background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+border: 1px dashed #86efac; border-radius: 10px; font-size: 0.82rem; color: #065f46;
+text-align: left;
+}
+.dp-login-card .fp-driver-demo-box strong { color: #047857; display: block; margin-bottom: 6px; }
+.dp-login-card .fp-driver-demo-box code {
+background: #dcfce7; padding: 2px 6px; border-radius: 4px;
+font-family: 'Courier New', monospace; font-weight: 700; color: #065f46;
+}
+
+/* ─── DRIVER PORTAL ─── */
+#appDriverPortal { display: none; min-height: 100dvh; padding: clamp(10px, 3vw, 20px); max-width: 100%; overflow-x: hidden; background: #0f172a; color: #f8fafc; padding-top: 60px; }
+.dp-toast { position: fixed; bottom: clamp(16px, 4vw, 30px); left: 50%; transform: translateX(-50%) translateY(20px); background: #1a1a2e; color: #fff; padding: 12px clamp(16px, 4vw, 28px); border-radius: 30px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); z-index: 9999; font-size: clamp(.8rem, 2.2vw, .9rem); font-weight: 500; opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; max-width: 92%; display: flex; align-items: center; gap: 8px; }
+.dp-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.dp-toast.success { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+.dp-toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.dp-toast.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.dp-hdr { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #334155; flex-wrap: wrap; gap: 10px; }
+.dp-hdr h1 { font-size: clamp(1.1rem, 3.5vw, 1.4rem); font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 6px; }
+.dp-hdr p { font-size: clamp(.75rem, 2vw, .85rem); color: #94a3b8; }
+.dp-hdr-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.dp-b { padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 18px); border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: inherit; font-size: clamp(.8rem, 2.2vw, .88rem); display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: #fff; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+.dp-b:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3); }
+.dp-b-green { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+.dp-b-gray { background: linear-gradient(135deg, #64748b, #475569); }
+.dp-b-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.dp-b-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.dp-b-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.dp-b-wa { background: linear-gradient(135deg, #25D366, #128C7E); }
+.dp-b-ghost { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
+.dp-b-ghost:hover { background: rgba(255, 255, 255, 0.2); }
+.dp-b-sm { padding: 6px 12px; font-size: .78rem; border-radius: 8px; }
+.dp-b-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+.dp-b-outline:hover { background: var(--primary); color: #fff; }
+.dp-scard { padding: clamp(14px, 3vw, 20px); border-radius: 16px; margin: clamp(12px, 3vw, 20px) 0; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); position: relative; overflow: hidden; }
+.dp-scard::before { content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.1); border-radius: 50%; }
+.dp-scard.off { background: linear-gradient(135deg, #64748b, #475569); }
+.dp-scard h3 { font-size: clamp(.95rem, 2.8vw, 1.1rem); font-weight: 700; position: relative; }
+.dp-scard p { font-size: clamp(.75rem, 2vw, .85rem); opacity: .9; position: relative; }
+.dp-scard .dp-ico { font-size: clamp(1.8rem, 5vw, 2.5rem); position: relative; }
+.dp-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(8px, 2vw, 12px); margin-bottom: clamp(12px, 3vw, 20px); }
+.dp-stat { background: #1e293b; padding: clamp(10px, 2.5vw, 16px); border-radius: 12px; border: 1px solid #334155; text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.dp-stat h4 { font-size: clamp(.6rem, 1.8vw, .7rem); color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.dp-stat .v { font-size: clamp(1.1rem, 3vw, 1.5rem); font-weight: 700; color: var(--primary); }
+.dp-stat .sub { font-size: clamp(.6rem, 1.6vw, .7rem); color: #64748b; margin-top: 2px; }
+.dp-tabs { display: flex; gap: 6px; margin: clamp(12px, 3vw, 20px) 0 clamp(10px, 2.5vw, 15px); overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px; }
+.dp-tabs::-webkit-scrollbar { display: none; }
+.dp-tab { padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 18px); background: #1e293b; border: 2px solid #334155; border-radius: 10px; color: #94a3b8; font-weight: 600; font-size: clamp(.78rem, 2.2vw, .88rem); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0; }
+.dp-tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.dp-tab .badge { background: rgba(255, 255, 255, 0.2); padding: 2px 8px; border-radius: 10px; font-size: .7rem; }
+.dp-section { display: none; animation: fadeIn 0.3s ease; }
+.dp-section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.dp-ocard { background: #1e293b; border: 2px solid #334155; border-radius: 14px; padding: clamp(12px, 3vw, 18px); margin-bottom: 10px; position: relative; overflow: hidden; transition: border-color 0.3s; }
+.dp-ocard.ring { border-color: #f59e0b; animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); } 50% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); } }
+.dp-ocard.active { border-color: var(--primary); background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(22, 163, 74, 0.04)); }
+.dp-ocard.completed { border-color: #475569; opacity: 0.9; }
+.dp-ring-tag { position: absolute; top: 10px; right: 10px; background: #f59e0b; color: #fff; padding: 4px 10px; border-radius: 20px; font-size: .72rem; font-weight: 700; animation: blink 1s infinite; display: flex; align-items: center; gap: 4px; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.dp-ocard-id { font-size: clamp(.9rem, 2.5vw, 1.05rem); font-weight: 700; color: #f59e0b; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+.dp-ocard-id .t { font-size: clamp(.7rem, 2vw, .78rem); color: #94a3b8; font-weight: 400; }
+.dp-ibox { background: rgba(255, 255, 255, 0.04); padding: clamp(10px, 2.5vw, 12px); border-radius: 10px; margin-bottom: 8px; }
+.dp-ibox h4 { font-size: clamp(.85rem, 2.3vw, .95rem); margin-bottom: 4px; }
+.dp-ibox h5 { font-size: clamp(.78rem, 2vw, .85rem); color: #94a3b8; margin-bottom: 4px; }
+.dp-ibox p { font-size: clamp(.75rem, 2vw, .83rem); color: #94a3b8; margin: 3px 0; display: flex; align-items: center; gap: 6px; }
+.dp-ibox p i { width: 16px; text-align: center; color: var(--primary); }
+.dp-dist-card { background: rgba(14, 165, 233, .08); border: 1px solid rgba(14, 165, 233, .2); border-radius: 10px; padding: 10px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.dp-dist-card .dp-dist-label { font-size: .7rem; text-transform: uppercase; letter-spacing: 1px; color: #0ea5e9; font-weight: 700; }
+.dp-dist-card .dp-dist-val { font-size: clamp(1.1rem, 3vw, 1.4rem); font-weight: 800; line-height: 1.1; margin-top: 2px; color: #0ea5e9; }
+.dp-dist-card .dp-dist-sub { font-size: .7rem; color: #64748b; margin-top: 2px; }
+.dp-dist-card .dp-dist-right { text-align: right; }
+.dp-dist-card .dp-dist-right .dp-dist-label { color: #8b5cf6; }
+.dp-dist-card .dp-dist-right .dp-dist-val { font-size: clamp(.95rem, 2.5vw, 1.1rem); color: #8b5cf6; }
+.dp-status-badge { padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 600; color: #fff; display: inline-block; }
+.dp-earnings-box { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 10px; padding: 10px; margin-top: 8px; }
+.dp-earnings-box h5 { font-size: clamp(.78rem, 2vw, .85rem); color: var(--primary); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.dp-earn-row { display: flex; justify-content: space-between; align-items: center; font-size: clamp(.75rem, 2vw, .82rem); padding: 3px 0; border-bottom: 1px dashed rgba(34, 197, 94, 0.2); }
+.dp-earn-row:last-child { border-bottom: none; }
+.dp-earn-row.fee { color: #fca5a5; }
+.dp-earn-row.total { font-weight: 700; font-size: clamp(.85rem, 2.2vw, .95rem); color: var(--primary); margin-top: 4px; padding-top: 4px; border-top: 2px solid rgba(34, 197, 94, 0.3); }
+.dp-earn-row .label { color: #94a3b8; }
+.dp-earn-row .value { font-weight: 600; }
+.dp-oacts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.dp-oacts .dp-b { flex: 1; min-width: 0; }
+.dp-earn-summary { background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.1)); border: 2px solid rgba(34, 197, 94, 0.3); border-radius: 14px; padding: clamp(12px, 3vw, 18px); margin-bottom: 12px; }
+.dp-earn-summary h4 { font-size: clamp(.9rem, 2.5vw, 1rem); font-weight: 700; color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.dp-earn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.dp-earn-item { background: rgba(255, 255, 255, 0.05); padding: clamp(8px, 2vw, 12px); border-radius: 10px; text-align: center; }
+.dp-earn-item .lbl { font-size: clamp(.6rem, 1.6vw, .7rem); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+.dp-earn-item .val { font-size: clamp(1rem, 2.8vw, 1.2rem); font-weight: 700; color: var(--primary); }
+.dp-earn-item .val.fee { color: #fca5a5; }
+.dp-earn-item .val.net { color: #4ade80; }
+.dp-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
+.dp-filters::-webkit-scrollbar { display: none; }
+.dp-filter-btn { padding: 5px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 20px; color: #94a3b8; font-size: clamp(.7rem, 1.8vw, .8rem); cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.dp-filter-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.dp-search-box { display: flex; align-items: center; background: #1e293b; border: 2px solid #334155; border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; transition: border-color 0.3s; }
+.dp-search-box:focus-within { border-color: var(--primary); }
+.dp-search-box input { background: transparent; border: none; color: #f8fafc; font-size: clamp(.82rem, 2.2vw, .9rem); flex: 1; outline: none; }
+.dp-search-box input::placeholder { color: #64748b; }
+.dp-search-box i { color: #64748b; margin-right: 8px; }
+.dp-empty { text-align: center; padding: clamp(24px, 6vw, 40px) 16px; color: #94a3b8; }
+.dp-empty i { font-size: clamp(2rem, 6vw, 3rem); margin-bottom: 10px; display: block; opacity: 0.5; }
+.dp-empty p { font-size: clamp(.82rem, 2.2vw, .9rem); }
+.dp-empty .sub { font-size: clamp(.72rem, 1.8vw, .8rem); margin-top: 4px; color: #64748b; }
+.dp-active-map-wrap { background: rgba(15, 23, 42, .6); border: 1px solid rgba(14, 165, 233, .25); border-radius: 14px; padding: clamp(10px, 2.5vw, 14px); margin-bottom: 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
+.dp-active-map-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+.dp-active-map { height: clamp(200px, 45vw, 300px); border-radius: 12px; margin-bottom: 0; border: 2px solid rgba(14, 165, 233, .3); }
+.dp-date-range { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.dp-date-input { background: #1e293b; border: 2px solid #334155; border-radius: 8px; padding: 8px 10px; color: #f8fafc; font-size: clamp(.78rem, 2vw, .85rem); outline: none; transition: border-color 0.3s; flex: 1; min-width: 0; }
+.dp-date-input:focus { border-color: var(--primary); }
+.dp-date-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+@media (min-width: 768px) {
+#appDriverPortal { padding: 20px 28px; padding-top: 60px; }
+.dp-stats { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.dp-earn-grid { grid-template-columns: repeat(4, 1fr); }
+.dp-active-map { height: 320px; }
+.dp-oacts .dp-b { min-width: 100px; }
+}
+@media (min-width: 1024px) {
+#appDriverPortal { max-width: 900px; margin: 0 auto; }
+}
+
+/* ─── INCOMING CALL OVERLAY ─── */
+#dpIncomingCallOverlay {
+position: fixed; inset: 0; z-index: 10000;
+background: rgba(15, 23, 42, 0.97);
+backdrop-filter: blur(12px);
+display: none; flex-direction: column;
+align-items: center; justify-content: space-between;
+padding: 60px 24px 40px; text-align: center;
+animation: dpSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#dpIncomingCallOverlay.show { display: flex; }
+@keyframes dpSlideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.dp-call-pulse-wrap { position: relative; margin-bottom: 20px; }
+.dp-call-pulse {
+width: 110px; height: 110px; border-radius: 50%;
+background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+display: flex; align-items: center; justify-content: center;
+font-size: 2.5rem; color: white; position: relative; z-index: 2;
+box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+}
+.dp-call-pulse::before, .dp-call-pulse::after {
+content: ''; position: absolute; inset: 0; border-radius: 50%;
+border: 3px solid var(--primary); z-index: 1;
+animation: dpPulseRing 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+.dp-call-pulse::after { animation-delay: 0.5s; }
+@keyframes dpPulseRing { 0% { transform: scale(0.8); opacity: 0.8; } 100% { transform: scale(2.2); opacity: 0; } }
+.dp-call-title { font-size: 1.1rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin-bottom: 8px; }
+.dp-call-restaurant { font-size: 1.6rem; font-weight: 800; color: #f8fafc; margin-bottom: 4px; }
+.dp-call-customer { font-size: 1rem; color: #cbd5e1; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.dp-call-details {
+background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+border-radius: 16px; padding: 16px; width: 100%; max-width: 360px; margin-bottom: auto;
+}
+.dp-call-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.dp-call-detail-row:last-child { border-bottom: none; }
+.dp-call-detail-row .lbl { color: #94a3b8; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+.dp-call-detail-row .val { color: #f8fafc; font-weight: 700; font-size: 1rem; }
+.dp-call-detail-row .val.earn { color: var(--primary); font-size: 1.2rem; }
+.dp-call-actions { display: flex; gap: 40px; width: 100%; max-width: 320px; justify-content: space-between; margin-top: 20px; }
+.dp-call-btn-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.dp-call-btn {
+width: 72px; height: 72px; border-radius: 50%; border: none;
+display: flex; align-items: center; justify-content: center;
+font-size: 1.8rem; color: white; cursor: pointer;
+transition: transform 0.15s, box-shadow 0.15s;
+box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+.dp-call-btn:active { transform: scale(0.9); }
+.dp-call-btn.reject { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.dp-call-btn.accept { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.dp-call-btn-label { font-size: 0.9rem; color: #f8fafc; font-weight: 600; }
+
+/* ─── APP TOAST ─── */
+.app-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e1e2a; color: #fff; padding: 12px 28px; border-radius: 30px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); z-index: 9999; font-size: 0.9rem; font-weight: 500; opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease; pointer-events: none; max-width: 90%; }
+.app-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ─── SYNC INDICATOR ─── */
+.app-sync-indicator {
+position: fixed; bottom: 16px; right: 16px;
+background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(10px);
+color: #fff; padding: 8px 16px; border-radius: 30px;
+font-size: 0.75rem; font-weight: 500;
+display: flex; align-items: center; gap: 8px;
+z-index: 9999; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.app-sync-dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; display: inline-block; animation: pulse-dot 1.5s infinite; }
+.app-sync-dot.offline { background: #ef4444; animation: none; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+</style>
+</head>
+<body>
+<!-- ─── SYNC INDICATOR ─── -->
+<div class="app-sync-indicator" id="appSyncIndicator">
+<span class="app-sync-dot" id="appSyncDot"></span>
+<span id="appSyncText">Connecting...</span>
+</div>
+
+<!-- ─── TOP NAV ─── -->
+<nav class="dp-top-nav">
+<a href="index.html" class="back-link">← Back to Go!point</a>
+<span class="brand">🛵 Driver Portal</span>
+<a href="admin.html">Admin Dashboard</a>
+</nav>
+
+<!-- ─── STANDALONE DRIVER LOGIN ─── -->
+<div class="dp-login-screen" id="dpLoginScreen">
+<div class="dp-login-card">
+<div class="logo">🛵</div>
+<h2>Driver Portal</h2>
+<p class="sub">Enter your credentials to start delivering</p>
+<input type="text" id="fpDriverUsername" placeholder="Username or Phone" autocomplete="off">
+<input type="password" class="fp-pin-input" id="fpDriverPin" placeholder="••••" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" autocomplete="off">
+<button class="dp-login-btn" onclick="driverLoginWithPin()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+<div class="fp-driver-demo-box">
+<strong><i class="fas fa-info-circle"></i> Demo Drivers:</strong>
+<div style="margin-top:6px; line-height:1.8;">
+<code>Ahmed Ali</code> PIN: <code>1234</code> &bull;
+<code>Mohamed Hassan</code> PIN: <code>2345</code><br>
+<code>Abdi Karim</code> PIN: <code>3456</code> &bull;
+<code>Fatima Omar</code> PIN: <code>4567</code><br>
+<code>Hanad</code> PIN: <code>1111</code>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ─── DRIVER PORTAL ─── -->
+<div id="appDriverPortal">
+<div class="dp-toast" id="dpToast"></div>
+
+<!-- FLEET SELECTION SCREEN -->
+<div id="dpFleetSelection" style="display:none; padding:20px; max-width:600px; margin:0 auto;">
+<div style="text-align:center; margin-bottom:24px;">
+<h1 style="font-size:1.6rem; font-weight:800; color:#22c55e; margin-bottom:8px;"><i class="fas fa-motorcycle"></i> Select Your Fleet</h1>
+<p style="color:#94a3b8; font-size:0.95rem;">Choose a vehicle to start delivering</p>
+</div>
+<div id="dpFleetList" style="display:flex; flex-direction:column; gap:12px;"></div>
+<button class="dp-b dp-b-gray" onclick="dpLogout()" style="width:100%; margin-top:20px; padding:14px;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+</div>
+
+<!-- INCOMING CALL OVERLAY -->
+<div id="dpIncomingCallOverlay">
+    <div>
+        <div class="dp-call-pulse-wrap">
+            <div class="dp-call-pulse"><i class="fas fa-motorcycle"></i></div>
+        </div>
+        <div class="dp-call-title">New Delivery Request</div>
+        <div class="dp-call-restaurant" id="callRestaurantName">Restaurant Name</div>
+        <div class="dp-call-customer"><i class="fas fa-user"></i> <span id="callCustomerName">Customer</span></div>
+    </div>
+    <div class="dp-call-details">
+        <div class="dp-call-detail-row">
+            <span class="lbl"><i class="fas fa-map-marker-alt"></i> Distance</span>
+            <span class="val" id="callDistance">0.0 km</span>
+        </div>
+        <div class="dp-call-detail-row">
+            <span class="lbl"><i class="fas fa-receipt"></i> Order Total</span>
+            <span class="val" id="callOrderTotal">$0.00</span>
+        </div>
+        <div class="dp-call-detail-row">
+            <span class="lbl"><i class="fas fa-wallet"></i> Your Earnings</span>
+            <span class="val earn" id="callDriverEarn">$0.00</span>
+        </div>
+        <div class="dp-call-detail-row" style="margin-top:8px; padding-top:8px; border-top: 1px dashed rgba(255,255,255,0.2); border-bottom:none;">
+            <span class="lbl"><i class="fas fa-location-arrow"></i> Destination</span>
+            <span class="val" style="font-size:0.85rem; text-align:right; max-width:60%;" id="callAddress">Address</span>
+        </div>
+    </div>
+    <div class="dp-call-actions">
+        <div class="dp-call-btn-wrap">
+            <button class="dp-call-btn reject" onclick="dpRejectCurrentCall()"><i class="fas fa-phone-slash"></i></button>
+            <span class="dp-call-btn-label">Reject</span>
+        </div>
+        <div class="dp-call-btn-wrap">
+            <button class="dp-call-btn accept" onclick="dpAcceptCurrentCall()"><i class="fas fa-phone"></i></button>
+            <span class="dp-call-btn-label">Accept</span>
+        </div>
+    </div>
+</div>
+
+<!-- Portal Screen -->
+<div id="dpScreenPortal">
+<div class="dp-hdr">
+<div>
+<button class="dp-b dp-b-ghost" onclick="dpLogout()" style="margin-bottom:8px;">
+<i class="fas fa-sign-out-alt"></i> Logout
+</button>
+<h1><i class="fas fa-motorcycle"></i> Driver Portal</h1>
+<p id="dpWelcomeMsg"></p>
+</div>
+<div class="dp-hdr-btns">
+<button class="dp-b dp-b-purple dp-b-sm" onclick="openAdminLoginFromDriver()"><i class="fas fa-shield-halved"></i> Admin</button>
+<button class="dp-b dp-b-blue dp-b-sm" onclick="dpSimulateOrder()"><i class="fas fa-plus"></i> Simulate Order</button>
+<button class="dp-b" id="dpBtnToggle" onclick="dpToggleOnline()">
+<i class="fas fa-toggle-on"></i> <span id="dpLblOnline">Online</span>
+</button>
+<button class="dp-b dp-b-gray dp-b-sm" onclick="dpResetDemo()"><i class="fas fa-rotate-right"></i> Reset</button>
+</div>
+</div>
+<div class="dp-scard" id="dpStatusCard">
+<div>
+<h3>You are <span id="dpStDisplay">Online</span></h3>
+<p id="dpStMsg">Ready to receive orders</p>
+</div>
+<div class="dp-ico" id="dpStIco">🟢</div>
+</div>
+<div class="dp-stats">
+<div class="dp-stat"><h4>Today</h4><div class="v" id="dpSToday">0</div><div class="sub">Deliveries</div></div>
+<div class="dp-stat"><h4>Active</h4><div class="v" id="dpSActive">0</div><div class="sub">In Progress</div></div>
+<div class="dp-stat"><h4>Earnings</h4><div class="v" id="dpSEarn">$0</div><div class="sub">Net Today</div></div>
+<div class="dp-stat"><h4>Distance</h4><div class="v" id="dpSDist">0 km</div><div class="sub">Covered</div></div>
+</div>
+<div class="dp-active-map-wrap" id="dpActiveMapWrap">
+<div class="dp-active-map-header">
+<div>
+<div id="dpMapEyebrow" style="font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:#0ea5e9;font-weight:700"><i class="fas fa-location-arrow"></i> My Location</div>
+<div id="dpActiveMapTitle" style="font-size:1.05rem;font-weight:700;color:#f8fafc;margin-top:2px">Waiting for orders…</div>
+</div>
+<div id="dpActiveMapStat" style="background:linear-gradient(135deg,#0ea5e9 0%,#3b82f6 100%);color:#fff;padding:10px 16px;border-radius:10px;font-weight:800;font-size:1.1rem;box-shadow:0 4px 12px rgba(14,165,233,.25);white-space:nowrap">— km</div>
+</div>
+<div id="dpActiveMapBox" class="dp-dmap dp-active-map"></div>
+<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;font-size:.72rem;color:#94a3b8">
+<span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#22c55e;margin-right:5px"></span>You</span>
+<span id="dpLegendPickup" style="display:none"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#8b5cf6;margin-right:5px"></span>Pickup</span>
+<span id="dpLegendCustomer" style="display:none"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;margin-right:5px"></span>Customer</span>
+<span id="dpLegendDelivery" style="display:none"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#8b5cf6;margin-right:5px"></span>Delivery</span>
+</div>
+</div>
+<div class="dp-tabs">
+<div class="dp-tab active" onclick="dpSwitchTab('incoming')" data-tab="incoming">
+<i class="fas fa-bell"></i> Incoming <span class="badge" id="dpCntNew">0</span>
+</div>
+<div class="dp-tab" onclick="dpSwitchTab('active')" data-tab="active">
+<i class="fas fa-truck"></i> My Deliveries <span class="badge" id="dpCntActive">0</span>
+</div>
+<div class="dp-tab" onclick="dpSwitchTab('history')" data-tab="history">
+<i class="fas fa-history"></i> Order History <span class="badge" id="dpCntHistory">0</span>
+</div>
+<div class="dp-tab" onclick="dpSwitchTab('fleet')" data-tab="fleet">
+<i class="fas fa-users"></i> My Fleet <span class="badge" id="dpCntFleet">0</span>
+</div>
+<div class="dp-tab" onclick="dpSwitchTab('earnings')" data-tab="earnings">
+<i class="fas fa-wallet"></i> Earnings
+</div>
+</div>
+<div class="dp-section active" id="dpSecIncoming"><div id="dpListIncoming"></div></div>
+<div class="dp-section" id="dpSecActive"><div id="dpListActive"></div></div>
+<div class="dp-section" id="dpSecHistory">
+<div class="dp-search-box">
+<i class="fas fa-search"></i>
+<input type="text" id="dpSearchHistory" placeholder="Search by order ID, customer, or restaurant..." oninput="dpRenderHistory()">
+</div>
+<div class="dp-filters">
+<button class="dp-filter-btn active" data-filter="all" onclick="dpSetHistoryFilter('all')">All</button>
+<button class="dp-filter-btn" data-filter="today" onclick="dpSetHistoryFilter('today')">Today</button>
+<button class="dp-filter-btn" data-filter="week" onclick="dpSetHistoryFilter('week')">This Week</button>
+<button class="dp-filter-btn" data-filter="month" onclick="dpSetHistoryFilter('month')">This Month</button>
+</div>
+<div class="dp-date-range">
+<input type="date" class="dp-date-input" id="dpDateFrom" onchange="dpRenderHistory()">
+<input type="date" class="dp-date-input" id="dpDateTo" onchange="dpRenderHistory()">
+<button class="dp-b dp-b-sm dp-b-outline" onclick="dpResetDateFilter()"><i class="fas fa-times"></i> Reset</button>
+</div>
+<div id="dpListHistory"></div>
+</div>
+<div class="dp-section" id="dpSecEarnings">
+<div class="dp-earn-summary">
+<h4><i class="fas fa-chart-pie"></i> Earnings Summary</h4>
+<div class="dp-earn-grid">
+<div class="dp-earn-item"><div class="lbl">Total Orders</div><div class="val" id="dpEarnTotalOrders">0</div></div>
+<div class="dp-earn-item"><div class="lbl">Gross Earnings</div><div class="val" id="dpEarnGross">$0.00</div></div>
+<div class="dp-earn-item"><div class="lbl">App Fee (20%)</div><div class="val fee" id="dpEarnFee">-$0.00</div></div>
+<div class="dp-earn-item"><div class="lbl">Net Earnings</div><div class="val net" id="dpEarnNet">$0.00</div></div>
+</div>
+</div>
+<div class="dp-filters">
+<button class="dp-filter-btn active" data-efilter="all" onclick="dpSetEarningsFilter('all')">All Time</button>
+<button class="dp-filter-btn" data-efilter="today" onclick="dpSetEarningsFilter('today')">Today</button>
+<button class="dp-filter-btn" data-efilter="week" onclick="dpSetEarningsFilter('week')">This Week</button>
+<button class="dp-filter-btn" data-efilter="month" onclick="dpSetEarningsFilter('month')">This Month</button>
+</div>
+<div id="dpListEarnings"></div>
+</div>
+<div class="dp-section" id="dpSecFleet">
+<div id="dpListFleet"></div>
+</div>
+</div>
+</div>
+
+<!-- ─── JAVASCRIPT ─── -->
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// ★ SUPABASE CLIENT INITIALIZATION ★
+// ═══════════════════════════════════════════════════════════════════
+const SB_URL = "https://tsuhzwqrduluzbxmdoxq.supabase.co";
+const SB_KEY = "sb_publishable_3kQN2CnO4h7ZxQbujz7eEQ_Q0jq0_Fj";
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+// ═══════════════════════════════════════════════════════════════════
+// ★ SUPABASE DATA LAYER ★
+// ═══════════════════════════════════════════════════════════════════
+
+async function supaLoadRestaurants() {
+  try {
+    const { data: restRows, error: rErr } = await sb.from('restaurants').select('*');
+    if (rErr) throw rErr;
+    const { data: menuRows, error: mErr } = await sb.from('menu_items').select('*').order('sort_order');
+    if (mErr) throw mErr;
+    const result = {};
+    (restRows || []).forEach(r => {
+      const rMenu = (menuRows || []).filter(m => m.restaurant_id === r.id);
+      const menu = { coffee: [], food: [], dessert: [], juices: [], softdrinks: [] };
+      rMenu.forEach(m => {
+        if (menu[m.category]) {
+          menu[m.category].push({ id: m.id, name: m.name, price: m.price, description: m.description, image: m.image_url });
+        }
+      });
+      result[r.id] = {
+        name: r.name, address: r.address, phone: r.phone, lat: r.lat, lng: r.lng,
+        rating: r.rating, deliveryTime: r.delivery_time, deliveryFee: r.delivery_fee,
+        cuisine: r.cuisine, activeCategories: r.active_categories || Object.keys(menu).filter(k => menu[k].length > 0),
+        menu, active: r.active
+      };
+    });
+    return result;
+  } catch (e) { console.error('supaLoadRestaurants error:', e); return {}; }
+}
+
+async function supaLoadVehicles() {
+  try {
+    const { data, error } = await sb.from('vehicles').select('*');
+    if (error) throw error;
+    return (data || []).map(v => ({
+      id: v.id, type: v.type, plateNumber: v.plate_number, model: v.model,
+      driverName: v.driver_name, driverPhone: v.driver_phone, driverPin: v.driver_pin,
+      license: v.license, status: v.status, lat: v.lat, lng: v.lng
+    }));
+  } catch (e) { console.error('supaLoadVehicles error:', e); return []; }
+}
+
+async function supaLoadOrders() {
+  try {
+    const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(o => ({
+      id: o.id,
+      customer: { name: o.customer_name, phone: o.customer_phone, address: o.customer_address, area: o.customer_area },
+      coordinates: o.coordinates, restaurant: o.restaurant_id, items: o.items || [],
+      total: o.total, status: o.status,
+      payment: { method: o.payment_method, phone: o.payment_phone },
+      vehicle: o.vehicle_snapshot, vehicleId: o.vehicle_id,
+      statusHistory: o.status_history || [], timestamp: new Date(o.created_at)
+    }));
+  } catch (e) { console.error('supaLoadOrders error:', e); return []; }
+}
+
+async function supaLoadSettings() {
+  try {
+    const { data, error } = await sb.from('settings').select('*');
+    if (error) throw error;
+    const result = {};
+    (data || []).forEach(s => { result[s.key] = s.value; });
+    return result;
+  } catch (e) { console.error('supaLoadSettings error:', e); return {}; }
+}
+
+async function supaSaveOrder(orderData) {
+  try {
+    const { error } = await sb.from('orders').insert({
+      id: orderData.id,
+      customer_name: orderData.customer?.name || '',
+      customer_phone: orderData.customer?.phone || '',
+      customer_address: orderData.customer?.address || '',
+      customer_area: orderData.customer?.area || '',
+      coordinates: orderData.coordinates,
+      restaurant_id: orderData.restaurant,
+      items: orderData.items,
+      total: orderData.total,
+      status: orderData.status,
+      payment_method: orderData.payment?.method || 'cash',
+      payment_phone: orderData.payment?.phone || '',
+      vehicle_id: orderData.vehicleId || null,
+      vehicle_snapshot: orderData.vehicle,
+      status_history: orderData.statusHistory || [{ status: 'pending', time: new Date().toISOString() }]
+    });
+    if (error) throw error;
+    return true;
+  } catch (e) { console.error('supaSaveOrder error:', e); return false; }
+}
+
+async function supaUpdateOrder(orderId, updates) {
+  try {
+    const row = {};
+    if (updates.status !== undefined) row.status = updates.status;
+    if (updates.vehicle !== undefined) row.vehicle_snapshot = updates.vehicle;
+    if (updates.vehicleId !== undefined) row.vehicle_id = updates.vehicleId;
+    if (updates.statusHistory !== undefined) row.status_history = updates.statusHistory;
+    const { error } = await sb.from('orders').update(row).eq('id', orderId);
+    if (error) throw error;
+    return true;
+  } catch (e) { console.error('supaUpdateOrder error:', e); return false; }
+}
+
+async function supaDeleteOrder(orderId) {
+  try {
+    const { error } = await sb.from('orders').delete().eq('id', orderId);
+    if (error) throw error;
+  } catch (e) { console.error('supaDeleteOrder error:', e); }
+}
+
+async function supaSaveVehicle(vehicleData) {
+  try {
+    const { error } = await sb.from('vehicles').upsert({
+      id: vehicleData.id, type: vehicleData.type, plate_number: vehicleData.plateNumber || vehicleData.plate,
+      model: vehicleData.model || '', driver_name: vehicleData.driverName,
+      driver_phone: vehicleData.driverPhone, driver_pin: vehicleData.driverPin,
+      license: vehicleData.license || '', status: vehicleData.status,
+      lat: vehicleData.lat || 9.56, lng: vehicleData.lng || 44.065
+    });
+    if (error) throw error;
+  } catch (e) { console.error('supaSaveVehicle error:', e); }
+}
+
+async function supaDeleteVehicle(vehicleId) {
+  try {
+    const { error } = await sb.from('vehicles').delete().eq('id', vehicleId);
+    if (error) throw error;
+  } catch (e) { console.error('supaDeleteVehicle error:', e); }
+}
+
+async function supaSaveRestaurant(key, restData) {
+  try {
+    const { error: rErr } = await sb.from('restaurants').upsert({
+      id: key, name: restData.name, address: restData.address || '',
+      phone: restData.phone || '', email: restData.email || '',
+      lat: restData.lat, lng: restData.lng,
+      rating: restData.rating || 4.5, delivery_time: restData.deliveryTime || '20 min',
+      delivery_fee: restData.deliveryFee || '$2', cuisine: restData.cuisine || 'Various',
+      logo_url: restData.logo || '', active_categories: restData.activeCategories || ['food','juices','softdrinks','coffee','dessert'],
+      active: restData.active !== false
+    });
+    if (rErr) throw rErr;
+    await sb.from('menu_items').delete().eq('restaurant_id', key);
+    const menuRows = [];
+    if (restData.menu) {
+      for (const cat in restData.menu) {
+        (restData.menu[cat] || []).forEach((item, idx) => {
+          menuRows.push({ restaurant_id: key, category: cat, name: item.name, price: item.price, description: item.description || '', image_url: item.image || '', sort_order: idx });
+        });
+      }
+    }
+    if (menuRows.length > 0) {
+      const { error: mErr } = await sb.from('menu_items').insert(menuRows);
+      if (mErr) throw mErr;
+    }
+    return true;
+  } catch (e) { console.error('supaSaveRestaurant error:', e); return false; }
+}
+
+async function supaDeleteRestaurant(key) {
+  try {
+    await sb.from('menu_items').delete().eq('restaurant_id', key);
+    await sb.from('restaurants').delete().eq('id', key);
+  } catch (e) { console.error('supaDeleteRestaurant error:', e); }
+}
+
+async function supaSaveSettings(key, value) {
+  try {
+    const { error } = await sb.from('settings').upsert({ key, value, updated_at: new Date().toISOString() });
+    if (error) throw error;
+  } catch (e) { console.error('supaSaveSettings error:', e); }
+}
+
+async function supaSignUp(email, password, fullName) {
+  try {
+    const { data, error } = await sb.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
+    if (error) throw error;
+    return data;
+  } catch (e) { console.error('supaSignUp error:', e); return null; }
+}
+
+async function supaSignIn(email, password) {
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+  } catch (e) { console.error('supaSignIn error:', e); return null; }
+}
+
+async function supaSignOut() {
+  try { await sb.auth.signOut(); } catch (e) {}
+}
+
+function supaSubscribeToOrders(callback) {
+  return sb.channel('orders-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
+      if (callback) callback(payload);
+    })
+    .subscribe();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ★ HYBRID LOAD: Supabase first, localStorage fallback ★
+// ═══════════════════════════════════════════════════════════════════
+let supaConnected = false;
+
+async function initSupabaseData() {
+  try {
+    const test = await sb.from('settings').select('key').limit(1);
+    if (test.error) throw test.error;
+    supaConnected = true;
+    const [restData, vehData, ordData, setaData] = await Promise.all([
+      supaLoadRestaurants(), supaLoadVehicles(), supaLoadOrders(), supaLoadSettings()
+    ]);
+    if (Object.keys(restData).length > 0) restaurants = restData;
+    if (vehData.length > 0) vehicles = vehData;
+    if (ordData.length > 0) orders = ordData;
+    if (Object.keys(setaData).length > 0) {
+      if (setaData.system) settings.system = setaData.system;
+      if (setaData.delivery) settings.delivery = setaData.delivery;
+    }
+    updateAppSyncStatus(true, 'Supabase Connected');
+    saveLocalData();
+    console.log('🟢 Supabase connected —', Object.keys(restData).length, 'restaurants,', vehData.length, 'vehicles');
+  } catch (e) {
+    supaConnected = false;
+    console.warn('Supabase init failed, using localStorage:', e);
+    updateAppSyncStatus(false, 'Local Mode');
+  }
+}
+
+// ─── UTILITY ───
+function showAppToast(msg) {
+const toast = document.getElementById('appToast');
+if (!toast) { const t = document.createElement('div'); t.className = 'app-toast'; t.id = 'appToast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => { t.classList.add('show'); setTimeout(() => { t.classList.remove('show'); }, 2800); }, 100); return; }
+toast.textContent = msg;
+toast.classList.add('show');
+clearTimeout(toast._timer);
+toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function appCalculateDistance(lat1, lng1, lat2, lng2) {
+const R = 6371;
+const dLat = ((lat2 - lat1) * Math.PI) / 180;
+const dLng = ((lng2 - lng1) * Math.PI) / 180;
+const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function appGetClosestVehicleOfType(type, lat, lng) {
+let available = vehicles.filter(v => v.status === 'available' && v.type === type);
+available.sort((a, b) => {
+const dA = appCalculateDistance(lat, lng, a.lat || 9.56, a.lng || 44.06);
+const dB = appCalculateDistance(lat, lng, b.lat || 9.56, b.lng || 44.06);
+return dA - dB;
+});
+return available.slice(0, 2);
+}
+
+function updateAppSyncStatus(online, text) {
+const dot = document.getElementById('appSyncDot'), txt = document.getElementById('appSyncText');
+if (dot && txt) { dot.className = online ? 'app-sync-dot' : 'app-sync-dot offline'; txt.textContent = text; }
+}
+
+function setupPaymentPhoneInput() {}
+
+// ─── DATA ───
+let restaurants = {}, vehicles = [], orders = [];
+let settings = { system: { businessName: 'Go!Point', businessAddress: 'Hargeisa, Somaliland', businessPhone: '+252 61 XXX XXXX', businessEmail: 'info@gopoint.com' } };
+
+const defaultRestaurants = {
+'damal-restaurant': { name: 'Damal Restaurant', address: 'Downtown, Hargeisa', phone: '+252 61 1234567', lat: 9.5600, lng: 44.0650, rating: 4.8, deliveryTime: '25 min', deliveryFee: '$2', cuisine: 'Mediterranean', activeCategories: ['food','coffee'], menu: {
+coffee: [{ id: 1, name: 'Espresso', price: 3.50, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Rich & bold single shot' }, { id: 2, name: 'Cappuccino', price: 4.25, image: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=200&h=200&fit=crop', description: 'Espresso with steamed milk foam' }],
+food: [{ id: 4, name: 'Signature Burger', price: 12.90, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop', description: 'Grilled beef, cheddar, fresh veggies' }, { id: 5, name: 'Truffle Pasta', price: 14.50, image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200&h=200&fit=crop', description: 'Creamy mushroom truffle sauce' }]
+}},
+'hiddo-dhowr-pizza': { name: 'Hiddo Dhowr Pizza', address: 'Main Street, Hargeisa', phone: '+252 61 2345678', lat: 9.5620, lng: 44.0680, rating: 4.9, deliveryTime: '20 min', deliveryFee: '$1.5', cuisine: 'Italian', activeCategories: ['food','juices','softdrinks','coffee','dessert'], menu: {
+food: [{ id: 12, name: 'Margherita Pizza', price: 10.50, image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop', description: 'Classic tomato, mozzarella, basil' }, { id: 13, name: 'Pepperoni Pizza', price: 12.90, image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=200&h=200&fit=crop', description: 'Loaded with pepperoni' }]
+}},
+'burger-house': { name: 'Burger House', address: 'Central Market, Hargeisa', phone: '+252 61 3456789', lat: 9.5580, lng: 44.0620, rating: 4.7, deliveryTime: '18 min', deliveryFee: '$2', cuisine: 'Fast Food', activeCategories: ['food','juices','softdrinks'], menu: {
+food: [{ id: 18, name: 'Classic Burger', price: 9.90, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop', description: 'Beef patty, lettuce, tomato' }, { id: 19, name: 'Double Cheese Burger', price: 13.50, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=200&h=200&fit=crop', description: 'Double patty with extra cheese' }]
+}},
+'som-coffee': { name: 'Som Coffee', address: 'University Road, Hargeisa', phone: '+252 61 4567890', lat: 9.5640, lng: 44.0700, rating: 4.9, deliveryTime: '15 min', deliveryFee: '$1', cuisine: 'Cafe', activeCategories: ['coffee','dessert','juices'], menu: {
+coffee: [{ id: 22, name: 'Somali Spiced Coffee', price: 4.00, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Traditional cardamom & clove' }, { id: 23, name: 'Iced Latte', price: 4.50, image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', description: 'Cold espresso with milk' }]
+}}
+};
+
+const defaultVehicles = [
+{ id: 'v1', type: 'bike', plateNumber: 'B1234', driverName: 'Ahmed Ali', driverPhone: '+252631112222', driverPin: '1234', status: 'available', lat: 9.5650, lng: 44.0700 },
+{ id: 'v2', type: 'taxi', plateNumber: 'T5678', driverName: 'Mohamed Hassan', driverPhone: '+252653334444', driverPin: '2345', status: 'available', lat: 9.5550, lng: 44.0550 },
+{ id: 'v3', type: 'bike', plateNumber: 'B9012', driverName: 'Abdi Karim', driverPhone: '+252635556666', driverPin: '3456', status: 'delivering', lat: 9.5700, lng: 44.0600 },
+{ id: 'v4', type: 'taxi', plateNumber: 'T2468', driverName: 'Fatima Omar', driverPhone: '+252657778888', driverPin: '4567', status: 'available', lat: 9.5610, lng: 44.0660 },
+{ id: 'v5', type: 'bike', plateNumber: 'B3456', driverName: 'Hanad', driverPhone: '+252610000000', driverPin: '1111', status: 'available', lat: 9.5600, lng: 44.0650 }
+];
+
+// ─── GLOBAL DRIVER PORTAL VARIABLES ───
+let dpDriver = null, dpOnline = true, dpAdminDeactivated = false, dpRinging = new Set(), dpRingCtx = null, dpRingOsc = null, dpRingGain = null, dpRingInt = null, dpCurrentTab = 'incoming', dpHistoryFilter = 'all', dpEarningsFilter = 'all', dpDateFrom = null, dpDateTo = null;
+let dpActiveMap = null, dpActiveDriverMarker = null, dpCustomerMarker = null, dpPickupMarker = null, dpRouteLine = null, dpActiveMidLabel = null, dpActiveOrderId = null;
+let dpPickupToCustLabel = null;
+let dpCurrentCallOrderId = null;
+const DP_CONFIG = { commissionRate: 0.20, currency: '$', defaultLat: 9.56, defaultLng: 44.065 };
+
+function loadFromLocalStorage() {
+const sr = localStorage.getItem('gopoint_restaurants');
+restaurants = sr ? JSON.parse(sr) : JSON.parse(JSON.stringify(defaultRestaurants));
+const sv = localStorage.getItem('gopoint_vehicles');
+vehicles = sv ? JSON.parse(sv) : JSON.parse(JSON.stringify(defaultVehicles));
+const so = localStorage.getItem('gopoint_orders');
+orders = so ? JSON.parse(so).map(o => ({ ...o, timestamp: new Date(o.timestamp) })) : [];
+const ss = localStorage.getItem('gopointSettings');
+if (ss) settings = JSON.parse(ss);
+}
+
+function saveLocalData() {
+localStorage.setItem('gopoint_restaurants', JSON.stringify(restaurants));
+localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles));
+localStorage.setItem('gopoint_orders', JSON.stringify(orders));
+localStorage.setItem('gopointSettings', JSON.stringify(settings));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ★ DRIVER LOGIN WITH USERNAME + PIN ★
+// ═══════════════════════════════════════════════════════════════════
+async function driverLoginWithPin() {
+const username = document.getElementById('fpDriverUsername').value.trim();
+const pin = document.getElementById('fpDriverPin').value.trim();
+
+if (!username) { dpToast('⚠️ Please enter your username or phone', 'error'); return; }
+if (!pin) { dpToast('⚠️ Please enter your 4-digit PIN', 'error'); return; }
+if (!/^\d{4}$/.test(pin)) { dpToast('⚠️ PIN must be exactly 4 digits', 'error'); return; }
+
+if (supaConnected) {
+  const { data, error } = await sb.from('vehicles').select('*');
+  if (!error && data) {
+    vehicles = data.map(v => ({ id: v.id, type: v.type, plateNumber: v.plate_number, model: v.model, driverName: v.driver_name, driverPhone: v.driver_phone, driverPin: v.driver_pin, license: v.license, status: v.status, lat: v.lat, lng: v.lng }));
+  }
+}
+
+loadFromLocalStorage();
+
+const matchedVehicle = vehicles.find(v => {
+const nameMatch = v.driverName && (
+v.driverName.toLowerCase() === username.toLowerCase() ||
+v.driverName.toLowerCase().includes(username.toLowerCase()) ||
+v.driverName.split(' ')[0].toLowerCase() === username.toLowerCase()
+);
+const phoneMatch = v.driverPhone && (
+v.driverPhone === username ||
+v.driverPhone.replace(/\D/g, '') === username.replace(/\D/g, '')
+);
+return (nameMatch || phoneMatch) && v.driverPin === pin;
+});
+
+if (!matchedVehicle) {
+dpToast('⚠️ Invalid credentials. Check username and PIN.', 'error');
+document.getElementById('fpDriverPin').value = '';
+document.getElementById('fpDriverPin').focus();
+return;
+}
+
+dpDriver = matchedVehicle;
+document.getElementById('dpLoginScreen').style.display = 'none';
+document.getElementById('appDriverPortal').style.display = 'block';
+document.getElementById('dpFleetSelection').style.display = 'none';
+document.getElementById('dpScreenPortal').style.display = 'block';
+dpOnline = true;
+dpLoadData();
+dpSyncVehicleStatus();
+document.getElementById('dpWelcomeMsg').textContent = dpDriver.driverName + ' • ' + (dpDriver.plateNumber || dpDriver.plate);
+dpUpdateUI();
+dpRefresh();
+setTimeout(() => dpInitActiveMap(), 200);
+dpToast(dpAdminDeactivated ? '🔴 deactivated by admin - Contact admin' : '✅ Welcome ' + dpDriver.driverName, dpAdminDeactivated ? 'error' : 'success');
+
+dpCheckForIncomingCalls();
+
+const activeOrder = orders.find(o => ['preparing', 'ready', 'out_for_delivery'].includes(o.status) && o.vehicle && o.vehicle.driverName === dpDriver.driverName);
+if (activeOrder) {
+setTimeout(() => {
+dpSwitchTab('active');
+setTimeout(() => dpShowCustomerOnMap(activeOrder.id, { useActiveMap: true }), 400);
+}, 500);
+}
+
+supaSubscribeToOrders((payload) => {
+loadFromLocalStorage();
+if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); }
+});
+}
+
+// Logout from driver portal back to front page
+function dpLogout() {
+dpDriver = null;
+dpCleanupMap();
+document.getElementById('appDriverPortal').style.display = 'none';
+document.getElementById('dpFleetSelection').style.display = 'none';
+document.getElementById('dpScreenPortal').style.display = 'block';
+document.getElementById('dpLoginScreen').style.display = 'flex';
+const u = document.getElementById('fpDriverUsername');
+const p = document.getElementById('fpDriverPin');
+if (u) u.value = '';
+if (p) p.value = '';
+showAppToast('👋 Logged out from Driver Portal');
+}
+
+function openAdminLoginFromDriver() {
+dpLogout();
+setTimeout(() => { window.location.href = 'admin.html'; }, 300);
+}
+
+// ─── FLEET SELECTION ───
+function dpRenderFleetList(fleets) {
+const list = document.getElementById('dpFleetList');
+list.innerHTML = fleets.map(f => {
+const icon = f.type === 'bike' ? 'fa-motorcycle' : 'fa-car';
+const typeColor = f.type === 'bike' ? '#22c55e' : '#f59e0b';
+return `<div onclick="dpSelectFleet('${f.id}')" style="background:#1e293b; border:2px solid #334155; border-radius:14px; padding:16px; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:14px;" onmouseover="this.style.borderColor='#22c55e'" onmouseout="this.style.borderColor='#334155'">
+<div style="width:48px; height:48px; border-radius:12px; background:${typeColor}22; display:flex; align-items:center; justify-content:center;">
+<i class="fas ${icon}" style="font-size:1.3rem; color:${typeColor};"></i>
+</div>
+<div style="flex:1;">
+<div style="font-weight:700; color:#f8fafc; font-size:1rem;">${f.driverName}</div>
+<div style="color:#94a3b8; font-size:0.85rem;">${f.plateNumber || 'N/A'} • ${f.type === 'bike' ? 'Motorcycle' : 'Taxi'}</div>
+</div>
+<div style="color:#22c55e; font-size:0.85rem; font-weight:600;">Available →</div>
+</div>`;
+}).join('');
+}
+
+function dpSelectFleet(fleetId) {
+const fleet = vehicles.find(v => v.id === fleetId);
+if (!fleet) { dpToast('Fleet not found', 'error'); return; }
+
+dpDriver = fleet;
+document.getElementById('dpFleetSelection').style.display = 'none';
+document.getElementById('dpScreenPortal').style.display = 'block';
+dpOnline = true;
+dpLoadData();
+dpSyncVehicleStatus();
+document.getElementById('dpWelcomeMsg').textContent = dpDriver.driverName + ' • ' + (dpDriver.plateNumber || dpDriver.plate);
+dpUpdateUI();
+dpRefresh();
+setTimeout(() => dpInitActiveMap(), 200);
+dpToast(dpAdminDeactivated ? '🔴 deactivated by admin - Contact admin' : '✅ Welcome ' + dpDriver.driverName, dpAdminDeactivated ? 'error' : 'success');
+
+dpCheckForIncomingCalls();
+
+const activeOrder = orders.find(o => ['preparing', 'ready', 'out_for_delivery'].includes(o.status) && o.vehicle && o.vehicle.driverName === dpDriver.driverName);
+if (activeOrder) {
+setTimeout(() => {
+dpSwitchTab('active');
+setTimeout(() => dpShowCustomerOnMap(activeOrder.id, { useActiveMap: true }), 400);
+}, 500);
+}
+}
+
+// ─── DRIVER PORTAL FUNCTIONS ───
+function dpLoadData() { /* Data already loaded */ }
+
+async function dpSyncVehicleStatus() {
+  if (!dpDriver) return;
+  if (supaConnected) {
+    const { data } = await sb.from('vehicles').select('*').eq('id', dpDriver.id).single();
+    if (data) {
+      dpAdminDeactivated = data.status === 'unavailable';
+      dpDriver.status = data.status;
+      dpDriver.lat = data.lat;
+      dpDriver.lng = data.lng;
+      const vi = vehicles.find(v => v.id === dpDriver.id);
+      if (vi) { vi.status = data.status; vi.lat = data.lat; vi.lng = data.lng; }
+      return;
+    }
+  }
+  try {
+    const saved = JSON.parse(localStorage.getItem('gopoint_vehicles'));
+    if (saved) {
+      const fresh = saved.find(v => v.id === dpDriver.id);
+      if (fresh) {
+        dpAdminDeactivated = fresh.status === 'unavailable';
+        dpDriver.status = fresh.status;
+        dpDriver.lat = fresh.lat;
+        dpDriver.lng = fresh.lng;
+        const vi = vehicles.find(v => v.id === dpDriver.id);
+        if (vi) { vi.status = fresh.status; vi.lat = fresh.lat; vi.lng = fresh.lng; }
+      }
+    }
+  } catch (_) {}
+}
+
+function dpCleanupMap() {
+dpStopRingtone();
+hideIncomingCall();
+if (dpActiveMap) { dpActiveMap.remove(); dpActiveMap = null; dpActiveDriverMarker = null; }
+dpCustomerMarker = null; dpPickupMarker = null; dpRouteLine = null; dpActiveMidLabel = null; dpPickupToCustLabel = null;
+const wrap = document.getElementById('dpActiveMapWrap');
+if (wrap) wrap.style.display = 'none';
+}
+
+function dpToggleOnline() {
+if (dpAdminDeactivated) { dpToast('🔴 deactivated by admin - Contact admin to reactivate', 'error'); return; }
+dpOnline = !dpOnline;
+dpUpdateUI();
+if (dpOnline) {
+dpRefresh();
+dpCheckForIncomingCalls();
+dpToast('🟢 You are now Online', 'success');
+} else {
+dpStopRingtone();
+hideIncomingCall();
+dpToast('⚫ You are now Offline', 'info');
+}
+}
+
+function dpResetDemo() { if(confirm('Reset all demo data and reload?')) { localStorage.clear(); location.reload(); } }
+
+function dpCheckForIncomingCalls() {
+    if (!dpOnline || dpAdminDeactivated) return;
+    const myPending = orders.filter(o => o.status === 'pending' && (!o.vehicle || o.vehicle.id === dpDriver?.id));
+    if (myPending.length > 0 && !dpCurrentCallOrderId) {
+        showIncomingCall(myPending[0].id);
+    } else if (myPending.length === 0 && dpCurrentCallOrderId) {
+        hideIncomingCall();
+    }
+}
+
+function showIncomingCall(orderId) {
+    const o = orders.find(x => x.id === orderId);
+    if (!o) return;
+    dpCurrentCallOrderId = orderId;
+    const r = restaurants[o.restaurant] || { name: 'Unknown' };
+    const d = dpDriver.lat ? appCalculateDistance(dpDriver.lat, dpDriver.lng, o.coordinates?.lat || DP_CONFIG.defaultLat, o.coordinates?.lng || DP_CONFIG.defaultLng).toFixed(1) : '?';
+    const earn = dpCalcEarnings(o);
+    document.getElementById('callRestaurantName').textContent = r.name;
+    document.getElementById('callCustomerName').textContent = o.customer?.name || 'Customer';
+    document.getElementById('callDistance').textContent = d + ' km';
+    document.getElementById('callOrderTotal').textContent = DP_CONFIG.currency + earn.total.toFixed(2);
+    document.getElementById('callDriverEarn').textContent = DP_CONFIG.currency + earn.driverEarn.toFixed(2);
+    document.getElementById('callAddress').textContent = o.customer?.address || 'Unknown Address';
+    document.getElementById('dpIncomingCallOverlay').classList.add('show');
+    dpPlayRingtone();
+}
+
+function hideIncomingCall() {
+    document.getElementById('dpIncomingCallOverlay').classList.remove('show');
+    dpCurrentCallOrderId = null;
+    dpStopRingtone();
+}
+
+function dpAcceptCurrentCall() {
+    if (dpCurrentCallOrderId) dpAccept(dpCurrentCallOrderId);
+    hideIncomingCall();
+}
+
+function dpRejectCurrentCall() {
+    if (dpCurrentCallOrderId) dpReject(dpCurrentCallOrderId);
+    hideIncomingCall();
+}
+
+function dpSimulateOrder() {
+    const now = new Date();
+    const rKeys = Object.keys(restaurants);
+    const newOrder = {
+        id: 'ord-' + Date.now(),
+        restaurant: rKeys.length > 0 ? rKeys[Math.floor(Math.random() * rKeys.length)] : 'damal-restaurant',
+        customer: { name: 'New Customer', phone: '+252639999999', address: '789 New Street, City Center' },
+        coordinates: { lat: 9.560 + (Math.random() * 0.02), lng: 44.060 + (Math.random() * 0.02) },
+        items: [{ name: 'Special Combo', quantity: 1 }],
+        total: 32.50,
+        status: 'pending',
+        timestamp: now.toISOString(),
+        statusHistory: [{ status: 'pending', time: now.toISOString() }]
+    };
+    orders.push(newOrder);
+    saveLocalData();
+    dpRefresh();
+    dpCheckForIncomingCalls();
+    dpToast('🔔 New order received!', 'info');
+}
+
+function dpUpdateUI() {
+const c = document.getElementById('dpStatusCard');
+if (dpAdminDeactivated) {
+  document.getElementById('dpLblOnline').textContent = 'Deactivated';
+  document.getElementById('dpStDisplay').textContent = 'Deactivated';
+  document.getElementById('dpStIco').textContent = '🔴';
+  document.getElementById('dpStMsg').textContent = 'Disabled by admin - Contact admin to reactivate';
+  c.className = 'dp-scard off';
+  document.getElementById('dpBtnToggle').className = 'dp-b dp-b-gray';
+  document.getElementById('dpBtnToggle').innerHTML = `<i class="fas fa-ban"></i> <span id="dpLblOnline">Deactivated</span>`;
+  return;
+}
+document.getElementById('dpLblOnline').textContent = dpOnline ? 'Online' : 'Offline';
+document.getElementById('dpStDisplay').textContent = dpOnline ? 'Online' : 'Offline';
+document.getElementById('dpStIco').textContent = dpOnline ? '🟢' : '⚫';
+document.getElementById('dpStMsg').textContent = dpOnline ? 'Ready to receive orders' : 'Offline - No orders will be received';
+c.className = dpOnline ? 'dp-scard' : 'dp-scard off';
+document.getElementById('dpBtnToggle').className = dpOnline ? 'dp-b dp-b-green' : 'dp-b dp-b-gray';
+document.getElementById('dpBtnToggle').innerHTML = `<i class="fas fa-toggle-${dpOnline ? 'on' : 'off'}"></i> <span id="dpLblOnline">${dpOnline ? 'Online' : 'Offline'}</span>`;
+}
+
+function dpSwitchTab(tab) {
+dpCurrentTab = tab;
+document.querySelectorAll('.dp-tab').forEach(t => t.classList.remove('active'));
+document.querySelector(`.dp-tab[data-tab="${tab}"]`).classList.add('active');
+document.querySelectorAll('.dp-section').forEach(s => s.classList.remove('active'));
+document.getElementById('dpSec' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+if (tab === 'history') dpRenderHistory();
+if (tab === 'earnings') dpRenderEarnings();
+if (tab === 'fleet') dpRenderFleet();
+}
+
+function dpRefresh() { dpSyncVehicleStatus(); dpRenderIncoming(); dpRenderActive(); dpRenderStats(); dpUpdateTabCounts(); }
+
+function dpRenderStats() {
+if (!dpDriver) return;
+const now = new Date();
+const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+const mine = orders.filter(o => o.vehicle && o.vehicle.driverName === dpDriver.driverName);
+const done = mine.filter(o => o.status === 'completed' && new Date(o.timestamp) >= today);
+const act = mine.filter(o => ['preparing', 'ready', 'out_for_delivery'].includes(o.status));
+let dist = 0;
+done.forEach(o => {
+const r = restaurants[o.restaurant] || {};
+dist += appCalculateDistance(r.lat || DP_CONFIG.defaultLat, r.lng || DP_CONFIG.defaultLng, o.coordinates?.lat || DP_CONFIG.defaultLat, o.coordinates?.lng || DP_CONFIG.defaultLng);
+});
+const earnings = dpGetDriverEarnings(dpDriver.driverName, 'today');
+document.getElementById('dpSToday').textContent = done.length;
+document.getElementById('dpSActive').textContent = act.length;
+document.getElementById('dpSEarn').textContent = DP_CONFIG.currency + earnings.net.toFixed(2);
+document.getElementById('dpSDist').textContent = dist.toFixed(1) + ' km';
+}
+
+function dpUpdateTabCounts() {
+const pending = orders.filter(o => o.status === 'pending' && (!o.vehicle || o.vehicle.id === dpDriver?.id)).length;
+const active = orders.filter(o => ['preparing', 'ready', 'out_for_delivery'].includes(o.status) && o.vehicle && o.vehicle.driverName === dpDriver?.driverName).length;
+const history = orders.filter(o => o.status === 'completed' && o.vehicle && o.vehicle.driverName === dpDriver?.driverName).length;
+document.getElementById('dpCntNew').textContent = pending;
+document.getElementById('dpCntActive').textContent = active;
+document.getElementById('dpCntHistory').textContent = history;
+document.getElementById('dpCntFleet').textContent = vehicles.length;
+}
+
+function dpGetDriverEarnings(driverName, filter = 'all') {
+const now = new Date();
+let filtered = orders.filter(o => o.status === 'completed' && o.vehicle && o.vehicle.driverName === driverName);
+if (filter === 'today') { const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); filtered = filtered.filter(o => new Date(o.timestamp) >= today); }
+else if (filter === 'week') { const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7); filtered = filtered.filter(o => new Date(o.timestamp) >= weekAgo); }
+else if (filter === 'month') { const monthAgo = new Date(now); monthAgo.setMonth(monthAgo.getMonth() - 1); filtered = filtered.filter(o => new Date(o.timestamp) >= monthAgo); }
+if (dpDateFrom) filtered = filtered.filter(o => new Date(o.timestamp) >= new Date(dpDateFrom));
+if (dpDateTo) { const toDate = new Date(dpDateTo); toDate.setHours(23, 59, 59, 999); filtered = filtered.filter(o => new Date(o.timestamp) <= toDate); }
+let gross = 0, fee = 0, net = 0;
+filtered.forEach(o => { const total = o.total || 0; const appFee = total * DP_CONFIG.commissionRate; gross += total; fee += appFee; net += total - appFee; });
+return { orders: filtered, gross, fee, net, count: filtered.length };
+}
+
+function dpRenderIncoming() {
+if (!dpDriver || dpAdminDeactivated) return;
+const p = orders.filter(o => o.status === 'pending' && o.id !== dpCurrentCallOrderId && (!o.vehicle || o.vehicle.id === dpDriver.id));
+const c = document.getElementById('dpListIncoming');
+if (!p.length) { c.innerHTML = `<div class="dp-empty"><i class="fas fa-inbox"></i><p>No other incoming orders</p><p class="sub">New orders will appear here</p></div>`; return; }
+c.innerHTML = p.map(o => {
+const r = restaurants[o.restaurant] || { name: 'Unknown' };
+const d = dpDriver.lat ? appCalculateDistance(dpDriver.lat, dpDriver.lng, o.coordinates?.lat || DP_CONFIG.defaultLat, o.coordinates?.lng || DP_CONFIG.defaultLng).toFixed(1) : '?';
+const isNew = !dpRinging.has(o.id);
+if (isNew) { dpRinging.add(o.id); setTimeout(() => dpRinging.delete(o.id), 30000); }
+const earn = dpCalcEarnings(o);
+return `<div class="dp-ocard${isNew ? ' ring' : ''}">
+${isNew ? '<div class="dp-ring-tag"><i class="fas fa-bell"></i> NEW ORDER</div>' : ''}
+<div class="dp-ocard-id"><span>Order #${String(o.id).slice(-6)}</span><span class="t">${new Date(o.timestamp).toLocaleTimeString()}</span></div>
+<div class="dp-ibox"><h4><i class="fas fa-user"></i> ${o.customer?.name || 'Customer'}</h4>
+<p><i class="fas fa-phone"></i> ${o.customer?.phone || '-'}</p>
+<p><i class="fas fa-map-marker-alt"></i> ${o.customer?.address || '-'}</p>
+<p><i class="fas fa-location-arrow"></i> ${d} km away</p></div>
+<div class="dp-ibox"><h5><i class="fas fa-store"></i> ${r.name}</h5>
+<p style="font-size:.78rem">${o.items?.map(i => i.name + ' x' + i.quantity).join(', ') || 'No items'}</p>
+<div class="price" style="font-weight:700;color:var(--primary);font-size:1.2rem;margin-top:5px;">${DP_CONFIG.currency}${(o.total || 0).toFixed(2)}</div></div>
+<div class="dp-earnings-box"><h5><i class="fas fa-wallet"></i> Your Earnings</h5>
+<div class="dp-earn-row"><span class="label">Order Total</span><span class="value">${DP_CONFIG.currency}${earn.total.toFixed(2)}</span></div>
+<div class="dp-earn-row fee"><span class="label">App Fee (${(DP_CONFIG.commissionRate*100).toFixed(0)}%)</span><span class="value">-${DP_CONFIG.currency}${earn.appFee.toFixed(2)}</span></div>
+<div class="dp-earn-row total"><span class="label">You Receive</span><span class="value">${DP_CONFIG.currency}${earn.driverEarn.toFixed(2)}</span></div>
+</div>
+<div class="dp-oacts">
+<button class="dp-b dp-b-green" onclick="dpAccept('${o.id}')"><i class="fas fa-check"></i> Accept</button>
+<button class="dp-b dp-b-red" onclick="dpReject('${o.id}')"><i class="fas fa-times"></i> Reject</button>
+</div>
+</div>`;
+}).join('');
+}
+
+function dpCalcEarnings(order) { const total = order.total || 0; const appFee = total * DP_CONFIG.commissionRate; return { total, appFee, driverEarn: total - appFee }; }
+
+async function dpAccept(id) {
+const i = orders.findIndex(x => x.id === id);
+if (i === -1) return;
+const o = orders[i];
+const vi = { id: dpDriver.id, driverName: dpDriver.driverName, driverPhone: dpDriver.driverPhone, plateNumber: dpDriver.plateNumber || dpDriver.plate, type: dpDriver.type, lat: dpDriver.lat, lng: dpDriver.lng };
+const h = o.statusHistory || [];
+h.push({ status: 'preparing', time: new Date().toISOString() });
+orders[i] = { ...o, status: 'preparing', vehicle: vi, vehicleId: dpDriver.id, statusHistory: h };
+const v2 = vehicles.find(v => v.id === dpDriver.id);
+if (v2) v2.status = 'delivering';
+saveLocalData();
+if (supaConnected) {
+  await supaUpdateOrder(id, { status: 'preparing', vehicle: vi, vehicleId: dpDriver.id, statusHistory: h });
+  await supaSaveVehicle({ ...dpDriver, status: 'delivering' });
+}
+dpStopRingtone();
+const rest = restaurants[o.restaurant] || {};
+const distToCustomer = (dpDriver.lat && o.coordinates?.lat) ? appCalculateDistance(dpDriver.lat, dpDriver.lng, o.coordinates.lat, o.coordinates.lng) : null;
+let toastMsg = '✅ Order #' + String(id).slice(-6) + ' accepted!';
+if (distToCustomer != null) toastMsg += ` • ${distToCustomer.toFixed(1)} km to customer`;
+dpToast(toastMsg, 'success');
+dpRefresh();
+dpSwitchTab('active');
+setTimeout(() => { if (typeof dpShowCustomerOnMap === 'function') dpShowCustomerOnMap(id); }, 350);
+}
+
+async function dpReject(id) {
+const i = orders.findIndex(x => x.id === id);
+if (i !== -1) { orders.splice(i, 1); saveLocalData(); if (supaConnected) await supaDeleteOrder(id); }
+dpStopRingtone(); dpToast('ℹ️ Order rejected', 'info'); dpRefresh(); }
+
+function dpRenderActive() {
+if (!dpDriver) return;
+const a = orders.filter(o => ['preparing', 'ready', 'out_for_delivery'].includes(o.status) && o.vehicle && o.vehicle.driverName === dpDriver.driverName);
+const c = document.getElementById('dpListActive');
+if (!a.length) { c.innerHTML = `<div class="dp-empty"><i class="fas fa-truck"></i><p>No active deliveries</p><p class="sub">Accepted orders will appear here</p></div>`; return; }
+c.innerHTML = a.map(o => {
+const st = { preparing: 'Preparing', ready: 'Ready', out_for_delivery: 'On the Way' }[o.status] || o.status;
+const clr = { preparing: '#3b82f6', ready: '#8b5cf6', out_for_delivery: '#f59e0b' }[o.status] || '#64748b';
+const earn = dpCalcEarnings(o);
+const driverLat = dpDriver.lat, driverLng = dpDriver.lng;
+const custLat = o.coordinates?.lat, custLng = o.coordinates?.lng;
+let distToCustomer = null, distToPickup = null;
+if (driverLat && driverLng && custLat && custLng) distToCustomer = appCalculateDistance(driverLat, driverLng, custLat, custLng);
+const rest = restaurants[o.restaurant] || {};
+if (driverLat && driverLng && rest.lat && rest.lng) distToPickup = appCalculateDistance(driverLat, driverLng, rest.lat, rest.lng);
+let act = '';
+if (o.status === 'preparing') act = `<button class="dp-b dp-b-green" onclick="dpUpdSt('${o.id}','ready')"><i class="fas fa-box"></i> Ready</button>`;
+else if (o.status === 'ready') act = `<button class="dp-b dp-b-purple" onclick="dpUpdSt('${o.id}','out_for_delivery')"><i class="fas fa-shipping-fast"></i> Dispatch</button>`;
+else if (o.status === 'out_for_delivery') act = `<button class="dp-b dp-b-green" onclick="dpUpdSt('${o.id}','completed')"><i class="fas fa-check-double"></i> Delivered</button>`;
+return `<div class="dp-ocard active">
+<div class="dp-ocard-id"><span>#${String(o.id).slice(-6)}</span><span class="dp-status-badge" style="background:${clr}">${st}</span></div>
+<div class="dp-dist-card">
+<div><div class="dp-dist-label"><i class="fas fa-route"></i> To Customer</div><div class="dp-dist-val">${distToCustomer == null ? '—' : distToCustomer.toFixed(1) + ' km'}</div><div class="dp-dist-sub"><i class="fas fa-location-arrow"></i> ${o.customer?.name || 'customer'}</div></div>
+${distToPickup != null ? `<div class="dp-dist-right"><div class="dp-dist-label">Pickup</div><div class="dp-dist-val">${distToPickup.toFixed(1)} km</div></div>` : ''}
+</div>
+<div class="dp-ibox"><h4><i class="fas fa-user"></i> ${o.customer?.name || 'Customer'}</h4>
+<p><i class="fas fa-phone"></i> ${o.customer?.phone || '-'}</p>
+<p><i class="fas fa-map-marker-alt"></i> ${o.customer?.address || '-'}</p>
+${rest.lat ? `<p><i class="fas fa-store"></i> ${rest.name}</p>` : ''}</div>
+<div class="dp-earnings-box"><h5><i class="fas fa-wallet"></i> Earnings</h5>
+<div class="dp-earn-row"><span class="label">Total</span><span class="value">${DP_CONFIG.currency}${earn.total.toFixed(2)}</span></div>
+<div class="dp-earn-row fee"><span class="label">Fee (${(DP_CONFIG.commissionRate*100).toFixed(0)}%)</span><span class="value">-${DP_CONFIG.currency}${earn.appFee.toFixed(2)}</span></div>
+<div class="dp-earn-row total"><span class="label">You Earn</span><span class="value">${DP_CONFIG.currency}${earn.driverEarn.toFixed(2)}</span></div>
+</div>
+<div class="dp-oacts">
+<button class="dp-b dp-b-blue" onclick="dpCallCust('${o.customer?.phone || ''}')"><i class="fas fa-phone"></i></button>
+<button class="dp-b dp-b-wa" onclick="dpWaCust('${o.customer?.phone || ''}')"><i class="fab fa-whatsapp"></i></button>
+${act}
+</div>
+</div>`;
+}).join('');
+}
+
+async function dpUpdSt(id, ns) {
+const i = orders.findIndex(x => x.id === id);
+if (i === -1) return;
+const o = orders[i];
+const h = o.statusHistory || [];
+h.push({ status: ns, time: new Date().toISOString() });
+orders[i] = { ...o, status: ns, statusHistory: h };
+if (ns === 'completed' && o.vehicleId) {
+const v = vehicles.find(v => v.id == o.vehicleId);
+if (v) v.status = 'available';
+const earn = dpCalcEarnings(o);
+dpToast(`✅ Delivered! You earned ${DP_CONFIG.currency}${earn.driverEarn.toFixed(2)}`, 'success');
+if (dpActiveOrderId === id) { dpClearRouteLayers(dpActiveMap); const wrap = document.getElementById('dpActiveMapWrap'); if (wrap) wrap.style.display = 'none'; dpActiveOrderId = null; }
+if (supaConnected) {
+  await supaUpdateOrder(id, { status: ns, statusHistory: h });
+  if (v) await supaSaveVehicle({ ...v, status: 'available' });
+}
+} else {
+dpToast('✅ Status updated to ' + ns.replace(/_/g, ' '), 'success');
+if (dpActiveOrderId === id) setTimeout(() => dpShowCustomerOnMap(id, { useActiveMap: true }), 200);
+if (supaConnected) await supaUpdateOrder(id, { status: ns, statusHistory: h });
+}
+saveLocalData();
+dpRefresh();
+}
+
+function dpCallCust(p) { if (!p) { dpToast('⚠️ No phone number', 'error'); return; } window.open('tel:' + p); }
+function dpWaCust(p) { if (!p) { dpToast('⚠️ No phone number', 'error'); return; } let n = p.replace(/\D/g, ''); if (!n.startsWith('252')) n = '252' + n; window.open('https://wa.me/' + n, '_blank'); }
+
+function dpSetHistoryFilter(f) { dpHistoryFilter = f; document.querySelectorAll('.dp-filters [data-filter]').forEach(b => b.classList.remove('active')); document.querySelector(`.dp-filters [data-filter="${f}"]`).classList.add('active'); dpRenderHistory(); }
+function dpResetDateFilter() { dpDateFrom = null; dpDateTo = null; document.getElementById('dpDateFrom').value = ''; document.getElementById('dpDateTo').value = ''; dpRenderHistory(); }
+
+function dpRenderHistory() {
+if (!dpDriver) return;
+const search = document.getElementById('dpSearchHistory').value.toLowerCase();
+let completed = orders.filter(o => o.status === 'completed' && o.vehicle && o.vehicle.driverName === dpDriver.driverName);
+const now = new Date();
+if (dpHistoryFilter === 'today') { const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); completed = completed.filter(o => new Date(o.timestamp) >= today); }
+else if (dpHistoryFilter === 'week') { const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7); completed = completed.filter(o => new Date(o.timestamp) >= weekAgo); }
+else if (dpHistoryFilter === 'month') { const monthAgo = new Date(now); monthAgo.setMonth(monthAgo.getMonth() - 1); completed = completed.filter(o => new Date(o.timestamp) >= monthAgo); }
+const df = document.getElementById('dpDateFrom').value;
+const dt = document.getElementById('dpDateTo').value;
+if (df) completed = completed.filter(o => new Date(o.timestamp) >= new Date(df));
+if (dt) { const toDate = new Date(dt); toDate.setHours(23, 59, 59, 999); completed = completed.filter(o => new Date(o.timestamp) <= toDate); }
+if (search) completed = completed.filter(o => { const r = restaurants[o.restaurant] || {}; return String(o.id).toLowerCase().includes(search) || (o.customer?.name || '').toLowerCase().includes(search) || (r.name || '').toLowerCase().includes(search); });
+completed.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+const c = document.getElementById('dpListHistory');
+if (!completed.length) { c.innerHTML = `<div class="dp-empty"><i class="fas fa-history"></i><p>No completed orders found</p><p class="sub">Your delivery history will appear here</p></div>`; return; }
+c.innerHTML = completed.map(o => {
+const r = restaurants[o.restaurant] || { name: 'Unknown Restaurant' };
+const earn = dpCalcEarnings(o);
+const date = new Date(o.timestamp);
+const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+return `<div class="dp-ocard completed">
+<div class="dp-ocard-id"><span>Order #${String(o.id).slice(-6)}</span><span class="t">${dateStr}</span></div>
+<div class="dp-ibox"><h4><i class="fas fa-check-circle" style="color:var(--primary)"></i> Delivered</h4>
+<p><i class="fas fa-user"></i> ${o.customer?.name || 'Customer'}</p>
+<p><i class="fas fa-store"></i> ${r.name}</p>
+<p><i class="fas fa-map-marker-alt"></i> ${o.customer?.address || '-'}</p></div>
+<div class="dp-ibox"><h5><i class="fas fa-receipt"></i> Order Details</h5>
+<p style="font-size:.78rem">${o.items?.map(i => i.name + ' x' + i.quantity).join(', ') || 'No items'}</p></div>
+<div class="dp-earnings-box"><h5><i class="fas fa-wallet"></i> Earnings Breakdown</h5>
+<div class="dp-earn-row"><span class="label">Order Total</span><span class="value">${DP_CONFIG.currency}${earn.total.toFixed(2)}</span></div>
+<div class="dp-earn-row fee"><span class="label">App Fee (${(DP_CONFIG.commissionRate*100).toFixed(0)}%)</span><span class="value">-${DP_CONFIG.currency}${earn.appFee.toFixed(2)}</span></div>
+<div class="dp-earn-row total"><span class="label">You Received</span><span class="value">${DP_CONFIG.currency}${earn.driverEarn.toFixed(2)}</span></div>
+</div>
+</div>`;
+}).join('');
+}
+
+function dpSetEarningsFilter(f) { dpEarningsFilter = f; document.querySelectorAll('.dp-filters [data-efilter]').forEach(b => b.classList.remove('active')); document.querySelector(`.dp-filters [data-efilter="${f}"]`).classList.add('active'); dpRenderEarnings(); }
+
+function dpRenderEarnings() {
+if (!dpDriver) return;
+const data = dpGetDriverEarnings(dpDriver.driverName, dpEarningsFilter);
+document.getElementById('dpEarnTotalOrders').textContent = data.count;
+document.getElementById('dpEarnGross').textContent = DP_CONFIG.currency + data.gross.toFixed(2);
+document.getElementById('dpEarnFee').textContent = '-' + DP_CONFIG.currency + data.fee.toFixed(2);
+document.getElementById('dpEarnNet').textContent = DP_CONFIG.currency + data.net.toFixed(2);
+const c = document.getElementById('dpListEarnings');
+if (!data.orders.length) { c.innerHTML = `<div class="dp-empty"><i class="fas fa-wallet"></i><p>No earnings in this period</p><p class="sub">Complete deliveries to see your earnings</p></div>`; return; }
+data.orders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+c.innerHTML = data.orders.map(o => {
+const r = restaurants[o.restaurant] || { name: 'Unknown' };
+const earn = dpCalcEarnings(o);
+const date = new Date(o.timestamp);
+const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+return `<div class="dp-ocard">
+<div class="dp-ocard-id"><span>Order #${String(o.id).slice(-6)}</span><span class="t">${dateStr}</span></div>
+<div class="dp-ibox"><p><i class="fas fa-store"></i> ${r.name}</p>
+<p><i class="fas fa-user"></i> ${o.customer?.name || 'Customer'}</p>
+<p style="font-size:.78rem">${o.items?.map(i => i.name + ' x' + i.quantity).join(', ') || ''}</p></div>
+<div class="dp-earnings-box">
+<div class="dp-earn-row"><span class="label">Order Total</span><span class="value">${DP_CONFIG.currency}${earn.total.toFixed(2)}</span></div>
+<div class="dp-earn-row fee"><span class="label">App Fee (${(DP_CONFIG.commissionRate*100).toFixed(0)}%)</span><span class="value">-${DP_CONFIG.currency}${earn.appFee.toFixed(2)}</span></div>
+<div class="dp-earn-row total"><span class="label">Your Earnings</span><span class="value">${DP_CONFIG.currency}${earn.driverEarn.toFixed(2)}</span></div>
+</div>
+</div>`;
+}).join('');
+}
+
+function dpRenderFleet() {
+loadFromLocalStorage();
+const c = document.getElementById('dpListFleet');
+document.getElementById('dpCntFleet').textContent = vehicles.length;
+if (!vehicles.length) { c.innerHTML = '<div class="dp-empty"><i class="fas fa-users"></i><p>No fleet registered</p><p class="sub">Contact admin to register fleet</p></div>'; return; }
+const statusColors = { available: '#22c55e', busy: '#f59e0b', delivering: '#3b82f6', offline: '#94a3b8' };
+const statusLabels = { available: 'Available', busy: 'Busy', delivering: 'On Delivery', offline: 'Offline' };
+c.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><h4 style="color:#e2e8f0;font-size:1rem"><i class="fas fa-users"></i> All Registered Fleets</h4><span style="background:rgba(59,130,246,.15);color:#60a5fa;padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:700">' + vehicles.length + ' drivers</span></div>' +
+vehicles.map(v => {
+const isMe = dpDriver && v.id === dpDriver.id;
+const sColor = statusColors[v.status] || '#94a3b8';
+const sLabel = statusLabels[v.status] || v.status;
+const completedOrders = orders.filter(o => o.status === 'completed' && o.vehicle && o.vehicle.driverName === v.driverName).length;
+const activeOrders = orders.filter(o => ['preparing','ready','out_for_delivery'].includes(o.status) && o.vehicle && o.vehicle.driverName === v.driverName).length;
+return '<div class="dp-ocard" style="' + (isMe ? 'border-left:3px solid #3b82f6;' : '') + '">' +
+'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+'<div style="display:flex;align-items:center;gap:10px">' +
+'<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,' + sColor + '22,' + sColor + '44);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:' + sColor + '"><i class="fas fa-' + (v.type === 'bike' ? 'motorcycle' : 'car') + '"></i></div>' +
+'<div><div style="color:#e2e8f0;font-weight:700;font-size:.92rem">' + v.driverName + (isMe ? ' <span style="background:#3b82f6;color:#fff;padding:1px 8px;border-radius:10px;font-size:.65rem;font-weight:700">YOU</span>' : '') + '</div>' +
+'<div style="color:#94a3b8;font-size:.75rem">' + (v.driverPhone || 'No phone') + ' &bull; ' + (v.plateNumber || 'No plate') + '</div></div>' +
+'</div>' +
+'<div style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + sColor + '"></span><span style="color:' + sColor + ';font-size:.78rem;font-weight:600">' + sLabel + '</span></div>' +
+'</div>' +
+'<div style="display:flex;gap:16px;font-size:.75rem;color:#94a3b8;margin-top:4px">' +
+'<span><i class="fas fa-motorcycle" style="margin-right:4px"></i>' + v.type + '</span>' +
+'<span><i class="fas fa-check-circle" style="margin-right:4px"></i>' + completedOrders + ' completed</span>' +
+(activeOrders ? '<span style="color:#3b82f6"><i class="fas fa-bolt" style="margin-right:4px"></i>' + activeOrders + ' active</span>' : '') +
+'</div>' +
+'</div>';
+}).join('');
+}
+
+function dpPlayRingtone() {
+try {
+if (!dpRingCtx) dpRingCtx = new (window.AudioContext || window.webkitAudioContext)();
+dpRingOsc = dpRingCtx.createOscillator();
+dpRingGain = dpRingCtx.createGain();
+dpRingOsc.type = 'square'; dpRingOsc.frequency.value = 450; dpRingGain.gain.value = 0.15;
+dpRingOsc.connect(dpRingGain); dpRingGain.connect(dpRingCtx.destination); dpRingOsc.start();
+let f = true;
+dpRingInt = setInterval(() => { if (dpRingOsc) { dpRingOsc.frequency.value = f ? 600 : 450; f = !f; } }, 300);
+} catch (e) {}
+}
+
+function dpStopRingtone() {
+if (dpRingOsc) { try { dpRingOsc.stop(); } catch (e) {} dpRingOsc = null; }
+if (dpRingInt) { clearInterval(dpRingInt); dpRingInt = null; }
+dpRingGain = null;
+}
+
+// ─── DRIVER MAP FUNCTIONS ───
+function dpClearRouteLayers(map) {
+const m = map || dpActiveMap;
+if (!m) return;
+if (dpCustomerMarker) { m.removeLayer(dpCustomerMarker); dpCustomerMarker = null; }
+if (dpPickupMarker) { m.removeLayer(dpPickupMarker); dpPickupMarker = null; }
+if (dpRouteLine) { m.removeLayer(dpRouteLine); dpRouteLine = null; }
+if (dpActiveMidLabel) { m.removeLayer(dpActiveMidLabel); dpActiveMidLabel = null; }
+if (dpPickupToCustLabel) { m.removeLayer(dpPickupToCustLabel); dpPickupToCustLabel = null; }
+}
+
+function dpInitActiveMap() {
+if (dpActiveMap) { dpActiveMap.invalidateSize(); return; }
+const box = document.getElementById('dpActiveMapBox');
+if (!box) return;
+const la = dpDriver?.lat || DP_CONFIG.defaultLat;
+const lo = dpDriver?.lng || DP_CONFIG.defaultLng;
+dpActiveMap = L.map('dpActiveMapBox', { zoomControl: true }).setView([la, lo], 14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(dpActiveMap);
+const ico = L.divIcon({ html: `<div style="width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.3);font-size:14px"><i class="fas fa-motorcycle"></i></div>`, className: '', iconSize: [36, 36], iconAnchor: [18, 18] });
+dpActiveDriverMarker = L.marker([la, lo], { icon: ico }).addTo(dpActiveMap);
+if (navigator.geolocation) {
+navigator.geolocation.getCurrentPosition(p => {
+const la2 = p.coords.latitude, lo2 = p.coords.longitude;
+if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la2, lo2]);
+if (dpActiveMap) dpActiveMap.setView([la2, lo2], 15);
+if (dpDriver) { dpDriver.lat = la2; dpDriver.lng = lo2; }
+}, () => {}, { enableHighAccuracy: true, timeout: 10000 });
+}
+}
+
+function dpShowCustomerOnMap(orderId, opts = {}) {
+const useActiveMap = opts.useActiveMap !== false;
+const o = orders.find(x => x.id === orderId);
+if (!o) { dpToast('⚠️ Order not found', 'error'); return; }
+const custLat = o.coordinates?.lat, custLng = o.coordinates?.lng;
+if (custLat == null || custLng == null) { dpToast('⚠️ Customer location unavailable', 'error'); return; }
+const driverLat = dpDriver?.lat, driverLng = dpDriver?.lng;
+const rest = restaurants[o.restaurant] || {};
+const pickupLat = rest.lat, pickupLng = rest.lng;
+let map = null, wrapEl = null, titleEl = null, statEl = null;
+if (useActiveMap) {
+wrapEl = document.getElementById('dpActiveMapWrap');
+titleEl = document.getElementById('dpActiveMapTitle');
+statEl = document.getElementById('dpActiveMapStat');
+if (wrapEl) wrapEl.style.display = 'block';
+if (!dpActiveMap) dpInitActiveMap();
+if (!dpActiveMap) { setTimeout(() => dpShowCustomerOnMap(orderId, opts), 200); return; }
+map = dpActiveMap;
+if (dpActiveDriverMarker && driverLat != null && driverLng != null) dpActiveDriverMarker.setLatLng([driverLat, driverLng]);
+dpClearRouteLayers(map);
+dpActiveOrderId = orderId;
+const custIco = L.divIcon({ html: `<div style="width:34px;height:34px;border-radius:50%;background:#ef4444;color:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.35);font-size:14px"><i class="fas fa-home"></i></div>`, className: '', iconSize: [34, 34], iconAnchor: [17, 17] });
+dpCustomerMarker = L.marker([custLat, custLng], { icon: custIco }).addTo(map).bindPopup(`<b>🏠 ${o.customer?.name || 'Customer'}</b><br>${o.customer?.address || ''}`);
+const cl = document.getElementById('dpLegendCustomer');
+if (cl) cl.style.display = 'inline-flex';
+if (pickupLat != null && pickupLng != null) {
+const pkIco = L.divIcon({ html: `<div style="width:34px;height:34px;border-radius:50%;background:#8b5cf6;color:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.35);font-size:14px"><i class="fas fa-store"></i></div>`, className: '', iconSize: [34, 34], iconAnchor: [17, 17] });
+dpPickupMarker = L.marker([pickupLat, pickupLng], { icon: pkIco }).addTo(map).bindPopup(`<b>🏪 ${rest.name || 'Restaurant'}</b>`);
+const pl = document.getElementById('dpLegendPickup');
+if (pl) pl.style.display = 'inline-flex';
+}
+const linePts = [];
+if (driverLat != null && driverLng != null) linePts.push([driverLat, driverLng]);
+if (pickupLat != null && pickupLng != null) linePts.push([pickupLat, pickupLng]);
+linePts.push([custLat, custLng]);
+if (linePts.length >= 2) {
+dpRouteLine = L.polyline(linePts, { color: '#0ea5e9', weight: 5, opacity: 0.85, dashArray: '10, 8', lineCap: 'round' }).addTo(map);
+}
+let distToCust = null, distToPickup = null, distPickupToCust = null;
+if (driverLat != null && driverLng != null) {
+if (pickupLat != null && pickupLng != null) distToPickup = appCalculateDistance(driverLat, driverLng, pickupLat, pickupLng);
+distToCust = appCalculateDistance(driverLat, driverLng, custLat, custLng);
+}
+if (pickupLat != null && pickupLng != null) distPickupToCust = appCalculateDistance(pickupLat, pickupLng, custLat, custLng);
+if (dpRouteLine && driverLat != null && distToCust != null) {
+const midLat = (driverLat + custLat) / 2, midLng = (driverLng + custLng) / 2;
+const labelIcon = L.divIcon({ html: `<div style="background:#0f172a;color:#fff;padding:8px 14px;border-radius:24px;font-weight:800;font-size:.95rem;box-shadow:0 4px 14px rgba(0,0,0,.4);border:2px solid #0ea5e9;white-space:nowrap"><i class="fas fa-route"></i> ${distToCust.toFixed(1)} km</div>`, className: '', iconSize: null, iconAnchor: [0, 0] });
+dpActiveMidLabel = L.marker([midLat, midLng], { icon: labelIcon, interactive: false }).addTo(map);
+}
+if (dpRouteLine && pickupLat != null && distPickupToCust != null) {
+const midLat2 = (pickupLat + custLat) / 2, midLng2 = (pickupLng + custLng) / 2;
+const labelIcon2 = L.divIcon({ html: `<div style="background:#8b5cf6;color:#fff;padding:6px 12px;border-radius:20px;font-weight:700;font-size:.85rem;box-shadow:0 4px 12px rgba(139,92,246,.4);border:2px solid #fff;white-space:nowrap"><i class="fas fa-utensils"></i> ${distPickupToCust.toFixed(1)} km</div>`, className: '', iconSize: null, iconAnchor: [0, 0] });
+if (dpPickupToCustLabel) map.removeLayer(dpPickupToCustLabel);
+dpPickupToCustLabel = L.marker([midLat2, midLng2], { icon: labelIcon2, interactive: false }).addTo(map);
+const dl = document.getElementById('dpLegendDelivery');
+if (dl) dl.style.display = 'inline-flex';
+}
+const bounds = L.latLngBounds(linePts);
+map.fitBounds(bounds, { padding: [60, 60], maxZoom: 15 });
+if (titleEl) {
+const st = o.status === 'out_for_delivery' ? 'On the Way' : o.status === 'ready' ? 'Ready' : 'Preparing';
+titleEl.innerHTML = `Order #${String(o.id).slice(-6)} • <span style="color:#94a3b8;font-weight:500">${st}</span>`;
+}
+if (statEl) {
+let html = `${distToCust != null ? distToCust.toFixed(1) + ' km' : '— km'}<div style="font-size:.65rem;font-weight:500;opacity:.85;margin-top:1px">to customer</div>`;
+if (distToPickup != null) html += `<div style="font-size:.65rem;font-weight:500;opacity:.85;margin-top:1px">${distToPickup.toFixed(1)} km to pickup</div>`;
+if (distPickupToCust != null) html += `<div style="font-size:.65rem;font-weight:500;opacity:.85;margin-top:1px;color:#c084fc">${distPickupToCust.toFixed(1)} km delivery</div>`;
+statEl.innerHTML = html;
+}
+setTimeout(() => { if (useActiveMap && wrapEl) wrapEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); map.invalidateSize(); }, 200);
+if (distToCust != null) dpToast(`🗺️ Route loaded: ${distToCust.toFixed(1)} km to customer`, 'success');
+}
+}
+
+function dpToast(msg, type = 'info') {
+const e = document.getElementById('dpToast');
+e.textContent = msg;
+e.className = 'dp-toast show ' + type;
+clearTimeout(e._t);
+e._t = setTimeout(() => { e.classList.remove('show'); }, 3000);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ★ DOMContentLoaded — Auto-login & initialization ★
+// ═══════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+loadFromLocalStorage();
+await initSupabaseData();
+const savedDriver = localStorage.getItem('dpDriver');
+if (savedDriver) {
+  try {
+    const drv = JSON.parse(savedDriver);
+    const match = vehicles.find(v => v.id === drv.id);
+    if (match) {
+      dpDriver = match;
+      document.getElementById('dpLoginScreen').style.display = 'none';
+      document.getElementById('appDriverPortal').style.display = 'block';
+      document.getElementById('dpFleetSelection').style.display = 'none';
+      document.getElementById('dpScreenPortal').style.display = 'block';
+      dpOnline = true;
+      dpLoadData();
+      dpSyncVehicleStatus();
+      document.getElementById('dpWelcomeMsg').textContent = dpDriver.driverName + ' • ' + (dpDriver.plateNumber || dpDriver.plate);
+      dpUpdateUI();
+      dpRefresh();
+      setTimeout(() => dpInitActiveMap(), 200);
+      dpCheckForIncomingCalls();
+      supaSubscribeToOrders((payload) => {
+        loadFromLocalStorage();
+        if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); }
+      });
+    }
+  } catch (e) { localStorage.removeItem('dpDriver'); }
+}
+const pinInput = document.getElementById('fpDriverPin');
+if (pinInput) {
+  pinInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); driverLoginWithPin(); }
+  });
+}
+const usernameInput = document.getElementById('fpDriverUsername');
+if (usernameInput) {
+  usernameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); if (pinInput) pinInput.focus(); }
+  });
+}
+});
+
+// Save driver session after successful login
+const _origDriverLogin = driverLoginWithPin;
+driverLoginWithPin = async function() {
+await _origDriverLogin();
+if (dpDriver) localStorage.setItem('dpDriver', JSON.stringify({ id: dpDriver.id }));
+};
+
+// Override dpLogout to clear saved session
+const _origDpLogout = dpLogout;
+dpLogout = function() {
+localStorage.removeItem('dpDriver');
+_origDpLogout();
+};
+</script>
+</body>
+</html>

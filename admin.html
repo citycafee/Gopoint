@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Go!point — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="styles.css" />
+<style>
+:root {
+--theme: #FF6B00;
+--theme-dark: #E55A00;
+--theme-light: #FF8533;
+--theme-glow: rgba(255, 107, 0, 0.3);
+--black: #1a1a1a;
+--white: #ffffff;
+--light-gray: #f8f9fa;
+--footer-bg: #0f0f0f;
+--footer-font: #ffffff;
+--glass-bg: rgba(241, 207, 207, 0.12);
+--glass-border: rgba(248, 168, 168, 0.18);
+--shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.12);
+--shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.2);
+--radius-sm: 8px;
+--radius-md: 12px;
+--radius-lg: 16px;
+--radius-xl: 24px;
+--transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+--primary: #22c55e;
+--primary-dark: #16a34a;
+--bg: #f5f7fa;
+--text: #0f172a;
+--gray: #64748b;
+--light-gray-app: #e2e8f0;
+--yellow-soft: #FEF3C7;
+--yellow-dark: #B45309;
+--blue-soft: #E0E7FF;
+--purple: #8B5CF6;
+--purple-soft: #EDE9FE;
+--green: #10B981;
+--green-soft: #D1FAE5;
+--red: #EF4444;
+--red-soft: #FEE2E2;
+--blue: #6366F1;
+--primary-glow: rgba(255,107,0,.15);
+--primary-soft: #FFF7ED;
+--surface: #FFFFFF;
+--surface-2: #F1F5F9;
+--border: #E2E8F0;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', 'Poppins', sans-serif; background-color: var(--light-gray); color: #333; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+/* ─── ADMIN NAVIGATION BAR ─── */
+.admin-nav-bar {
+position: fixed; top: 0; left: 0; width: 100%; z-index: 10000;
+background: rgba(15, 23, 42, 0.97); backdrop-filter: blur(16px);
+padding: 12px 30px; display: flex; justify-content: space-between; align-items: center;
+border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.admin-nav-bar .nav-left { display: flex; align-items: center; gap: 20px; }
+.admin-nav-bar .nav-links { display: flex; gap: 12px; }
+.admin-nav-bar .nav-links a {
+color: rgba(255,255,255,.7); text-decoration: none; font-size: .85rem; font-weight: 600;
+padding: 8px 16px; border-radius: 8px; transition: var(--transition); display: flex; align-items: center; gap: 6px;
+}
+.admin-nav-bar .nav-links a:hover { background: rgba(255,255,255,.1); color: #fff; }
+.admin-nav-bar .nav-right { display: flex; align-items: center; gap: 16px; }
+.admin-nav-bar .nav-right span { color: rgba(255,255,255,.6); font-size: .85rem; font-weight: 500; }
+.admin-nav-bar .back-link {
+color: var(--primary); text-decoration: none; font-weight: 700; font-size: .9rem;
+display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px;
+transition: var(--transition);
+}
+.admin-nav-bar .back-link:hover { background: rgba(34,197,94,.15); }
+
+/* ─── ADMIN DASHBOARD ─── */
+#adminDashboard { display: none; min-height: 100dvh; padding-top: 56px; }
+#adminDashboard.active { display: block; }
+.ad-sidebar { position: fixed; top: 56px; left: 0; width: 260px; height: calc(100dvh - 56px); background: var(--text); color: #fff; z-index: 100; display: flex; flex-direction: column; transition: transform .35s cubic-bezier(.4,0,.2,1); overflow-y: auto; }
+.ad-sidebar-logo { padding: 24px 22px; font-size: 1.3rem; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 12px; letter-spacing: -.03em; }
+.ad-sidebar-logo .logo-icon { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+.ad-sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+.ad-sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 11px 14px; color: rgba(255,255,255,.5); text-decoration: none; font-size: .88rem; font-weight: 600; cursor: pointer; transition: var(--transition); border-radius: 10px; margin-bottom: 2px; }
+.ad-sidebar-nav a:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.9); }
+.ad-sidebar-nav a.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 4px 16px rgba(255,107,0,.35); }
+.ad-sidebar-nav a span { width: 22px; text-align: center; font-size: 1.05rem; }
+.ad-main { margin-left: 260px; min-height: 100dvh; padding: 0; }
+.ad-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 36px; background: rgba(255,255,255,.85); backdrop-filter: blur(16px) saturate(180%); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
+.ad-header h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -.03em; }
+.ad-header .ad-user { display: flex; align-items: center; gap: 16px; }
+.ad-header .ad-user span { font-size: .85rem; color: var(--gray); font-weight: 500; }
+.ad-header .ad-user button { padding: 8px 18px; background: var(--light-gray); border: 1px solid var(--border); border-radius: 8px; font-size: .82rem; font-weight: 600; cursor: pointer; color: var(--gray); transition: var(--transition); font-family: inherit; }
+.ad-header .ad-user button:hover { background: var(--border); color: var(--text); }
+.ad-content { padding: 32px 36px; }
+.ad-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; margin-bottom: 32px; }
+.ad-stat { background: var(--white); border-radius: 14px; padding: 24px; border: 1px solid var(--border); transition: var(--transition); position: relative; overflow: hidden; }
+.ad-stat::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); opacity: 0; transition: var(--transition); }
+.ad-stat:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: transparent; }
+.ad-stat:hover::after { opacity: 1; }
+.ad-stat h3 { font-size: .7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 10px; font-weight: 700; }
+.ad-stat .value { font-size: 2rem; font-weight: 800; color: var(--text); letter-spacing: -.04em; line-height: 1.1; }
+.ad-stat .change { font-size: .78rem; color: var(--gray); margin-top: 6px; font-weight: 500; }
+.ad-section { background: var(--white); border-radius: 14px; border: 1px solid var(--border); margin-bottom: 24px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.ad-section-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+.ad-section-header h2 { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 10px; letter-spacing: -.02em; }
+.ad-section-header h2 i { color: var(--primary); font-size: 1rem; }
+.ad-badge { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; padding: 5px 14px; border-radius: 20px; font-size: .72rem; font-weight: 700; box-shadow: 0 2px 10px rgba(255,107,0,.25); }
+.ad-section-body { padding: 20px 24px; }
+.ad-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.ad-table th { text-align: left; padding: 14px 16px; font-size: .68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); border-bottom: 2px solid var(--border); font-weight: 700; background: var(--light-gray); }
+.ad-table th:first-child { border-radius: 8px 0 0 0; }
+.ad-table th:last-child { border-radius: 0 8px 0 0; }
+.ad-table td { padding: 14px 16px; font-size: .88rem; border-bottom: 1px solid var(--border); transition: background .15s; }
+.ad-table tr:hover td { background: var(--light-gray); }
+.ad-order-status { padding: 6px 14px; border-radius: 20px; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; display: inline-block; }
+.ad-order-status.pending { background: var(--yellow-soft); color: #B45309; }
+.ad-order-status.preparing { background: var(--blue-soft); color: var(--blue); }
+.ad-order-status.ready { background: var(--purple-soft); color: var(--purple); }
+.ad-order-status.out_for_delivery { background: var(--yellow-soft); color: #B45309; }
+.ad-order-status.completed { background: var(--green-soft); color: #059669; }
+.ad-order-status.cancelled { background: var(--red-soft); color: #DC2626; }
+.ad-active-badge { padding: 6px 14px; border-radius: 20px; font-size: .7rem; font-weight: 700; display: inline-block; }
+.ad-active-badge.active { background: var(--green-soft); color: #059669; }
+.ad-active-badge.inactive { background: var(--red-soft); color: #DC2626; }
+.ad-fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.ad-fleet-card { background: var(--light-gray); border: 1px solid var(--border); border-radius: 14px; padding: 20px; display: flex; justify-content: space-between; align-items: center; transition: var(--transition); }
+.ad-fleet-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); background: var(--white); }
+.ad-fleet-info { display: flex; align-items: center; gap: 14px; }
+.ad-fleet-avatar { width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .9rem; box-shadow: 0 4px 12px rgba(255,107,0,.25); flex-shrink: 0; }
+.ad-fleet-details h4 { font-size: .95rem; font-weight: 700; letter-spacing: -.01em; }
+.ad-fleet-details p { font-size: .8rem; color: var(--gray); margin-top: 2px; font-weight: 500; }
+.ad-fleet-status { display: flex; align-items: center; gap: 12px; }
+.ad-status-badge { padding: 6px 14px; border-radius: 20px; font-size: .7rem; font-weight: 700; }
+.ad-status-badge.available { background: var(--green-soft); color: #059669; }
+.ad-status-badge.unavailable { background: var(--red-soft); color: #DC2626; }
+.ad-status-badge.delivering { background: var(--yellow-soft); color: #B45309; }
+.ad-toggle { position: relative; width: 44px; height: 26px; }
+.ad-toggle input { opacity: 0; width: 0; height: 0; }
+.ad-toggle .slider { position: absolute; inset: 0; background: #CBD5E1; border-radius: 26px; cursor: pointer; transition: var(--transition); }
+.ad-toggle .slider:before { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: var(--transition); box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+.ad-toggle input:checked + .slider { background: var(--green); box-shadow: 0 2px 10px rgba(16,185,129,.3); }
+.ad-toggle input:checked + .slider:before { transform: translateX(18px); }
+.ad-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.ad-btn { padding: 7px 16px; border: none; border-radius: 8px; font-size: .72rem; font-weight: 700; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; transition: var(--transition); text-transform: uppercase; letter-spacing: .4px; }
+.ad-btn:active { transform: scale(.95); }
+.ad-btn-green { background: var(--green); color: #fff; box-shadow: 0 2px 8px rgba(16,185,129,.3); }
+.ad-btn-green:hover { background: #059669; }
+.ad-btn-blue { background: var(--blue); color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.3); }
+.ad-btn-purple { background: var(--purple); color: #fff; box-shadow: 0 2px 8px rgba(139,92,246,.3); }
+.ad-btn-orange { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(255,107,0,.3); }
+.ad-btn-red { background: var(--red); color: #fff; box-shadow: 0 2px 8px rgba(239,68,68,.3); }
+.ad-btn-outline { background: var(--white); color: var(--gray); border: 2px solid var(--border); }
+.ad-btn-edit { background: var(--blue-soft); color: var(--blue); }
+.ad-btn-delete { background: var(--red-soft); color: #DC2626; }
+.ad-report-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.ad-report-item { background: var(--light-gray); border-radius: 14px; padding: 20px; text-align: center; border: 1px solid var(--border); transition: var(--transition); }
+.ad-report-item:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.ad-report-item h4 { font-size: .68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); margin-bottom: 8px; font-weight: 700; }
+.ad-report-item .value { font-size: 1.5rem; font-weight: 800; letter-spacing: -.03em; }
+.ad-report-item .value.green { color: var(--green); }
+.ad-report-item .value.orange { color: var(--primary); }
+.ad-modal { position: fixed; inset: 0; z-index: 10000; background: rgba(15,23,42,.5); backdrop-filter: blur(12px) saturate(150%); display: none; align-items: center; justify-content: center; }
+.ad-modal.active { display: flex; }
+.ad-modal-box { background: var(--white); border-radius: 20px; width: 92%; max-width: 720px; max-height: 90dvh; overflow: hidden; display: flex; flex-direction: column; animation: scaleIn .3s cubic-bezier(.16,1,.3,1); box-shadow: var(--shadow-lg); border: 1px solid var(--border); }
+@keyframes scaleIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+.ad-modal-header { display: flex; justify-content: space-between; align-items: center; padding: 22px 26px; border-bottom: 1px solid var(--border); }
+.ad-modal-header h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: -.02em; }
+.ad-modal-header button { background: var(--light-gray); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 8px; font-size: 1rem; cursor: pointer; color: var(--gray); display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+.ad-modal-header button:hover { background: var(--border); color: var(--text); }
+.ad-modal-body { padding: 26px; overflow-y: auto; flex: 1; }
+.ad-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.ad-tab-btn { padding: 9px 20px; border: 2px solid var(--border); border-radius: 8px; background: var(--white); font-size: .82rem; font-weight: 600; cursor: pointer; transition: var(--transition); color: var(--gray); font-family: inherit; }
+.ad-tab-btn:hover { border-color: var(--gray); background: var(--light-gray); }
+.ad-tab-btn.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; border-color: var(--primary); box-shadow: 0 4px 14px rgba(255,107,0,.3); }
+.ad-tab-content { display: none; }
+.ad-tab-content.active { display: block; }
+.ad-form-group { margin-bottom: 18px; }
+.ad-form-group label { display: block; font-size: .8rem; font-weight: 600; color: var(--gray); margin-bottom: 6px; }
+.ad-form-control { width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; font-size: .9rem; outline: none; font-family: inherit; transition: var(--transition); background: var(--white); }
+.ad-form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(255,107,0,.15); }
+.ad-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.ad-form-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); }
+.ad-menu-item { background: var(--light-gray); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 12px; position: relative; transition: var(--transition); }
+.ad-menu-item:hover { border-color: var(--gray); background: var(--white); }
+.ad-menu-item .remove-btn { position: absolute; top: 12px; right: 12px; background: var(--red-soft); color: #DC2626; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: .75rem; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+.ad-add-item { background: var(--white); border: 2px dashed var(--border); border-radius: 10px; padding: 12px 18px; color: var(--gray); font-size: .85rem; font-weight: 600; cursor: pointer; width: 100%; margin-top: 12px; transition: var(--transition); font-family: inherit; }
+.ad-add-item:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+.ad-delivery-section { margin-bottom: 24px; }
+.ad-delivery-section h4 { font-size: .95rem; font-weight: 700; margin-bottom: 14px; color: var(--text); letter-spacing: -.01em; }
+.ad-delivery-option { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.ad-delivery-option:last-child { border-bottom: none; }
+.ad-toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; padding: 14px 32px; border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.2); z-index: 99999; font-size: .9rem; font-weight: 600; opacity: 0; transition: all .4s cubic-bezier(.16,1,.3,1); pointer-events: none; max-width: 90%; letter-spacing: -.01em; }
+.ad-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.ad-empty { text-align: center; padding: 48px 24px; color: var(--gray); }
+.ad-empty i { font-size: 2.8rem; margin-bottom: 14px; display: block; opacity: .25; }
+.ad-empty p { font-size: .9rem; font-weight: 500; }
+.ad-mobile-toggle { display: none; position: fixed; top: 68px; left: 16px; z-index: 101; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; width: 44px; height: 44px; border-radius: 10px; border: none; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 16px rgba(255,107,0,.35); transition: var(--transition); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(255,107,0,.15); } 50% { box-shadow: 0 0 40px rgba(255,107,0,.15); } }
+@media (max-width: 1024px) { .ad-stats { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px) {
+.ad-sidebar { transform: translateX(-100%); width: 280px; }
+.ad-sidebar.open { transform: translateX(0); box-shadow: 4px 0 40px rgba(0,0,0,.3); }
+.ad-main { margin-left: 0; }
+.ad-header { padding: 14px 18px; }
+.ad-content { padding: 18px; }
+.ad-form-row { grid-template-columns: 1fr; }
+.ad-fleet-grid { grid-template-columns: 1fr; }
+.ad-mobile-toggle { display: flex !important; }
+.ad-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.ad-stat { padding: 16px; }
+.ad-stat .value { font-size: 1.4rem; }
+.ad-report-summary { grid-template-columns: repeat(2, 1fr); }
+.admin-nav-bar { padding: 10px 16px; }
+.admin-nav-bar .nav-links a { font-size: .78rem; padding: 6px 10px; }
+.admin-nav-bar .nav-links a span.nav-text { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── ADMIN NAVIGATION BAR ─── -->
+<div class="admin-nav-bar">
+<div class="nav-left">
+<a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Go!point</a>
+<div class="nav-links">
+<a href="driver.html"><i class="fas fa-motorcycle"></i> <span class="nav-text">Driver Portal</span></a>
+</div>
+</div>
+<div class="nav-right">
+<span>Admin Dashboard</span>
+</div>
+</div>
+
+<!-- ─── ADMIN DASHBOARD ─── -->
+<div id="adminDashboard">
+
+<!-- DASHBOARD CONTENT -->
+<button class="ad-mobile-toggle" onclick="document.querySelector('.ad-sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
+<aside class="ad-sidebar">
+<div class="ad-sidebar-logo"><div class="logo-icon">🛵</div> Go!Point</div>
+<nav class="ad-sidebar-nav">
+<a class="active" onclick="adSwitchTab('dashboard')"><span>📊</span> Dashboard</a>
+<a onclick="adSwitchTab('orders')"><span>📦</span> Orders</a>
+<a onclick="adSwitchTab('fleet')"><span>🛵</span> Fleet</a>
+<a onclick="adSwitchTab('restaurants')"><span>🍽️</span> Restaurants</a>
+<a onclick="adSwitchTab('restaurantReport')"><span>📈</span> Restaurant Report</a>
+<a onclick="adSwitchTab('fleetReport')"><span>🚚</span> Fleet Report</a>
+<a onclick="adOpenSettings()"><span>⚙️</span> Settings</a>
+<a onclick="adLogout()"><span>🚪</span> Logout</a>
+</nav>
+</aside>
+<main class="ad-main">
+<div class="ad-header">
+<h1 id="adPageTitle">📊 Dashboard</h1>
+<div class="ad-user"><span>👤 Admin</span><button onclick="adLogout()">Logout</button></div>
+</div>
+<div class="ad-content">
+<div class="ad-stats">
+<div class="ad-stat"><h3>Today's Orders</h3><div class="value" id="adStatToday">0</div><div class="change">Current day total</div></div>
+<div class="ad-stat"><h3>This Month</h3><div class="value" id="adStatMonth">0</div><div class="change">Current month total</div></div>
+<div class="ad-stat"><h3>Revenue</h3><div class="value" id="adStatRevenue">$0</div><div class="change">Completed orders</div></div>
+<div class="ad-stat"><h3>Active Drivers</h3><div class="value" id="adStatActiveDrivers">0</div><div class="change" id="adStatTotalDrivers">0 total</div></div>
+<div class="ad-stat"><h3>All Time Orders</h3><div class="value" id="adStatAllOrders">0</div><div class="change">Since launch</div></div>
+</div>
+<div class="ad-section" id="adFleetSection">
+<div class="ad-section-header"><h2><i class="fas fa-cogs"></i> Fleet Management</h2><span class="ad-badge" id="adFleetCount">0</span></div>
+<div class="ad-section-body"><div class="ad-fleet-grid" id="adFleetList"><div class="ad-empty"><i class="fas fa-motorcycle"></i><p>No vehicles registered</p></div></div></div>
+</div>
+<div class="ad-section" id="adOrdersSection">
+<div class="ad-section-header"><h2><i class="fas fa-bolt"></i> Active Orders</h2><span class="ad-badge" id="adActiveOrdersBadge">0</span></div>
+<div class="ad-section-body" id="adActiveOrdersList"><div class="ad-empty"><i class="fas fa-inbox"></i><p>No active orders</p></div></div>
+</div>
+<div class="ad-section" id="adCompletedSection">
+<div class="ad-section-header"><h2><i class="fas fa-check-circle"></i> Completed Orders</h2></div>
+<div class="ad-section-body"><table class="ad-table"><thead><tr><th>Order ID</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody id="adCompletedBody"><tr><td colspan="5" class="ad-empty">No completed orders</td></tr></tbody></table></div>
+</div>
+<div class="ad-section" id="adRestaurantsSection" style="display:none;">
+<div class="ad-section-header"><h2><i class="fas fa-utensils"></i> All Restaurants</h2><span class="ad-badge" id="adRestaurantCount">0</span></div>
+<div class="ad-section-body" id="adRestaurantsList"><div class="ad-empty"><i class="fas fa-store"></i><p>No restaurants</p></div></div>
+</div>
+<div class="ad-section" id="adRestReportSection" style="display:none;">
+<div class="ad-section-header"><h2><i class="fas fa-file-invoice-dollar"></i> Daily Restaurant Report</h2><span class="ad-badge" id="adReportDate">Today</span></div>
+<div class="ad-section-body"><div class="ad-report-summary" id="adRestReportSummary"></div><div id="adRestReportTable"></div></div>
+</div>
+<div class="ad-section" id="adFleetReportSection" style="display:none;">
+<div class="ad-section-header"><h2><i class="fas fa-truck"></i> Daily Fleet Report</h2><span class="ad-badge" id="adFleetReportDate">Today</span></div>
+<div class="ad-section-body"><div class="ad-report-summary" id="adFleetReportSummary"></div><div id="adFleetReportTable"></div></div>
+</div>
+</div>
+</main>
+</div>
+
+<!-- ADMIN SETTINGS MODAL -->
+<div class="ad-modal" id="adSettingsModal">
+<div class="ad-modal-box">
+<div class="ad-modal-header"><h2><i class="fas fa-cog" style="margin-right:8px;color:var(--primary)"></i>Settings</h2><button onclick="adCloseSettings()"><i class="fas fa-times"></i></button></div>
+<div class="ad-modal-body">
+<div class="ad-tabs">
+<button class="ad-tab-btn active" onclick="adSettingsTab('restaurants')">Restaurants</button>
+<button class="ad-tab-btn" onclick="adSettingsTab('fleet')">Fleet</button>
+<button class="ad-tab-btn" onclick="adSettingsTab('delivery')">Delivery</button>
+<button class="ad-tab-btn" onclick="adSettingsTab('system')">System</button>
+</div>
+<div class="ad-tab-content active" id="adSetRestTab">
+<h3 style="font-size:1rem;font-weight:700;margin-bottom:14px;">Restaurant Management</h3>
+<button onclick="adShowRestForm()" class="ad-btn ad-btn-green" style="margin-bottom:16px;"><i class="fas fa-plus"></i> Add Restaurant</button>
+<div id="adSettingsRestList"><p style="color:var(--gray);font-size:.88rem;">No restaurants added yet.</p></div>
+</div>
+<div class="ad-tab-content" id="adSetFleetTab">
+<h3 style="font-size:1rem;font-weight:700;margin-bottom:14px;">Fleet Management</h3>
+<button onclick="adShowFleetForm()" class="ad-btn ad-btn-green" style="margin-bottom:16px;"><i class="fas fa-plus"></i> Register Fleet</button>
+<div id="adSettingsFleetList"><p style="color:var(--gray);font-size:.88rem;">No fleet registered yet.</p></div>
+</div>
+<div class="ad-tab-content" id="adSetDeliveryTab">
+<div class="ad-delivery-section"><h4>Delivery Services</h4>
+<div class="ad-delivery-option"><label>Matorbike Delivery</label><label class="ad-toggle"><input type="checkbox" id="adSetMotorcycle" checked><span class="slider"></span></label></div>
+<div class="ad-delivery-option"><label>Taxi Delivery</label><label class="ad-toggle"><input type="checkbox" id="adSetTaxi" checked><span class="slider"></span></label></div>
+</div>
+<div class="ad-delivery-section"><h4>Delivery Zones</h4>
+<div class="ad-form-group"><label>Max Distance (km)</label><input type="number" class="ad-form-control" id="adSetMaxDist" value="10" min="1"></div>
+<div class="ad-form-group"><label>Base Delivery Fee ($)</label><input type="number" class="ad-form-control" id="adSetBaseFee" value="2.50" min="0" step="0.01"></div>
+<div class="ad-form-group"><label>Per km Fee ($)</label><input type="number" class="ad-form-control" id="adSetPerKm" value="0.50" min="0" step="0.01"></div>
+</div>
+<div class="ad-delivery-section"><h4>Delivery Hours</h4>
+<div class="ad-form-row">
+<div class="ad-form-group"><label>Start Time</label><input type="time" class="ad-form-control" id="adSetStart" value="08:00"></div>
+<div class="ad-form-group"><label>End Time</label><input type="time" class="ad-form-control" id="adSetEnd" value="22:00"></div>
+</div>
+</div>
+<div style="text-align:right;margin-top:14px;"><button onclick="adSaveDelivery()" class="ad-btn ad-btn-orange" style="padding:10px 24px;">Save Delivery Settings</button></div>
+</div>
+<div class="ad-tab-content" id="adSetSystemTab">
+<div class="ad-delivery-section"><h4>General Settings</h4>
+<div class="ad-form-group"><label>Business Name</label><input type="text" class="ad-form-control" id="adSetBizName" value="Go!Point"></div>
+<div class="ad-form-group"><label>Address</label><input type="text" class="ad-form-control" id="adSetBizAddr" value="Hargeisa, Somaliland"></div>
+<div class="ad-form-group"><label>Phone</label><input type="tel" class="ad-form-control" id="adSetBizPhone" value="+252 61 XXX XXXX"></div>
+<div class="ad-form-group"><label>Email</label><input type="email" class="ad-form-control" id="adSetBizEmail" value="info@gopoint.com"></div>
+</div>
+<div class="ad-delivery-section"><h4>Order Settings</h4>
+<div class="ad-form-group"><label>Min Order for Delivery ($)</label><input type="number" class="ad-form-control" id="adSetMinOrder" value="10" min="0" step="0.01"></div>
+<div class="ad-form-group"><label>Default Order Type</label><select class="ad-form-control" id="adSetDefaultOrder"><option value="dine-in">Dine In</option><option value="takeaway">Take Away</option><option value="delivery" selected>Delivery</option></select></div>
+</div>
+<div style="text-align:right;margin-top:14px;"><button onclick="adSaveSystem()" class="ad-btn ad-btn-orange" style="padding:10px 24px;">Save System Settings</button></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- RESTAURANT FORM MODAL -->
+<div class="ad-modal" id="adRestFormModal">
+<div class="ad-modal-box">
+<div class="ad-modal-header"><h2 id="adRestFormTitle">Add New Restaurant</h2><button onclick="adCloseRestForm()"><i class="fas fa-times"></i></button></div>
+<div class="ad-modal-body">
+<form id="adRestForm">
+<div class="ad-form-row">
+<div class="ad-form-group"><label>Restaurant Name *</label><input type="text" class="ad-form-control" id="adRestName" required></div>
+<div class="ad-form-group"><label>Address</label><input type="text" class="ad-form-control" id="adRestAddress"></div>
+<div class="ad-form-group"><label>Latitude</label><input type="number" class="ad-form-control" id="adRestLat" step="any"></div>
+<div class="ad-form-group"><label>Longitude</label><input type="number" class="ad-form-control" id="adRestLng" step="any"></div>
+<div class="ad-form-group"><label>Phone</label><input type="tel" class="ad-form-control" id="adRestPhone"></div>
+<div class="ad-form-group"><label>Email</label><input type="email" class="ad-form-control" id="adRestEmail"></div>
+<div class="ad-form-group"><label>Cuisine</label><input type="text" class="ad-form-control" id="adRestCuisine"></div>
+<div class="ad-form-group"><label>Rating</label><input type="number" class="ad-form-control" id="adRestRating" step="0.1" min="0" max="5"></div>
+</div>
+<div class="ad-form-group"><label>Logo URL</label><input type="url" class="ad-form-control" id="adRestLogo"></div>
+<h3 style="font-size:1rem;font-weight:700;margin:20px 0 14px;">Menu Items</h3>
+<div class="ad-tabs">
+<button type="button" class="ad-tab-btn active" onclick="adMenuTab('food')">Food</button>
+<button type="button" class="ad-tab-btn" onclick="adMenuTab('dessert')">Dessert</button>
+<button type="button" class="ad-tab-btn" onclick="adMenuTab('juices')">Juices</button>
+<button type="button" class="ad-tab-btn" onclick="adMenuTab('softdrinks')">Soft Drinks</button>
+<button type="button" class="ad-tab-btn" onclick="adMenuTab('coffee')">Coffee</button>
+</div>
+<div class="ad-tab-content active" id="adMenuFood"><div id="adFoodItems"></div><button type="button" class="ad-add-item" onclick="adAddMenuItem('food')"><i class="fas fa-plus"></i> Add Food Item</button></div>
+<div class="ad-tab-content" id="adMenuDessert"><div id="adDessertItems"></div><button type="button" class="ad-add-item" onclick="adAddMenuItem('dessert')"><i class="fas fa-plus"></i> Add Dessert Item</button></div>
+<div class="ad-tab-content" id="adMenuJuices"><div id="adJuicesItems"></div><button type="button" class="ad-add-item" onclick="adAddMenuItem('juices')"><i class="fas fa-plus"></i> Add Juice Item</button></div>
+<div class="ad-tab-content" id="adMenuSoftdrinks"><div id="adSoftdrinksItems"></div><button type="button" class="ad-add-item" onclick="adAddMenuItem('softdrinks')"><i class="fas fa-plus"></i> Add Soft Drink Item</button></div>
+<div class="ad-tab-content" id="adMenuCoffee"><div id="adCoffeeItems"></div><button type="button" class="ad-add-item" onclick="adAddMenuItem('coffee')"><i class="fas fa-plus"></i> Add Coffee Item</button></div>
+</form>
+<div class="ad-form-footer">
+<button onclick="adCloseRestForm()" class="ad-btn ad-btn-outline">Cancel</button>
+<button onclick="adSubmitRest()" class="ad-btn ad-btn-green">Save Restaurant</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- FLEET FORM MODAL -->
+<div class="ad-modal" id="adFleetFormModal">
+<div class="ad-modal-box">
+<div class="ad-modal-header"><h2 id="adFleetFormTitle">Register Fleet</h2><button onclick="adCloseFleetForm()"><i class="fas fa-times"></i></button></div>
+<div class="ad-modal-body">
+<form id="adFleetForm">
+<h3 style="font-size:1rem;font-weight:700;margin-bottom:14px;">Driver Information</h3>
+<div class="ad-form-row">
+<div class="ad-form-group"><label>Driver Name *</label><input type="text" class="ad-form-control" id="adFleetName" required></div>
+<div class="ad-form-group"><label>Phone *</label><input type="tel" class="ad-form-control" id="adFleetPhone" required></div>
+<div class="ad-form-group"><label>License *</label><input type="text" class="ad-form-control" id="adFleetLicense" required></div>
+<div class="ad-form-group"><label>PIN (4 digits) *</label><input type="text" class="ad-form-control" id="adFleetPin" maxlength="4" required></div>
+</div>
+<h3 style="font-size:1rem;font-weight:700;margin:20px 0 14px;">Vehicle Information</h3>
+<div class="ad-form-row">
+<div class="ad-form-group"><label>Type *</label><select class="ad-form-control" id="adFleetType" required><option value="bike">Matorbike</option><option value="taxi">Taxi</option></select></div>
+<div class="ad-form-group"><label>Plate Number *</label><input type="text" class="ad-form-control" id="adFleetPlate" required></div>
+<div class="ad-form-group"><label>Model</label><input type="text" class="ad-form-control" id="adFleetModel"></div>
+<div class="ad-form-group"><label>Status *</label><select class="ad-form-control" id="adFleetStatus" required><option value="available">Available</option><option value="unavailable">Unavailable</option></select></div>
+</div>
+</form>
+<div class="ad-form-footer">
+<button onclick="adCloseFleetForm()" class="ad-btn ad-btn-outline">Cancel</button>
+<button onclick="adSubmitFleet()" class="ad-btn ad-btn-green">Register Fleet</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ADMIN TOAST -->
+<div class="ad-toast" id="adToast"></div>
+</div>
+
+<!-- ─── JAVASCRIPT ─── -->
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// ★ SUPABASE CLIENT INITIALIZATION ★
+// ═══════════════════════════════════════════════════════════════════
+const SB_URL = "https://tsuhzwqrduluzbxmdoxq.supabase.co";
+const SB_KEY = "sb_publishable_3kQN2CnO4h7ZxQbujz7eEQ_Q0jq0_Fj";
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+// ═══════════════════════════════════════════════════════════════════
+// ★ SUPABASE DATA LAYER ★
+// ═══════════════════════════════════════════════════════════════════
+
+async function supaLoadRestaurants() {
+  try {
+    const { data: restRows, error: rErr } = await sb.from('restaurants').select('*');
+    if (rErr) throw rErr;
+    const { data: menuRows, error: mErr } = await sb.from('menu_items').select('*').order('sort_order');
+    if (mErr) throw mErr;
+    const result = {};
+    (restRows || []).forEach(r => {
+      const rMenu = (menuRows || []).filter(m => m.restaurant_id === r.id);
+      const menu = { coffee: [], food: [], dessert: [], juices: [], softdrinks: [] };
+      rMenu.forEach(m => {
+        if (menu[m.category]) {
+          menu[m.category].push({ id: m.id, name: m.name, price: m.price, description: m.description, image: m.image_url });
+        }
+      });
+      result[r.id] = {
+        name: r.name, address: r.address, phone: r.phone, lat: r.lat, lng: r.lng,
+        rating: r.rating, deliveryTime: r.delivery_time, deliveryFee: r.delivery_fee,
+        cuisine: r.cuisine, activeCategories: r.active_categories || Object.keys(menu).filter(k => menu[k].length > 0),
+        menu, active: r.active
+      };
+    });
+    return result;
+  } catch (e) { console.error('supaLoadRestaurants error:', e); return {}; }
+}
+
+async function supaLoadVehicles() {
+  try {
+    const { data, error } = await sb.from('vehicles').select('*');
+    if (error) throw error;
+    return (data || []).map(v => ({
+      id: v.id, type: v.type, plateNumber: v.plate_number, model: v.model,
+      driverName: v.driver_name, driverPhone: v.driver_phone, driverPin: v.driver_pin,
+      license: v.license, status: v.status, lat: v.lat, lng: v.lng
+    }));
+  } catch (e) { console.error('supaLoadVehicles error:', e); return []; }
+}
+
+async function supaLoadOrders() {
+  try {
+    const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(o => ({
+      id: o.id,
+      customer: { name: o.customer_name, phone: o.customer_phone, address: o.customer_address, area: o.customer_area },
+      coordinates: o.coordinates, restaurant: o.restaurant_id, items: o.items || [],
+      total: o.total, status: o.status,
+      payment: { method: o.payment_method, phone: o.payment_phone },
+      vehicle: o.vehicle_snapshot, vehicleId: o.vehicle_id,
+      statusHistory: o.status_history || [], timestamp: new Date(o.created_at)
+    }));
+  } catch (e) { console.error('supaLoadOrders error:', e); return []; }
+}
+
+async function supaLoadSettings() {
+  try {
+    const { data, error } = await sb.from('settings').select('*');
+    if (error) throw error;
+    const result = {};
+    (data || []).forEach(s => { result[s.key] = s.value; });
+    return result;
+  } catch (e) { console.error('supaLoadSettings error:', e); return {}; }
+}
+
+async function supaSaveOrder(orderData) {
+  try {
+    const { error } = await sb.from('orders').insert({
+      id: orderData.id,
+      customer_name: orderData.customer?.name || '',
+      customer_phone: orderData.customer?.phone || '',
+      customer_address: orderData.customer?.address || '',
+      customer_area: orderData.customer?.area || '',
+      coordinates: orderData.coordinates,
+      restaurant_id: orderData.restaurant,
+      items: orderData.items,
+      total: orderData.total,
+      status: orderData.status,
+      payment_method: orderData.payment?.method || 'cash',
+      payment_phone: orderData.payment?.phone || '',
+      vehicle_id: orderData.vehicleId || null,
+      vehicle_snapshot: orderData.vehicle,
+      status_history: orderData.statusHistory || [{ status: 'pending', time: new Date().toISOString() }]
+    });
+    if (error) throw error;
+    return true;
+  } catch (e) { console.error('supaSaveOrder error:', e); return false; }
+}
+
+async function supaUpdateOrder(orderId, updates) {
+  try {
+    const row = {};
+    if (updates.status !== undefined) row.status = updates.status;
+    if (updates.vehicle !== undefined) row.vehicle_snapshot = updates.vehicle;
+    if (updates.vehicleId !== undefined) row.vehicle_id = updates.vehicleId;
+    if (updates.statusHistory !== undefined) row.status_history = updates.statusHistory;
+    const { error } = await sb.from('orders').update(row).eq('id', orderId);
+    if (error) throw error;
+    return true;
+  } catch (e) { console.error('supaUpdateOrder error:', e); return false; }
+}
+
+async function supaDeleteOrder(orderId) {
+  try {
+    const { error } = await sb.from('orders').delete().eq('id', orderId);
+    if (error) throw error;
+  } catch (e) { console.error('supaDeleteOrder error:', e); }
+}
+
+async function supaSaveVehicle(vehicleData) {
+  try {
+    const { error } = await sb.from('vehicles').upsert({
+      id: vehicleData.id, type: vehicleData.type, plate_number: vehicleData.plateNumber || vehicleData.plate,
+      model: vehicleData.model || '', driver_name: vehicleData.driverName,
+      driver_phone: vehicleData.driverPhone, driver_pin: vehicleData.driverPin,
+      license: vehicleData.license || '', status: vehicleData.status,
+      lat: vehicleData.lat || 9.56, lng: vehicleData.lng || 44.065
+    });
+    if (error) throw error;
+  } catch (e) { console.error('supaSaveVehicle error:', e); }
+}
+
+async function supaDeleteVehicle(vehicleId) {
+  try {
+    const { error } = await sb.from('vehicles').delete().eq('id', vehicleId);
+    if (error) throw error;
+  } catch (e) { console.error('supaDeleteVehicle error:', e); }
+}
+
+async function supaSaveRestaurant(key, restData) {
+  try {
+    const { error: rErr } = await sb.from('restaurants').upsert({
+      id: key, name: restData.name, address: restData.address || '',
+      phone: restData.phone || '', email: restData.email || '',
+      lat: restData.lat, lng: restData.lng,
+      rating: restData.rating || 4.5, delivery_time: restData.deliveryTime || '20 min',
+      delivery_fee: restData.deliveryFee || '$2', cuisine: restData.cuisine || 'Various',
+      logo_url: restData.logo || '', active_categories: restData.activeCategories || ['food','juices','softdrinks','coffee','dessert'],
+      active: restData.active !== false
+    });
+    if (rErr) throw rErr;
+    await sb.from('menu_items').delete().eq('restaurant_id', key);
+    const menuRows = [];
+    if (restData.menu) {
+      for (const cat in restData.menu) {
+        (restData.menu[cat] || []).forEach((item, idx) => {
+          menuRows.push({ restaurant_id: key, category: cat, name: item.name, price: item.price, description: item.description || '', image_url: item.image || '', sort_order: idx });
+        });
+      }
+    }
+    if (menuRows.length > 0) {
+      const { error: mErr } = await sb.from('menu_items').insert(menuRows);
+      if (mErr) throw mErr;
+    }
+    console.log('✅ Restaurant saved to Supabase:', key);
+    return true;
+  } catch (e) { console.error('❌ supaSaveRestaurant error:', e); return false; }
+}
+
+async function supaDeleteRestaurant(key) {
+  try {
+    await sb.from('menu_items').delete().eq('restaurant_id', key);
+    await sb.from('restaurants').delete().eq('id', key);
+  } catch (e) { console.error('supaDeleteRestaurant error:', e); }
+}
+
+async function supaSaveSettings(key, value) {
+  try {
+    const { error } = await sb.from('settings').upsert({ key, value, updated_at: new Date().toISOString() });
+    if (error) throw error;
+  } catch (e) { console.error('supaSaveSettings error:', e); }
+}
+
+async function supaSignUp(email, password, fullName) {
+  try {
+    const { data, error } = await sb.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
+    if (error) throw error;
+    return data;
+  } catch (e) { console.error('supaSignUp error:', e); return null; }
+}
+
+async function supaSignIn(email, password) {
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+  } catch (e) { console.error('supaSignIn error:', e); return null; }
+}
+
+async function supaSignOut() {
+  try { await sb.auth.signOut(); } catch (e) {}
+}
+
+function supaSubscribeToOrders(callback) {
+  return sb.channel('orders-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
+      if (callback) callback(payload);
+    })
+    .subscribe();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ★ HYBRID LOAD: Supabase first, localStorage fallback ★
+// ═══════════════════════════════════════════════════════════════════
+let supaConnected = false;
+
+async function initSupabaseData() {
+  try {
+    const test = await sb.from('settings').select('key').limit(1);
+    if (test.error) throw test.error;
+    supaConnected = true;
+    const [restData, vehData, ordData, setaData] = await Promise.all([
+      supaLoadRestaurants(), supaLoadVehicles(), supaLoadOrders(), supaLoadSettings()
+    ]);
+    if (Object.keys(restData).length > 0) restaurants = restData;
+    if (vehData.length > 0) vehicles = vehData;
+    if (ordData.length > 0) orders = ordData;
+    if (Object.keys(setaData).length > 0) {
+      if (setaData.system) settings.system = setaData.system;
+      if (setaData.delivery) settings.delivery = setaData.delivery;
+    }
+    saveLocalData();
+    console.log('🟢 Supabase connected —', Object.keys(restData).length, 'restaurants,', vehData.length, 'vehicles');
+  } catch (e) {
+    supaConnected = false;
+    console.warn('Supabase init failed, using localStorage:', e);
+  }
+}
+
+// ─── UTILITY ───
+function showAppToast(msg) {
+  const toast = document.createElement('div');
+  toast.className = 'app-toast show';
+  toast.textContent = msg;
+  toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1e1e2a;color:#fff;padding:12px 28px;border-radius:30px;box-shadow:0 8px 30px rgba(0,0,0,.2);z-index:99999;font-size:.9rem;font-weight:500;max-width:90%;';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function appCalculateDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function appGetClosestVehicleOfType(type, lat, lng) {
+  let available = vehicles.filter(v => v.status === 'available' && v.type === type);
+  available.sort((a, b) => {
+    const dA = appCalculateDistance(lat, lng, a.lat || 9.56, a.lng || 44.06);
+    const dB = appCalculateDistance(lat, lng, b.lat || 9.56, b.lng || 44.06);
+    return dA - dB;
+  });
+  return available.slice(0, 2);
+}
+
+function updateAppSyncStatus(online, text) {}
+
+function setupPaymentPhoneInput() {}
+
+// ─── DATA ───
+let restaurants = {}, vehicles = [], orders = [];
+let settings = { system: { businessName: 'Go!Point', businessAddress: 'Hargeisa, Somaliland', businessPhone: '+252 61 XXX XXXX', businessEmail: 'info@gopoint.com' } };
+
+const defaultRestaurants = {
+'damal-restaurant': { name: 'Damal Restaurant', address: 'Downtown, Hargeisa', phone: '+252 61 1234567', lat: 9.5600, lng: 44.0650, rating: 4.8, deliveryTime: '25 min', deliveryFee: '$2', cuisine: 'Mediterranean', activeCategories: ['food','coffee'], menu: {
+coffee: [{ id: 1, name: 'Espresso', price: 3.50, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Rich & bold single shot' }, { id: 2, name: 'Cappuccino', price: 4.25, image: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=200&h=200&fit=crop', description: 'Espresso with steamed milk foam' }],
+food: [{ id: 4, name: 'Signature Burger', price: 12.90, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop', description: 'Grilled beef, cheddar, fresh veggies' }, { id: 5, name: 'Truffle Pasta', price: 14.50, image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200&h=200&fit=crop', description: 'Creamy mushroom truffle sauce' }]
+}},
+'hiddo-dhowr-pizza': { name: 'Hiddo Dhowr Pizza', address: 'Main Street, Hargeisa', phone: '+252 61 2345678', lat: 9.5620, lng: 44.0680, rating: 4.9, deliveryTime: '20 min', deliveryFee: '$1.5', cuisine: 'Italian', activeCategories: ['food','juices','softdrinks','coffee','dessert'], menu: {
+food: [{ id: 12, name: 'Margherita Pizza', price: 10.50, image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop', description: 'Classic tomato, mozzarella, basil' }, { id: 13, name: 'Pepperoni Pizza', price: 12.90, image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=200&h=200&fit=crop', description: 'Loaded with pepperoni' }]
+}},
+'burger-house': { name: 'Burger House', address: 'Central Market, Hargeisa', phone: '+252 61 3456789', lat: 9.5580, lng: 44.0620, rating: 4.7, deliveryTime: '18 min', deliveryFee: '$2', cuisine: 'Fast Food', activeCategories: ['food','juices','softdrinks'], menu: {
+food: [{ id: 18, name: 'Classic Burger', price: 9.90, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop', description: 'Beef patty, lettuce, tomato' }, { id: 19, name: 'Double Cheese Burger', price: 13.50, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=200&h=200&fit=crop', description: 'Double patty with extra cheese' }]
+}},
+'som-coffee': { name: 'Som Coffee', address: 'University Road, Hargeisa', phone: '+252 61 4567890', lat: 9.5640, lng: 44.0700, rating: 4.9, deliveryTime: '15 min', deliveryFee: '$1', cuisine: 'Cafe', activeCategories: ['coffee','dessert','juices'], menu: {
+coffee: [{ id: 22, name: 'Somali Spiced Coffee', price: 4.00, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop', description: 'Traditional cardamom & clove' }, { id: 23, name: 'Iced Latte', price: 4.50, image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', description: 'Cold espresso with milk' }]
+}}
+};
+
+const defaultVehicles = [
+{ id: 'v1', type: 'bike', plateNumber: 'B1234', driverName: 'Ahmed Ali', driverPhone: '+252631112222', driverPin: '1234', status: 'available', lat: 9.5650, lng: 44.0700 },
+{ id: 'v2', type: 'taxi', plateNumber: 'T5678', driverName: 'Mohamed Hassan', driverPhone: '+252653334444', driverPin: '2345', status: 'available', lat: 9.5550, lng: 44.0550 },
+{ id: 'v3', type: 'bike', plateNumber: 'B9012', driverName: 'Abdi Karim', driverPhone: '+252635556666', driverPin: '3456', status: 'delivering', lat: 9.5700, lng: 44.0600 },
+{ id: 'v4', type: 'taxi', plateNumber: 'T2468', driverName: 'Fatima Omar', driverPhone: '+252657778888', driverPin: '4567', status: 'available', lat: 9.5610, lng: 44.0660 },
+{ id: 'v5', type: 'bike', plateNumber: 'B3456', driverName: 'Hanad', driverPhone: '+252610000000', driverPin: '1111', status: 'available', lat: 9.5600, lng: 44.0650 }
+];
+
+function loadFromLocalStorage() {
+  const sr = localStorage.getItem('gopoint_restaurants');
+  restaurants = sr ? JSON.parse(sr) : JSON.parse(JSON.stringify(defaultRestaurants));
+  const sv = localStorage.getItem('gopoint_vehicles');
+  vehicles = sv ? JSON.parse(sv) : JSON.parse(JSON.stringify(defaultVehicles));
+  const so = localStorage.getItem('gopoint_orders');
+  orders = so ? JSON.parse(so).map(o => ({ ...o, timestamp: new Date(o.timestamp) })) : [];
+  const ss = localStorage.getItem('gopointSettings');
+  if (ss) settings = JSON.parse(ss);
+}
+
+function saveLocalData() {
+  localStorage.setItem('gopoint_restaurants', JSON.stringify(restaurants));
+  localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles));
+  localStorage.setItem('gopoint_orders', JSON.stringify(orders));
+  localStorage.setItem('gopointSettings', JSON.stringify(settings));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ★ ADMIN DASHBOARD FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════
+let adRestaurants = {}, adVehicles = [], adOrders = [];
+let adSettings = { system: { businessName: 'Go!Point', businessAddress: 'Hargeisa, Somaliland', businessPhone: '+252 61 XXX XXXX', businessEmail: 'info@gopoint.com' } };
+let adCurrentTab = 'dashboard';
+let adEditRestKey = null;
+let adEditFleetId = null;
+
+function adLoadData() {
+  try { adRestaurants = JSON.parse(localStorage.getItem('gopoint_restaurants')) || JSON.parse(JSON.stringify(defaultRestaurants)); } catch (_) { adRestaurants = JSON.parse(JSON.stringify(defaultRestaurants)); }
+  try { adVehicles = JSON.parse(localStorage.getItem('gopoint_vehicles')) || JSON.parse(JSON.stringify(defaultVehicles)); } catch (_) { adVehicles = JSON.parse(JSON.stringify(defaultVehicles)); }
+  try { adOrders = JSON.parse(localStorage.getItem('gopoint_orders')) || []; } catch (_) { adOrders = []; }
+  try { adSettings = JSON.parse(localStorage.getItem('gopointSettings')) || adSettings; } catch (_) {}
+  adOrders = adOrders.map(o => ({ ...o, timestamp: new Date(o.timestamp) }));
+}
+
+function adSaveData() {
+  localStorage.setItem('gopoint_restaurants', JSON.stringify(adRestaurants));
+  localStorage.setItem('gopoint_vehicles', JSON.stringify(adVehicles));
+  localStorage.setItem('gopoint_orders', JSON.stringify(adOrders));
+  localStorage.setItem('gopointSettings', JSON.stringify(adSettings));
+}
+
+function adRenderAll() {
+  adRenderStats();
+  adRenderFleet();
+  adRenderActiveOrders();
+  adRenderCompleted();
+  adRenderRestaurants();
+  adRenderSettingsRestList();
+  adRenderSettingsFleetList();
+}
+
+function adRenderStats() {
+  const now = new Date(), todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()), monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const today = adOrders.filter(o => new Date(o.timestamp) >= todayStart).length;
+  const month = adOrders.filter(o => new Date(o.timestamp) >= monthStart).length;
+  const revenue = adOrders.filter(o => o.status === 'completed').reduce((s, o) => s + (o.total || 0), 0);
+  const activeDrivers = adVehicles.filter(v => v.status === 'available' || v.status === 'delivering').length;
+  document.getElementById('adStatToday').textContent = today;
+  document.getElementById('adStatMonth').textContent = month;
+  document.getElementById('adStatRevenue').textContent = '$' + revenue.toFixed(2);
+  document.getElementById('adStatActiveDrivers').textContent = activeDrivers;
+  document.getElementById('adStatTotalDrivers').textContent = adVehicles.length + ' total';
+  document.getElementById('adStatAllOrders').textContent = adOrders.length;
+  document.getElementById('adFleetCount').textContent = adVehicles.length + ' vehicles';
+  document.getElementById('adActiveOrdersBadge').textContent = adOrders.filter(o => ['pending', 'preparing', 'ready', 'out_for_delivery'].includes(o.status)).length;
+  document.getElementById('adRestaurantCount').textContent = Object.keys(adRestaurants).length;
+}
+
+function adRenderFleet() {
+  const el = document.getElementById('adFleetList'); if (!el) return;
+  if (!adVehicles.length) { el.innerHTML = '<div class="ad-empty"><i class="fas fa-motorcycle"></i><p>No vehicles registered</p></div>'; return; }
+  el.innerHTML = adVehicles.map(v => {
+    const initials = (v.driverName || '??').split(' ').map(n => n[0]).join('').toUpperCase();
+    const icon = v.type === 'bike' ? '🏍️' : '🚕';
+    const sClass = v.status === 'available' ? 'available' : v.status === 'delivering' ? 'delivering' : 'unavailable';
+    const sLabel = v.status === 'available' ? 'Available' : v.status === 'delivering' ? 'Delivering' : 'Unavailable';
+    const checked = v.status === 'available' ? 'checked' : '';
+    return '<div class="ad-fleet-card"><div class="ad-fleet-info"><div class="ad-fleet-avatar">' + initials + '</div><div class="ad-fleet-details"><h4>' + v.driverName + '</h4><p>' + icon + ' ' + (v.plateNumber || v.plate || 'N/A') + ' • ' + (v.driverPhone || '') + '</p>' + (v.model ? '<p style="font-size:11px;color:var(--gray);">' + v.model + '</p>' : '') + '</div></div><div class="ad-fleet-status"><span class="ad-status-badge ' + sClass + '">' + sLabel + '</span><label class="ad-toggle"><input type="checkbox" ' + checked + ' onchange="adToggleVehicle(\'' + v.id + '\',this.checked)"><span class="slider"></span></label></div></div>';
+  }).join('');
+}
+
+async function adToggleVehicle(vid, checked) {
+  const v = adVehicles.find(x => x.id == vid); if (!v) return;
+  v.status = checked ? 'available' : 'unavailable';
+  adSaveData(); adRenderAll(); adToast(v.driverName + ' is now ' + v.status);
+  if (supaConnected) await supaSaveVehicle(v);
+}
+
+function adRenderActiveOrders() {
+  const active = adOrders.filter(o => ['pending', 'preparing', 'ready', 'out_for_delivery'].includes(o.status));
+  const el = document.getElementById('adActiveOrdersList'); if (!el) return;
+  if (!active.length) { el.innerHTML = '<div class="ad-empty"><i class="fas fa-inbox"></i><p>No active orders</p></div>'; return; }
+  const priority = { pending: 0, preparing: 1, ready: 2, out_for_delivery: 3 };
+  active.sort((a, b) => (priority[a.status] || 0) - (priority[b.status] || 0));
+  let html = '<table class="ad-table"><thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Action</th></tr></thead><tbody>';
+  active.forEach(o => {
+    const st = o.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const items = (o.items || []).map(i => i.name + ' x' + i.quantity).join(', ');
+    html += '<tr><td>#' + String(o.id).slice(-6) + '</td><td>' + (o.customer?.name || 'Walk-in') + '</td><td>' + items + '</td><td>$' + (o.total || 0).toFixed(2) + '</td><td><span class="ad-order-status ' + o.status + '">' + st + '</span></td><td><div class="ad-actions">' + adOrderActions(o) + '</div></td></tr>';
+  });
+  html += '</tbody></table>'; el.innerHTML = html;
+}
+
+function adOrderActions(o) {
+  let b = '';
+  if (o.status === 'pending') b += '<button class="ad-btn ad-btn-green" onclick="adUpdateOrder(\'' + o.id + '\',\'preparing\')"><i class="fas fa-check"></i> Accept</button><button class="ad-btn ad-btn-red" onclick="adUpdateOrder(\'' + o.id + '\',\'cancelled\')"><i class="fas fa-times"></i></button>';
+  else if (o.status === 'preparing') b += '<button class="ad-btn ad-btn-purple" onclick="adUpdateOrder(\'' + o.id + '\',\'ready\')"><i class="fas fa-utensils"></i> Ready</button>';
+  else if (o.status === 'ready') b += '<button class="ad-btn ad-btn-orange" onclick="adUpdateOrder(\'' + o.id + '\',\'out_for_delivery\')"><i class="fas fa-shipping-fast"></i> Dispatch</button>';
+  else if (o.status === 'out_for_delivery') b += '<button class="ad-btn ad-btn-green" onclick="adUpdateOrder(\'' + o.id + '\',\'completed\')"><i class="fas fa-check-double"></i> Delivered</button>';
+  return b;
+}
+
+async function adUpdateOrder(id, newStatus) {
+  const idx = adOrders.findIndex(o => o.id === id); if (idx === -1) return;
+  const o = adOrders[idx];
+  if (newStatus === 'out_for_delivery' && o.vehicleId) { const v = adVehicles.find(x => x.id == o.vehicleId); if (v) v.status = 'delivering'; }
+  if (newStatus === 'completed' && o.vehicleId) { const v = adVehicles.find(x => x.id == o.vehicleId); if (v) v.status = 'available'; }
+  const h = o.statusHistory || []; h.push({ status: newStatus, time: new Date().toISOString() });
+  adOrders[idx] = { ...o, status: newStatus, statusHistory: h };
+  adSaveData(); adRenderAll(); adToast('Order #' + String(id).slice(-6) + ' → ' + newStatus);
+  if (supaConnected) {
+    await supaUpdateOrder(id, { status: newStatus, statusHistory: h });
+    const v = adVehicles.find(x => x.id == o.vehicleId);
+    if (v && (newStatus === 'out_for_delivery' || newStatus === 'completed')) await supaSaveVehicle(v);
+  }
+}
+
+function adRenderCompleted() {
+  const completed = adOrders.filter(o => o.status === 'completed' || o.status === 'cancelled');
+  const tbody = document.getElementById('adCompletedBody'); if (!tbody) return;
+  if (!completed.length) { tbody.innerHTML = '<tr><td colspan="5" class="ad-empty">No completed orders</td></tr>'; return; }
+  const sorted = [...completed].reverse().slice(0, 20);
+  tbody.innerHTML = sorted.map(o => {
+    const st = o.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const items = (o.items || []).map(i => i.name + ' x' + i.quantity).join(', ');
+    return '<tr><td>#' + String(o.id).slice(-6) + '</td><td>' + new Date(o.timestamp).toLocaleString() + '</td><td>' + items + '</td><td>$' + (o.total || 0).toFixed(2) + '</td><td><span class="ad-order-status ' + o.status + '">' + st + '</span></td></tr>';
+  }).join('');
+}
+
+function adRenderRestaurants() {
+  const el = document.getElementById('adRestaurantsList'); if (!el) return;
+  const keys = Object.keys(adRestaurants);
+  if (!keys.length) { el.innerHTML = '<div class="ad-empty"><i class="fas fa-store"></i><p>No restaurants registered</p></div>'; return; }
+  let html = '<table class="ad-table"><thead><tr><th>Name</th><th>Address</th><th>Phone</th><th>Cuisine</th><th>Rating</th><th>Status</th></tr></thead><tbody>';
+  keys.forEach(k => { const r = adRestaurants[k]; const active = r.active !== undefined ? r.active : true;
+    html += '<tr><td><strong>' + r.name + '</strong></td><td>' + (r.address || '-') + '</td><td>' + (r.phone || '-') + '</td><td>' + (r.cuisine || 'Various') + '</td><td>⭐ ' + (r.rating || '4.5') + '</td><td><span class="ad-active-badge ' + (active ? 'active' : 'inactive') + '">' + (active ? 'Active' : 'Inactive') + '</span></td></tr>';
+  });
+  html += '</tbody></table>'; el.innerHTML = html;
+}
+
+function adRenderRestReport() {
+  const now = new Date(), todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayOrders = adOrders.filter(o => o.status === 'completed' && new Date(o.timestamp) >= todayStart);
+  const report = {};
+  todayOrders.forEach(o => { const k = o.restaurant || 'unknown'; if (!report[k]) report[k] = { name: adRestaurants[k]?.name || k, total: 0, count: 0 }; report[k].total += o.total || 0; report[k].count++; });
+  const totalOrders = todayOrders.length, totalValue = todayOrders.reduce((s, o) => s + (o.total || 0), 0), totalComm = totalValue * 0.05;
+  const sum = document.getElementById('adRestReportSummary'); if (sum) sum.innerHTML = '<div class="ad-report-item"><h4>Total Orders</h4><div class="value">' + totalOrders + '</div></div><div class="ad-report-item"><h4>Total Value</h4><div class="value green">$' + totalValue.toFixed(2) + '</div></div><div class="ad-report-item"><h4>Commission (5%)</h4><div class="value orange">$' + totalComm.toFixed(2) + '</div></div>';
+  const tbl = document.getElementById('adRestReportTable'); if (!tbl) return;
+  if (!Object.keys(report).length) { tbl.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">No completed orders today.</p>'; return; }
+  let h = '<table class="ad-table"><thead><tr><th>Restaurant</th><th>Orders</th><th>Total Value</th><th>Commission</th></tr></thead><tbody>';
+  let gt = 0, gc = 0;
+  Object.keys(report).forEach(k => { const r = report[k]; const c = r.total * 0.05; gt += r.total; gc += c; h += '<tr><td><strong>' + r.name + '</strong></td><td>' + r.count + '</td><td>$' + r.total.toFixed(2) + '</td><td>$' + c.toFixed(2) + '</td></tr>'; });
+  h += '<tr style="font-weight:700;background:var(--light-gray);"><td>TOTAL</td><td>' + totalOrders + '</td><td>$' + gt.toFixed(2) + '</td><td>$' + gc.toFixed(2) + '</td></tr></tbody></table>'; tbl.innerHTML = h;
+}
+
+function adRenderFleetReport() {
+  const now = new Date(), todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayDel = adOrders.filter(o => o.status === 'completed' && new Date(o.timestamp) >= todayStart && o.vehicleId);
+  const items = []; let totalDist = 0, totalDelCharge = 0, totalSvcFee = 0;
+  todayDel.forEach(o => {
+    const rest = adRestaurants[o.restaurant] || {}; const restLat = rest.lat || 9.56, restLng = rest.lng || 44.065;
+    const custLat = o.coordinates?.lat || 9.56, custLng = o.coordinates?.lng || 44.065;
+    const dist = adCalcDist(restLat, restLng, custLat, custLng); totalDist += dist;
+    let base = 1.2; if (dist > 6) base += (dist - 6) * 0.2; const svc = 0.5; const total = base + svc;
+    totalDelCharge += base; totalSvcFee += svc;
+    const v = adVehicles.find(x => x.id == o.vehicleId);
+    items.push({ orderId: o.id, restaurant: rest.name || 'Unknown', customer: o.customer?.name || 'Walk-in', driver: v?.driverName || 'Unknown', distance: dist, base, svc, total });
+  });
+  const sum = document.getElementById('adFleetReportSummary'); if (sum) sum.innerHTML = '<div class="ad-report-item"><h4>Deliveries</h4><div class="value">' + items.length + '</div></div><div class="ad-report-item"><h4>Total Distance</h4><div class="value">' + totalDist.toFixed(2) + ' km</div></div><div class="ad-report-item"><h4>Delivery Charge</h4><div class="value green">$' + totalDelCharge.toFixed(2) + '</div></div><div class="ad-report-item"><h4>Service Fee</h4><div class="value orange">$' + totalSvcFee.toFixed(2) + '</div></div>';
+  const tbl = document.getElementById('adFleetReportTable'); if (!tbl) return;
+  if (!items.length) { tbl.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">No completed deliveries today.</p>'; return; }
+  let h = '<table class="ad-table"><thead><tr><th>Order</th><th>Driver</th><th>Restaurant</th><th>Customer</th><th>Distance</th><th>Delivery</th><th>Service</th><th>Total</th></tr></thead><tbody>';
+  items.forEach(r => { h += '<tr><td>#' + String(r.orderId).slice(-6) + '</td><td><strong>' + r.driver + '</strong></td><td>' + r.restaurant + '</td><td>' + r.customer + '</td><td>' + r.distance.toFixed(2) + ' km</td><td>$' + r.base.toFixed(2) + '</td><td>$' + r.svc.toFixed(2) + '</td><td><strong>$' + r.total.toFixed(2) + '</strong></td></tr>'; });
+  h += '<tr style="font-weight:700;background:var(--light-gray);"><td colspan="7" style="text-align:right;">TOTAL</td><td>$' + (totalDelCharge + totalSvcFee).toFixed(2) + '</td></tr></tbody></table>'; tbl.innerHTML = h;
+}
+
+function adCalcDist(lat1, lng1, lat2, lng2) { const R = 6371; const dLat = ((lat2 - lat1) * Math.PI) / 180; const dLng = ((lng2 - lng1) * Math.PI) / 180; const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2; return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); }
+
+function adSwitchTab(tab) {
+  adCurrentTab = tab;
+  document.querySelectorAll('.ad-sidebar-nav a').forEach(a => a.classList.remove('active'));
+  const navLink = document.querySelector('.ad-sidebar-nav a[onclick*="' + tab + '"]'); if (navLink) navLink.classList.add('active');
+  ['adFleetSection', 'adOrdersSection', 'adCompletedSection', 'adRestaurantsSection', 'adRestReportSection', 'adFleetReportSection'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  const titles = { dashboard: '📊 Dashboard', orders: '📦 Orders', fleet: '🛵 Fleet Management', restaurants: '🍽️ Restaurants', restaurantReport: '📈 Restaurant Report', fleetReport: '🚚 Fleet Report' };
+  document.getElementById('adPageTitle').textContent = titles[tab] || 'Dashboard';
+  if (tab === 'dashboard' || tab === 'orders' || tab === 'fleet' || tab === 'restaurants') {
+    document.getElementById('adFleetSection').style.display = 'block';
+    document.getElementById('adOrdersSection').style.display = 'block';
+    document.getElementById('adCompletedSection').style.display = 'block';
+    document.getElementById('adRestaurantsSection').style.display = 'block';
+    document.getElementById('adRestReportSection').style.display = 'none';
+    document.getElementById('adFleetReportSection').style.display = 'none';
+    if (tab === 'fleet') { document.getElementById('adOrdersSection').style.display = 'none'; document.getElementById('adCompletedSection').style.display = 'none'; document.getElementById('adRestaurantsSection').style.display = 'none'; }
+    else if (tab === 'orders') { document.getElementById('adFleetSection').style.display = 'none'; document.getElementById('adRestaurantsSection').style.display = 'none'; }
+    else if (tab === 'restaurants') { document.getElementById('adFleetSection').style.display = 'none'; document.getElementById('adOrdersSection').style.display = 'none'; document.getElementById('adCompletedSection').style.display = 'none'; }
+    adRenderAll();
+  } else if (tab === 'restaurantReport') { document.getElementById('adRestReportSection').style.display = 'block'; adRenderRestReport(); }
+  else if (tab === 'fleetReport') { document.getElementById('adFleetReportSection').style.display = 'block'; adRenderFleetReport(); }
+}
+
+function adOpenSettings() { document.getElementById('adSettingsModal').classList.add('active'); adRenderSettingsRestList(); adRenderSettingsFleetList(); adLoadSettingsValues(); }
+function adCloseSettings() { document.getElementById('adSettingsModal').classList.remove('active'); }
+function adSettingsTab(tab) {
+  document.querySelectorAll('#adSettingsModal .ad-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#adSettingsModal .ad-tab-content').forEach(c => c.classList.remove('active'));
+  const btns = document.querySelectorAll('#adSettingsModal .ad-tab-btn');
+  const tabMap = { restaurants: 0, fleet: 1, delivery: 2, system: 3 }; if (tabMap[tab] !== undefined && btns[tabMap[tab]]) btns[tabMap[tab]].classList.add('active');
+  const contentMap = { restaurants: 'adSetRestTab', fleet: 'adSetFleetTab', delivery: 'adSetDeliveryTab', system: 'adSetSystemTab' };
+  const content = document.getElementById(contentMap[tab]); if (content) content.classList.add('active');
+}
+
+function adLoadSettingsValues() {
+  const ds = JSON.parse(localStorage.getItem('gopoint_delivery_settings') || '{"motorcycleDelivery":true,"taxiDelivery":true,"maxDistance":10,"baseFee":2.50,"perKmFee":0.50,"startTime":"08:00","endTime":"22:00"}');
+  document.getElementById('adSetMotorcycle').checked = ds.motorcycleDelivery !== undefined ? ds.motorcycleDelivery : true;
+  document.getElementById('adSetTaxi').checked = ds.taxiDelivery !== undefined ? ds.taxiDelivery : true;
+  document.getElementById('adSetMaxDist').value = ds.maxDistance || 10;
+  document.getElementById('adSetBaseFee').value = ds.baseFee || 2.50;
+  document.getElementById('adSetPerKm').value = ds.perKmFee || 0.50;
+  document.getElementById('adSetStart').value = ds.startTime || '08:00';
+  document.getElementById('adSetEnd').value = ds.endTime || '22:00';
+  const sys = JSON.parse(localStorage.getItem('gopoint_system_settings') || '{"businessName":"Go!Point","businessAddress":"Hargeisa, Somaliland","businessPhone":"+252 61 XXX XXXX","businessEmail":"info@gopoint.com","minOrder":10,"defaultOrder":"delivery"}');
+  document.getElementById('adSetBizName').value = sys.businessName || 'Go!Point';
+  document.getElementById('adSetBizAddr').value = sys.businessAddress || 'Hargeisa, Somaliland';
+  document.getElementById('adSetBizPhone').value = sys.businessPhone || '+252 61 XXX XXXX';
+  document.getElementById('adSetBizEmail').value = sys.businessEmail || 'info@gopoint.com';
+  document.getElementById('adSetMinOrder').value = sys.minOrder || 10;
+  document.getElementById('adSetDefaultOrder').value = sys.defaultOrder || 'delivery';
+}
+
+async function adSaveDelivery() {
+  const s = { motorcycleDelivery: document.getElementById('adSetMotorcycle').checked, taxiDelivery: document.getElementById('adSetTaxi').checked, maxDistance: parseFloat(document.getElementById('adSetMaxDist').value) || 10, baseFee: parseFloat(document.getElementById('adSetBaseFee').value) || 2.50, perKmFee: parseFloat(document.getElementById('adSetPerKm').value) || 0.50, startTime: document.getElementById('adSetStart').value || '08:00', endTime: document.getElementById('adSetEnd').value || '22:00' };
+  localStorage.setItem('gopoint_delivery_settings', JSON.stringify(s)); adToast('Delivery settings saved!');
+  if (supaConnected) await supaSaveSettings('delivery', s);
+}
+
+async function adSaveSystem() {
+  const s = { businessName: document.getElementById('adSetBizName').value.trim() || 'Go!Point', businessAddress: document.getElementById('adSetBizAddr').value.trim() || 'Hargeisa, Somaliland', businessPhone: document.getElementById('adSetBizPhone').value.trim(), businessEmail: document.getElementById('adSetBizEmail').value.trim(), minOrder: parseFloat(document.getElementById('adSetMinOrder').value) || 10, defaultOrder: document.getElementById('adSetDefaultOrder').value || 'delivery' };
+  localStorage.setItem('gopoint_system_settings', JSON.stringify(s)); adToast('System settings saved!');
+  if (supaConnected) await supaSaveSettings('system', s);
+}
+
+function adRenderSettingsRestList() {
+  const el = document.getElementById('adSettingsRestList'); if (!el) return;
+  const keys = Object.keys(adRestaurants);
+  if (!keys.length) { el.innerHTML = '<p style="color:var(--gray);font-size:.88rem;">No restaurants added yet.</p>'; return; }
+  el.innerHTML = keys.map(k => { const r = adRestaurants[k]; return '<div class="ad-fleet-card"><div class="ad-fleet-info"><div class="ad-fleet-avatar" style="font-size:1.2rem;">🍽️</div><div class="ad-fleet-details"><h4>' + r.name + '</h4><p>' + (r.address || 'No address') + '</p><p>' + (r.phone || 'No phone') + '</p></div></div><div class="ad-fleet-status"><button class="ad-btn ad-btn-edit" onclick="adEditRest(\'' + k + '\')"><i class="fas fa-edit"></i></button><button class="ad-btn ad-btn-delete" onclick="adDeleteRest(\'' + k + '\')"><i class="fas fa-trash"></i></button></div></div>'; }).join('');
+}
+
+function adShowRestForm() { adEditRestKey = null; document.getElementById('adRestFormTitle').textContent = 'Add New Restaurant'; document.getElementById('adRestForm').reset(); ['food', 'dessert', 'juices', 'softdrinks', 'coffee'].forEach(c => { const el = document.getElementById('ad' + c.charAt(0).toUpperCase() + c.slice(1) + 'Items'); if (el) el.innerHTML = ''; }); adAddMenuItem('food'); document.getElementById('adRestFormModal').classList.add('active'); }
+function adCloseRestForm() { document.getElementById('adRestFormModal').classList.remove('active'); }
+function adEditRest(key) {
+  if (!adRestaurants[key]) return; adEditRestKey = key; const r = adRestaurants[key];
+  document.getElementById('adRestFormTitle').textContent = 'Edit Restaurant';
+  document.getElementById('adRestName').value = r.name || ''; document.getElementById('adRestAddress').value = r.address || '';
+  document.getElementById('adRestLat').value = r.lat || ''; document.getElementById('adRestLng').value = r.lng || '';
+  document.getElementById('adRestPhone').value = r.phone || ''; document.getElementById('adRestEmail').value = r.email || '';
+  document.getElementById('adRestCuisine').value = r.cuisine || ''; document.getElementById('adRestRating').value = r.rating || '';
+  document.getElementById('adRestLogo').value = r.logo || '';
+  ['food', 'dessert', 'juices', 'softdrinks', 'coffee'].forEach(c => { const el = document.getElementById('ad' + c.charAt(0).toUpperCase() + c.slice(1) + 'Items'); if (el) el.innerHTML = ''; });
+  if (r.menu) { for (const cat in r.menu) { const el = document.getElementById('ad' + cat.charAt(0).toUpperCase() + cat.slice(1) + 'Items'); if (el) { r.menu[cat].forEach(item => { const div = document.createElement('div'); div.className = 'ad-menu-item'; div.innerHTML = '<button type="button" class="remove-btn" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button><div class="ad-form-row"><div class="ad-form-group"><label>Item Name *</label><input type="text" class="ad-form-control" name="admin-' + cat + '-name" value="' + item.name + '" required></div><div class="ad-form-group"><label>Price *</label><input type="number" class="ad-form-control" name="admin-' + cat + '-price" value="' + item.price + '" step="0.01" min="0" required></div></div><div class="ad-form-group"><label>Description</label><input type="text" class="ad-form-control" name="admin-' + cat + '-description" value="' + (item.description || '') + '"></div><div class="ad-form-group"><label>Image URL</label><input type="url" class="ad-form-control" name="admin-' + cat + '-image" value="' + (item.image || '') + '"></div>'; el.appendChild(div); }); } } }
+  document.getElementById('adRestFormModal').classList.add('active');
+}
+async function adDeleteRest(key) { if (!adRestaurants[key]) return; if (confirm('Delete "' + adRestaurants[key].name + '"?')) { delete adRestaurants[key]; delete restaurants[key]; adSaveData(); adRenderSettingsRestList(); adRenderRestaurants(); adToast('Restaurant deleted'); if (supaConnected) await supaDeleteRestaurant(key); } }
+async function adSubmitRest() {
+  const name = document.getElementById('adRestName').value.trim(); if (!name) { adToast('Restaurant name required'); return; }
+  const key = adEditRestKey || name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const menu = { coffee: adCollectMenu('coffee'), food: adCollectMenu('food'), dessert: adCollectMenu('dessert'), juices: adCollectMenu('juices'), softdrinks: adCollectMenu('softdrinks') };
+  if (!Object.values(menu).some(c => c.length > 0)) { adToast('Add at least one menu item'); return; }
+  const data = { name, address: document.getElementById('adRestAddress').value.trim(), lat: parseFloat(document.getElementById('adRestLat').value) || null, lng: parseFloat(document.getElementById('adRestLng').value) || null, phone: document.getElementById('adRestPhone').value.trim(), email: document.getElementById('adRestEmail').value.trim(), cuisine: document.getElementById('adRestCuisine').value.trim() || 'Various', rating: parseFloat(document.getElementById('adRestRating').value) || 4.5, logo: document.getElementById('adRestLogo').value.trim(), menu, active: true, activeCategories: Object.keys(menu).filter(c => menu[c].length > 0), deliveryTime: '20 min', deliveryFee: '$2' };
+  adRestaurants[key] = data;
+  restaurants[key] = data;
+  adSaveData();
+  adRenderSettingsRestList(); adRenderRestaurants(); adCloseRestForm();
+  adToast(adEditRestKey ? '"' + name + '" updated!' : '"' + name + '" added!');
+  if (supaConnected) {
+    const result = await supaSaveRestaurant(key, data);
+    if (result !== false) adToast('✅ Synced to Supabase');
+    else adToast('⚠️ Saved locally — Supabase sync failed');
+  }
+  adEditRestKey = null;
+}
+function adCollectMenu(cat) {
+  const items = []; const forms = document.querySelectorAll('#ad' + cat.charAt(0).toUpperCase() + cat.slice(1) + 'Items .ad-menu-item');
+  forms.forEach((form, idx) => { const ni = form.querySelector('[name="admin-' + cat + '-name"]'); const pi = form.querySelector('[name="admin-' + cat + '-price"]');
+    if (ni && pi && ni.value.trim() && pi.value) { const di = form.querySelector('[name="admin-' + cat + '-description"]'); const ii = form.querySelector('[name="admin-' + cat + '-image"]');
+      items.push({ id: Date.now() + idx, name: ni.value.trim(), price: parseFloat(pi.value), description: di ? di.value.trim() : '', image: ii ? ii.value.trim() : '' }); } }); return items;
+}
+function adAddMenuItem(cat) {
+  const el = document.getElementById('ad' + cat.charAt(0).toUpperCase() + cat.slice(1) + 'Items'); if (!el) return;
+  const div = document.createElement('div'); div.className = 'ad-menu-item';
+  div.innerHTML = '<button type="button" class="remove-btn" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button><div class="ad-form-row"><div class="ad-form-group"><label>Item Name *</label><input type="text" class="ad-form-control" name="admin-' + cat + '-name" required></div><div class="ad-form-group"><label>Price *</label><input type="number" class="ad-form-control" name="admin-' + cat + '-price" step="0.01" min="0" required></div></div><div class="ad-form-group"><label>Description</label><input type="text" class="ad-form-control" name="admin-' + cat + '-description"></div><div class="ad-form-group"><label>Image URL</label><input type="url" class="ad-form-control" name="admin-' + cat + '-image"></div>';
+  el.appendChild(div);
+}
+function adMenuTab(tab) {
+  document.querySelectorAll('#adRestFormModal .ad-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#adRestFormModal .ad-tab-content').forEach(c => c.classList.remove('active'));
+  const btns = document.querySelectorAll('#adRestFormModal .ad-tab-btn');
+  const tabMap = { food: 0, dessert: 1, juices: 2, softdrinks: 3, coffee: 4 }; if (tabMap[tab] !== undefined && btns[tabMap[tab]]) btns[tabMap[tab]].classList.add('active');
+  const contentMap = { food: 'adMenuFood', dessert: 'adMenuDessert', juices: 'adMenuJuices', softdrinks: 'adMenuSoftdrinks', coffee: 'adMenuCoffee' };
+  const content = document.getElementById(contentMap[tab]); if (content) content.classList.add('active');
+}
+
+function adRenderSettingsFleetList() {
+  const el = document.getElementById('adSettingsFleetList'); if (!el) return;
+  if (!adVehicles.length) { el.innerHTML = '<p style="color:var(--gray);font-size:.88rem;">No fleet registered yet.</p>'; return; }
+  el.innerHTML = adVehicles.map(v => {
+    const initials = (v.driverName || '??').split(' ').map(n => n[0]).join('').toUpperCase();
+    const icon = v.type === 'bike' ? '🏍️' : '🚕';
+    const sClass = v.status === 'available' ? 'available' : v.status === 'delivering' ? 'delivering' : 'unavailable';
+    const sLabel = v.status === 'available' ? 'Available' : v.status === 'delivering' ? 'Delivering' : 'Unavailable';
+    return '<div class="ad-fleet-card"><div class="ad-fleet-info"><div class="ad-fleet-avatar">' + initials + '</div><div class="ad-fleet-details"><h4>' + v.driverName + '</h4><p>' + icon + ' ' + (v.plateNumber || v.plate || 'N/A') + ' • ' + (v.driverPhone || '') + '</p>' + (v.model ? '<p style="font-size:11px;color:var(--gray);">' + v.model + '</p>' : '') + '</div></div><div class="ad-fleet-status"><span class="ad-status-badge ' + sClass + '">' + sLabel + '</span><button class="ad-btn ad-btn-edit" onclick="adEditFleet(\'' + v.id + '\')"><i class="fas fa-edit"></i></button><button class="ad-btn ad-btn-delete" onclick="adDeleteFleet(\'' + v.id + '\')"><i class="fas fa-trash"></i></button></div></div>';
+  }).join('');
+}
+
+function adShowFleetForm() { adEditFleetId = null; document.getElementById('adFleetFormTitle').textContent = 'Register Fleet'; document.getElementById('adFleetForm').reset(); document.getElementById('adFleetStatus').value = 'available'; document.getElementById('adFleetFormModal').classList.add('active'); }
+function adCloseFleetForm() { document.getElementById('adFleetFormModal').classList.remove('active'); }
+function adEditFleet(vid) {
+  const v = adVehicles.find(x => x.id == vid); if (!v) return; adEditFleetId = vid;
+  document.getElementById('adFleetFormTitle').textContent = 'Edit Fleet';
+  document.getElementById('adFleetName').value = v.driverName || ''; document.getElementById('adFleetPhone').value = v.driverPhone || '';
+  document.getElementById('adFleetLicense').value = v.license || ''; document.getElementById('adFleetPin').value = v.driverPin || '';
+  document.getElementById('adFleetType').value = v.type || 'bike'; document.getElementById('adFleetPlate').value = v.plateNumber || v.plate || '';
+  document.getElementById('adFleetModel').value = v.model || ''; document.getElementById('adFleetStatus').value = v.status || 'available';
+  document.getElementById('adFleetFormModal').classList.add('active');
+}
+async function adDeleteFleet(vid) { if (!confirm('Delete this fleet entry?')) return; adVehicles = adVehicles.filter(v => v.id != vid); adSaveData(); adRenderSettingsFleetList(); adRenderFleet(); adToast('Fleet entry deleted'); if (supaConnected) await supaDeleteVehicle(vid); }
+async function adSubmitFleet() {
+  const name = document.getElementById('adFleetName').value.trim(), phone = document.getElementById('adFleetPhone').value.trim(), license = document.getElementById('adFleetLicense').value.trim(), pin = document.getElementById('adFleetPin').value.trim() || '1234', type = document.getElementById('adFleetType').value, plate = document.getElementById('adFleetPlate').value.trim(), model = document.getElementById('adFleetModel').value.trim(), status = document.getElementById('adFleetStatus').value;
+  if (!name || !phone || !license || !plate) { adToast('All required fields must be filled'); return; }
+  if (adEditFleetId) { const idx = adVehicles.findIndex(v => v.id == adEditFleetId); if (idx !== -1) adVehicles[idx] = { ...adVehicles[idx], driverName: name, driverPhone: phone, license, driverPin: pin, type, plateNumber: plate, model, status }; adToast('Fleet updated!'); }
+  else { const newV = { id: 'v-' + Date.now(), type, plateNumber: plate, model, driverName: name, driverPhone: phone, driverPin: pin, status, lat: 9.56, lng: 44.065 }; adVehicles.push(newV); adToast('Fleet registered!'); if (supaConnected) await supaSaveVehicle(newV); }
+  adSaveData(); adRenderSettingsFleetList(); adRenderFleet(); adCloseFleetForm();
+  if (supaConnected && adEditFleetId) { const v = adVehicles.find(x => x.id == adEditFleetId); if (v) await supaSaveVehicle(v); }
+}
+
+function adLogout() { if (!confirm('Logout from Admin Dashboard?')) return; localStorage.removeItem('admin_auth'); document.getElementById('adminDashboard').classList.remove('active'); document.getElementById('adminDashboard').style.display = 'none'; document.getElementById('frontPageContainer').style.display = 'block'; window.scrollTo({ top: 0 }); }
+
+function adBackToHome() { document.getElementById('adminDashboard').classList.remove('active'); document.getElementById('adminDashboard').style.display = 'none'; window.location.href = 'index.html'; }
+
+function adToast(msg) { const e = document.getElementById('adToast'); e.textContent = msg; e.classList.add('show'); clearTimeout(e._t); e._t = setTimeout(() => { e.classList.remove('show'); }, 3000); }
+
+function openAdminLogin() { window.location.href = 'index.html'; }
+function openAdminLoginFromApp() { window.location.href = 'index.html'; }
+function openAdminLoginFromDriver() { window.location.href = 'index.html'; }
+
+function showAdminDashboard() {
+  document.getElementById('adminDashboard').classList.add('active');
+  document.getElementById('adminDashboard').style.display = 'block';
+  adLoadData();
+  adSwitchTab('dashboard');
+  window.scrollTo({ top: 0 });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ★ DOMContentLoaded — Auto-login & initialization ★
+// ═══════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  loadFromLocalStorage();
+  await initSupabaseData();
+
+  // Auto-login: check if admin is already logged in
+  const adminAuth = localStorage.getItem('admin_auth');
+  if (adminAuth === 'true') {
+    showAdminDashboard();
+  } else {
+    // Show admin login prompt or redirect
+    const proceed = confirm('Admin Login\n\nUsername: admin\nPassword: admin123\n\nClick OK to login as admin.');
+    if (proceed) {
+      localStorage.setItem('admin_auth', 'true');
+      showAdminDashboard();
+    } else {
+      window.location.href = 'index.html';
+    }
+  }
+
+  // Listen for keyboard shortcut (Ctrl+Shift+A) for admin access
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+      e.preventDefault();
+      localStorage.setItem('admin_auth', 'true');
+      showAdminDashboard();
+    }
+  });
+});
+</script>
+</body>
+</html>

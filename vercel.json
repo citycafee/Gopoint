@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "admin.html", "use": "@vercel/static" },
+    { "src": "driver.html", "use": "@vercel/static" },
+    { "src": "styles.css", "use": "@vercel/static" }
+  ]
+}
