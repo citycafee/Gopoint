@@ -189,16 +189,71 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .cart-badge { background: #ef4444; color: white; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
 .app-view { display: none; margin-top: 70px; padding: 1rem 2rem; max-width: 1400px; margin-left: auto; margin-right: auto; }
 .app-view.active { display: block; }
-.app-profile-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06); max-width: 600px; margin: 0 auto; }
-.app-profile-card .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 700; margin: 0 auto 16px; }
-.app-profile-card .profile-field { margin-bottom: 16px; }
-.app-profile-card .profile-field label { font-weight: 600; color: var(--gray); font-size: 0.85rem; display: block; margin-bottom: 4px; }
-.app-profile-card .profile-field .value { font-size: 1.1rem; font-weight: 500; color: var(--text); padding: 8px 12px; background: #f8fafc; border-radius: 8px; }
-.app-profile-card .profile-field input { width: 100%; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 1rem; font-family: inherit; }
-.app-profile-card .profile-actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
-.app-profile-card .profile-actions button { flex: 1; padding: 10px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: inherit; }
-.btn-save { background: var(--primary); color: white; }
-.btn-edit { background: #e5e7eb; color: #333; }
+.app-profile-view { max-width: 640px; margin: 0 auto; }
+.app-profile-view .pf-hero { background: linear-gradient(135deg, #F5C451 0%, #e6b33e 60%, #00A19B 100%); padding: 0 24px 60px; position: relative; border-radius: 0 0 20px 20px; margin: -1rem -2rem 0; }
+.app-profile-view .pf-hero-top { display: flex; justify-content: flex-end; align-items: center; padding: 16px 0; gap: 10px; }
+.app-profile-view .pf-hero-actions button { background: rgba(255,255,255,0.25); backdrop-filter: blur(8px); border: none; color: #1a1a1a; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+.app-profile-view .pf-hero-actions button:hover { background: rgba(255,255,255,0.45); }
+.app-profile-view .pf-avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 8px; }
+.app-profile-view .pf-avatar-ring { width: 110px; height: 110px; border-radius: 50%; background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; position: relative; }
+.app-profile-view .pf-avatar-ring::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.5); }
+.app-profile-view .pf-avatar-initial { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #00A19B, #22c55e); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 800; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+.app-profile-view .pf-avatar-name { font-size: 28px; font-weight: 800; color: #1a1a1a; }
+.app-profile-view .pf-avatar-phone { font-size: 14px; color: rgba(26,26,26,0.7); font-weight: 500; }
+.app-profile-view .pf-member-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.3); backdrop-filter: blur(6px); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #1a1a1a; margin-top: 4px; }
+.app-profile-view .pf-content { margin-top: -40px; padding: 0 16px; position: relative; z-index: 2; }
+.app-profile-view .pf-stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.app-profile-view .pf-stat-card { background: #fff; border-radius: 16px; padding: 18px 12px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.app-profile-view .pf-stat-num { font-size: 26px; font-weight: 800; color: #00A19B; }
+.app-profile-view .pf-stat-label { font-size: 11px; color: #888; font-weight: 600; margin-top: 2px; }
+.app-profile-view .pf-section { background: #fff; border-radius: 20px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.app-profile-view .pf-section-title { font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.app-profile-view .pf-section-title i { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
+.app-profile-view .pf-info-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
+.app-profile-view .pf-info-row:last-child { border-bottom: none; }
+.app-profile-view .pf-info-left { display: flex; align-items: center; gap: 14px; }
+.app-profile-view .pf-info-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.app-profile-view .pf-info-text .pf-info-label { font-size: 12px; color: #888; font-weight: 500; }
+.app-profile-view .pf-info-text .pf-info-value { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+.app-profile-view .pf-info-edit { background: none; border: none; color: #00A19B; font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 8px; transition: background .2s; }
+.app-profile-view .pf-info-edit:hover { background: #f0fdf9; }
+.app-profile-view .pf-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.app-profile-view .pf-action-card { display: flex; align-items: center; gap: 14px; padding: 16px; background: #f8fafc; border-radius: 14px; cursor: pointer; transition: all .2s; border: 2px solid transparent; text-decoration: none; color: #1a1a1a; }
+.app-profile-view .pf-action-card:hover { border-color: #00A19B; background: #f0fdf9; transform: translateY(-2px); }
+.app-profile-view .pf-action-card .pf-a-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.app-profile-view .pf-action-card .pf-a-label { font-size: 14px; font-weight: 700; }
+.app-profile-view .pf-action-card .pf-a-desc { font-size: 11px; color: #888; }
+.app-profile-view .pf-bottom-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.app-profile-view .pf-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all .2s; font-family: inherit; }
+.app-profile-view .pf-btn:active { transform: scale(0.97); }
+.app-profile-view .pf-btn-primary { background: linear-gradient(135deg, #00A19B, #008F8A); color: #fff; box-shadow: 0 4px 16px rgba(0,161,155,0.3); }
+.app-profile-view .pf-btn-outline { background: #fff; color: #E63946; border: 2px solid #E63946; }
+.app-profile-view .pf-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+.app-profile-view .pf-modal-overlay.active { display: flex; }
+.app-profile-view .pf-modal-card { background: #fff; border-radius: 20px; padding: 28px 24px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; }
+.app-profile-view .pf-modal-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #00A19B, #22c55e); border-radius: 20px 20px 0 0; }
+.app-profile-view .pf-modal-close { position: absolute; top: 16px; right: 16px; background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #555; }
+.app-profile-view .pf-modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; color: #1a1a1a; }
+.app-profile-view .pf-form-group { margin-bottom: 16px; }
+.app-profile-view .pf-form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+.app-profile-view .pf-form-group input { width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; font-weight: 500; font-family: inherit; outline: none; transition: border-color .2s; }
+.app-profile-view .pf-form-group input:focus { border-color: #00A19B; }
+.app-profile-view .pf-modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.app-profile-view .pf-modal-actions button { flex: 1; }
+.app-profile-view .pf-order-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
+.app-profile-view .pf-order-item:last-child { border-bottom: none; }
+.app-profile-view .pf-order-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.app-profile-view .pf-order-details { flex: 1; }
+.app-profile-view .pf-order-id { font-size: 14px; font-weight: 700; }
+.app-profile-view .pf-order-meta { font-size: 12px; color: #888; margin-top: 2px; }
+.app-profile-view .pf-order-status { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.app-profile-view .pf-status-delivered { background: #dcfce7; color: #16a34a; }
+.app-profile-view .pf-status-active { background: #fef3c7; color: #d97706; }
+.app-profile-view .pf-status-cancelled { background: #fee2e2; color: #dc2626; }
+.app-profile-view .pf-order-price { font-size: 15px; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
+.app-profile-view .pf-empty-state { text-align: center; padding: 30px 20px; color: #aaa; }
+.app-profile-view .pf-empty-state i { font-size: 40px; margin-bottom: 12px; }
+.app-profile-view .pf-empty-state p { font-size: 14px; }
 .app-orders-list, .app-addresses-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
 .app-order-card, .app-address-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); border: 1px solid #e5e7eb; }
 .app-order-card .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -1401,7 +1456,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <div class="user-dropdown" id="appUserDropdown">
 <div class="user-dropdown-header"><div class="user-name-big" id="appUserDropdownName">Google User</div><div class="user-email" id="appUserDropdownEmail">user@gmail.com</div></div>
 <button class="user-dropdown-item" onclick="navigateToView('home')"><i class="fas fa-home"></i> Home</button>
-<button class="user-dropdown-item" onclick="window.location.href='customer_profile.html'"><i class="fas fa-user"></i> My Profile</button>
+<button class="user-dropdown-item" onclick="navigateToView('profile')"><i class="fas fa-user"></i> My Profile</button>
 <button class="user-dropdown-item" onclick="openTrackingModal()"><i class="fas fa-map-marked-alt"></i> Track Order</button>
 <button class="user-dropdown-item" onclick="openAdminLoginFromApp()"><i class="fas fa-shield-halved"></i> Admin Dashboard</button>
 <button class="user-dropdown-item danger" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -1455,14 +1510,74 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 
 <!-- Profile View -->
 <div id="appProfileView" class="app-view">
-<div class="app-profile-card">
-<div class="profile-avatar" id="profileAvatar">U</div>
-<div class="profile-field"><label>Username</label><div class="value" id="profileUsername">User</div></div>
-<div class="profile-field"><label>Phone</label><div class="value" id="profilePhone">+252 61 1234567</div></div>
-<div class="profile-field"><label>Email</label><div class="value" id="profileEmail">user@example.com</div></div>
-<div class="profile-actions">
-<button class="btn-edit" onclick="toggleProfileEdit()"><i class="fas fa-edit"></i> Edit</button>
-<button class="btn-save" id="profileSaveBtn" style="display:none;" onclick="saveProfile()"><i class="fas fa-save"></i> Save</button>
+<div class="app-profile-view">
+<!-- Hero Header -->
+<div class="pf-hero">
+<div class="pf-hero-top">
+<div class="pf-hero-actions">
+<button onclick="navigateToView('home')" title="Back"><i class="fas fa-arrow-left"></i></button>
+</div>
+</div>
+<div class="pf-avatar-wrap">
+<div class="pf-avatar-ring">
+<div class="pf-avatar-initial" id="pfProfileAvatar">U</div>
+</div>
+<div class="pf-avatar-name" id="pfProfileName">User</div>
+<div class="pf-avatar-phone" id="pfProfilePhone">+252 61 XXX XXXX</div>
+<div class="pf-member-badge"><i class="fas fa-star"></i> Go!point Member</div>
+</div>
+</div>
+<!-- Main Content -->
+<div class="pf-content">
+<!-- Stats -->
+<div class="pf-stats-row">
+<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatOrders">0</div><div class="pf-stat-label">Total Orders</div></div>
+<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatSpent">$0</div><div class="pf-stat-label">Total Spent</div></div>
+<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatSaved">$0</div><div class="pf-stat-label">Saved</div></div>
+</div>
+<!-- Quick Actions -->
+<div class="pf-section">
+<div class="pf-section-title"><i style="background:linear-gradient(135deg,#00A19B,#22c55e);"><i class="fas fa-bolt"></i></i> Quick Actions</div>
+<div class="pf-actions-grid">
+<div class="pf-action-card" onclick="navigateToView('home')"><div class="pf-a-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-utensils"></i></div><div><div class="pf-a-label">Order Food</div><div class="pf-a-desc">Browse restaurants</div></div></div>
+<div class="pf-action-card" onclick="navigateToView('orders')"><div class="pf-a-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-receipt"></i></div><div><div class="pf-a-label">My Orders</div><div class="pf-a-desc">Track & reorder</div></div></div>
+<div class="pf-action-card" onclick="openProfileEditModal()"><div class="pf-a-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-pen"></i></div><div><div class="pf-a-label">Edit Profile</div><div class="pf-a-desc">Update your info</div></div></div>
+<div class="pf-action-card" onclick="showAppToast('Help coming soon!')"><div class="pf-a-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-headset"></i></div><div><div class="pf-a-label">Get Help</div><div class="pf-a-desc">Contact support</div></div></div>
+</div>
+</div>
+<!-- Personal Info -->
+<div class="pf-section">
+<div class="pf-section-title"><i style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fas fa-user-circle"></i></i> Personal Information</div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f0fdf9;color:#00A19B;"><i class="fas fa-user"></i></div><div class="pf-info-text"><div class="pf-info-label">Full Name</div><div class="pf-info-value" id="pfInfoName">User</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-phone"></i></div><div class="pf-info-text"><div class="pf-info-label">Phone Number</div><div class="pf-info-value" id="pfInfoPhone">+252 61 XXX XXXX</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-envelope"></i></div><div class="pf-info-text"><div class="pf-info-label">Email Address</div><div class="pf-info-value" id="pfInfoEmail">Not set</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f1f5f9;color:#64748b;"><i class="fas fa-shield-alt"></i></div><div class="pf-info-text"><div class="pf-info-label">Login Method</div><div class="pf-info-value" id="pfInfoProvider">Phone + OTP</div></div></div></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f0fdf9;color:#16a34a;"><i class="fas fa-calendar-alt"></i></div><div class="pf-info-text"><div class="pf-info-label">Member Since</div><div class="pf-info-value" id="pfInfoSince">-</div></div></div></div>
+</div>
+<!-- Recent Orders -->
+<div class="pf-section">
+<div class="pf-section-title"><i style="background:linear-gradient(135deg,#f59e0b,#d97706);"><i class="fas fa-clock"></i></i> Recent Orders</div>
+<div id="pfRecentOrders"><div class="pf-empty-state"><i class="fas fa-receipt"></i><p>No orders yet. Start ordering!</p></div></div>
+</div>
+<!-- Bottom Actions -->
+<div class="pf-bottom-actions">
+<button class="pf-btn pf-btn-primary" onclick="navigateToView('home')"><i class="fas fa-shopping-bag"></i> Order Now</button>
+<button class="pf-btn pf-btn-outline" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+</div>
+</div>
+<!-- Edit Profile Modal -->
+<div class="pf-modal-overlay" id="pfEditModal">
+<div class="pf-modal-card">
+<button class="pf-modal-close" onclick="closeProfileEditModal()">x</button>
+<div class="pf-modal-title">Edit Profile</div>
+<div class="pf-form-group"><label>Full Name</label><input type="text" id="pfEditName" placeholder="Your name"></div>
+<div class="pf-form-group"><label>Phone Number</label><input type="tel" id="pfEditPhone" placeholder="+252 61 XXX XXXX"></div>
+<div class="pf-form-group"><label>Email Address</label><input type="email" id="pfEditEmail" placeholder="your@email.com"></div>
+<div class="pf-modal-actions">
+<button class="pf-btn pf-btn-outline" onclick="closeProfileEditModal()" style="color:#555;border-color:#e5e7eb;">Cancel</button>
+<button class="pf-btn pf-btn-primary" onclick="saveProfileFromModal()">Save Changes</button>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -2896,7 +3011,7 @@ function navigateToView(view) {
 document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
 document.getElementById('appExplorerContainer').classList.remove('active');
 if (view === 'home') { document.getElementById('appHomeView').classList.add('active'); document.getElementById('appMiniCartBar').classList.remove('visible'); appRenderRestaurantList(); if (appMap) setTimeout(() => appMap.invalidateSize(), 100); }
-else if (view === 'profile') { window.location.href='customer_profile.html'; return; }
+else if (view === 'profile') { document.getElementById('appProfileView').classList.add('active'); renderProfileView(); }
 else if (view === 'orders') { document.getElementById('appOrdersView').classList.add('active'); renderOrdersView(); }
 else if (view === 'addresses') { document.getElementById('appAddressesView').classList.add('active'); renderAddressesView(); }
 document.querySelectorAll('.app-nav-right ul li').forEach(li => li.classList.remove('active-nav'));
@@ -2908,10 +3023,36 @@ if (cartVisible) toggleCart();
 
 function renderProfileView() {
 if (!currentUser) return;
-document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
-document.getElementById('profileUsername').textContent = currentUser.name || 'User';
-document.getElementById('profilePhone').textContent = currentUser.phone || 'Not set';
-document.getElementById('profileEmail').textContent = currentUser.email || 'Not set';
+const name = currentUser.name || 'User';
+const phone = currentUser.phone || 'Not set';
+const email = currentUser.email || 'Not set';
+const provider = currentUser.provider === 'whatsapp' ? 'WhatsApp' : currentUser.provider === 'gmail' ? 'Gmail' : currentUser.provider === 'username' ? 'Username + Password' : 'Phone + OTP';
+document.getElementById('pfProfileAvatar').textContent = name.charAt(0).toUpperCase();
+document.getElementById('pfProfileName').textContent = name;
+document.getElementById('pfProfilePhone').textContent = phone;
+document.getElementById('pfInfoName').textContent = name;
+document.getElementById('pfInfoPhone').textContent = phone;
+document.getElementById('pfInfoEmail').textContent = email;
+document.getElementById('pfInfoProvider').textContent = provider;
+if (currentUser.created || currentUser.registeredAt) { document.getElementById('pfInfoSince').textContent = new Date(currentUser.created || currentUser.registeredAt).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }); }
+const userOrders = orders.filter(o => o.customer?.phone === currentUser.phone || o.customer?.name === currentUser.name);
+const totalSpent = userOrders.reduce((s, o) => s + (o.total || 0), 0);
+document.getElementById('pfStatOrders').textContent = userOrders.length;
+document.getElementById('pfStatSpent').textContent = '$' + totalSpent.toFixed(2);
+document.getElementById('pfStatSaved').textContent = '$' + (totalSpent * 0.05).toFixed(2);
+const container = document.getElementById('pfRecentOrders');
+const recentOrders = userOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
+if (!recentOrders.length) { container.innerHTML = '<div class="pf-empty-state"><i class="fas fa-receipt"></i><p>No orders yet. Start ordering!</p></div>'; return; }
+container.innerHTML = recentOrders.map(o => {
+const status = o.status || 'pending';
+let statusClass = 'pf-status-active', statusLabel = status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+if (status === 'delivered') { statusClass = 'pf-status-delivered'; statusLabel = 'Delivered'; }
+if (status === 'cancelled') { statusClass = 'pf-status-cancelled'; statusLabel = 'Cancelled'; }
+const date = new Date(o.timestamp).toLocaleDateString('en-US', { month:'short', day:'numeric' });
+const time = new Date(o.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+const items = o.items?.map(i => i.name).join(', ') || 'Order';
+return '<div class="pf-order-item"><div class="pf-order-icon" style="background:' + (status === 'delivered' ? '#dcfce7' : '#fef3c7') + ';color:' + (status === 'delivered' ? '#16a34a' : '#d97706') + ';"><i class="fas fa-' + (status === 'delivered' ? 'check-circle' : 'clock') + '"></i></div><div class="pf-order-details"><div class="pf-order-id">#' + String(o.id).slice(-6) + '</div><div class="pf-order-meta">' + date + ' at ' + time + ' &bull; ' + items + '</div></div><span class="pf-order-status ' + statusClass + '">' + statusLabel + '</span><div class="pf-order-price">$' + (o.total || 0).toFixed(2) + '</div></div>';
+}).join('');
 }
 
 function renderOrdersView() {
@@ -2935,22 +3076,22 @@ container.innerHTML = addresses.map((addr, idx) => `<div class="app-address-card
 function addNewAddress() { const area = prompt('Enter area name:'); if (!area) return; const address = prompt('Enter full address:'); if (!address) return; const label = prompt('Enter a label (e.g., Home, Work):') || 'Address'; const addresses = JSON.parse(localStorage.getItem('gopoint_addresses') || '[]'); addresses.push({ label, area, address }); localStorage.setItem('gopoint_addresses', JSON.stringify(addresses)); renderAddressesView(); showAppToast('✅ Address saved'); }
 function deleteAddress(index) { if (!confirm('Delete this address?')) return; const addresses = JSON.parse(localStorage.getItem('gopoint_addresses') || '[]'); addresses.splice(index, 1); localStorage.setItem('gopoint_addresses', JSON.stringify(addresses)); renderAddressesView(); showAppToast('🗑️ Address deleted'); }
 
-function toggleProfileEdit() {
-const saveBtn = document.getElementById('profileSaveBtn'), nameDisplay = document.getElementById('profileUsername'), phoneDisplay = document.getElementById('profilePhone'), emailDisplay = document.getElementById('profileEmail');
-if (saveBtn.style.display === 'none') {
-nameDisplay.innerHTML = `<input type="text" id="editUsername" value="${currentUser.name}" class="app-glovo-input" style="margin-top:4px;">`;
-phoneDisplay.innerHTML = `<input type="text" id="editPhone" value="${currentUser.phone || ''}" class="app-glovo-input" style="margin-top:4px;">`;
-emailDisplay.innerHTML = `<input type="email" id="editEmail" value="${currentUser.email || ''}" class="app-glovo-input" style="margin-top:4px;">`;
-saveBtn.style.display = 'block';
-document.querySelector('.btn-edit').textContent = 'Cancel';
-document.querySelector('.btn-edit').onclick = cancelProfileEdit;
-} else { cancelProfileEdit(); }
+function openProfileEditModal() {
+if (!currentUser) return;
+document.getElementById('pfEditName').value = currentUser.name || '';
+document.getElementById('pfEditPhone').value = currentUser.phone || '';
+document.getElementById('pfEditEmail').value = currentUser.email || '';
+document.getElementById('pfEditModal').classList.add('active');
 }
 
-function cancelProfileEdit() { const saveBtn = document.getElementById('profileSaveBtn'); saveBtn.style.display = 'none'; document.querySelector('.btn-edit').textContent = 'Edit'; document.querySelector('.btn-edit').onclick = toggleProfileEdit; renderProfileView(); }
+function closeProfileEditModal() {
+document.getElementById('pfEditModal').classList.remove('active');
+}
 
-async function saveProfile() {
-const name = document.getElementById('editUsername').value.trim(), phone = document.getElementById('editPhone').value.trim(), email = document.getElementById('editEmail').value.trim();
+async function saveProfileFromModal() {
+const name = document.getElementById('pfEditName').value.trim();
+const phone = document.getElementById('pfEditPhone').value.trim();
+const email = document.getElementById('pfEditEmail').value.trim();
 if (!name) { showAppToast('⚠️ Name required'); return; }
 currentUser.name = name;
 currentUser.phone = phone || currentUser.phone;
@@ -2959,7 +3100,8 @@ localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
 if (supaConnected && currentUser.id) { await sb.from('profiles').upsert({ id: currentUser.id, full_name: name, phone: phone || '' }); }
 updateUserUI();
 showAppToast('✅ Profile updated');
-cancelProfileEdit();
+closeProfileEditModal();
+renderProfileView();
 }
 
 async function initApp() { loadFromLocalStorage(); await initSupabaseData(); appInitMap(); appStartBannerCarousel(); setupAppEventListeners(); appRenderRestaurantList(); supaSubscribeToOrders((payload) => { loadFromLocalStorage(); if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); } }); }
