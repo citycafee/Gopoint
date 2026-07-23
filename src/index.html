@@ -1105,8 +1105,10 @@ document.addEventListener('click', (e) => { const dropdown = document.getElement
 function navigateToView(view) {
 document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
 document.getElementById('appExplorerContainer').classList.remove('active');
+const appHeader = document.querySelector('.app-header');
+if (view === 'profile') { document.getElementById('appProfileView').classList.add('active'); renderProfileView(); if (appHeader) appHeader.style.display = 'none'; }
+else { if (appHeader) appHeader.style.display = ''; }
 if (view === 'home') { document.getElementById('appHomeView').classList.add('active'); document.getElementById('appMiniCartBar').classList.remove('visible'); appRenderRestaurantList(); if (appMap) setTimeout(() => appMap.invalidateSize(), 100); }
-else if (view === 'profile') { document.getElementById('appProfileView').classList.add('active'); renderProfileView(); }
 else if (view === 'orders') { document.getElementById('appOrdersView').classList.add('active'); renderOrdersView(); }
 else if (view === 'addresses') { document.getElementById('appAddressesView').classList.add('active'); renderAddressesView(); }
 document.querySelectorAll('.app-nav-right ul li').forEach(li => li.classList.remove('active-nav'));
