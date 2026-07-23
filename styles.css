@@ -178,56 +178,55 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .cart-badge { background: #ef4444; color: white; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
 .app-view { display: none; margin-top: 70px; padding: 1rem 2rem; max-width: 1400px; margin-left: auto; margin-right: auto; }
 .app-view.active { display: block; }
-.app-profile-view { min-height: 100vh; background: #f8f9fb; padding-bottom: 40px; margin: 0 -2rem; }
-.app-profile-view .pf-hero { background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 50%, #15803d 100%); padding: 0 20px 80px; position: relative; }
-.app-profile-view .pf-hero::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 30px; background: #f8f9fb; border-radius: 24px 24px 0 0; }
-.app-profile-view .pf-hero-top { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; }
-.app-profile-view .pf-hero-top .pf-back-btn { background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); border: none; color: #fff; width: 42px; height: 42px; border-radius: 14px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+.app-profile-view { min-height: 100vh; background: var(--bg); padding-bottom: 40px; margin: 0 -2rem; }
+.app-profile-view .pf-hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 20px 20px 40px; position: relative; margin: 0 -2rem; }
+.app-profile-view .pf-hero-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.app-profile-view .pf-hero-top .pf-back-btn { background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); border: none; color: #fff; width: 40px; height: 40px; border-radius: var(--radius-md); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
 .app-profile-view .pf-hero-top .pf-back-btn:hover { background: rgba(255,255,255,0.35); }
 .app-profile-view .pf-hero-top .pf-hero-title { color: #fff; font-size: 18px; font-weight: 700; }
-.app-profile-view .pf-avatar-section { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 10px; }
-.app-profile-view .pf-avatar-main { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #fff 0%, #dcfce7 100%); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
-.app-profile-view .pf-avatar-letter { width: 82px; height: 82px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 800; }
-.app-profile-view .pf-avatar-badge { position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px; background: #F5C451; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; border: 3px solid var(--primary); }
-.app-profile-view .pf-user-name { color: #fff; font-size: 24px; font-weight: 800; letter-spacing: -0.3px; }
-.app-profile-view .pf-user-phone { color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 500; }
-.app-profile-view .pf-content { margin-top: -20px; padding: 0 20px; position: relative; z-index: 2; }
-.app-profile-view .pf-stats-card { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 20px; }
-.app-profile-view .pf-stat-item { text-align: center; padding: 20px 10px; background: #fff; }
-.app-profile-view .pf-stat-item:not(:last-child) { border-right: 1px solid #f1f5f9; }
-.app-profile-view .pf-stat-value { font-size: 24px; font-weight: 800; color: var(--primary); }
-.app-profile-view .pf-stat-label { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
-.app-profile-view .pf-card { background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-.app-profile-view .pf-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.app-profile-view .pf-card-title { font-size: 16px; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
-.app-profile-view .pf-card-title .pf-title-icon { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; }
-.app-profile-view .pf-menu-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background .15s; }
+.app-profile-view .pf-avatar-section { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.app-profile-view .pf-avatar-main { width: 90px; height: 90px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+.app-profile-view .pf-avatar-letter { width: 74px; height: 74px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; }
+.app-profile-view .pf-avatar-badge { position: absolute; bottom: 0; right: 0; width: 26px; height: 26px; background: #F5C451; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; border: 3px solid #fff; }
+.app-profile-view .pf-user-name { color: #fff; font-size: 22px; font-weight: 800; }
+.app-profile-view .pf-user-phone { color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 500; }
+.app-profile-view .pf-content { padding: 0 16px; margin-top: -20px; position: relative; z-index: 2; }
+.app-profile-view .pf-stats-card { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: #fff; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); margin-bottom: 16px; }
+.app-profile-view .pf-stat-item { text-align: center; padding: 18px 8px; background: #fff; }
+.app-profile-view .pf-stat-item:not(:last-child) { border-right: 1px solid var(--light-gray); }
+.app-profile-view .pf-stat-value { font-size: 22px; font-weight: 800; color: var(--primary); }
+.app-profile-view .pf-stat-label { font-size: 11px; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.app-profile-view .pf-card { background: #fff; border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
+.app-profile-view .pf-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--light-gray); }
+.app-profile-view .pf-card-title { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; }
+.app-profile-view .pf-card-title .pf-title-icon { width: 30px; height: 30px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff; }
+.app-profile-view .pf-card-action { font-size: 13px; font-weight: 600; color: var(--primary); cursor: pointer; border: none; background: none; padding: 6px 12px; border-radius: var(--radius-sm); transition: var(--transition); }
+.app-profile-view .pf-card-action:hover { background: rgba(34,197,94,0.08); }
+.app-profile-view .pf-menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--light-gray); cursor: pointer; transition: var(--transition); }
 .app-profile-view .pf-menu-item:last-child { border-bottom: none; }
-.app-profile-view .pf-menu-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.app-profile-view .pf-menu-item:hover { opacity: 0.8; }
+.app-profile-view .pf-menu-icon { width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
 .app-profile-view .pf-menu-text { flex: 1; }
-.app-profile-view .pf-menu-label { font-size: 15px; font-weight: 600; color: #1a1a2e; }
-.app-profile-view .pf-menu-sublabel { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-.app-profile-view .pf-menu-arrow { color: #cbd5e1; font-size: 14px; }
-.app-profile-view .pf-empty-orders { text-align: center; padding: 40px 20px; }
-.app-profile-view .pf-empty-orders i { font-size: 48px; color: #e2e8f0; margin-bottom: 16px; }
-.app-profile-view .pf-empty-orders p { font-size: 14px; color: #94a3b8; margin-bottom: 20px; }
-.app-profile-view .pf-empty-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; border: none; border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; }
-.app-profile-view .pf-logout-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; background: #fff; color: #ef4444; border: 2px solid #fee2e2; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all .2s; margin-top: 10px; }
-.app-profile-view .pf-logout-btn:hover { background: #fef2f2; border-color: #ef4444; }
+.app-profile-view .pf-menu-label { font-size: 14px; font-weight: 600; color: var(--text); }
+.app-profile-view .pf-menu-sublabel { font-size: 12px; color: var(--gray); margin-top: 1px; }
+.app-profile-view .pf-menu-arrow { color: var(--light-gray-app); font-size: 12px; }
+.app-profile-view .pf-logout-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: #fff; color: #ef4444; border: 1px solid #fecaca; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); margin-top: 8px; box-shadow: var(--shadow-sm); }
+.app-profile-view .pf-logout-btn:hover { background: #fef2f2; }
 .app-profile-view .pf-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; justify-content: flex-end; align-items: flex-end; }
 .app-profile-view .pf-modal-overlay.active { display: flex; }
-.app-profile-view .pf-modal-sheet { background: #fff; border-radius: 24px 24px 0 0; padding: 12px 24px 32px; width: 100%; max-width: 500px; margin: 0 auto; animation: slideUp .3s ease; }
+.app-profile-view .pf-modal-sheet { background: #fff; border-radius: var(--radius-xl) var(--radius-xl) 0 0; padding: 12px 20px 28px; width: 100%; max-width: 480px; margin: 0 auto; animation: slideUp .3s ease; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.app-profile-view .pf-modal-handle { width: 40px; height: 4px; background: #e2e8f0; border-radius: 4px; margin: 0 auto 20px; }
-.app-profile-view .pf-modal-title { font-size: 20px; font-weight: 800; color: #1a1a2e; margin-bottom: 24px; text-align: center; }
-.app-profile-view .pf-form-group { margin-bottom: 16px; }
-.app-profile-view .pf-form-group label { display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px; }
-.app-profile-view .pf-form-group input { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 15px; font-weight: 500; font-family: inherit; outline: none; transition: border-color .2s; background: #f8fafc; }
-.app-profile-view .pf-form-group input:focus { border-color: var(--primary); background: #fff; }
-.app-profile-view .pf-modal-actions { display: flex; gap: 12px; margin-top: 24px; }
-.app-profile-view .pf-modal-actions button { flex: 1; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .2s; }
-.app-profile-view .pf-modal-cancel { background: #f1f5f9; color: #64748b; }
-.app-profile-view .pf-modal-save { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 4px 16px rgba(34,197,94,0.3); }
+.app-profile-view .pf-modal-handle { width: 36px; height: 4px; background: var(--light-gray-app); border-radius: 4px; margin: 0 auto 16px; }
+.app-profile-view .pf-modal-title { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 20px; text-align: center; }
+.app-profile-view .pf-form-group { margin-bottom: 14px; }
+.app-profile-view .pf-form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--gray); margin-bottom: 6px; }
+.app-profile-view .pf-form-group input { width: 100%; padding: 12px 14px; border: 1px solid var(--light-gray-app); border-radius: var(--radius-md); font-size: 14px; font-weight: 500; font-family: inherit; outline: none; transition: var(--transition); background: var(--light-gray); }
+.app-profile-view .pf-form-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); background: #fff; }
+.app-profile-view .pf-modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.app-profile-view .pf-modal-actions button { flex: 1; padding: 12px; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: var(--transition); }
+.app-profile-view .pf-modal-cancel { background: var(--light-gray); color: var(--gray); }
+.app-profile-view .pf-modal-save { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
+.app-profile-view .pf-modal-save:hover { background: var(--primary-dark); }
 .app-orders-list, .app-addresses-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
 .app-order-card, .app-address-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); border: 1px solid #e5e7eb; }
 .app-order-card .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
