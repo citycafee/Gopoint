@@ -3008,8 +3008,9 @@ function navigateToView(view) {
 document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
 document.getElementById('appExplorerContainer').classList.remove('active');
 const appNavbar = document.querySelector('.app-navbar');
-if (view === 'profile') { document.getElementById('appProfileView').classList.add('active'); renderProfileView(); if (appNavbar) appNavbar.style.display = 'none'; }
-else { if (appNavbar) appNavbar.style.display = ''; }
+const appNavRight = document.querySelector('.app-nav-right');
+if (view === 'profile') { document.getElementById('appProfileView').classList.add('active'); renderProfileView(); if (appNavbar) appNavbar.style.display = ''; if (appNavRight) appNavRight.style.display = 'none'; }
+else { if (appNavbar) appNavbar.style.display = ''; if (appNavRight) appNavRight.style.display = ''; }
 if (view === 'home') { document.getElementById('appHomeView').classList.add('active'); document.getElementById('appMiniCartBar').classList.remove('visible'); appRenderRestaurantList(); if (appMap) setTimeout(() => appMap.invalidateSize(), 100); }
 else if (view === 'orders') { document.getElementById('appOrdersView').classList.add('active'); renderOrdersView(); }
 else if (view === 'addresses') { document.getElementById('appAddressesView').classList.add('active'); renderAddressesView(); }
