@@ -216,7 +216,7 @@ Username: <code>admin</code> · Password: <code>admin123</code>
 <div class="user-dropdown" id="appUserDropdown">
 <div class="user-dropdown-header"><div class="user-name-big" id="appUserDropdownName">Google User</div><div class="user-email" id="appUserDropdownEmail">user@gmail.com</div></div>
 <button class="user-dropdown-item" onclick="navigateToView('home')"><i class="fas fa-home"></i> Home</button>
-<button class="user-dropdown-item" onclick="window.location.href='d:\\myapp\\OneDrive\\Desktop\\gg\\customer_profile.html'"><i class="fas fa-user"></i> My Profile</button>
+<button class="user-dropdown-item" onclick="window.location.href='customer_profile.html'"><i class="fas fa-user"></i> My Profile</button>
 <button class="user-dropdown-item" onclick="openTrackingModal()"><i class="fas fa-map-marked-alt"></i> Track Order</button>
 <button class="user-dropdown-item" onclick="openAdminLoginFromApp()"><i class="fas fa-shield-halved"></i> Admin Dashboard</button>
 <button class="user-dropdown-item danger" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -1045,7 +1045,7 @@ function navigateToView(view) {
 document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
 document.getElementById('appExplorerContainer').classList.remove('active');
 if (view === 'home') { document.getElementById('appHomeView').classList.add('active'); document.getElementById('appMiniCartBar').classList.remove('visible'); appRenderRestaurantList(); if (appMap) setTimeout(() => appMap.invalidateSize(), 100); }
-else if (view === 'profile') { window.location.href='d:\\myapp\\OneDrive\\Desktop\\gg\\customer_profile.html'; return; }
+else if (view === 'profile') { window.location.href='customer_profile.html'; return; }
 else if (view === 'orders') { document.getElementById('appOrdersView').classList.add('active'); renderOrdersView(); }
 else if (view === 'addresses') { document.getElementById('appAddressesView').classList.add('active'); renderAddressesView(); }
 document.querySelectorAll('.app-nav-right ul li').forEach(li => li.classList.remove('active-nav'));
