@@ -817,7 +817,350 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <span id="appSyncText">Local Mode</span>
 </div>
 
+<!-- ─── FRONT PAGE ─── -->
+<div id="frontPageContainer" style="display:block;">
+<header class="fp-header" id="fpHeader">
+<div class="fp-logo"><div class="fp-logo-text">Go<span>!</span>point</div></div>
+<nav class="fp-nav">
+<ul>
+<li><a onclick="openFrontLogin()"><i class="fas fa-user"></i> <span>Login</span></a></li>
+<li><a onclick="goToMarketplace()"><i class="fas fa-store"></i> <span>Marketplace</span></a></li>
 
+<li><a><i class="fas fa-globe"></i> <span>EN</span></a></li>
+</ul>
+</nav>
+<div class="fp-hamburger" id="fpHamburger" onclick="toggleFpMobileMenu()"><span></span><span></span><span></span></div>
+</header>
+<div class="fp-mobile-menu" id="fpMobileMenu">
+<a onclick="openFrontLogin(); toggleFpMobileMenu();"><i class="fas fa-user"></i> Login</a>
+<a onclick="goToMarketplace(); toggleFpMobileMenu();"><i class="fas fa-store"></i> Marketplace</a>
+<a onclick="openAdminLogin(); toggleFpMobileMenu();"><i class="fas fa-shield-halved"></i> Admin</a>
+<a><i class="fas fa-globe"></i> English</a>
+</div>
+
+<!-- Login Modal -->
+<div class="fp-login-modal" id="fpLoginModal">
+<div class="fp-login-card">
+<button class="fp-login-close" onclick="closeFrontLogin()">×</button>
+<div class="fp-login-logo">
+<div style="font-size:3rem;">🛵</div>
+<h2>Welcome to Go!point</h2>
+<p>Sign in to order or manage deliveries</p>
+</div>
+<div class="fp-login-tabs">
+<div class="fp-login-tab active" onclick="switchLoginTab('customer')" id="tabCustomer">👤 Customer</div>
+<div class="fp-login-tab" onclick="switchLoginTab('driver')" id="tabDriver">🛵 Driver</div>
+<div class="fp-login-tab" onclick="switchLoginTab('admin')" id="tabAdmin">🛡️ Admin</div>
+</div>
+
+<!-- Customer Login Section -->
+<div id="fpCustomerLoginSection">
+<div id="fpLoginStep" style="display:block;">
+<p style="text-align:center; font-size:15px; font-weight:600; color:#333; margin-bottom:16px;">Continue with one of the following options</p>
+
+<div class="fp-form-group">
+<div class="fp-phone-row">
+<div class="fp-phone-prefix">
+<select id="fpPhonePrefix">
+<option value="+252">🇸🇴 +252</option>
+<option value="+254">🇰🇪 +254</option>
+<option value="+256">🇺🇬 +256</option>
+<option value="+255">🇹🇿 +255</option>
+<option value="+251">🇪🇹 +251</option>
+</select>
+</div>
+<input type="tel" class="fp-phone-field" id="fpCustomerPhone" placeholder="Phone number" maxlength="12">
+</div>
+</div>
+
+<p class="fp-login-subtext" style="font-size:11px; color:#999; margin-bottom:14px; line-height:1.5;">
+This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" style="color:#666;">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" style="color:#666;">Terms of Service</a> apply.
+</p>
+
+<button class="fp-btn fp-btn-whatsapp" onclick="loginWithPhone()" style="border-radius:30px; padding:14px; font-size:15px; font-weight:700;">
+<i class="fab fa-whatsapp" style="font-size:1.2rem;"></i> Continue with WhatsApp
+</button>
+
+<div class="fp-or-divider"><span>or with</span></div>
+
+<div style="display:flex; flex-direction:column; gap:10px;">
+<button class="fp-social-btn" onclick="loginWithGmail()">
+<svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+Google
+</button>
+<button class="fp-social-btn" onclick="loginWithFacebook()" style="border-color:#1877F2; color:#1877F2;">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+Facebook
+</button>
+<button class="fp-social-btn" onclick="loginWithEmail()">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#333" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg>
+Email
+</button>
+</div>
+
+<div style="text-align:center; margin-top:16px;">
+<span style="font-size:12px; color:#999;">Don't have an account? </span>
+<a onclick="showRegisterStep()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">Sign up here</a>
+</div>
+<div style="text-align:center; margin-top:10px;">
+<span style="font-size:12px; color:#999;">Just browsing? </span>
+<a onclick="goToMarketplace()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">Go to marketplace →</a>
+</div>
+</div>
+
+<!-- Email Login Step (hidden by default) -->
+<div id="fpEmailLoginStep" style="display:none;">
+<p style="text-align:center; font-size:15px; font-weight:600; color:#333; margin-bottom:16px;">Sign in with your email</p>
+<div class="fp-form-group"><label class="fp-form-label">Email Address</label><input type="email" class="fp-phone-input" id="fpEmailLogin" placeholder="Enter your email"></div>
+<div class="fp-form-group"><label class="fp-form-label">Password</label><input type="password" class="fp-phone-input" id="fpEmailPassword" placeholder="Enter your password"></div>
+<button class="fp-btn fp-btn-whatsapp" onclick="loginWithEmailSubmit()" style="border-radius:30px; padding:14px; font-size:15px; font-weight:700;"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+<div style="text-align:center; margin-top:14px;"><a onclick="showPhoneLoginStep()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">← Back to phone login</a></div>
+</div>
+
+<div id="fpRegisterSection" style="display:none;">
+<p style="text-align:center; margin-bottom:16px; color:#555; font-size:14px;">Create your account to continue</p>
+<div class="fp-form-group"><label class="fp-form-label">Full Name *</label><input type="text" class="fp-phone-input" id="fpRegisterName" placeholder="Enter your full name" required></div>
+<div class="fp-form-group"><label class="fp-form-label">Email Address *</label><input type="email" class="fp-phone-input" id="fpRegisterEmail" placeholder="Enter your email" required></div>
+<div class="fp-form-group">
+<label class="fp-form-label">Password *</label>
+<input type="password" class="fp-phone-input" id="fpRegisterPassword" placeholder="Create a password" required oninput="checkPasswordStrength()">
+<div id="fpPasswordHint" style="font-size:0.75rem; color:#888; margin-top:4px;">At least 8 characters. Use a mix of letters, numbers & symbols.</div>
+<div id="fpPasswordStrength" style="display:none; margin-top:6px;">
+<div style="display:flex; gap:4px; margin-bottom:4px;">
+<div id="fpStr1" style="flex:1; height:4px; border-radius:2px; background:#e5e7eb;"></div>
+<div id="fpStr2" style="flex:1; height:4px; border-radius:2px; background:#e5e7eb;"></div>
+<div id="fpStr3" style="flex:1; height:4px; border-radius:2px; background:#e5e7eb;"></div>
+</div>
+<span id="fpStrLabel" style="font-size:0.7rem; font-weight:600;"></span>
+</div>
+</div>
+<div class="fp-form-group"><label class="fp-form-label">Confirm Password *</label><input type="password" class="fp-phone-input" id="fpRegisterConfirm" placeholder="Confirm your password" required></div>
+<label style="display:flex; align-items:flex-start; gap:8px; margin-bottom:16px; font-size:0.8rem; color:#555; cursor:pointer; line-height:1.4;">
+<input type="checkbox" id="fpTermsCheck" style="margin-top:3px; accent-color:var(--theme); flex-shrink:0;">
+<span>I agree to the <a href="#" style="color:var(--theme); font-weight:600;">Terms of Service</a> and <a href="#" style="color:var(--theme); font-weight:600;">Privacy Policy</a>.</span>
+</label>
+<button class="fp-btn fp-btn-whatsapp" onclick="registerUser()"><i class="fas fa-user-plus"></i> Sign Up</button>
+<div class="fp-skip-text" style="margin-top:14px;">Already have an account? <a onclick="showLoginStep()">Log in</a></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- DRIVER LOGIN SECTION - UPDATED WITH USERNAME + PIN FORM  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="fpDriverLoginSection" style="display:none;">
+<div style="text-align:center; margin-bottom:20px; color:#666; font-size:0.9rem;">
+<i class="fas fa-motorcycle" style="color:var(--primary); font-size:1.5rem;"></i>
+<p style="margin-top:8px; font-weight:600;">Driver Sign In</p>
+<p style="font-size:0.8rem; color:#999; margin-top:4px;">Enter your credentials to access the Driver Portal</p>
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-user" style="color:var(--primary);"></i> Username or Phone</label>
+<input type="text" class="fp-phone-input" id="fpDriverUsername" placeholder="e.g. Ahmed Ali or +252631112222" autocomplete="off">
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-lock" style="color:var(--primary);"></i> PIN (4 digits)</label>
+<input type="password" class="fp-phone-input fp-pin-input" id="fpDriverPin" placeholder="••••" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" autocomplete="off">
+</div>
+<button class="fp-btn fp-btn-whatsapp" onclick="driverLoginWithPin()" style="margin-top:8px;">
+<i class="fas fa-sign-in-alt"></i> Sign In to Driver Portal
+</button>
+<div class="fp-skip-text" style="margin-top:14px;">
+<a onclick="switchLoginTab('customer')">← Back to Customer Login</a>
+</div>
+<div class="fp-driver-demo-box">
+<strong><i class="fas fa-info-circle"></i> welcome:</strong>
+<div style="margin-top:6px; line-height:1.8;">
+
+</div>
+</div>
+</div>
+
+<!-- Admin Login Section -->
+<div id="fpAdminLoginSection" style="display:none;">
+<div style="text-align:center; margin-bottom:20px; color:#666; font-size:0.9rem;">
+<i class="fas fa-shield-halved" style="color:var(--primary); font-size:1.5rem;"></i>
+<p style="margin-top:8px; font-weight:600;">Admin Sign In</p>
+<p style="font-size:0.8rem; color:#999; margin-top:4px;">Access the Management Dashboard</p>
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-user" style="color:var(--primary);"></i> Username</label>
+<input type="text" class="fp-phone-input" id="fpAdminUsername" placeholder="Enter admin username" autocomplete="off">
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-lock" style="color:var(--primary);"></i> Password</label>
+<input type="password" class="fp-phone-input" id="fpAdminPassword" placeholder="Enter admin password" autocomplete="off">
+</div>
+<button class="fp-btn fp-btn-whatsapp" onclick="adminLoginFromModal()" style="margin-top:8px;">
+<i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+</button>
+<div class="fp-skip-text" style="margin-top:14px;">
+<a onclick="switchLoginTab('customer')">← Back to Customer Login</a>
+</div>
+<div class="fp-driver-demo-box">
+<strong><i class="fas fa-info-circle"></i> welcome:</strong>
+<div style="margin-top:6px; line-height:1.8;">
+</div>
+<div style="margin-top:8px; font-size:0.75rem; color:#065f46;">
+<i class="fas fa-lightbulb"></i> Tip: Press <b>Enter</b> in the password field to sign in quickly.
+</div>
+</div>
+</div>
+
+
+</div>
+</div>
+
+<!-- Google Profile Completion Modal -->
+<div class="fp-google-modal" id="fpGoogleProfileModal">
+<div class="fp-google-modal-card">
+<button class="fp-login-close" onclick="closeGoogleProfileModal()">×</button>
+<div class="fp-google-welcome">
+<div class="fp-google-avatar" id="fpGoogleAvatar">G</div>
+<h2>Welcome to Go!point!</h2>
+<p>Please complete your profile to continue</p>
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-user" style="color:#4285F4;"></i> Full Name</label>
+<input type="text" class="fp-phone-input" id="fpGoogleName" placeholder="Enter your full name">
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-envelope" style="color:#4285F4;"></i> Email</label>
+<input type="email" class="fp-phone-input" id="fpGoogleEmail" placeholder="Your Google email" readonly style="background:#f5f5f5; color:#888;">
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-phone" style="color:#4285F4;"></i> Phone Number *</label>
+<div class="app-phone-input">
+<span class="app-phone-prefix">+252</span>
+<input type="tel" class="app-phone-number" id="fpGooglePhone" placeholder="6X XXX XXXX" maxlength="9">
+</div>
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-map-marker-alt" style="color:#4285F4;"></i> Delivery Area</label>
+<input type="text" class="fp-phone-input" id="fpGoogleArea" placeholder="e.g. Hargeisa, Edna Adan">
+</div>
+<button class="fp-btn fp-google-complete-btn" onclick="completeGoogleProfile()">
+<i class="fas fa-check-circle"></i> Complete & Start Ordering
+</button>
+</div>
+</div>
+
+<section class="fp-hero-bg">
+<div class="fp-hero-setup">
+<div class="fp-hero-logo-text">Go<span>!</span>point</div>
+<div class="fp-tagline">
+<h1>Delivered at the Speed of Now</h1>
+<p>Your Go!point Biker is ready. Fast, reliable delivery to your doorstep — anytime, anywhere.</p>
+</div>
+<button class="fp-go-btn" onclick="openFrontLogin()"><i class="fas fa-store"></i> Get Started</button>
+</div>
+</section>
+
+<!-- How It Works Section -->
+<section style="background:#f8fafc; padding:60px 20px;">
+<div style="max-width:1100px; margin:0 auto; text-align:center;">
+<h2 style="font-size:2rem; font-weight:800; color:#0f172a; margin-bottom:8px;">How It Works</h2>
+<p style="color:#64748b; font-size:1rem; margin-bottom:40px;">Order your favorite food in 3 simple steps</p>
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:24px;">
+<div style="background:white; border-radius:16px; padding:32px 24px; box-shadow:0 4px 20px rgba(0,0,0,0.06); text-align:center;">
+<div style="width:64px; height:64px; background:linear-gradient(135deg,#22c55e,#16a34a); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;"><i class="fas fa-store" style="font-size:1.5rem; color:white;"></i></div>
+<h3 style="font-size:1.1rem; font-weight:700; color:#0f172a; margin-bottom:8px;">1. Browse Restaurants</h3>
+<p style="color:#64748b; font-size:0.9rem; line-height:1.6;">Explore local restaurants, view menus, and find your favorite dishes. Filter by cuisine, rating, or delivery time.</p>
+</div>
+<div style="background:white; border-radius:16px; padding:32px 24px; box-shadow:0 4px 20px rgba(0,0,0,0.06); text-align:center;">
+<div style="width:64px; height:64px; background:linear-gradient(135deg,#f59e0b,#d97706); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;"><i class="fas fa-shopping-cart" style="font-size:1.5rem; color:white;"></i></div>
+<h3 style="font-size:1.1rem; font-weight:700; color:#0f172a; margin-bottom:8px;">2. Place Your Order</h3>
+<p style="color:#64748b; font-size:0.9rem; line-height:1.6;">Add items to cart, choose delivery or pickup, select payment method (Telesom, E-Dahab, or Cash), and confirm your order.</p>
+</div>
+<div style="background:white; border-radius:16px; padding:32px 24px; box-shadow:0 4px 20px rgba(0,0,0,0.06); text-align:center;">
+<div style="width:64px; height:64px; background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;"><i class="fas fa-motorcycle" style="font-size:1.5rem; color:white;"></i></div>
+<h3 style="font-size:1.1rem; font-weight:700; color:#0f172a; margin-bottom:8px;">3. Fast Delivery</h3>
+<p style="color:#64748b; font-size:0.9rem; line-height:1.6;">A nearby rider picks up your order and delivers it fast. Track your delivery in real-time on the map.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Features Section -->
+<section style="background:white; padding:60px 20px;">
+<div style="max-width:1100px; margin:0 auto; text-align:center;">
+<h2 style="font-size:2rem; font-weight:800; color:#0f172a; margin-bottom:8px;">Why Choose Go!point?</h2>
+<p style="color:#64748b; font-size:1rem; margin-bottom:40px;">The best delivery experience in Somaliland</p>
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:20px;">
+<div style="text-align:center; padding:24px;">
+<div style="font-size:2.5rem; margin-bottom:12px;">⚡</div>
+<h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Lightning Fast</h4>
+<p style="color:#64748b; font-size:0.85rem;">Average delivery in 15-25 minutes. Our riders are always nearby.</p>
+</div>
+<div style="text-align:center; padding:24px;">
+<div style="font-size:2.5rem; margin-bottom:12px;">💰</div>
+<h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Multiple Payments</h4>
+<p style="color:#64748b; font-size:0.85rem;">Pay with Telesom, E-Dahab, or Cash on delivery. Your choice.</p>
+</div>
+<div style="text-align:center; padding:24px;">
+<div style="font-size:2.5rem; margin-bottom:12px;">📍</div>
+<h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Live Tracking</h4>
+<p style="color:#64748b; font-size:0.85rem;">Track your order in real-time from restaurant to your doorstep.</p>
+</div>
+<div style="text-align:center; padding:24px;">
+<div style="font-size:2.5rem; margin-bottom:12px;">🍽️</div>
+<h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Top Restaurants</h4>
+<p style="color:#64748b; font-size:0.85rem;">Order from the best local restaurants. Pizza, burgers, coffee & more.</p>
+</div>
+<div style="text-align:center; padding:24px;">
+<div style="font-size:2.5rem; margin-bottom:12px;">🛵</div>
+<h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Motorcycle & Taxi</h4>
+<p style="color:#64748b; font-size:0.85rem;">Choose motorcycle for fast delivery or taxi for larger orders.</p>
+</div>
+<div style="text-align:center; padding:24px;">
+<div style="font-size:2.5rem; margin-bottom:12px;">🔒</div>
+<h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Secure & Reliable</h4>
+<p style="color:#64748b; font-size:0.85rem;">Your orders are handled with care. Rated riders only.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- For Drivers Section -->
+<section style="background:linear-gradient(135deg,#0f172a,#1e293b); padding:60px 20px; color:white;">
+<div style="max-width:900px; margin:0 auto; text-align:center;">
+<h2 style="font-size:2rem; font-weight:800; margin-bottom:12px;">Become a Go!point Rider</h2>
+<p style="color:#94a3b8; font-size:1rem; margin-bottom:32px;">Earn money on your own schedule. Join our growing team of delivery riders.</p>
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:24px; margin-bottom:32px;">
+<div style="background:rgba(255,255,255,0.08); border-radius:12px; padding:24px;">
+<div style="font-size:2rem; margin-bottom:8px;">💵</div>
+<h4 style="font-weight:600; margin-bottom:4px;">Earn Per Delivery</h4>
+<p style="color:#94a3b8; font-size:0.85rem;">Keep 80% of each delivery fee. Cash out anytime.</p>
+</div>
+<div style="background:rgba(255,255,255,0.08); border-radius:12px; padding:24px;">
+<div style="font-size:2rem; margin-bottom:8px;">⏰</div>
+<h4 style="font-weight:600; margin-bottom:4px;">Flexible Hours</h4>
+<p style="color:#94a3b8; font-size:0.85rem;">Work when you want. Morning, night, or weekends.</p>
+</div>
+<div style="background:rgba(255,255,255,0.08); border-radius:12px; padding:24px;">
+<div style="font-size:2rem; margin-bottom:8px;">📱</div>
+<h4 style="font-weight:600; margin-bottom:4px;">Easy to Use</h4>
+<p style="color:#94a3b8; font-size:0.85rem;">Simple app. Accept orders, navigate, deliver. That's it.</p>
+</div>
+</div>
+<button class="fp-go-btn" onclick="openFrontLogin(); switchLoginTab('driver');" style="background:#22c55e;"><i class="fas fa-motorcycle"></i> Join as Rider</button>
+</div>
+</section>
+
+<footer class="fp-footer">
+<div class="fp-footer-container">
+<div>
+<div class="fp-footer-logo-text">Go<span>!</span>point</div>
+<p class="fp-footer-brand-text">Your one-stop delivery app. From food to groceries, our Go!point Bikers bring it all — fast and fresh.</p>
+</div>
+<div class="fp-footer-columns">
+<div class="fp-column"><h4>Contact</h4><a href="mailto:support@gopoint.so">support@gopoint.so</a><a href="tel:+252610000000">+252 61 000 0000</a></div>
+<div class="fp-column"><h4>Company</h4><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a></div>
+<div class="fp-column"><h4>Legal</h4><a href="#">Terms of Service</a><a href="#">Privacy Policy</a><a href="#">Help Center</a></div>
+</div>
+</div>
+<div class="fp-copyright">© 2025 Go!point — ONE APP TO RULE THEM ALL</div>
+</footer>
+</div>
 
 <!-- ─── ADMIN DASHBOARD ─── -->
 <div id="adminDashboard">
@@ -1838,20 +2181,6 @@ setupPaymentPhoneInput();
 const savedLocation = localStorage.getItem('gopoint_customer_location');
 if (savedLocation) { try { customerLocation = JSON.parse(savedLocation); } catch(e) {} }
 
-// Check if admin is logged in
-const isAdmin = localStorage.getItem('admin_auth') === 'true';
-const driverLoginData = localStorage.getItem('gopoint_driver_login');
-
-// Check if a user session exists
-const { data: { session } } = await sb.auth.getSession();
-const savedUser = localStorage.getItem('gopoint_user');
-
-if (!session && !savedUser && !isAdmin && !driverLoginData) {
-  window.location.href = 'front.html';
-  return;
-}
-
-// Handle Google auth state
 sb.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_IN' && session?.user) {
     const u = session.user;
@@ -1864,9 +2193,13 @@ sb.auth.onAuthStateChange((event, session) => {
     };
     currentUser = googleUser;
     localStorage.setItem('gopoint_user', JSON.stringify(googleUser));
+    if (!document.getElementById('appContainer').classList.contains('active')) {
+      goToMarketplace();
+    }
   }
 });
 
+const { data: { session } } = await sb.auth.getSession();
 if (session?.user) {
   const u = session.user;
   const googleUser = {
@@ -1878,64 +2211,30 @@ if (session?.user) {
   };
   currentUser = googleUser;
   localStorage.setItem('gopoint_user', JSON.stringify(googleUser));
-} else if (savedUser) {
-  try { currentUser = JSON.parse(savedUser); } catch (e) { localStorage.removeItem('gopoint_user'); }
+  goToMarketplace();
+} else {
+  const savedUser = localStorage.getItem('gopoint_user');
+  if (savedUser) { try { currentUser = JSON.parse(savedUser); goToMarketplace(); } catch (e) { localStorage.removeItem('gopoint_user'); } }
 }
-
+window.addEventListener('scroll', () => {
+const header = document.getElementById('fpHeader');
+if (header) { if (window.scrollY > 50) header.classList.add('scrolled'); else header.classList.remove('scrolled'); }
+});
 initApp();
 
-// Handle admin login
-if (isAdmin) {
-  localStorage.removeItem('admin_auth');
-  showAdminDashboard();
-  return;
+// ─── DRIVER LOGIN ENTER KEY SUPPORT ───
+const driverUsernameInput = document.getElementById('fpDriverUsername');
+const driverPinInput = document.getElementById('fpDriverPin');
+if (driverUsernameInput) {
+driverUsernameInput.addEventListener('keypress', (e) => {
+if (e.key === 'Enter') { e.preventDefault(); if (driverPinInput) driverPinInput.focus(); }
+});
 }
-
-// Handle driver login from front.html
-if (driverLoginData) {
-  try {
-    const matchedVehicle = JSON.parse(driverLoginData);
-    localStorage.removeItem('gopoint_driver_login');
-    dpDriver = matchedVehicle;
-    document.getElementById('appContainer').classList.add('active');
-    document.getElementById('appContainer').classList.add('driver-active');
-    document.getElementById('appDriverPortal').style.display = 'block';
-    document.getElementById('dpFleetSelection').style.display = 'none';
-    document.getElementById('dpScreenPortal').style.display = 'block';
-    dpOnline = true;
-    dpLoadData();
-    dpLoadRingtone();
-    dpSyncVehicleStatus();
-    document.getElementById('dpWelcomeMsg').textContent = dpDriver.driverName + ' • ' + (dpDriver.plateNumber || dpDriver.plate);
-    dpUpdateUI();
-    dpRefresh();
-    setTimeout(() => dpInitActiveMap(), 200);
-    dpToast(dpAdminDeactivated ? '🔴 deactivated by admin - Contact admin' : '✅ Welcome ' + dpDriver.driverName, dpAdminDeactivated ? 'error' : 'success');
-    dpCheckForIncomingCalls();
-    if (dpPollInterval) clearInterval(dpPollInterval);
-    dpPollInterval = setInterval(async () => {
-      if (!dpDriver) { clearInterval(dpPollInterval); dpPollInterval = null; return; }
-      if (supaConnected) {
-        const vehData = await supaLoadVehicles();
-        if (vehData.length > 0) { vehicles = vehData; const fresh = vehicles.find(v => v.id === dpDriver.id); if (fresh) dpDriver = fresh; }
-        const ordData = await supaLoadOrders();
-        if (ordData.length > 0) { orders = ordData; }
-        saveLocalData();
-      }
-      dpRefresh();
-      dpCheckForIncomingCalls();
-    }, 5000);
-    const activeOrder = orders.find(o => ['preparing', 'ready', 'out_for_delivery'].includes(o.status) && o.vehicle && o.vehicle.driverName === dpDriver.driverName);
-    if (activeOrder) {
-      setTimeout(() => {
-        dpSwitchTab('active');
-        setTimeout(() => dpShowCustomerOnMap(activeOrder.id, { useActiveMap: true }), 400);
-      }, 500);
-    }
-  } catch(e) { console.error('Driver login error:', e); }
-  return;
+if (driverPinInput) {
+driverPinInput.addEventListener('keypress', (e) => {
+if (e.key === 'Enter') { e.preventDefault(); driverLoginWithPin(); }
+});
 }
-
 });
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1981,6 +2280,8 @@ return;
 
 // Successfully authenticated - enter driver portal directly
 dpDriver = matchedVehicle;
+closeFrontLogin();
+document.getElementById('frontPageContainer').style.display = 'none';
 document.getElementById('appContainer').classList.add('active');
 document.getElementById('appContainer').classList.add('driver-active');
 document.getElementById('appDriverPortal').style.display = 'block';
@@ -1996,8 +2297,10 @@ dpRefresh();
 setTimeout(() => dpInitActiveMap(), 200);
 dpToast(dpAdminDeactivated ? '🔴 deactivated by admin - Contact admin' : '✅ Welcome ' + dpDriver.driverName, dpAdminDeactivated ? 'error' : 'success');
 
+// Check for pending orders
 dpCheckForIncomingCalls();
 
+// Auto-refresh from Supabase every 5 seconds
 if (dpPollInterval) clearInterval(dpPollInterval);
 dpPollInterval = setInterval(async () => {
   if (!dpDriver) { clearInterval(dpPollInterval); dpPollInterval = null; return; }
@@ -2012,6 +2315,7 @@ dpPollInterval = setInterval(async () => {
   dpCheckForIncomingCalls();
 }, 5000);
 
+// If driver has active orders, show them
 const activeOrder = orders.find(o => ['preparing', 'ready', 'out_for_delivery'].includes(o.status) && o.vehicle && o.vehicle.driverName === dpDriver.driverName);
 if (activeOrder) {
 setTimeout(() => {
@@ -2029,12 +2333,14 @@ dpCleanupMap();
 document.getElementById('appDriverPortal').style.display = 'none';
 document.getElementById('dpFleetSelection').style.display = 'none';
 document.getElementById('dpScreenPortal').style.display = 'block';
-document.getElementById('appContainer').classList.remove('active', 'driver-active');
+document.getElementById('appContainer').classList.remove('driver-active');
+document.getElementById('frontPageContainer').style.display = 'block';
+// Clear login form
 const u = document.getElementById('fpDriverUsername');
 const p = document.getElementById('fpDriverPin');
 if (u) u.value = '';
 if (p) p.value = '';
-window.location.href = 'front.html';
+showAppToast('👋 Logged out from Driver Portal');
 }
 
 // ─── FLEET SELECTION ───
@@ -2912,18 +3218,19 @@ localStorage.setItem('gopoint_users', JSON.stringify(users));
 completeLogin({ name, email, phone: '', provider: 'email' });
 }
 
-function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
-function goToMarketplace() { document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); updateUserUI(); navigateToView('home'); setTimeout(() => { if (appMap) appMap.invalidateSize(); appRenderRestaurantList(); }, 100); }
+function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
+function goToMarketplace() { document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); updateUserUI(); navigateToView('home'); setTimeout(() => { if (appMap) appMap.invalidateSize(); appRenderRestaurantList(); }, 100); }
 
 async function logoutUser() {
 if (!confirm('Are you sure you want to logout?')) return;
 await sb.auth.signOut();
 currentUser = null;
 localStorage.removeItem('gopoint_user');
-localStorage.removeItem('gopoint_driver_login');
 document.getElementById('appContainer').classList.remove('active');
+document.getElementById('frontPageContainer').style.display = 'block';
 document.getElementById('appUserDropdown').classList.remove('active');
-window.location.href = 'front.html';
+window.scrollTo({ top: 0 });
+showAppToast('👋 Logged out successfully');
 }
 
 function updateUserUI() {
@@ -3769,27 +4076,40 @@ document.getElementById('adminDashboard').classList.remove('active');
 document.getElementById('adminDashboard').style.display = '';
 document.getElementById('appContainer').classList.remove('active', 'driver-active');
 document.getElementById('appContainer').style.display = '';
-window.location.href = 'front.html';
+document.getElementById('frontPageContainer').style.display = 'block';
+window.scrollTo({ top: 0 });
 }
 
-function adBackToHome() { document.getElementById('adminDashboard').classList.remove('active'); window.location.href = 'front.html'; }
+function adBackToHome() { document.getElementById('adminDashboard').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'block'; window.scrollTo({ top: 0 }); }
 
 function adToast(msg) { const e = document.getElementById('adToast'); e.textContent = msg; e.classList.add('show'); clearTimeout(e._t); e._t = setTimeout(() => { e.classList.remove('show'); }, 3000); }
 
 function openAdminLogin() {
-  window.location.href = 'front.html';
+  document.getElementById('frontPageContainer').style.display = 'block';
+  document.getElementById('appContainer').classList.remove('active');
+  document.getElementById('adminDashboard').classList.remove('active');
+  openFrontLogin();
+  switchLoginTab('admin');
 }
 
 function openAdminLoginFromApp() {
   document.getElementById('appUserDropdown').classList.remove('active');
-  window.location.href = 'front.html';
+  document.getElementById('appContainer').classList.remove('active');
+  document.getElementById('frontPageContainer').style.display = 'block';
+  openFrontLogin();
+  switchLoginTab('admin');
 }
 
 function openAdminLoginFromDriver() {
   dpLogout();
+  setTimeout(() => {
+    openFrontLogin();
+    switchLoginTab('admin');
+  }, 300);
 }
 
 async function showAdminDashboard() {
+  document.getElementById('frontPageContainer').style.display = 'none';
   document.getElementById('appContainer').classList.remove('active');
   document.getElementById('adminDashboard').classList.add('active');
   document.getElementById('adminDashboard').style.display = 'block';
