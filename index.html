@@ -928,6 +928,86 @@ Facebook
 </div>
 </div>
 
+<!-- ─── DRIVER LOGIN POPUP ─── -->
+<div class="fp-fullpage-login" id="fpDriverLoginPopup">
+<div class="fp-fpl-card">
+<div class="fp-fpl-hero-bg" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+<button class="fp-fpl-close" onclick="closeDriverLoginPopup()">×</button>
+<div style="font-size:2.5rem; margin-bottom:4px;">🛵</div>
+<div class="fp-fpl-hero-logo" style="color:white;">Driver Portal</div>
+<p class="fp-fpl-hero-sub">Deliver with Go!point</p>
+</div>
+<div class="fp-fpl-body">
+<h1 class="fp-fpl-title">Welcome, Rider!</h1>
+<p class="fp-fpl-subtitle">Enter your credentials to access the Driver Portal</p>
+
+<div class="fp-fpl-phone-group">
+<label class="fp-fpl-phone-label"><i class="fas fa-user" style="color:#22c55e; margin-right:4px;"></i> Username or Phone</label>
+<div style="border: 2px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: white; transition: var(--transition);" id="fpDriverLoginRow">
+<input type="text" class="fp-fpl-phone-input" id="fpDriverLoginUsername" placeholder="e.g. Ahmed Ali or +252631112222" autocomplete="off" style="padding: 13px 14px;">
+</div>
+</div>
+
+<div class="fp-fpl-phone-group">
+<label class="fp-fpl-phone-label"><i class="fas fa-lock" style="color:#22c55e; margin-right:4px;"></i> PIN (4 digits)</label>
+<div style="border: 2px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: white; transition: var(--transition);" id="fpDriverPinRow">
+<input type="password" class="fp-fpl-phone-input" id="fpDriverLoginPin" placeholder="••••" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" autocomplete="off" style="padding: 13px 14px; letter-spacing: 6px; font-size: 18px; text-align: center;">
+</div>
+</div>
+
+<button class="fp-fpl-continue-btn" onclick="driverPopupLogin()" style="background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);">
+<i class="fas fa-sign-in-alt"></i> Sign In to Driver Portal
+</button>
+
+<div class="fp-fpl-footer-links" style="border-top: 1px solid #f0f0f0; padding-top: 14px;">
+<a onclick="closeDriverLoginPopup(); openFullpageLogin();"><i class="fas fa-arrow-left"></i> Back to Customer Login</a>
+<a onclick="closeDriverLoginPopup(); fplOpenAdminLogin();"><i class="fas fa-shield-halved"></i> Sign in as Admin</a>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ─── ADMIN LOGIN POPUP ─── -->
+<div class="fp-fullpage-login" id="fpAdminLoginPopup">
+<div class="fp-fpl-card">
+<div class="fp-fpl-hero-bg" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
+<button class="fp-fpl-close" onclick="closeAdminLoginPopup()">×</button>
+<div style="font-size:2.5rem; margin-bottom:4px;">🛡️</div>
+<div class="fp-fpl-hero-logo" style="color:white;">Admin Portal</div>
+<p class="fp-fpl-hero-sub">Management Dashboard</p>
+</div>
+<div class="fp-fpl-body">
+<h1 class="fp-fpl-title">Admin Sign In</h1>
+<p class="fp-fpl-subtitle">Access the Management Dashboard</p>
+
+<div class="fp-fpl-phone-group">
+<label class="fp-fpl-phone-label"><i class="fas fa-user" style="color:#6366f1; margin-right:4px;"></i> Username</label>
+<div style="border: 2px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: white; transition: var(--transition);">
+<input type="text" class="fp-fpl-phone-input" id="fpAdminLoginUsername" placeholder="Enter admin username" autocomplete="off" style="padding: 13px 14px;">
+</div>
+</div>
+
+<div class="fp-fpl-phone-group">
+<label class="fp-fpl-phone-label"><i class="fas fa-lock" style="color:#6366f1; margin-right:4px;"></i> Password</label>
+<div style="border: 2px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: white; transition: var(--transition);">
+<input type="password" class="fp-fpl-phone-input" id="fpAdminLoginPassword" placeholder="Enter admin password" autocomplete="off" style="padding: 13px 14px;">
+</div>
+</div>
+
+<button class="fp-fpl-continue-btn" onclick="adminPopupLogin()" style="background: linear-gradient(135deg, #6366f1, #4f46e5); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);">
+<i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+</button>
+
+<p style="font-size:11px; color:#aaa; text-align:center; margin-top:8px;"><i class="fas fa-lightbulb"></i> Tip: Press <b>Enter</b> in the password field to sign in quickly.</p>
+
+<div class="fp-fpl-footer-links" style="border-top: 1px solid #f0f0f0; padding-top: 14px;">
+<a onclick="closeAdminLoginPopup(); openFullpageLogin();"><i class="fas fa-arrow-left"></i> Back to Customer Login</a>
+<a onclick="closeAdminLoginPopup(); fplOpenDriverLogin();"><i class="fas fa-motorcycle"></i> Sign in as Driver</a>
+</div>
+</div>
+</div>
+</div>
+
 <header class="fp-header" id="fpHeader">
 <div class="fp-logo"><div class="fp-logo-text">Go<span>!</span>point</div></div>
 <nav class="fp-nav">
@@ -2287,6 +2367,14 @@ e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
 window.addEventListener('DOMContentLoaded', async () => {
 setupPaymentPhoneInput();
 
+// Enter key support for popup logins
+document.addEventListener('keydown', (e) => {
+if (e.key !== 'Enter') return;
+if (document.getElementById('fpDriverLoginPopup')?.classList.contains('active')) { e.preventDefault(); driverPopupLogin(); }
+if (document.getElementById('fpAdminLoginPopup')?.classList.contains('active')) { e.preventDefault(); adminPopupLogin(); }
+if (document.getElementById('fpFullpageLogin')?.classList.contains('active')) { e.preventDefault(); fplContinueWithPhone(); }
+});
+
 const savedLocation = localStorage.getItem('gopoint_customer_location');
 if (savedLocation) { try { customerLocation = JSON.parse(savedLocation); } catch(e) {} }
 
@@ -3114,14 +3202,54 @@ loginWithPhone();
 
 function fplOpenDriverLogin() {
 closeFullpageLogin();
-openFrontLogin();
-switchLoginTab('driver');
+document.getElementById('fpDriverLoginPopup').classList.add('active');
+document.body.style.overflow = 'hidden';
+setTimeout(() => { document.getElementById('fpDriverLoginPin').focus(); }, 300);
 }
 
 function fplOpenAdminLogin() {
 closeFullpageLogin();
-openFrontLogin();
-switchLoginTab('admin');
+document.getElementById('fpAdminLoginPopup').classList.add('active');
+document.body.style.overflow = 'hidden';
+setTimeout(() => { document.getElementById('fpAdminLoginUsername').focus(); }, 300);
+}
+
+function closeDriverLoginPopup() {
+document.getElementById('fpDriverLoginPopup').classList.remove('active');
+document.body.style.overflow = '';
+}
+
+function closeAdminLoginPopup() {
+document.getElementById('fpAdminLoginPopup').classList.remove('active');
+document.body.style.overflow = '';
+}
+
+function openFullpageLogin() {
+document.getElementById('fpFullpageLogin').classList.add('active');
+document.body.style.overflow = 'hidden';
+setTimeout(() => { document.getElementById('fpFplPhone').focus(); }, 300);
+}
+
+function driverPopupLogin() {
+const username = document.getElementById('fpDriverLoginUsername').value.trim();
+const pin = document.getElementById('fpDriverLoginPin').value.trim();
+if (!username) { showAppToast('Please enter your username or phone'); document.getElementById('fpDriverLoginUsername').focus(); return; }
+if (!pin || pin.length !== 4) { showAppToast('Please enter your 4-digit PIN'); document.getElementById('fpDriverLoginPin').focus(); return; }
+closeDriverLoginPopup();
+document.getElementById('fpDriverUsername').value = username;
+document.getElementById('fpDriverPin').value = pin;
+driverLoginWithPin();
+}
+
+function adminPopupLogin() {
+const username = document.getElementById('fpAdminLoginUsername').value.trim();
+const password = document.getElementById('fpAdminLoginPassword').value.trim();
+if (!username) { showAppToast('Please enter admin username'); document.getElementById('fpAdminLoginUsername').focus(); return; }
+if (!password) { showAppToast('Please enter admin password'); document.getElementById('fpAdminLoginPassword').focus(); return; }
+closeAdminLoginPopup();
+document.getElementById('fpAdminUsername').value = username;
+document.getElementById('fpAdminPassword').value = password;
+adminLoginFromModal();
 }
 
 function fplBrowseMarketplace() {
@@ -3353,7 +3481,7 @@ completeLogin({ name, email, phone: '', provider: 'email' });
 }
 
 function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
-function goToMarketplace() { document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
+function goToMarketplace() { document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('fpDriverLoginPopup').classList.remove('active'); document.getElementById('fpAdminLoginPopup').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
 
 async function logoutUser() {
 if (!confirm('Are you sure you want to logout?')) return;
