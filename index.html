@@ -2177,15 +2177,33 @@ e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
 
 window.addEventListener('DOMContentLoaded', async () => {
 setupPaymentPhoneInput();
+
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session?.user) {
+    const u = session.user;
+    const googleUser = {
+      name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'User',
+      email: u.email || '',
+      phone: u.user_metadata?.phone || '',
+      provider: u.provider || 'google',
+      id: u.id
+    };
+    currentUser = googleUser;
+    localStorage.setItem('gopoint_user', JSON.stringify(googleUser));
+    if (!document.getElementById('appContainer').classList.contains('active')) {
+      goToMarketplace();
+    }
+  }
+});
+
 const { data: { session } } = await sb.auth.getSession();
 if (session?.user) {
   const u = session.user;
-  const googleEmail = u.email || '';
   const googleUser = {
-    name: u.user_metadata?.full_name || u.user_metadata?.name || googleEmail.split('@')[0] || 'Google User',
-    email: googleEmail,
+    name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'User',
+    email: u.email || '',
     phone: u.user_metadata?.phone || '',
-    provider: 'google',
+    provider: u.provider || 'google',
     id: u.id
   };
   currentUser = googleUser;
