@@ -155,6 +155,57 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-divider span { padding: 0 10px; font-size: 12px; color: #999; }
 .fp-skip-text { text-align: center; margin-top: 16px; font-size: 12px; color: #999; }
 .fp-skip-text a { color: var(--theme); cursor: pointer; font-weight: 600; text-decoration: none; }
+/* ─── FULL PAGE LOGIN (GLOVO STYLE) ─── */
+.fp-fullpage-login { position: fixed; inset: 0; z-index: 10000; background: var(--white); display: none; flex-direction: column; overflow-y: auto; }
+.fp-fullpage-login.active { display: flex; }
+.fp-fpl-header { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; position: sticky; top: 0; background: var(--white); z-index: 2; }
+.fp-fpl-back { background: none; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; color: #333; transition: var(--transition); flex-shrink: 0; }
+.fp-fpl-back:hover { background: #f5f5f5; }
+.fp-fpl-header-title { font-size: 17px; font-weight: 700; color: var(--black); margin-left: 8px; }
+.fp-fpl-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px 30px; max-width: 440px; margin: 0 auto; width: 100%; }
+.fp-fpl-logo { font-size: 3.2rem; margin-bottom: 12px; }
+.fp-fpl-title { font-size: 26px; font-weight: 800; color: var(--black); text-align: center; margin-bottom: 6px; letter-spacing: -0.3px; }
+.fp-fpl-subtitle { font-size: 14px; color: #888; text-align: center; margin-bottom: 32px; line-height: 1.5; }
+.fp-fpl-phone-group { width: 100%; margin-bottom: 20px; }
+.fp-fpl-phone-label { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px; display: block; }
+.fp-fpl-phone-row { display: flex; border: 2px solid #e5e7eb; border-radius: 14px; overflow: hidden; background: white; transition: var(--transition); }
+.fp-fpl-phone-row:focus-within { border-color: var(--theme); box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.1); }
+.fp-fpl-country-select { display: flex; align-items: center; gap: 4px; padding: 14px 12px; border-right: 1px solid #e5e7eb; background: #fafafa; font-size: 14px; font-weight: 600; color: #333; cursor: pointer; user-select: none; min-width: 100px; }
+.fp-fpl-country-select select { border: none; background: transparent; font-size: 13px; font-weight: 600; color: #333; outline: none; cursor: pointer; font-family: inherit; appearance: none; -webkit-appearance: none; padding-right: 16px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0 center; }
+.fp-fpl-phone-input { border: none; padding: 14px 16px; font-size: 16px; outline: none; flex: 1; font-family: inherit; letter-spacing: 0.5px; }
+.fp-fpl-phone-input::placeholder { color: #bbb; font-weight: 400; }
+.fp-fpl-continue-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--theme), var(--theme-dark)); color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition); font-family: inherit; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3); }
+.fp-fpl-continue-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4); }
+.fp-fpl-continue-btn:active { transform: translateY(0); }
+.fp-fpl-divider { display: flex; align-items: center; width: 100%; margin-bottom: 20px; gap: 14px; }
+.fp-fpl-divider::before, .fp-fpl-divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
+.fp-fpl-divider span { font-size: 12px; color: #aaa; font-weight: 500; white-space: nowrap; }
+.fp-fpl-social-row { display: flex; gap: 12px; width: 100%; margin-bottom: 28px; }
+.fp-fpl-social-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 10px; border: 2px solid #e5e7eb; border-radius: 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit; background: white; color: #333; }
+.fp-fpl-social-btn:hover { border-color: #ccc; background: #fafafa; transform: translateY(-1px); }
+.fp-fpl-social-btn svg, .fp-fpl-social-btn img { width: 20px; height: 20px; flex-shrink: 0; }
+.fp-fpl-social-btn.whatsapp { border-color: #25D366; color: #25D366; }
+.fp-fpl-social-btn.whatsapp:hover { background: #f0faf4; border-color: #25D366; }
+.fp-fpl-social-btn.google { border-color: #4285F4; color: #4285F4; }
+.fp-fpl-social-btn.google:hover { background: #f0f6ff; border-color: #4285F4; }
+.fp-fpl-social-btn.facebook { border-color: #1877F2; color: #1877F2; }
+.fp-fpl-social-btn.facebook:hover { background: #f0f6ff; border-color: #1877F2; }
+.fp-fpl-footer-links { width: 100%; text-align: center; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+.fp-fpl-footer-links a { display: block; font-size: 13px; color: #888; text-decoration: none; padding: 8px 0; cursor: pointer; transition: var(--transition); font-weight: 500; }
+.fp-fpl-footer-links a:hover { color: var(--theme); }
+.fp-fpl-footer-links a i { margin-right: 6px; width: 16px; text-align: center; }
+.fp-fpl-terms { font-size: 11px; color: #bbb; text-align: center; margin-top: 20px; line-height: 1.6; }
+.fp-fpl-terms a { color: #999; text-decoration: none; }
+.fp-fpl-hero-bg { background: linear-gradient(135deg, var(--theme) 0%, var(--theme-dark) 100%); min-height: 220px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.fp-fpl-hero-content { text-align: center; color: white; padding: 40px 20px; }
+.fp-fpl-hero-content .fp-hero-logo-text { font-size: 42px; margin-bottom: 8px; text-shadow: none; }
+.fp-fpl-hero-content p { font-size: 15px; opacity: 0.9; }
+@media (max-width: 480px) {
+.fp-fpl-body { padding: 30px 20px 24px; }
+.fp-fpl-title { font-size: 22px; }
+.fp-fpl-social-row { flex-direction: column; gap: 10px; }
+.fp-fpl-hero-bg { min-height: 180px; }
+}
 .fp-hero-bg { background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0.7) 100%), url('rider.jpg'); background-size: cover; background-position: center; min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
 .fp-hero-setup { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 800px; padding: 20px; text-align: center; position: relative; z-index: 2; }
 .fp-hero-logo-text { font-size: clamp(48px, 8vw, 72px); font-weight: 900; color: var(--white); letter-spacing: -2px; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); margin-bottom: 16px; }
@@ -819,6 +870,67 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 
 <!-- ─── FRONT PAGE ─── -->
 <div id="frontPageContainer" style="display:block;">
+
+<!-- ─── FULL PAGE LOGIN (GLOVO STYLE) ─── -->
+<div class="fp-fullpage-login" id="fpFullpageLogin">
+<div class="fp-fpl-hero-bg">
+<div class="fp-fpl-hero-content">
+<div class="fp-hero-logo-text" style="font-size:42px;">Go<span>!</span>point</div>
+<p>Your favorite food, delivered fast</p>
+</div>
+</div>
+<div class="fp-fpl-body">
+<div class="fp-fpl-logo">🛵</div>
+<h1 class="fp-fpl-title">What's your phone number?</h1>
+<p class="fp-fpl-subtitle">We'll send you a verification code to get started</p>
+
+<div class="fp-fpl-phone-group">
+<label class="fp-fpl-phone-label">Phone Number</label>
+<div class="fp-fpl-phone-row">
+<div class="fp-fpl-country-select">
+<select id="fpFplCountry">
+<option value="+252" data-flag="🇸🇴">🇸🇴 +252</option>
+<option value="+254" data-flag="🇰🇪">🇰🇪 +254</option>
+<option value="+256" data-flag="🇺🇬">🇺🇬 +256</option>
+<option value="+255" data-flag="🇹🇿">🇹🇿 +255</option>
+<option value="+251" data-flag="🇪🇹">🇪🇹 +251</option>
+</select>
+</div>
+<input type="tel" class="fp-fpl-phone-input" id="fpFplPhone" placeholder="6X XXX XXXX" maxlength="12">
+</div>
+</div>
+
+<button class="fp-fpl-continue-btn" onclick="fplContinueWithPhone()">
+Continue
+</button>
+
+<div class="fp-fpl-divider"><span>or continue with</span></div>
+
+<div class="fp-fpl-social-row">
+<button class="fp-fpl-social-btn whatsapp" onclick="fplContinueWithPhone()">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+WhatsApp
+</button>
+<button class="fp-fpl-social-btn google" onclick="loginWithGmail()">
+<svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+Google
+</button>
+<button class="fp-fpl-social-btn facebook" onclick="loginWithFacebook()">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+Facebook
+</button>
+</div>
+
+<div class="fp-fpl-footer-links">
+<a onclick="fplOpenDriverLogin()"><i class="fas fa-motorcycle"></i> Sign in as Driver</a>
+<a onclick="fplOpenAdminLogin()"><i class="fas fa-shield-halved"></i> Sign in as Admin</a>
+<a onclick="fplBrowseMarketplace()"><i class="fas fa-store"></i> Browse as Guest</a>
+</div>
+
+<p class="fp-fpl-terms">By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+</div>
+</div>
+
 <header class="fp-header" id="fpHeader">
 <div class="fp-logo"><div class="fp-logo-text">Go<span>!</span>point</div></div>
 <nav class="fp-nav">
@@ -2971,13 +3083,9 @@ e._t = setTimeout(() => { e.classList.remove('show'); }, 3000);
 
 // ─── FRONT PAGE LOGIN FUNCTIONS ───
 function openFrontLogin() {
-switchLoginTab('customer');
-document.getElementById('fpLoginModal').classList.add('active');
+document.getElementById('fpFullpageLogin').classList.add('active');
 document.body.style.overflow = 'hidden';
-detectFrontLocation();
-setTimeout(() => {
-document.getElementById('fpLoginUsername').focus();
-}, 100);
+setTimeout(() => { document.getElementById('fpFplPhone').focus(); }, 300);
 }
 
 function closeFrontLogin() {
@@ -2985,6 +3093,43 @@ document.getElementById('fpLoginModal').classList.remove('active');
 document.body.style.overflow = '';
 document.getElementById('fpRegisterSection').style.display = 'none';
 document.getElementById('fpLoginStep').style.display = 'block';
+}
+
+function closeFullpageLogin() {
+document.getElementById('fpFullpageLogin').classList.remove('active');
+document.body.style.overflow = '';
+}
+
+function fplContinueWithPhone() {
+const phone = document.getElementById('fpFplPhone').value.trim();
+const country = document.getElementById('fpFplCountry').value;
+if (!phone || phone.length < 6) {
+showAppToast('Please enter a valid phone number');
+document.getElementById('fpFplPhone').focus();
+return;
+}
+const fullPhone = country + phone;
+document.getElementById('fpCustomerPhone').value = phone;
+document.getElementById('fpPhonePrefix').value = country;
+closeFullpageLogin();
+loginWithPhone();
+}
+
+function fplOpenDriverLogin() {
+closeFullpageLogin();
+openFrontLogin();
+switchLoginTab('driver');
+}
+
+function fplOpenAdminLogin() {
+closeFullpageLogin();
+openFrontLogin();
+switchLoginTab('admin');
+}
+
+function fplBrowseMarketplace() {
+closeFullpageLogin();
+goToMarketplace();
 }
 
 function toggleFpMobileMenu() { document.getElementById('fpMobileMenu').classList.toggle('active'); }
@@ -3211,7 +3356,7 @@ completeLogin({ name, email, phone: '', provider: 'email' });
 }
 
 function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
-function goToMarketplace() { document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); updateUserUI(); navigateToView('home'); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
+function goToMarketplace() { document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
 
 async function logoutUser() {
 if (!confirm('Are you sure you want to logout?')) return;
