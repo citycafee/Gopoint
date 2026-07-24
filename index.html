@@ -2182,27 +2182,7 @@ setupPaymentPhoneInput();
 const savedLocation = localStorage.getItem('gopoint_customer_location');
 if (savedLocation) { try { customerLocation = JSON.parse(savedLocation); } catch(e) {} }
 
-sb.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN' && session?.user) {
-    const u = session.user;
-    const googleUser = {
-      name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'User',
-      email: u.email || '',
-      phone: u.user_metadata?.phone || '',
-      provider: u.provider || 'google',
-      id: u.id
-    };
-    currentUser = googleUser;
-    localStorage.setItem('gopoint_user', JSON.stringify(googleUser));
-    if (!document.getElementById('appContainer').classList.contains('active')) {
-      goToMarketplace();
-    }
-  }
-});
-
-const { data: { session } } = await sb.auth.getSession();
-if (session?.user) {
-  const u = session.user;
+async function handleGoogleUser(u) {
   const googleUser = {
     name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'User',
     email: u.email || '',
@@ -2213,10 +2193,22 @@ if (session?.user) {
   currentUser = googleUser;
   localStorage.setItem('gopoint_user', JSON.stringify(googleUser));
   goToMarketplace();
-} else {
-  const savedUser = localStorage.getItem('gopoint_user');
-  if (savedUser) { try { currentUser = JSON.parse(savedUser); goToMarketplace(); } catch (e) { localStorage.removeItem('gopoint_user'); } }
 }
+
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session?.user) {
+    handleGoogleUser(session.user);
+  }
+});
+
+const { data: { session } } = await sb.auth.getSession();
+if (session?.user) {
+  handleGoogleUser(session.user);
+  return;
+}
+
+const savedUser = localStorage.getItem('gopoint_user');
+if (savedUser) { try { currentUser = JSON.parse(savedUser); goToMarketplace(); } catch (e) { localStorage.removeItem('gopoint_user'); } }
 window.addEventListener('scroll', () => {
 const header = document.getElementById('fpHeader');
 if (header) { if (window.scrollY > 50) header.classList.add('scrolled'); else header.classList.remove('scrolled'); }
@@ -3220,7 +3212,7 @@ completeLogin({ name, email, phone: '', provider: 'email' });
 }
 
 function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
-function goToMarketplace() { document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); updateUserUI(); navigateToView('home'); setTimeout(() => { if (appMap) appMap.invalidateSize(); appRenderRestaurantList(); }, 100); }
+function goToMarketplace() { document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); updateUserUI(); navigateToView('home'); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
 
 async function logoutUser() {
 if (!confirm('Are you sure you want to logout?')) return;
