@@ -130,7 +130,21 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-form-label { display: block; font-size: 13px; font-weight: 500; color: #555; margin-bottom: 6px; }
 .fp-phone-input { flex: 1; padding: 12px 14px; border: 1px solid #e5e5e5; border-radius: var(--radius-sm); font-size: 15px; outline: none; transition: var(--transition); font-family: inherit; width: 100%; }
 .fp-phone-input:focus { border-color: var(--theme); box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2); }
-.fp-login-options { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.fp-phone-row { display: flex; gap: 0; border: 1px solid #e5e5e5; border-radius: var(--radius-sm); overflow: hidden; background: white; }
+.fp-phone-row:focus-within { border-color: var(--theme); box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2); }
+.fp-phone-prefix { display: flex; align-items: center; gap: 4px; padding: 12px 10px; border-right: 1px solid #e5e5e5; background: #fafafa; font-size: 14px; font-weight: 600; color: #333; cursor: pointer; user-select: none; min-width: 90px; }
+.fp-phone-prefix select { border: none; background: transparent; font-size: 13px; font-weight: 600; color: #333; outline: none; cursor: pointer; font-family: inherit; appearance: none; -webkit-appearance: none; padding-right: 14px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0 center; }
+.fp-phone-row .fp-phone-field { border: none; padding: 12px 14px; font-size: 15px; outline: none; flex: 1; font-family: inherit; }
+.fp-login-subtitle { font-size: 13px; color: #999; margin-bottom: 16px; }
+.fp-login-subtitle a { color: var(--theme); font-weight: 600; text-decoration: none; }
+.fp-or-divider { display: flex; align-items: center; margin: 16px 0; gap: 12px; }
+.fp-or-divider::before, .fp-or-divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
+.fp-or-divider span { font-size: 12px; color: #999; font-weight: 500; white-space: nowrap; }
+.fp-social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit; background: white; color: #333; }
+.fp-social-btn:hover { border-color: #ccc; background: #fafafa; transform: translateY(-1px); }
+.fp-social-btn img, .fp-social-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+.fp-recaptcha-text { font-size: 11px; color: #999; text-align: center; margin-top: 12px; line-height: 1.5; }
+.fp-recaptcha-text a { color: #666; text-decoration: none; }
 .fp-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit; }
 .fp-btn-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
 .fp-btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
@@ -842,19 +856,67 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <!-- Customer Login Section -->
 <div id="fpCustomerLoginSection">
 <div id="fpLoginStep" style="display:block;">
-<div class="fp-form-group"><label class="fp-form-label">Username</label><input type="text" class="fp-phone-input" id="fpLoginUsername" placeholder="Enter username"></div>
-<div class="fp-form-group"><label class="fp-form-label">Password</label><input type="password" class="fp-phone-input" id="fpLoginPassword" placeholder="Enter password"></div>
-<button class="fp-btn fp-btn-whatsapp" onclick="loginWithUsername()"><i class="fas fa-sign-in-alt"></i> Login</button>
-<div class="fp-skip-text" style="margin-top:14px;">Don't have an account? <a onclick="showRegisterStep()">Sign up here</a></div>
-<div class="fp-divider"><span>or continue with</span></div>
-<div class="fp-login-options">
-<button class="fp-btn fp-btn-whatsapp" onclick="loginWithWhatsApp()"><i class="fab fa-whatsapp" style="font-size:1.3rem;"></i> WhatsApp</button>
-<button class="fp-btn fp-btn-gmail" onclick="loginWithGmail()">
-<svg style="width:20px;height:20px;" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg> Gmail
+<p style="text-align:center; font-size:15px; font-weight:600; color:#333; margin-bottom:16px;">Continue with one of the following options</p>
+
+<div class="fp-form-group">
+<div class="fp-phone-row">
+<div class="fp-phone-prefix">
+<select id="fpPhonePrefix">
+<option value="+252">🇸🇴 +252</option>
+<option value="+254">🇰🇪 +254</option>
+<option value="+256">🇺🇬 +256</option>
+<option value="+255">🇹🇿 +255</option>
+<option value="+251">🇪🇹 +251</option>
+</select>
+</div>
+<input type="tel" class="fp-phone-field" id="fpCustomerPhone" placeholder="Phone number" maxlength="12">
+</div>
+</div>
+
+<p class="fp-login-subtext" style="font-size:11px; color:#999; margin-bottom:14px; line-height:1.5;">
+This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" style="color:#666;">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" style="color:#666;">Terms of Service</a> apply.
+</p>
+
+<button class="fp-btn fp-btn-whatsapp" onclick="loginWithPhone()" style="border-radius:30px; padding:14px; font-size:15px; font-weight:700;">
+<i class="fab fa-whatsapp" style="font-size:1.2rem;"></i> Continue with WhatsApp
+</button>
+
+<div class="fp-or-divider"><span>or with</span></div>
+
+<div style="display:flex; flex-direction:column; gap:10px;">
+<button class="fp-social-btn" onclick="loginWithGmail()">
+<svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+Google
+</button>
+<button class="fp-social-btn" onclick="loginWithFacebook()" style="border-color:#1877F2; color:#1877F2;">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+Facebook
+</button>
+<button class="fp-social-btn" onclick="loginWithEmail()">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#333" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg>
+Email
 </button>
 </div>
-<div class="fp-skip-text" style="margin-top:14px;">Just browsing? <a onclick="goToMarketplace()">Go to marketplace →</a></div>
+
+<div style="text-align:center; margin-top:16px;">
+<span style="font-size:12px; color:#999;">Don't have an account? </span>
+<a onclick="showRegisterStep()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">Sign up here</a>
 </div>
+<div style="text-align:center; margin-top:10px;">
+<span style="font-size:12px; color:#999;">Just browsing? </span>
+<a onclick="goToMarketplace()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">Go to marketplace →</a>
+</div>
+</div>
+
+<!-- Email Login Step (hidden by default) -->
+<div id="fpEmailLoginStep" style="display:none;">
+<p style="text-align:center; font-size:15px; font-weight:600; color:#333; margin-bottom:16px;">Sign in with your email</p>
+<div class="fp-form-group"><label class="fp-form-label">Email Address</label><input type="email" class="fp-phone-input" id="fpEmailLogin" placeholder="Enter your email"></div>
+<div class="fp-form-group"><label class="fp-form-label">Password</label><input type="password" class="fp-phone-input" id="fpEmailPassword" placeholder="Enter your password"></div>
+<button class="fp-btn fp-btn-whatsapp" onclick="loginWithEmailSubmit()" style="border-radius:30px; padding:14px; font-size:15px; font-weight:700;"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+<div style="text-align:center; margin-top:14px;"><a onclick="showPhoneLoginStep()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">← Back to phone login</a></div>
+</div>
+
 <div id="fpRegisterSection" style="display:none;">
 <p style="text-align:center; margin-bottom:16px; color:#555; font-size:14px;">Create your account to continue</p>
 <div class="fp-form-group"><label class="fp-form-label">Full Name *</label><input type="text" class="fp-phone-input" id="fpRegisterName" placeholder="Enter your full name" required></div>
@@ -2105,6 +2167,12 @@ googlePhone.addEventListener('input', function(e) {
 e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
 });
 }
+const customerPhone = document.getElementById('fpCustomerPhone');
+if (customerPhone) {
+customerPhone.addEventListener('input', function(e) {
+e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
+});
+}
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -2922,6 +2990,12 @@ document.getElementById('fpCustomerLoginSection').style.display = type === 'cust
 document.getElementById('fpDriverLoginSection').style.display = type === 'driver' ? 'block' : 'none';
 document.getElementById('fpAdminLoginSection').style.display = type === 'admin' ? 'block' : 'none';
 
+if (type === 'customer') {
+document.getElementById('fpLoginStep').style.display = 'block';
+document.getElementById('fpEmailLoginStep').style.display = 'none';
+document.getElementById('fpRegisterSection').style.display = 'none';
+}
+
 // Clear driver login form when switching to driver tab and focus pin
 if (type === 'driver') {
 const pinInput = document.getElementById('fpDriverPin');
@@ -3000,7 +3074,63 @@ showAppToast('📍 Location: ' + customerLocation.area);
 }, () => { showAppToast('⚠️ Location permission denied'); }, { enableHighAccuracy: true, timeout: 15000 });
 }
 
-function loginWithWhatsApp() { showRegisterStep(); showAppToast('📱 Create your account'); }
+function loginWithWhatsApp() {
+const phone = document.getElementById('fpCustomerPhone').value.trim();
+const prefix = document.getElementById('fpPhonePrefix').value;
+if (!phone || phone.length < 6) { showAppToast('⚠️ Please enter your phone number'); return; }
+const fullPhone = prefix + phone;
+const whatsappMsg = encodeURIComponent('Hi Go!point, I want to sign up for delivery service.');
+window.open('https://wa.me/' + fullPhone.replace('+', '') + '?text=' + whatsappMsg, '_blank');
+const user = { name: 'WhatsApp User', email: '', phone: fullPhone, provider: 'whatsapp' };
+completeLogin(user);
+}
+
+function loginWithPhone() {
+const phone = document.getElementById('fpCustomerPhone').value.trim();
+const prefix = document.getElementById('fpPhonePrefix').value;
+if (!phone || phone.length < 6) { showAppToast('⚠️ Please enter a valid phone number'); return; }
+const fullPhone = prefix + phone;
+const users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+const key = fullPhone;
+if (users[key]) {
+completeLogin(users[key]);
+} else {
+const user = { name: 'Customer', email: '', phone: fullPhone, provider: 'phone' };
+users[key] = user;
+localStorage.setItem('gopoint_users', JSON.stringify(users));
+completeLogin(user);
+}
+}
+
+function loginWithFacebook() {
+showAppToast('📘 Facebook login coming soon!');
+}
+
+function loginWithEmail() {
+document.getElementById('fpLoginStep').style.display = 'none';
+document.getElementById('fpEmailLoginStep').style.display = 'block';
+}
+
+function showPhoneLoginStep() {
+document.getElementById('fpLoginStep').style.display = 'block';
+document.getElementById('fpEmailLoginStep').style.display = 'none';
+}
+
+function loginWithEmailSubmit() {
+const email = document.getElementById('fpEmailLogin').value.trim();
+const password = document.getElementById('fpEmailPassword').value;
+if (!email || !email.includes('@')) { showAppToast('⚠️ Please enter a valid email'); return; }
+if (!password) { showAppToast('⚠️ Please enter your password'); return; }
+const users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+const key = email.toLowerCase();
+if (users[key] && users[key].password === password) {
+completeLogin(users[key]);
+} else if (!users[key]) {
+showAppToast('⚠️ No account found. Please sign up first.');
+} else {
+showAppToast('⚠️ Incorrect password');
+}
+}
 async function loginWithGmail() {
   showAppToast('🔐 Connecting to Google...');
   const { data, error } = await sb.auth.signInWithOAuth({
