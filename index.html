@@ -2178,6 +2178,9 @@ e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
 window.addEventListener('DOMContentLoaded', async () => {
 setupPaymentPhoneInput();
 
+const savedLocation = localStorage.getItem('gopoint_customer_location');
+if (savedLocation) { try { customerLocation = JSON.parse(savedLocation); } catch(e) {} }
+
 sb.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_IN' && session?.user) {
     const u = session.user;
@@ -3069,6 +3072,10 @@ showAppToast('⚠️ Invalid admin credentials');
 }
 
 function detectFrontLocation() {
+const saved = localStorage.getItem('gopoint_customer_location');
+if (saved) {
+  try { customerLocation = JSON.parse(saved); showAppToast('📍 Location: ' + customerLocation.area); return; } catch(e) {}
+}
 if (!navigator.geolocation) { showAppToast('⚠️ Geolocation not supported'); return; }
 navigator.geolocation.getCurrentPosition(async (pos) => {
 const lat = pos.coords.latitude, lng = pos.coords.longitude;
@@ -3081,8 +3088,9 @@ const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.bu
 const landmark = a.amenity || a.shop || a.tourism || a.landmark || '';
 customerLocation.area = landmark ? `${landmark}, ${area}` : area;
 customerLocation.fullAddress = data.display_name || '';
+localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
 showAppToast('📍 Location: ' + customerLocation.area);
-} catch (e) { showAppToast('📍 GPS captured'); }
+} catch (e) { showAppToast('📍 GPS captured'); localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation)); }
 }, () => { showAppToast('⚠️ Location permission denied'); }, { enableHighAccuracy: true, timeout: 15000 });
 }
 
