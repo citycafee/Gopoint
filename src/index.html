@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -1025,7 +1025,14 @@ showAppToast('ðŸ“ Location: ' + customerLocation.area);
 
 
 function loginWithWhatsApp() { showRegisterStep(); showAppToast('ðŸ“± Create your account'); }
-function loginWithGmail() { showAppToast('ðŸ” Connecting to Google...'); setTimeout(() => { const mockUser = { name: 'Google User', email: 'user@gmail.com', phone: '', provider: 'gmail' }; completeLogin(mockUser); }, 1200); }
+async function loginWithGmail() {
+  showAppToast('🔐 Connecting to Google...');
+  const { data, error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + window.location.pathname }
+  });
+  if (error) showAppToast('⚠️ ' + error.message);
+}
 
 
 async function registerUser() {
@@ -1635,8 +1642,9 @@ if (document.getElementById('appContainer')?.classList.contains('active')) { loa
 
 window.addEventListener('DOMContentLoaded', async () => {
   setupPaymentPhoneInput();
-  const savedUser = localStorage.getItem('gopoint_user');
+  const { data: { session } } = await sb.auth.getSession(); if (session?.user) { const u = session.user; const googleUser = { name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'Google User', email: u.email || '', phone: u.user_metadata?.phone || '', provider: 'google', id: u.id }; currentUser = googleUser; localStorage.setItem('gopoint_user', JSON.stringify(googleUser)); goToMarketplace(); } else { const savedUser = localStorage.getItem('gopoint_user');
   if (savedUser) { try { currentUser = JSON.parse(savedUser); goToMarketplace(); } catch (e) { localStorage.removeItem('gopoint_user'); } }
+  }
   window.addEventListener('scroll', () => {
     const header = document.getElementById('fpHeader');
     if (header) { if (window.scrollY > 50) header.classList.add('scrolled'); else header.classList.remove('scrolled'); }

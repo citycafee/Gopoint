@@ -108,6 +108,16 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-login-modal.active { opacity: 1; visibility: visible; }
 .fp-login-card { background: var(--white); border-radius: var(--radius-xl); width: 90%; max-width: 440px; padding: 28px; box-shadow: var(--shadow-lg); position: relative; overflow: hidden; max-height: 90vh; overflow-y: auto; }
 .fp-login-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(90deg, var(--theme), var(--theme-dark)); }
+.fp-google-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 10001; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+.fp-google-modal.active { opacity: 1; visibility: visible; }
+.fp-google-modal-card { background: var(--white); border-radius: var(--radius-xl); width: 90%; max-width: 440px; padding: 28px; box-shadow: var(--shadow-lg); position: relative; overflow: hidden; max-height: 90vh; overflow-y: auto; }
+.fp-google-modal-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(90deg, #4285F4, #34A853, #FBBC05, #EA4335); }
+.fp-google-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #4285F4, #34A853); color: white; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; margin: 0 auto 12px; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3); }
+.fp-google-welcome { text-align: center; margin-bottom: 20px; }
+.fp-google-welcome h2 { font-size: 20px; font-weight: 800; color: var(--black); margin-top: 10px; }
+.fp-google-welcome p { font-size: 13px; color: #777; margin-top: 4px; }
+.fp-google-complete-btn { background: linear-gradient(135deg, #4285F4, #34A853); color: white; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3); }
+.fp-google-complete-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4); }
 .fp-login-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 24px; color: #777; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
 .fp-login-close:hover { background: #f0f0f0; color: var(--theme); }
 .fp-login-logo { text-align: center; margin-bottom: 20px; }
@@ -938,6 +948,40 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 </div>
 </div>
 
+<!-- Google Profile Completion Modal -->
+<div class="fp-google-modal" id="fpGoogleProfileModal">
+<div class="fp-google-modal-card">
+<button class="fp-login-close" onclick="closeGoogleProfileModal()">×</button>
+<div class="fp-google-welcome">
+<div class="fp-google-avatar" id="fpGoogleAvatar">G</div>
+<h2>Welcome to Go!point!</h2>
+<p>Please complete your profile to continue</p>
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-user" style="color:#4285F4;"></i> Full Name</label>
+<input type="text" class="fp-phone-input" id="fpGoogleName" placeholder="Enter your full name">
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-envelope" style="color:#4285F4;"></i> Email</label>
+<input type="email" class="fp-phone-input" id="fpGoogleEmail" placeholder="Your Google email" readonly style="background:#f5f5f5; color:#888;">
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-phone" style="color:#4285F4;"></i> Phone Number *</label>
+<div class="app-phone-input">
+<span class="app-phone-prefix">+252</span>
+<input type="tel" class="app-phone-number" id="fpGooglePhone" placeholder="6X XXX XXXX" maxlength="9">
+</div>
+</div>
+<div class="fp-form-group">
+<label class="fp-form-label"><i class="fas fa-map-marker-alt" style="color:#4285F4;"></i> Delivery Area</label>
+<input type="text" class="fp-phone-input" id="fpGoogleArea" placeholder="e.g. Hargeisa, Edna Adan">
+</div>
+<button class="fp-btn fp-google-complete-btn" onclick="completeGoogleProfile()">
+<i class="fas fa-check-circle"></i> Complete & Start Ordering
+</button>
+</div>
+</div>
+
 <section class="fp-hero-bg">
 <div class="fp-hero-setup">
 <div class="fp-hero-logo-text">Go<span>!</span>point</div>
@@ -1519,22 +1563,22 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <div class="pf-stat-item"><div class="pf-stat-value" id="pfStatSaved">$0</div><div class="pf-stat-label">Saved</div></div>
 </div>
 <!-- Account Menu -->
-<div class="pf-card">
-<div class="pf-card-header"><div class="pf-card-title"><div class="pf-title-icon" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));"><i class="fas fa-user"></i></div> Account</div></div>
-<div class="pf-menu-item" onclick="openProfileEditModal()"><div class="pf-menu-icon" style="background:#f0fdf9;color:var(--primary);"><i class="fas fa-pen-to-square"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Edit Profile</div><div class="pf-menu-sublabel">Update your name, phone, email</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
-<div class="pf-menu-item" onclick="navigateToView('orders')"><div class="pf-menu-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-bag-shopping"></i></div><div class="pf-menu-text"><div class="pf-menu-label">My Orders</div><div class="pf-menu-sublabel">View order history & track</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
-<div class="pf-menu-item" onclick="showAppToast('Addresses coming soon!')"><div class="pf-menu-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-location-dot"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Saved Addresses</div><div class="pf-menu-sublabel">Manage delivery addresses</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
-<div class="pf-menu-item" onclick="showAppToast('Payment coming soon!')"><div class="pf-menu-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-credit-card"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Payment Methods</div><div class="pf-menu-sublabel">Manage cards & wallets</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
+<div class="pf-card pf-card-large">
+<div class="pf-card-header"><div class="pf-card-title"><div class="pf-title-icon pf-title-icon-lg" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));"><i class="fas fa-user"></i></div> Account</div></div>
+<div class="pf-menu-item pf-menu-item-lg" onclick="openProfileEditModal()"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#f0fdf9;color:var(--primary);"><i class="fas fa-pen-to-square"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Edit Profile</div><div class="pf-menu-sublabel">Update your name, phone, email</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
+<div class="pf-menu-item pf-menu-item-lg" onclick="navigateToView('orders')"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#fef3c7;color:#d97706;"><i class="fas fa-bag-shopping"></i></div><div class="pf-menu-text"><div class="pf-menu-label">My Orders</div><div class="pf-menu-sublabel">View order history & track</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
+<div class="pf-menu-item pf-menu-item-lg" onclick="showAppToast('Addresses coming soon!')"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-location-dot"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Saved Addresses</div><div class="pf-menu-sublabel">Manage delivery addresses</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
+<div class="pf-menu-item pf-menu-item-lg" onclick="showAppToast('Payment coming soon!')"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-credit-card"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Payment Methods</div><div class="pf-menu-sublabel">Manage cards & wallets</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
 </div>
 <!-- Support & Settings -->
-<div class="pf-card">
-<div class="pf-card-header"><div class="pf-card-title"><div class="pf-title-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);"><i class="fas fa-gear"></i></div> Help & Settings</div></div>
-<div class="pf-menu-item" onclick="showAppToast('Help coming soon!')"><div class="pf-menu-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-headset"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Get Help</div><div class="pf-menu-sublabel">Contact support team</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
-<div class="pf-menu-item" onclick="showAppToast('Notifications coming soon!')"><div class="pf-menu-icon" style="background:#ccfbf1;color:#0d9488;"><i class="fas fa-bell"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Notifications</div><div class="pf-menu-sublabel">Manage push & email alerts</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
-<div class="pf-menu-item" onclick="showAppToast('About coming soon!')"><div class="pf-menu-icon" style="background:#f1f5f9;color:#64748b;"><i class="fas fa-circle-info"></i></div><div class="pf-menu-text"><div class="pf-menu-label">About Go!point</div><div class="pf-menu-sublabel">Version, terms & privacy</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
+<div class="pf-card pf-card-large">
+<div class="pf-card-header"><div class="pf-card-title"><div class="pf-title-icon pf-title-icon-lg" style="background:linear-gradient(135deg,#f59e0b,#d97706);"><i class="fas fa-gear"></i></div> Help & Settings</div></div>
+<div class="pf-menu-item pf-menu-item-lg" onclick="showAppToast('Help coming soon!')"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#fce7f3;color:#db2777;"><i class="fas fa-headset"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Get Help</div><div class="pf-menu-sublabel">Contact support team</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
+<div class="pf-menu-item pf-menu-item-lg" onclick="showAppToast('Notifications coming soon!')"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#ccfbf1;color:#0d9488;"><i class="fas fa-bell"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Notifications</div><div class="pf-menu-sublabel">Manage push & email alerts</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
+<div class="pf-menu-item pf-menu-item-lg" onclick="showAppToast('About coming soon!')"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#f1f5f9;color:#64748b;"><i class="fas fa-circle-info"></i></div><div class="pf-menu-text"><div class="pf-menu-label">About Go!point</div><div class="pf-menu-sublabel">Version, terms & privacy</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
 </div>
 <!-- Logout -->
-<button class="pf-logout-btn" onclick="logoutUser()"><i class="fas fa-right-from-bracket"></i> Sign Out</button>
+<button class="pf-logout-btn pf-logout-btn-lg" onclick="logoutUser()"><i class="fas fa-right-from-bracket"></i> Sign Out</button>
 </div>
 <!-- Edit Profile Modal (Bottom Sheet) -->
 <div class="pf-modal-overlay" id="pfEditModal">
@@ -2055,12 +2099,40 @@ paymentPhone.addEventListener('input', function(e) {
 e.target.value = e.target.value.replace(/\D/g, '').slice(0, 7);
 });
 }
+const googlePhone = document.getElementById('fpGooglePhone');
+if (googlePhone) {
+googlePhone.addEventListener('input', function(e) {
+e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
+});
+}
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
 setupPaymentPhoneInput();
-const savedUser = localStorage.getItem('gopoint_user');
-if (savedUser) { try { currentUser = JSON.parse(savedUser); goToMarketplace(); } catch (e) { localStorage.removeItem('gopoint_user'); } }
+const { data: { session } } = await sb.auth.getSession();
+if (session?.user) {
+  const u = session.user;
+  const googleEmail = u.email || '';
+  const savedProfiles = JSON.parse(localStorage.getItem('gopoint_google_profiles') || '{}');
+  if (savedProfiles[googleEmail]) {
+    currentUser = savedProfiles[googleEmail];
+    localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
+    goToMarketplace();
+  } else {
+    const googleUser = {
+      name: u.user_metadata?.full_name || u.user_metadata?.name || googleEmail.split('@')[0] || 'Google User',
+      email: googleEmail,
+      phone: u.user_metadata?.phone || '',
+      provider: 'google',
+      id: u.id
+    };
+    currentUser = googleUser;
+    showGoogleProfileModal(googleUser);
+  }
+} else {
+  const savedUser = localStorage.getItem('gopoint_user');
+  if (savedUser) { try { currentUser = JSON.parse(savedUser); goToMarketplace(); } catch (e) { localStorage.removeItem('gopoint_user'); } }
+}
 window.addEventListener('scroll', () => {
 const header = document.getElementById('fpHeader');
 if (header) { if (window.scrollY > 50) header.classList.add('scrolled'); else header.classList.remove('scrolled'); }
@@ -2929,7 +3001,56 @@ showAppToast('📍 Location: ' + customerLocation.area);
 }
 
 function loginWithWhatsApp() { showRegisterStep(); showAppToast('📱 Create your account'); }
-function loginWithGmail() { showAppToast('🔐 Connecting to Google...'); setTimeout(() => { const mockUser = { name: 'Google User', email: 'user@gmail.com', phone: '', provider: 'gmail' }; completeLogin(mockUser); }, 1200); }
+async function loginWithGmail() {
+  showAppToast('🔐 Connecting to Google...');
+  const { data, error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + window.location.pathname }
+  });
+  if (error) showAppToast('⚠️ ' + error.message);
+}
+
+function showGoogleProfileModal(user) {
+  document.getElementById('fpGoogleAvatar').textContent = (user.name || 'G').charAt(0).toUpperCase();
+  document.getElementById('fpGoogleName').value = user.name || '';
+  document.getElementById('fpGoogleEmail').value = user.email || '';
+  document.getElementById('fpGooglePhone').value = '';
+  document.getElementById('fpGoogleArea').value = '';
+  document.getElementById('fpGoogleProfileModal').classList.add('active');
+  closeFrontLogin();
+}
+
+function closeGoogleProfileModal() {
+  document.getElementById('fpGoogleProfileModal').classList.remove('active');
+}
+
+async function completeGoogleProfile() {
+  const name = document.getElementById('fpGoogleName').value.trim();
+  const phone = document.getElementById('fpGooglePhone').value.trim();
+  const area = document.getElementById('fpGoogleArea').value.trim();
+  if (!name) { showAppToast('⚠️ Please enter your full name'); return; }
+  if (!phone || phone.length < 6) { showAppToast('⚠️ Please enter a valid phone number'); return; }
+  if (!area) { showAppToast('⚠️ Please enter your delivery area'); return; }
+
+  const fullPhone = '+252' + phone;
+  const completedUser = {
+    ...currentUser,
+    name: name,
+    phone: fullPhone,
+    area: area,
+    profileComplete: true
+  };
+
+  const savedProfiles = JSON.parse(localStorage.getItem('gopoint_google_profiles') || '{}');
+  savedProfiles[completedUser.email] = completedUser;
+  localStorage.setItem('gopoint_google_profiles', JSON.stringify(savedProfiles));
+
+  currentUser = completedUser;
+  localStorage.setItem('gopoint_user', JSON.stringify(completedUser));
+  closeGoogleProfileModal();
+  showAppToast('✅ Profile complete! Welcome, ' + name + '!');
+  setTimeout(() => goToMarketplace(), 500);
+}
 
 function registerUser() {
 const name = document.getElementById('fpRegisterName').value.trim(), email = document.getElementById('fpRegisterEmail').value.trim(), password = document.getElementById('fpRegisterPassword').value, confirm = document.getElementById('fpRegisterConfirm').value, agreed = document.getElementById('fpTermsCheck').checked;
@@ -2950,8 +3071,9 @@ completeLogin({ name, email, phone: '', provider: 'email' });
 function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
 function goToMarketplace() { document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); updateUserUI(); navigateToView('home'); setTimeout(() => { if (appMap) appMap.invalidateSize(); appRenderRestaurantList(); }, 100); }
 
-function logoutUser() {
+async function logoutUser() {
 if (!confirm('Are you sure you want to logout?')) return;
+await sb.auth.signOut();
 currentUser = null;
 localStorage.removeItem('gopoint_user');
 document.getElementById('appContainer').classList.remove('active');
