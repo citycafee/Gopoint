@@ -2181,22 +2181,16 @@ const { data: { session } } = await sb.auth.getSession();
 if (session?.user) {
   const u = session.user;
   const googleEmail = u.email || '';
-  const savedProfiles = JSON.parse(localStorage.getItem('gopoint_google_profiles') || '{}');
-  if (savedProfiles[googleEmail]) {
-    currentUser = savedProfiles[googleEmail];
-    localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
-    goToMarketplace();
-  } else {
-    const googleUser = {
-      name: u.user_metadata?.full_name || u.user_metadata?.name || googleEmail.split('@')[0] || 'Google User',
-      email: googleEmail,
-      phone: u.user_metadata?.phone || '',
-      provider: 'google',
-      id: u.id
-    };
-    currentUser = googleUser;
-    showGoogleProfileModal(googleUser);
-  }
+  const googleUser = {
+    name: u.user_metadata?.full_name || u.user_metadata?.name || googleEmail.split('@')[0] || 'Google User',
+    email: googleEmail,
+    phone: u.user_metadata?.phone || '',
+    provider: 'google',
+    id: u.id
+  };
+  currentUser = googleUser;
+  localStorage.setItem('gopoint_user', JSON.stringify(googleUser));
+  goToMarketplace();
 } else {
   const savedUser = localStorage.getItem('gopoint_user');
   if (savedUser) { try { currentUser = JSON.parse(savedUser); goToMarketplace(); } catch (e) { localStorage.removeItem('gopoint_user'); } }
