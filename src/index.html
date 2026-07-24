@@ -1029,7 +1029,7 @@ async function loginWithGmail() {
   showAppToast('🔐 Connecting to Google...');
   const { data, error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin + window.location.pathname }
+    options: { redirectTo: 'https://gopoint-gopoint.vercel.app/' }
   });
   if (error) showAppToast('⚠️ ' + error.message);
 }
