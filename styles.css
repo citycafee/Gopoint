@@ -106,6 +106,8 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-form-label { display: block; font-size: 13px; font-weight: 500; color: #555; margin-bottom: 6px; }
 .fp-phone-input { flex: 1; padding: 14px; border: 2px solid #e5e7eb; border-radius: 14px; font-size: 15px; outline: none; transition: all 0.2s ease; font-family: inherit; width: 100%; }
 .fp-phone-input:focus { border-color: var(--theme); box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.12); }
+#fpDriverLoginSection input:focus,
+#fpAdminLoginSection input:focus { border-color: var(--theme) !important; box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.12) !important; outline: none; }
 .fp-login-options { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
 .fp-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
 .fp-btn-whatsapp { background: linear-gradient(135deg, var(--theme), var(--theme-dark)); color: white; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3); }

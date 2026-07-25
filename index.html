@@ -123,6 +123,8 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-login-logo { text-align: center; margin-bottom: 24px; }
 .fp-login-logo h2 { font-size: 22px; font-weight: 800; color: var(--black); margin-top: 8px; }
 .fp-login-logo p { font-size: 14px; color: #888; margin-top: 4px; }
+#fpDriverLoginSection input:focus,
+#fpAdminLoginSection input:focus { border-color: var(--theme) !important; box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.12) !important; outline: none; }
 .fp-login-tabs { display: flex; gap: 6px; margin-bottom: 20px; background: #f1f5f9; padding: 4px; border-radius: 10px; }
 .fp-login-tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 0.9rem; transition: var(--transition); }
 .fp-login-tab.active { background: var(--white); color: var(--primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
@@ -1254,64 +1256,82 @@ Facebook
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!-- DRIVER LOGIN SECTION - UPDATED WITH USERNAME + PIN FORM  -->
+<!-- DRIVER LOGIN SECTION - GLOVO/KIKIDROP STYLE              -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="fpDriverLoginSection" style="display:none;">
-<div style="text-align:center; margin-bottom:20px; color:#666; font-size:0.9rem;">
-<i class="fas fa-motorcycle" style="color:var(--primary); font-size:1.5rem;"></i>
-<p style="margin-top:8px; font-weight:600;">Driver Sign In</p>
-<p style="font-size:0.8rem; color:#999; margin-top:4px;">Enter your credentials to access the Driver Portal</p>
+<div style="text-align:center; margin-bottom:24px;">
+<div style="width:64px; height:64px; background:linear-gradient(135deg, #22c55e, #16a34a); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; box-shadow:0 6px 20px rgba(34,197,94,0.3);">
+<i class="fas fa-motorcycle" style="font-size:26px; color:white;"></i>
 </div>
-<div class="fp-form-group">
-<label class="fp-form-label"><i class="fas fa-user" style="color:var(--primary);"></i> Username or Phone</label>
-<input type="text" class="fp-phone-input" id="fpDriverUsername" placeholder="e.g. Ahmed Ali or +252631112222" autocomplete="off">
+<h3 style="font-size:20px; font-weight:800; color:#1a1a1a; margin-bottom:4px;">Driver Sign In</h3>
+<p style="font-size:13px; color:#888;">Enter your credentials to access the Driver Portal</p>
 </div>
-<div class="fp-form-group">
-<label class="fp-form-label"><i class="fas fa-lock" style="color:var(--primary);"></i> PIN (4 digits)</label>
-<input type="password" class="fp-phone-input fp-pin-input" id="fpDriverPin" placeholder="••••" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" autocomplete="off">
+
+<div style="margin-bottom:14px;">
+<label style="display:block; font-size:13px; font-weight:600; color:#555; margin-bottom:6px;"><i class="fas fa-user" style="color:#22c55e; margin-right:4px;"></i> Username or Phone</label>
+<input type="text" class="fp-phone-input" id="fpDriverUsername" placeholder="e.g. Ahmed Ali or +252631112222" autocomplete="off" style="border:2px solid #e5e7eb; border-radius:14px; padding:14px; font-size:15px; width:100%; transition:all 0.2s ease;">
 </div>
-<button class="fp-btn fp-btn-whatsapp" onclick="driverLoginWithPin()" style="margin-top:8px;">
+
+<div style="margin-bottom:20px;">
+<label style="display:block; font-size:13px; font-weight:600; color:#555; margin-bottom:6px;"><i class="fas fa-lock" style="color:#22c55e; margin-right:4px;"></i> PIN (4 digits)</label>
+<input type="password" class="fp-phone-input" id="fpDriverPin" placeholder="••••" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" autocomplete="off" style="border:2px solid #e5e7eb; border-radius:14px; padding:14px; font-size:18px; width:100%; text-align:center; letter-spacing:8px; transition:all 0.2s ease;">
+</div>
+
+<button onclick="driverLoginWithPin()" style="width:100%; padding:15px; background:linear-gradient(135deg, #22c55e, #16a34a); color:white; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 4px 15px rgba(34,197,94,0.3); transition:all 0.2s ease; font-family:inherit;">
 <i class="fas fa-sign-in-alt"></i> Sign In to Driver Portal
 </button>
-<div class="fp-skip-text" style="margin-top:14px;">
-<a onclick="switchLoginTab('customer')">← Back to Customer Login</a>
-</div>
-<div class="fp-driver-demo-box">
-<strong><i class="fas fa-info-circle"></i> welcome:</strong>
-<div style="margin-top:6px; line-height:1.8;">
 
-</div>
-</div>
+<div style="display:flex; justify-content:center; gap:16px; margin-top:20px; padding-top:16px; border-top:1px solid #f0f0f0;">
+<a onclick="switchLoginTab('customer')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-arrow-left"></i> Customer Login</a>
+<a onclick="switchLoginTab('admin')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-shield-halved"></i> Admin</a>
 </div>
 
-<!-- Admin Login Section -->
+<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:14px; margin-top:16px;">
+<p style="font-size:12px; font-weight:700; color:#166534; margin-bottom:6px;"><i class="fas fa-info-circle"></i> Demo Credentials</p>
+<div style="font-size:12px; color:#166534; line-height:1.8;">
+Ahmed Ali: <code style="background:#dcfce7; padding:2px 6px; border-radius:4px; font-weight:600;">1234</code> · Mohamed Hassan: <code style="background:#dcfce7; padding:2px 6px; border-radius:4px; font-weight:600;">2345</code><br>
+Abdi Karim: <code style="background:#dcfce7; padding:2px 6px; border-radius:4px; font-weight:600;">3456</code> · Fatima Omar: <code style="background:#dcfce7; padding:2px 6px; border-radius:4px; font-weight:600;">4567</code>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ADMIN LOGIN SECTION - GLOVO/KIKIDROP STYLE                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <div id="fpAdminLoginSection" style="display:none;">
-<div style="text-align:center; margin-bottom:20px; color:#666; font-size:0.9rem;">
-<i class="fas fa-shield-halved" style="color:var(--primary); font-size:1.5rem;"></i>
-<p style="margin-top:8px; font-weight:600;">Admin Sign In</p>
-<p style="font-size:0.8rem; color:#999; margin-top:4px;">Access the Management Dashboard</p>
+<div style="text-align:center; margin-bottom:24px;">
+<div style="width:64px; height:64px; background:linear-gradient(135deg, #6366f1, #4f46e5); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; box-shadow:0 6px 20px rgba(99,102,241,0.3);">
+<i class="fas fa-shield-halved" style="font-size:26px; color:white;"></i>
 </div>
-<div class="fp-form-group">
-<label class="fp-form-label"><i class="fas fa-user" style="color:var(--primary);"></i> Username</label>
-<input type="text" class="fp-phone-input" id="fpAdminUsername" placeholder="Enter admin username" autocomplete="off">
+<h3 style="font-size:20px; font-weight:800; color:#1a1a1a; margin-bottom:4px;">Admin Sign In</h3>
+<p style="font-size:13px; color:#888;">Access the Management Dashboard</p>
 </div>
-<div class="fp-form-group">
-<label class="fp-form-label"><i class="fas fa-lock" style="color:var(--primary);"></i> Password</label>
-<input type="password" class="fp-phone-input" id="fpAdminPassword" placeholder="Enter admin password" autocomplete="off">
+
+<div style="margin-bottom:14px;">
+<label style="display:block; font-size:13px; font-weight:600; color:#555; margin-bottom:6px;"><i class="fas fa-user" style="color:#6366f1; margin-right:4px;"></i> Username</label>
+<input type="text" class="fp-phone-input" id="fpAdminUsername" placeholder="Enter admin username" autocomplete="off" style="border:2px solid #e5e7eb; border-radius:14px; padding:14px; font-size:15px; width:100%; transition:all 0.2s ease;">
 </div>
-<button class="fp-btn fp-btn-whatsapp" onclick="adminLoginFromModal()" style="margin-top:8px;">
+
+<div style="margin-bottom:20px;">
+<label style="display:block; font-size:13px; font-weight:600; color:#555; margin-bottom:6px;"><i class="fas fa-lock" style="color:#6366f1; margin-right:4px;"></i> Password</label>
+<input type="password" class="fp-phone-input" id="fpAdminPassword" placeholder="Enter admin password" autocomplete="off" style="border:2px solid #e5e7eb; border-radius:14px; padding:14px; font-size:15px; width:100%; transition:all 0.2s ease;">
+</div>
+
+<button onclick="adminLoginFromModal()" style="width:100%; padding:15px; background:linear-gradient(135deg, #6366f1, #4f46e5); color:white; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 4px 15px rgba(99,102,241,0.3); transition:all 0.2s ease; font-family:inherit;">
 <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
 </button>
-<div class="fp-skip-text" style="margin-top:14px;">
-<a onclick="switchLoginTab('customer')">← Back to Customer Login</a>
+
+<div style="display:flex; justify-content:center; gap:16px; margin-top:20px; padding-top:16px; border-top:1px solid #f0f0f0;">
+<a onclick="switchLoginTab('customer')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-arrow-left"></i> Customer Login</a>
+<a onclick="switchLoginTab('driver')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-motorcycle"></i> Driver</a>
 </div>
-<div class="fp-driver-demo-box">
-<strong><i class="fas fa-info-circle"></i> welcome:</strong>
-<div style="margin-top:6px; line-height:1.8;">
+
+<div style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:12px; padding:14px; margin-top:16px;">
+<p style="font-size:12px; font-weight:700; color:#3730a3; margin-bottom:6px;"><i class="fas fa-info-circle"></i> Demo Credentials</p>
+<div style="font-size:12px; color:#3730a3; line-height:1.8;">
+Username: <code style="background:#e0e7ff; padding:2px 6px; border-radius:4px; font-weight:600;">admin</code> · Password: <code style="background:#e0e7ff; padding:2px 6px; border-radius:4px; font-weight:600;">admin123</code>
 </div>
-<div style="margin-top:8px; font-size:0.75rem; color:#065f46;">
-<i class="fas fa-lightbulb"></i> Tip: Press <b>Enter</b> in the password field to sign in quickly.
-</div>
+<p style="font-size:11px; color:#6366f1; margin-top:8px;"><i class="fas fa-lightbulb"></i> Tip: Press <b>Enter</b> in the password field to sign in quickly.</p>
 </div>
 </div>
 
