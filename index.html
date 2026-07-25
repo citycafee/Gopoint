@@ -1173,18 +1173,56 @@ Facebook
 <!-- Customer Login Section -->
 <div id="fpCustomerLoginSection">
 <div id="fpLoginStep" style="display:block;">
-<div class="fp-form-group"><label class="fp-form-label">Username</label><input type="text" class="fp-phone-input" id="fpLoginUsername" placeholder="Enter username"></div>
-<div class="fp-form-group"><label class="fp-form-label">Password</label><input type="password" class="fp-phone-input" id="fpLoginPassword" placeholder="Enter password"></div>
-<button class="fp-btn fp-btn-whatsapp" onclick="loginWithUsername()"><i class="fas fa-sign-in-alt"></i> Login</button>
-<div class="fp-skip-text" style="margin-top:14px;">Don't have an account? <a onclick="showRegisterStep()">Sign up here</a></div>
-<div class="fp-divider"><span>or continue with</span></div>
-<div class="fp-login-options">
-<button class="fp-btn fp-btn-whatsapp" onclick="loginWithWhatsApp()"><i class="fab fa-whatsapp" style="font-size:1.3rem;"></i> WhatsApp</button>
-<button class="fp-btn fp-btn-gmail" onclick="loginWithGmail()">
-<svg style="width:20px;height:20px;" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg> Gmail
+<p style="text-align:center; font-size:15px; font-weight:600; color:#333; margin-bottom:16px;">Continue with one of the following options</p>
+
+<div class="fp-form-group">
+<div class="fp-phone-row">
+<div class="fp-phone-prefix">
+<select id="fpPhonePrefix">
+<option value="+252">🇸🇴 +252</option>
+<option value="+254">🇰🇪 +254</option>
+<option value="+256">🇺🇬 +256</option>
+<option value="+255">🇹🇿 +255</option>
+<option value="+251">🇪🇹 +251</option>
+</select>
+</div>
+<input type="tel" class="fp-phone-field" id="fpCustomerPhone" placeholder="Phone number" maxlength="12">
+</div>
+</div>
+
+<p class="fp-login-subtext" style="font-size:11px; color:#999; margin-bottom:14px; line-height:1.5;">
+This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" style="color:#666;">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" style="color:#666;">Terms of Service</a> apply.
+</p>
+
+<button class="fp-btn fp-btn-whatsapp" onclick="loginWithPhone()" style="border-radius:30px; padding:14px; font-size:15px; font-weight:700;">
+<i class="fab fa-whatsapp" style="font-size:1.2rem;"></i> Continue with WhatsApp
+</button>
+
+<div class="fp-or-divider"><span>or with</span></div>
+
+<div style="display:flex; flex-direction:column; gap:10px;">
+<button class="fp-social-btn" onclick="loginWithGmail()">
+<svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+Google
+</button>
+<button class="fp-social-btn" onclick="loginWithFacebook()" style="border-color:#1877F2; color:#1877F2;">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+Facebook
+</button>
+<button class="fp-social-btn" onclick="loginWithEmail()">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#333" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg>
+Email
 </button>
 </div>
-<div class="fp-skip-text" style="margin-top:14px;">Just browsing? <a onclick="goToMarketplace()">Go to marketplace →</a></div>
+
+<div style="text-align:center; margin-top:16px;">
+<span style="font-size:12px; color:#999;">Don't have an account? </span>
+<a onclick="showRegisterStep()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">Sign up here</a>
+</div>
+<div style="text-align:center; margin-top:10px;">
+<span style="font-size:12px; color:#999;">Just browsing? </span>
+<a onclick="goToMarketplace()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">Go to marketplace →</a>
+</div>
 </div>
 
 <!-- Email Login Step (hidden by default) -->
