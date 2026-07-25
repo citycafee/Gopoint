@@ -564,7 +564,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .dp-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(8px, 2vw, 12px); margin-bottom: clamp(12px, 3vw, 20px); }
 .dp-stat { background: #1e293b; padding: clamp(10px, 2.5vw, 16px); border-radius: 12px; border: 1px solid #334155; text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .dp-stat h4 { font-size: clamp(.6rem, 1.8vw, .7rem); color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-.dp-stat .v { font-size: clamp(1.1rem, 3vw, 1.5rem); font-weight: 700; color: var(--primary); }
+.dp-stat .v { font-size: clamp(1rem, 2.5vw, 1.25rem); font-weight: 700; color: var(--primary); }
 .dp-stat .sub { font-size: clamp(.6rem, 1.6vw, .7rem); color: #64748b; margin-top: 2px; }
 .dp-tabs { display: flex; gap: 6px; margin: clamp(12px, 3vw, 20px) 0 clamp(10px, 2.5vw, 15px); overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px; }
 .dp-tabs::-webkit-scrollbar { display: none; }
@@ -601,7 +601,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .dp-earn-row { display: flex; justify-content: space-between; align-items: center; font-size: clamp(.75rem, 2vw, .82rem); padding: 3px 0; border-bottom: 1px dashed rgba(34, 197, 94, 0.2); }
 .dp-earn-row:last-child { border-bottom: none; }
 .dp-earn-row.fee { color: #fca5a5; }
-.dp-earn-row.total { font-weight: 700; font-size: clamp(.85rem, 2.2vw, .95rem); color: var(--primary); margin-top: 4px; padding-top: 4px; border-top: 2px solid rgba(34, 197, 94, 0.3); }
+.dp-earn-row.total { font-weight: 700; font-size: clamp(.9rem, 2.3vw, 1rem); color: var(--primary); margin-top: 4px; padding-top: 4px; border-top: 2px solid rgba(34, 197, 94, 0.3); }
 .dp-earn-row .label { color: #94a3b8; }
 .dp-earn-row .value { font-weight: 600; }
 .dp-oacts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
@@ -611,7 +611,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .dp-earn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .dp-earn-item { background: rgba(255, 255, 255, 0.05); padding: clamp(8px, 2vw, 12px); border-radius: 10px; text-align: center; }
 .dp-earn-item .lbl { font-size: clamp(.6rem, 1.6vw, .7rem); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
-.dp-earn-item .val { font-size: clamp(1rem, 2.8vw, 1.2rem); font-weight: 700; color: var(--primary); }
+.dp-earn-item .val { font-size: clamp(.9rem, 2.5vw, 1.1rem); font-weight: 700; color: var(--primary); }
 .dp-earn-item .val.fee { color: #fca5a5; }
 .dp-earn-item .val.net { color: #4ade80; }
 .dp-filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
@@ -688,7 +688,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .dp-call-detail-row:last-child { border-bottom: none; }
 .dp-call-detail-row .lbl { color: #94a3b8; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
 .dp-call-detail-row .val { color: #f8fafc; font-weight: 700; font-size: 1rem; }
-.dp-call-detail-row .val.earn { color: var(--primary); font-size: 1.2rem; }
+.dp-call-detail-row .val.earn { color: var(--primary); font-size: 1rem; }
 .dp-call-actions { display: flex; gap: 40px; width: 100%; max-width: 320px; justify-content: space-between; margin-top: 20px; }
 .dp-call-btn-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .dp-call-btn {
@@ -1937,7 +1937,7 @@ Email
 <div style="padding:16px; background:linear-gradient(to right, #f0fdf4, #ecfdf5); border-radius:16px; border:1px solid #bbf7d0; margin-bottom:24px;">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
 <span style="font-size:1.1rem; font-weight:600;"><i class="fas fa-receipt" style="color:var(--primary); margin-right:8px;"></i>Total:</span>
-<span id="appPaymentTotal" style="font-size:1.2rem; font-weight:700; color:var(--primary);">$0.00</span>
+<span id="appPaymentTotal" style="font-size:1.1rem; font-weight:700; color:var(--primary);">$0.00</span>
 </div>
 <div style="border-top:1px solid #bbf7d0; padding-top:12px;">
 <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;"><i class="fas fa-user" style="color:var(--primary);"></i><span style="font-weight:600;">Customer:</span> <span id="appPayCustomerName">-</span></div>
@@ -2804,7 +2804,7 @@ ${isNew ? '<div class="dp-ring-tag"><i class="fas fa-bell"></i> NEW ORDER</div>'
 <p><i class="fas fa-location-arrow"></i> ${d} km away</p></div>
 <div class="dp-ibox"><h5><i class="fas fa-store"></i> ${r.name}</h5>
 <p style="font-size:.78rem">${o.items?.map(i => i.name + ' x' + i.quantity).join(', ') || 'No items'}</p>
-<div class="price" style="font-weight:700;color:var(--primary);font-size:1.2rem;margin-top:5px;">${DP_CONFIG.currency}${(o.total || 0).toFixed(2)}</div></div>
+<div class="price" style="font-weight:700;color:var(--primary);font-size:1rem;margin-top:5px;">${DP_CONFIG.currency}${(o.total || 0).toFixed(2)}</div></div>
 <div class="dp-earnings-box"><h5><i class="fas fa-wallet"></i> Your Earnings</h5>
 <div class="dp-earn-row"><span class="label">Order Total</span><span class="value">${formatPrice(earn.total)}</span></div>
 <div class="dp-earn-row fee"><span class="label">App Fee (${(DP_CONFIG.commissionRate*100).toFixed(0)}%)</span><span class="value">-${formatPrice(earn.appFee)}</span></div>
