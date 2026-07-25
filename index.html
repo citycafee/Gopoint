@@ -106,8 +106,8 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-mobile-menu a { color: var(--white); text-decoration: none; font-size: 24px; font-weight: 600; padding: 12px 30px; border-radius: var(--radius-md); cursor: pointer; }
 .fp-login-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
 .fp-login-modal.active { opacity: 1; visibility: visible; }
-.fp-login-card { background: var(--white); border-radius: var(--radius-xl); width: 90%; max-width: 440px; padding: 28px; box-shadow: var(--shadow-lg); position: relative; overflow: hidden; max-height: 90vh; overflow-y: auto; }
-.fp-login-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(90deg, var(--theme), var(--theme-dark)); }
+.fp-login-card { background: var(--white); border-radius: 20px; width: 90%; max-width: 420px; padding: 32px 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); position: relative; overflow: hidden; max-height: 90vh; overflow-y: auto; }
+.fp-login-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--theme), var(--theme-dark)); }
 .fp-google-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 10001; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
 .fp-google-modal.active { opacity: 1; visibility: visible; }
 .fp-google-modal-card { background: var(--white); border-radius: var(--radius-xl); width: 90%; max-width: 440px; padding: 28px; box-shadow: var(--shadow-lg); position: relative; overflow: hidden; max-height: 90vh; overflow-y: auto; }
@@ -120,9 +120,9 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-google-complete-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4); }
 .fp-login-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 24px; color: #777; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
 .fp-login-close:hover { background: #f0f0f0; color: var(--theme); }
-.fp-login-logo { text-align: center; margin-bottom: 20px; }
-.fp-login-logo h2 { font-size: 22px; font-weight: 800; color: var(--black); margin-top: 10px; }
-.fp-login-logo p { font-size: 13px; color: #777; margin-top: 4px; }
+.fp-login-logo { text-align: center; margin-bottom: 24px; }
+.fp-login-logo h2 { font-size: 22px; font-weight: 800; color: var(--black); margin-top: 8px; }
+.fp-login-logo p { font-size: 14px; color: #888; margin-top: 4px; }
 .fp-login-tabs { display: flex; gap: 6px; margin-bottom: 20px; background: #f1f5f9; padding: 4px; border-radius: 10px; }
 .fp-login-tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 0.9rem; transition: var(--transition); }
 .fp-login-tab.active { background: var(--white); color: var(--primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
@@ -130,24 +130,25 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-form-label { display: block; font-size: 13px; font-weight: 500; color: #555; margin-bottom: 6px; }
 .fp-phone-input { flex: 1; padding: 12px 14px; border: 1px solid #e5e5e5; border-radius: var(--radius-sm); font-size: 15px; outline: none; transition: var(--transition); font-family: inherit; width: 100%; }
 .fp-phone-input:focus { border-color: var(--theme); box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2); }
-.fp-phone-row { display: flex; gap: 0; border: 1px solid #e5e5e5; border-radius: var(--radius-sm); overflow: hidden; background: white; }
-.fp-phone-row:focus-within { border-color: var(--theme); box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2); }
-.fp-phone-prefix { display: flex; align-items: center; gap: 4px; padding: 12px 10px; border-right: 1px solid #e5e5e5; background: #fafafa; font-size: 14px; font-weight: 600; color: #333; cursor: pointer; user-select: none; min-width: 90px; }
+.fp-phone-row { display: flex; gap: 0; border: 2px solid #e5e7eb; border-radius: 14px; overflow: hidden; background: white; transition: all 0.2s ease; }
+.fp-phone-row:focus-within { border-color: var(--theme); box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.12); }
+.fp-phone-prefix { display: flex; align-items: center; gap: 4px; padding: 14px 12px; border-right: 1px solid #e5e7eb; background: #fafafa; font-size: 14px; font-weight: 600; color: #333; cursor: pointer; user-select: none; min-width: 90px; }
 .fp-phone-prefix select { border: none; background: transparent; font-size: 13px; font-weight: 600; color: #333; outline: none; cursor: pointer; font-family: inherit; appearance: none; -webkit-appearance: none; padding-right: 14px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0 center; }
-.fp-phone-row .fp-phone-field { border: none; padding: 12px 14px; font-size: 15px; outline: none; flex: 1; font-family: inherit; }
+.fp-phone-row .fp-phone-field { border: none; padding: 14px 14px; font-size: 16px; outline: none; flex: 1; font-family: inherit; letter-spacing: 0.3px; }
+.fp-phone-row .fp-phone-field::placeholder { color: #bbb; }
 .fp-login-subtitle { font-size: 13px; color: #999; margin-bottom: 16px; }
 .fp-login-subtitle a { color: var(--theme); font-weight: 600; text-decoration: none; }
 .fp-or-divider { display: flex; align-items: center; margin: 16px 0; gap: 12px; }
 .fp-or-divider::before, .fp-or-divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
 .fp-or-divider span { font-size: 12px; color: #999; font-weight: 500; white-space: nowrap; }
-.fp-social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit; background: white; color: #333; }
-.fp-social-btn:hover { border-color: #ccc; background: #fafafa; transform: translateY(-1px); }
+.fp-social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 16px; border: 2px solid #e5e7eb; border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: inherit; background: white; color: #333; }
+.fp-social-btn:hover { border-color: #d1d5db; background: #f9fafb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
 .fp-social-btn img, .fp-social-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
 .fp-recaptcha-text { font-size: 11px; color: #999; text-align: center; margin-top: 12px; line-height: 1.5; }
 .fp-recaptcha-text a { color: #666; text-decoration: none; }
-.fp-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit; }
-.fp-btn-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
-.fp-btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
+.fp-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
+.fp-btn-whatsapp { background: linear-gradient(135deg, var(--theme), var(--theme-dark)); color: white; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3); }
+.fp-btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4); }
 .fp-btn-gmail { background: white; color: #333; border: 2px solid #e5e5e5; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
 .fp-btn-gmail:hover { border-color: #4285F4; transform: translateY(-2px); }
 .fp-divider { display: flex; align-items: center; margin: 16px 0; }
@@ -1155,27 +1156,23 @@ Facebook
 <a><i class="fas fa-globe"></i> English</a>
 </div>
 
-<!-- Login Modal -->
+<!-- ─── LOGIN MODAL (GLOVO/KIKIDROP STYLE) ─── -->
 <div class="fp-login-modal" id="fpLoginModal">
 <div class="fp-login-card">
 <button class="fp-login-close" onclick="closeFrontLogin()">×</button>
 <div class="fp-login-logo">
-<div style="font-size:3rem;">🛵</div>
+<div style="font-size:3rem; margin-bottom:4px;">🛵</div>
 <h2>Welcome to Go!point</h2>
 <p>Sign in to order or manage deliveries</p>
 </div>
-<div class="fp-login-tabs">
-<div class="fp-login-tab active" onclick="switchLoginTab('customer')" id="tabCustomer">👤 Customer</div>
-<div class="fp-login-tab" onclick="switchLoginTab('driver')" id="tabDriver">🛵 Driver</div>
-<div class="fp-login-tab" onclick="switchLoginTab('admin')" id="tabAdmin">🛡️ Admin</div>
-</div>
 
-<!-- Customer Login Section -->
+<!-- Customer Tab (default) -->
 <div id="fpCustomerLoginSection">
 <div id="fpLoginStep" style="display:block;">
-<p style="text-align:center; font-size:15px; font-weight:600; color:#333; margin-bottom:16px;">Continue with one of the following options</p>
+<h3 style="text-align:center; font-size:17px; font-weight:700; color:#1a1a1a; margin-bottom:6px;">What's your phone number?</h3>
+<p style="text-align:center; font-size:13px; color:#888; margin-bottom:20px;">We'll send you a verification code to get started</p>
 
-<div class="fp-form-group">
+<div style="margin-bottom:16px;">
 <div class="fp-phone-row">
 <div class="fp-phone-prefix">
 <select id="fpPhonePrefix">
@@ -1186,43 +1183,38 @@ Facebook
 <option value="+251">🇪🇹 +251</option>
 </select>
 </div>
-<input type="tel" class="fp-phone-field" id="fpCustomerPhone" placeholder="Phone number" maxlength="12">
+<input type="tel" class="fp-phone-field" id="fpCustomerPhone" placeholder="6X XXX XXXX" maxlength="12">
 </div>
 </div>
 
-<p class="fp-login-subtext" style="font-size:11px; color:#999; margin-bottom:14px; line-height:1.5;">
-This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" style="color:#666;">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" style="color:#666;">Terms of Service</a> apply.
-</p>
-
-<button class="fp-btn fp-btn-whatsapp" onclick="loginWithPhone()" style="border-radius:30px; padding:14px; font-size:15px; font-weight:700;">
-<i class="fab fa-whatsapp" style="font-size:1.2rem;"></i> Continue with WhatsApp
+<button class="fp-btn fp-btn-whatsapp" onclick="loginWithPhone()" style="border-radius:30px; padding:15px; font-size:16px; font-weight:700; width:100%; box-shadow:0 4px 15px rgba(34,197,94,0.3);">
+Continue
 </button>
 
-<div class="fp-or-divider"><span>or with</span></div>
+<div class="fp-or-divider"><span>or continue with</span></div>
 
 <div style="display:flex; flex-direction:column; gap:10px;">
-<button class="fp-social-btn" onclick="loginWithGmail()">
+<button class="fp-social-btn" onclick="fplContinueWithPhone()" style="border-color:#25D366; color:#25D366; border-radius:12px; padding:12px; font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+WhatsApp
+</button>
+<button class="fp-social-btn" onclick="loginWithGmail()" style="border-radius:12px; padding:12px; font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
 <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
 Google
 </button>
-<button class="fp-social-btn" onclick="loginWithFacebook()" style="border-color:#1877F2; color:#1877F2;">
+<button class="fp-social-btn" onclick="loginWithFacebook()" style="border-color:#1877F2; color:#1877F2; border-radius:12px; padding:12px; font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
 <svg viewBox="0 0 24 24" width="20" height="20" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
 Facebook
 </button>
-<button class="fp-social-btn" onclick="loginWithEmail()">
-<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#333" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg>
-Email
-</button>
 </div>
 
-<div style="text-align:center; margin-top:16px;">
-<span style="font-size:12px; color:#999;">Don't have an account? </span>
-<a onclick="showRegisterStep()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">Sign up here</a>
+<div style="display:flex; justify-content:center; gap:20px; margin-top:20px; padding-top:16px; border-top:1px solid #f0f0f0;">
+<a onclick="switchLoginTab('driver')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-motorcycle"></i> Driver</a>
+<a onclick="switchLoginTab('admin')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-shield-halved"></i> Admin</a>
+<a onclick="goToMarketplace()" style="font-size:13px; color:var(--theme); cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-store"></i> Guest</a>
 </div>
-<div style="text-align:center; margin-top:10px;">
-<span style="font-size:12px; color:#999;">Just browsing? </span>
-<a onclick="goToMarketplace()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">Go to marketplace →</a>
-</div>
+
+<p style="text-align:center; font-size:11px; color:#aaa; margin-top:14px; line-height:1.5;">By continuing, you agree to our <a href="#" style="color:#888;">Terms of Service</a> and <a href="#" style="color:#888;">Privacy Policy</a></p>
 </div>
 
 <!-- Email Login Step (hidden by default) -->
@@ -1230,7 +1222,7 @@ Email
 <p style="text-align:center; font-size:15px; font-weight:600; color:#333; margin-bottom:16px;">Sign in with your email</p>
 <div class="fp-form-group"><label class="fp-form-label">Email Address</label><input type="email" class="fp-phone-input" id="fpEmailLogin" placeholder="Enter your email"></div>
 <div class="fp-form-group"><label class="fp-form-label">Password</label><input type="password" class="fp-phone-input" id="fpEmailPassword" placeholder="Enter your password"></div>
-<button class="fp-btn fp-btn-whatsapp" onclick="loginWithEmailSubmit()" style="border-radius:30px; padding:14px; font-size:15px; font-weight:700;"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+<button class="fp-btn fp-btn-whatsapp" onclick="loginWithEmailSubmit()" style="border-radius:30px; padding:14px; font-size:15px; font-weight:700; width:100%;"><i class="fas fa-sign-in-alt"></i> Sign In</button>
 <div style="text-align:center; margin-top:14px;"><a onclick="showPhoneLoginStep()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">← Back to phone login</a></div>
 </div>
 
@@ -1256,8 +1248,8 @@ Email
 <input type="checkbox" id="fpTermsCheck" style="margin-top:3px; accent-color:var(--theme); flex-shrink:0;">
 <span>I agree to the <a href="#" style="color:var(--theme); font-weight:600;">Terms of Service</a> and <a href="#" style="color:var(--theme); font-weight:600;">Privacy Policy</a>.</span>
 </label>
-<button class="fp-btn fp-btn-whatsapp" onclick="registerUser()"><i class="fas fa-user-plus"></i> Sign Up</button>
-<div class="fp-skip-text" style="margin-top:14px;">Already have an account? <a onclick="showLoginStep()">Log in</a></div>
+<button class="fp-btn fp-btn-whatsapp" onclick="registerUser()" style="border-radius:30px; padding:14px; font-size:15px; font-weight:700; width:100%;"><i class="fas fa-user-plus"></i> Sign Up</button>
+<div style="text-align:center; margin-top:14px;"><a onclick="showLoginStep()" style="font-size:12px; color:var(--theme); cursor:pointer; font-weight:600;">← Already have an account? Log in</a></div>
 </div>
 </div>
 

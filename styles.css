@@ -95,28 +95,25 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-mobile-menu a { color: var(--white); text-decoration: none; font-size: 24px; font-weight: 600; padding: 12px 30px; border-radius: var(--radius-md); cursor: pointer; }
 .fp-login-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
 .fp-login-modal.active { opacity: 1; visibility: visible; }
-.fp-login-card { background: var(--white); border-radius: var(--radius-xl); width: 90%; max-width: 440px; padding: 28px; box-shadow: var(--shadow-lg); position: relative; overflow: hidden; max-height: 90vh; overflow-y: auto; }
-.fp-login-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(90deg, var(--theme), var(--theme-dark)); }
-.fp-login-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 24px; color: #777; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
-.fp-login-close:hover { background: #f0f0f0; color: var(--theme); }
-.fp-login-logo { text-align: center; margin-bottom: 20px; }
-.fp-login-logo h2 { font-size: 22px; font-weight: 800; color: var(--black); margin-top: 10px; }
-.fp-login-logo p { font-size: 13px; color: #777; margin-top: 4px; }
-.fp-login-tabs { display: flex; gap: 6px; margin-bottom: 20px; background: #f1f5f9; padding: 4px; border-radius: 10px; }
-.fp-login-tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 0.9rem; transition: var(--transition); }
-.fp-login-tab.active { background: var(--white); color: var(--primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+.fp-login-card { background: var(--white); border-radius: 20px; width: 90%; max-width: 420px; padding: 32px 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); position: relative; overflow: hidden; max-height: 90vh; overflow-y: auto; }
+.fp-login-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--theme), var(--theme-dark)); }
+.fp-login-close { position: absolute; top: 16px; right: 16px; background: #f5f5f5; border: none; font-size: 20px; color: #666; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; z-index: 2; }
+.fp-login-close:hover { background: #eee; color: #333; }
+.fp-login-logo { text-align: center; margin-bottom: 24px; }
+.fp-login-logo h2 { font-size: 22px; font-weight: 800; color: var(--black); margin-top: 8px; }
+.fp-login-logo p { font-size: 14px; color: #888; margin-top: 4px; }
 .fp-form-group { margin-bottom: 16px; }
 .fp-form-label { display: block; font-size: 13px; font-weight: 500; color: #555; margin-bottom: 6px; }
-.fp-phone-input { flex: 1; padding: 12px 14px; border: 1px solid #e5e5e5; border-radius: var(--radius-sm); font-size: 15px; outline: none; transition: var(--transition); font-family: inherit; width: 100%; }
-.fp-phone-input:focus { border-color: var(--theme); box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.2); }
+.fp-phone-input { flex: 1; padding: 14px; border: 2px solid #e5e7eb; border-radius: 14px; font-size: 15px; outline: none; transition: all 0.2s ease; font-family: inherit; width: 100%; }
+.fp-phone-input:focus { border-color: var(--theme); box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.12); }
 .fp-login-options { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
-.fp-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit; }
-.fp-btn-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
-.fp-btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
-.fp-btn-gmail { background: white; color: #333; border: 2px solid #e5e5e5; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
+.fp-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
+.fp-btn-whatsapp { background: linear-gradient(135deg, var(--theme), var(--theme-dark)); color: white; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3); }
+.fp-btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4); }
+.fp-btn-gmail { background: white; color: #333; border: 2px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
 .fp-btn-gmail:hover { border-color: #4285F4; transform: translateY(-2px); }
 .fp-divider { display: flex; align-items: center; margin: 16px 0; }
-.fp-divider::before, .fp-divider::after { content: ''; flex: 1; height: 1px; background: #e5e5e5; }
+.fp-divider::before, .fp-divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
 .fp-divider span { padding: 0 10px; font-size: 12px; color: #999; }
 .fp-skip-text { text-align: center; margin-top: 16px; font-size: 12px; color: #999; }
 .fp-skip-text a { color: var(--theme); cursor: pointer; font-weight: 600; text-decoration: none; }
