@@ -556,6 +556,10 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 /* Profile */
 .pf-content { max-width: 640px; margin: -30px auto 30px; padding: 0 12px; }
 .pf-hero { padding: 0 16px 50px; }
+.pf-avatar-ring { width: 94px; height: 94px; }
+.pf-avatar-ring::after { inset: -3px; border-width: 2px; }
+.pf-avatar-letter { width: 76px; height: 76px; font-size: 34px; }
+.pf-user-name { font-size: 24px; }
 .pf-stats-row { gap: 8px; margin-bottom: 14px; }
 .pf-stat-card { padding: 14px 8px; }
 .pf-stat-num { font-size: 22px; }
@@ -614,6 +618,11 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .pf-stat-card { padding: 12px 6px; }
 .pf-stat-num { font-size: 20px; }
 .pf-stat-lbl { font-size: 0.6rem; }
+.pf-avatar-ring { width: 80px; height: 80px; }
+.pf-avatar-ring::after { inset: -2px; border-width: 2px; }
+.pf-avatar-letter { width: 64px; height: 64px; font-size: 28px; }
+.pf-user-name { font-size: 20px; }
+.pf-user-phone { font-size: 12px; }
 .pf-section { padding: 14px; }
 .pf-actions-grid { grid-template-columns: 1fr; }
 .pf-a-label { font-size: 13px; }
@@ -1966,7 +1975,7 @@ Email
 <div class="pf-modal-overlay" id="pfEditModal">
 <div class="pf-modal-card">
 <button class="pf-modal-close" onclick="closeProfileEditModal()">×</button>
-<div class="pf-modal-title">Edit Profile</div>
+<div class="pf-modal-title">Personal Information</div>
 <div class="pf-form-group"><label>Full Name</label><input type="text" id="pfEditName" placeholder="Your name"></div>
 <div class="pf-form-group"><label>Phone Number</label><input type="tel" id="pfEditPhone" placeholder="+252 61 XXX XXXX"></div>
 <div class="pf-form-group"><label>Email Address</label><input type="email" id="pfEditEmail" placeholder="your@email.com"></div>
