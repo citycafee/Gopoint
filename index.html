@@ -266,6 +266,9 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-profile-view .pf-hero-top { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; }
 .app-profile-view .pf-hero-top .pf-back-btn { background: rgba(255,255,255,0.25); backdrop-filter: blur(8px); border: none; color: #1a1a1a; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; }
 .app-profile-view .pf-hero-top .pf-back-btn:hover { background: rgba(255,255,255,0.45); }
+.app-profile-view .pf-hero-actions { display: flex; gap: 10px; }
+.app-profile-view .pf-hero-actions button { background: rgba(255,255,255,0.25); backdrop-filter: blur(8px); border: none; color: #1a1a1a; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+.app-profile-view .pf-hero-actions button:hover { background: rgba(255,255,255,0.45); }
 .app-profile-view .pf-hero-top .pf-hero-title { color: #1a1a1a; font-size: 22px; font-weight: 800; }
 .app-profile-view .pf-avatar-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 8px; }
 .app-profile-view .pf-avatar-main { position: relative; }
@@ -295,6 +298,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-profile-view .pf-info-row:last-child { border-bottom: none; }
 .app-profile-view .pf-info-left { display: flex; align-items: center; gap: 14px; }
 .app-profile-view .pf-info-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.app-profile-view .pf-info-text { flex: 1; }
 .app-profile-view .pf-info-label { font-size: 12px; color: #888; font-weight: 500; }
 .app-profile-view .pf-info-value { font-size: 15px; font-weight: 600; color: #1a1a1a; }
 .app-profile-view .pf-info-edit { background: none; border: none; color: #00A19B; font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 8px; transition: background .2s; }
@@ -1901,7 +1905,9 @@ Email
 <div class="pf-hero-top">
 <button class="pf-back-btn" onclick="navigateToView('home')"><i class="fas fa-arrow-left"></i></button>
 <div class="pf-hero-title">Go!point</div>
-<button class="pf-back-btn" onclick="openProfileEditModal()"><i class="fas fa-pen"></i></button>
+<div class="pf-hero-actions">
+<button onclick="openProfileEditModal()" title="Edit"><i class="fas fa-pen"></i></button>
+</div>
 </div>
 <div class="pf-avatar-section">
 <div class="pf-avatar-main">
@@ -1930,17 +1936,18 @@ Email
 <div class="pf-action-card" onclick="navigateToView('home')"><div class="pf-a-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-utensils"></i></div><div><div class="pf-a-label">Order Food</div><div class="pf-a-desc">Browse restaurants</div></div></div>
 <div class="pf-action-card" onclick="navigateToView('orders')"><div class="pf-a-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-receipt"></i></div><div><div class="pf-a-label">My Orders</div><div class="pf-a-desc">Track & reorder</div></div></div>
 <div class="pf-action-card" onclick="openProfileEditModal()"><div class="pf-a-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-pen"></i></div><div><div class="pf-a-label">Edit Profile</div><div class="pf-a-desc">Update your info</div></div></div>
-<div class="pf-action-card" onclick="openTrackingModal()"><div class="pf-a-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-map-marked-alt"></i></div><div><div class="pf-a-label">Track Order</div><div class="pf-a-desc">Live delivery tracking</div></div></div>
+<div class="pf-action-card" onclick="showAppToast('Help coming soon!')"><div class="pf-a-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-headset"></i></div><div><div class="pf-a-label">Get Help</div><div class="pf-a-desc">Contact support</div></div></div>
 </div>
 </div>
 <!-- Personal Info -->
 <div class="pf-section">
 <div class="pf-section-title"><i style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fas fa-user-circle"></i></i> Personal Information</div>
-<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f0fdf9;color:#00A19B;"><i class="fas fa-user"></i></div><div><div class="pf-info-label">Full Name</div><div class="pf-info-value" id="pfInfoName">User</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
-<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-phone"></i></div><div><div class="pf-info-label">Phone Number</div><div class="pf-info-value" id="pfInfoPhone">+252 61 XXX XXXX</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
-<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-envelope"></i></div><div><div class="pf-info-label">Email Address</div><div class="pf-info-value" id="pfInfoEmail">Not set</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
-<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f1f5f9;color:#64748b;"><i class="fas fa-shield-alt"></i></div><div><div class="pf-info-label">Login Method</div><div class="pf-info-value" id="pfInfoProvider">Phone + OTP</div></div></div></div>
-<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f0fdf9;color:#16a34a;"><i class="fas fa-calendar-alt"></i></div><div><div class="pf-info-label">Member Since</div><div class="pf-info-value" id="pfInfoSince">-</div></div></div></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f0fdf9;color:#00A19B;"><i class="fas fa-user"></i></div><div class="pf-info-text"><div class="pf-info-label">Full Name</div><div class="pf-info-value" id="pfInfoName">User</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-phone"></i></div><div class="pf-info-text"><div class="pf-info-label">Phone Number</div><div class="pf-info-value" id="pfInfoPhone">+252 61 XXX XXXX</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-envelope"></i></div><div class="pf-info-text"><div class="pf-info-label">Email Address</div><div class="pf-info-value" id="pfInfoEmail">Not set</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-map-marker-alt"></i></div><div class="pf-info-text"><div class="pf-info-label">Default Address</div><div class="pf-info-value" id="pfInfoAddress">Not set</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f1f5f9;color:#64748b;"><i class="fas fa-shield-alt"></i></div><div class="pf-info-text"><div class="pf-info-label">Login Method</div><div class="pf-info-value" id="pfInfoProvider">Phone + OTP</div></div></div></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f0fdf9;color:#16a34a;"><i class="fas fa-calendar-alt"></i></div><div class="pf-info-text"><div class="pf-info-label">Member Since</div><div class="pf-info-value" id="pfInfoSince">-</div></div></div></div>
 </div>
 <!-- Recent Orders -->
 <div class="pf-section">
@@ -3671,6 +3678,7 @@ document.getElementById('pfStatSaved').textContent = '$' + (totalSpent * 0.05).t
 document.getElementById('pfInfoName').textContent = name;
 document.getElementById('pfInfoPhone').textContent = phone;
 document.getElementById('pfInfoEmail').textContent = email;
+document.getElementById('pfInfoAddress').textContent = currentUser.address || 'Not set';
 document.getElementById('pfInfoProvider').textContent = provider;
 const created = currentUser.created || currentUser.registeredAt;
 document.getElementById('pfInfoSince').textContent = created ? new Date(created).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) : '-';

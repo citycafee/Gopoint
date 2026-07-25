@@ -277,55 +277,78 @@ Username: <code>admin</code> · Password: <code>admin123</code>
 <div class="pf-hero">
 <div class="pf-hero-top">
 <button class="pf-back-btn" onclick="navigateToView('home')"><i class="fas fa-arrow-left"></i></button>
-<div class="pf-hero-title">My Profile</div>
-<button class="pf-back-btn" onclick="openProfileEditModal()"><i class="fas fa-pen"></i></button>
+<div class="pf-hero-title">Go!point</div>
+<div class="pf-hero-actions">
+<button onclick="openProfileEditModal()" title="Edit"><i class="fas fa-pen"></i></button>
+</div>
 </div>
 <div class="pf-avatar-section">
 <div class="pf-avatar-main">
+<div class="pf-avatar-ring">
 <div class="pf-avatar-letter" id="pfProfileAvatar">U</div>
+</div>
 <div class="pf-avatar-badge"><i class="fas fa-check"></i></div>
 </div>
 <div class="pf-user-name" id="pfProfileName">User</div>
 <div class="pf-user-phone" id="pfProfilePhone">+252 61 XXX XXXX</div>
+<div class="pf-member-badge"><i class="fas fa-crown"></i> Member</div>
 </div>
 </div>
 <!-- Main Content -->
 <div class="pf-content">
-<!-- Stats Card -->
-<div class="pf-stats-card">
-<div class="pf-stat-item"><div class="pf-stat-value" id="pfStatOrders">0</div><div class="pf-stat-label">Orders</div></div>
-<div class="pf-stat-item"><div class="pf-stat-value" id="pfStatSpent">$0</div><div class="pf-stat-label">Spent</div></div>
-<div class="pf-stat-item"><div class="pf-stat-value" id="pfStatSaved">$0</div><div class="pf-stat-label">Saved</div></div>
+<!-- Stats -->
+<div class="pf-stats-row">
+<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatOrders">0</div><div class="pf-stat-lbl">Total Orders</div></div>
+<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatSpent">$0</div><div class="pf-stat-lbl">Total Spent</div></div>
+<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatSaved">$0</div><div class="pf-stat-lbl">Saved</div></div>
 </div>
-<!-- Account Menu -->
-<div class="pf-card">
-<div class="pf-card-header"><div class="pf-card-title"><div class="pf-title-icon" style="background:linear-gradient(135deg,#00A19B,#22c55e);"><i class="fas fa-user"></i></div> Account</div></div>
-<div class="pf-menu-item" onclick="openProfileEditModal()"><div class="pf-menu-icon" style="background:#f0fdf9;color:#00A19B;"><i class="fas fa-pen-to-square"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Edit Profile</div><div class="pf-menu-sublabel">Update your name, phone, email</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
-<div class="pf-menu-item" onclick="navigateToView('orders')"><div class="pf-menu-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-bag-shopping"></i></div><div class="pf-menu-text"><div class="pf-menu-label">My Orders</div><div class="pf-menu-sublabel">View order history & track</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
-<div class="pf-menu-item" onclick="showAppToast('Addresses coming soon!')"><div class="pf-menu-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-location-dot"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Saved Addresses</div><div class="pf-menu-sublabel">Manage delivery addresses</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
-<div class="pf-menu-item" onclick="showAppToast('Payment coming soon!')"><div class="pf-menu-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-credit-card"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Payment Methods</div><div class="pf-menu-sublabel">Manage cards & wallets</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
+<!-- Quick Actions -->
+<div class="pf-section">
+<div class="pf-section-title"><i style="background:linear-gradient(135deg,#00A19B,#22c55e);"><i class="fas fa-bolt"></i></i> Quick Actions</div>
+<div class="pf-actions-grid">
+<div class="pf-action-card" onclick="navigateToView('home')"><div class="pf-a-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-utensils"></i></div><div><div class="pf-a-label">Order Food</div><div class="pf-a-desc">Browse restaurants</div></div></div>
+<div class="pf-action-card" onclick="navigateToView('orders')"><div class="pf-a-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-receipt"></i></div><div><div class="pf-a-label">My Orders</div><div class="pf-a-desc">Track & reorder</div></div></div>
+<div class="pf-action-card" onclick="openProfileEditModal()"><div class="pf-a-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-pen"></i></div><div><div class="pf-a-label">Edit Profile</div><div class="pf-a-desc">Update your info</div></div></div>
+<div class="pf-action-card" onclick="showAppToast('Help coming soon!')"><div class="pf-a-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-headset"></i></div><div><div class="pf-a-label">Get Help</div><div class="pf-a-desc">Contact support</div></div></div>
 </div>
-<!-- Support & Settings -->
-<div class="pf-card">
-<div class="pf-card-header"><div class="pf-card-title"><div class="pf-title-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);"><i class="fas fa-gear"></i></div> Help & Settings</div></div>
-<div class="pf-menu-item" onclick="showAppToast('Help coming soon!')"><div class="pf-menu-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-headset"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Get Help</div><div class="pf-menu-sublabel">Contact support team</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
-<div class="pf-menu-item" onclick="showAppToast('Notifications coming soon!')"><div class="pf-menu-icon" style="background:#ccfbf1;color:#0d9488;"><i class="fas fa-bell"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Notifications</div><div class="pf-menu-sublabel">Manage push & email alerts</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
-<div class="pf-menu-item" onclick="showAppToast('About coming soon!')"><div class="pf-menu-icon" style="background:#f1f5f9;color:#64748b;"><i class="fas fa-circle-info"></i></div><div class="pf-menu-text"><div class="pf-menu-label">About Go!point</div><div class="pf-menu-sublabel">Version, terms & privacy</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
 </div>
-<!-- Logout -->
-<button class="pf-logout-btn" onclick="logoutUser()"><i class="fas fa-right-from-bracket"></i> Sign Out</button>
+<!-- Personal Info -->
+<div class="pf-section">
+<div class="pf-section-title"><i style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fas fa-user-circle"></i></i> Personal Information</div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f0fdf9;color:#00A19B;"><i class="fas fa-user"></i></div><div class="pf-info-text"><div class="pf-info-label">Full Name</div><div class="pf-info-value" id="pfInfoName">User</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-phone"></i></div><div class="pf-info-text"><div class="pf-info-label">Phone Number</div><div class="pf-info-value" id="pfInfoPhone">+252 61 XXX XXXX</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-envelope"></i></div><div class="pf-info-text"><div class="pf-info-label">Email Address</div><div class="pf-info-value" id="pfInfoEmail">Not set</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-map-marker-alt"></i></div><div class="pf-info-text"><div class="pf-info-label">Default Address</div><div class="pf-info-value" id="pfInfoAddress">Not set</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f1f5f9;color:#64748b;"><i class="fas fa-shield-alt"></i></div><div class="pf-info-text"><div class="pf-info-label">Login Method</div><div class="pf-info-value" id="pfInfoProvider">Phone + OTP</div></div></div></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f0fdf9;color:#16a34a;"><i class="fas fa-calendar-alt"></i></div><div class="pf-info-text"><div class="pf-info-label">Member Since</div><div class="pf-info-value" id="pfInfoSince">-</div></div></div></div>
 </div>
-<!-- Edit Profile Modal (Bottom Sheet) -->
+<!-- Recent Orders -->
+<div class="pf-section">
+<div class="pf-section-title"><i style="background:linear-gradient(135deg,#f59e0b,#d97706);"><i class="fas fa-clock"></i></i> Recent Orders</div>
+<div id="pfRecentOrders">
+<div class="pf-empty"><i class="fas fa-receipt"></i><p>No orders yet. Start ordering!</p></div>
+</div>
+</div>
+<!-- Bottom Actions -->
+<div class="pf-bottom-actions">
+<button class="pf-btn pf-btn-primary" onclick="navigateToView('home')"><i class="fas fa-shopping-bag"></i> Order Now</button>
+<button class="pf-btn pf-btn-outline" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+</div>
+</div>
+<!-- Edit Profile Modal -->
 <div class="pf-modal-overlay" id="pfEditModal">
-<div class="pf-modal-sheet">
-<div class="pf-modal-handle"></div>
+<div class="pf-modal-card">
+<button class="pf-modal-close" onclick="closeProfileEditModal()">×</button>
 <div class="pf-modal-title">Edit Profile</div>
 <div class="pf-form-group"><label>Full Name</label><input type="text" id="pfEditName" placeholder="Your name"></div>
 <div class="pf-form-group"><label>Phone Number</label><input type="tel" id="pfEditPhone" placeholder="+252 61 XXX XXXX"></div>
 <div class="pf-form-group"><label>Email Address</label><input type="email" id="pfEditEmail" placeholder="your@email.com"></div>
+<div class="pf-form-group"><label>Default Address</label><input type="text" id="pfEditAddress" placeholder="Your delivery address"></div>
 <div class="pf-modal-actions">
 <button class="pf-modal-cancel" onclick="closeProfileEditModal()">Cancel</button>
 <button class="pf-modal-save" onclick="saveProfileFromModal()">Save Changes</button>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1130,6 +1153,7 @@ document.getElementById('pfStatSaved').textContent = '$' + (totalSpent * 0.05).t
 document.getElementById('pfInfoName').textContent = name;
 document.getElementById('pfInfoPhone').textContent = phone;
 document.getElementById('pfInfoEmail').textContent = email;
+document.getElementById('pfInfoAddress').textContent = currentUser.address || 'Not set';
 document.getElementById('pfInfoProvider').textContent = provider;
 const created = currentUser.created || currentUser.registeredAt;
 document.getElementById('pfInfoSince').textContent = created ? new Date(created).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) : '-';
