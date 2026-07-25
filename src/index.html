@@ -1386,7 +1386,7 @@ const rImg = (r.menu.food && r.menu.food[0]) ? r.menu.food[0].image : (r.menu.co
 document.getElementById('appExplorerRestHeader').innerHTML = `<div class="app-explorer-rest-img" style="background-image:url('${rImg}')"></div><div class="app-explorer-rest-info"><h3>${r.name}</h3><div class="app-explorer-rest-meta"><span><i class="fas fa-utensils"></i> ${r.cuisine||''}</span><span><i class="fas fa-star" style="color:#f59e0b;"></i> ${r.rating||'4.5'}</span><span><i class="fas fa-clock"></i> ${r.deliveryTime||''}</span></div></div>`;
 const active = r.activeCategories || allCategories;
 appExplorerCurrentCategory = active.includes('food') ? 'food' : active[0] || 'food';
-document.getElementById('appExplorerCatTabs').innerHTML = allCategories.filter(c => active.includes(c)).map(c => `<div class="app-explorer-cat-tab${c===appExplorerCurrentCategory?' active':''}" data-cat="${c}" onclick="appSelectExplorerCategory('${c}')">${categoryLabels[c]}</div>`).join('');
+document.getElementById('appExplorerCatTabs').innerHTML = active.map(c => `<div class="app-explorer-cat-tab${c===appExplorerCurrentCategory?' active':''}" data-cat="${c}" onclick="appSelectExplorerCategory('${c}')">${categoryLabels[c] || c}</div>`).join('');
 appRenderExplorerMenuItems();
 document.getElementById('appHomeView').style.display = 'none';
 document.getElementById('appExplorerContainer').classList.add('active');
