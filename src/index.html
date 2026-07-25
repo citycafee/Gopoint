@@ -913,6 +913,7 @@ setTimeout(() => { if (adminUsername) adminUsername.focus(); }, 100);
 
 function openFrontLogin() { document.getElementById('fpLoginModal').classList.add('active'); switchLoginTab('customer'); }
 function closeFrontLogin() { document.getElementById('fpLoginModal').classList.remove('active'); }
+function openFrontLoginModal() { document.getElementById('fpLoginModal').classList.add('active'); switchLoginTab('customer'); }
 function toggleFpMobileMenu() { const m = document.getElementById('fpMobileMenu'), h = document.getElementById('fpHamburger'); m.classList.toggle('active'); h.classList.toggle('active'); }
 
 function switchLoginTab(type) {
@@ -1083,7 +1084,7 @@ async function registerUser() {
 
 
 function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); closeFrontLogin(); showAppToast('âœ… Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
-function goToMarketplace() { document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); updateUserUI(); navigateToView('home'); setTimeout(() => { if (appMap) appMap.invalidateSize(); appRenderRestaurantList(); }, 100); }
+function goToMarketplace() { document.getElementById('fpLoginModal').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); updateUserUI(); navigateToView('home'); if (customerLocation && customerLocation.area) { document.getElementById('appHomeSearchInput').placeholder = '📍 ' + customerLocation.area + ' — Search restaurants...'; } setTimeout(() => { if (appMap) appMap.invalidateSize(); appRenderRestaurantList(); }, 100); }
 
 
 async function logoutUser() {
