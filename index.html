@@ -400,13 +400,22 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-explorer-cat-tab.active { background:var(--primary); color:white; border-color:var(--primary); }
 @media (max-width:768px) {
   #appExplorerMenuItems .menu-item { flex-direction: row; border-radius: 14px; gap: 0; }
-  #appExplorerMenuItems .menu-item .item-image { width: 110px; min-width: 110px; height: 100%; min-height: 110px; border-radius: 12px 0 0 12px; order: 0; }
-  #appExplorerMenuItems .menu-item .item-content { padding: 10px 12px 10px 12px; order: 1; min-width: 0; }
-  #appExplorerMenuItems .menu-item .item-content .item-title { font-size: 14px; }
-  #appExplorerMenuItems .menu-item .item-content .item-description { font-size: 12px; margin-bottom: 6px; -webkit-line-clamp: 2; }
-  #appExplorerMenuItems .menu-item .item-content .item-footer .item-price { font-size: 15px; }
-  #appExplorerMenuItems .menu-item .item-content .item-footer .add-btn { padding: 6px 12px; font-size: 12px; }
-  #appExplorerMenuItems .menu-item .cart-badge-indicator { top: 4px; right: 4px; width: 22px; height: 22px; font-size: 12px; }
+  #appExplorerMenuItems .menu-item .item-image { width: 100px; min-width: 100px; height: 100%; min-height: 100px; border-radius: 12px 0 0 12px; order: 0; object-fit: cover; }
+  #appExplorerMenuItems .menu-item .item-content { padding: 8px 10px; order: 1; min-width: 0; }
+  #appExplorerMenuItems .menu-item .item-content .item-title { font-size: 13px; font-weight: 600; }
+  #appExplorerMenuItems .menu-item .item-content .item-description { font-size: 11px; margin-bottom: 4px; -webkit-line-clamp: 2; }
+  #appExplorerMenuItems .menu-item .item-content .item-footer .item-price { font-size: 13px; }
+  #appExplorerMenuItems .menu-item .item-content .item-footer .add-btn { padding: 5px 10px; font-size: 11px; border-radius: 8px; }
+  #appExplorerMenuItems .menu-item .cart-badge-indicator { top: 4px; right: 4px; width: 20px; height: 20px; font-size: 11px; }
+  #appExplorerMenuItems .menu-item .item-content .item-footer { gap: 6px; }
+}
+@media (max-width:480px) {
+  #appExplorerMenuItems .menu-item .item-image { width: 85px; min-width: 85px; min-height: 85px; }
+  #appExplorerMenuItems .menu-item .item-content { padding: 6px 8px; }
+  #appExplorerMenuItems .menu-item .item-content .item-title { font-size: 12px; }
+  #appExplorerMenuItems .menu-item .item-content .item-description { font-size: 10px; }
+  #appExplorerMenuItems .menu-item .item-content .item-footer .item-price { font-size: 12px; }
+  #appExplorerMenuItems .menu-item .item-content .item-footer .add-btn { padding: 4px 8px; font-size: 10px; }
 }
 .app-mini-cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 12px 20px; display: none; justify-content: space-between; align-items: center; z-index: 900; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15); cursor: pointer; }
 .app-mini-cart-bar.visible { display: flex; }
@@ -469,11 +478,13 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 
 /* ─── RESPONSIVE ─── */
 @media (max-width:768px) {
+/* Front page */
 .fp-header { padding: 10px 15px; }
 .fp-nav { display: none; }
 .fp-hamburger { display: flex; }
 .fp-footer-container { grid-template-columns: 1fr; gap: 30px; }
 .fp-footer-columns { grid-template-columns: 1fr 1fr; }
+/* Bottom navbar */
 .app-navbar { position:fixed; bottom:0; top:auto; left:0; right:0; height:auto; min-height:auto; padding:0; box-shadow:0 -2px 12px rgba(0,0,0,0.08); z-index:1100; background:#fff; border-radius:16px 16px 0 0; }
 .app-header { flex-direction:row; align-items:center; justify-content:space-around; padding:6px 0 8px; max-width:100%; }
 .app-nav-left { display:none; }
@@ -485,20 +496,41 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-nav-right ul li.active-nav { background:rgba(34,197,94,0.1); }
 .app-nav-right ul li.active-nav i { color:var(--primary); }
 .user-avatar-btn .user-name { display: none; }
-.app-container { padding: 1rem 0; padding-bottom:80px; }
-.app-explorer { margin-top:0; padding-bottom:100px; }
-.app-sticky-top { top: 110px; padding: 0.5rem 0; }
+/* Views & containers */
+.app-view { margin-top:0; padding: 0.75rem; }
+.app-container { padding: 0.75rem 0; padding-bottom:130px; }
+.app-explorer { margin-top:0; padding-bottom:130px; }
+.app-sticky-top { top: 0; padding: 0.5rem 0; }
 .app-banner { padding: 0.5rem 0; }
 .app-categories-page { margin: 0.5rem 0; }
-.app-container { padding: 1rem 0; }
-.app-row-eq-height { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
-.app-card { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
-.app-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12); }
-.app-card_image_view { height: 140px; }
-#appMap { height: 280px; }
-.app-cart-window { width: 90%; right: 5%; }
-.user-avatar-btn .user-name { display: none; }
-.app-view { padding: 1rem; }
+/* Restaurant cards - mobile optimized */
+.app-row-eq-height { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
+.app-card { border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+.app-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+.app-card_image_view { height: 120px; border-radius: 14px 14px 0 0; }
+.app-card_heading { font-size: 0.9rem; font-weight: 700; line-height: 1.2; margin-bottom: 2px; }
+.app-card_description { font-size: 0.72rem; color: #888; line-height: 1.3; }
+.app-restaurant-meta { gap: 4px; }
+.app-restaurant-rating { font-size: 0.7rem; }
+.app-restaurant-delivery-time { font-size: 0.68rem; }
+.app-restaurant-delivery-info { gap: 4px; }
+/* Map */
+#appMap { height: 220px; }
+/* Cart & mini cart */
+.app-cart-window { width: 92%; right: 4%; bottom: 130px; max-height: 60vh; }
+.app-mini-cart-bar { bottom: 56px; }
+/* Payment grid */
+.app-payment-options { grid-template-columns: 1fr 1fr !important; }
+.app-payment-option { padding: 0.75rem 0.5rem; }
+/* Tracking map */
+#appTrackingMap { height: 250px; }
+/* Profile & views padding */
+.pf-content { padding: 0 0.5rem; }
+.pf-hero { padding: 1rem; }
+.app-view { padding: 0.75rem; }
+/* Step indicator */
+.app-step span { font-size: 0.65rem; white-space: nowrap; }
+/* Admin sidebar */
 .mgmt-sidebar { width: 100%; height: auto; position: relative; display: flex; flex-wrap: wrap; padding: 10px 15px; }
 .mgmt-sidebar-logo { width: 100%; margin-bottom: 8px; }
 .mgmt-sidebar-nav { display: flex; width: 100%; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
@@ -511,6 +543,45 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .mgmt-orders-table th, .mgmt-orders-table td { padding: 6px 8px; }
 .mgmt-driver-card { flex-direction: column; align-items: stretch; }
 .mgmt-driver-status { justify-content: space-between; }
+}
+@media (max-width:480px) {
+.fp-hero-logo-text { font-size: 48px; }
+.fp-login-card { padding: 24px 20px; }
+.fp-footer-columns { grid-template-columns: 1fr; }
+/* Restaurant cards - single column, compact */
+.app-row-eq-height { grid-template-columns: 1fr; gap: 0.6rem; }
+.app-card { display: flex; flex-direction: row; border-radius: 14px; overflow: hidden; }
+.app-card_image_view { width: 120px; min-width: 120px; height: 100px; border-radius: 14px 0 0 14px; object-fit: cover; }
+.app-card_inner { display: flex; flex-direction: row; gap: 0; }
+.app-card_inner > div { flex: 1; padding: 8px 10px; display: flex; flex-direction: column; justify-content: center; }
+.app-card { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }
+.app-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+.app-card_heading { font-size: 0.85rem; }
+.app-card_description { font-size: 0.7rem; }
+.app-restaurant-meta { flex-direction: row; align-items: center; gap: 6px; }
+.app-restaurant-delivery-info { flex-direction: row; gap: 6px; }
+/* Bottom navbar compact */
+.app-nav-right ul li { padding: 3px 6px; }
+.app-nav-right ul li i { font-size: 1.05rem; }
+/* Cart */
+.app-cart-window { width: 95%; right: 2.5%; bottom: 120px; }
+/* Mini cart */
+.app-mini-cart-bar { bottom: 52px; padding: 10px 14px; }
+.app-mini-cart-total { font-size: 1rem; }
+/* Payment single column on tiny phones */
+.app-payment-options { grid-template-columns: 1fr !important; }
+.app-payment-option { padding: 0.6rem; }
+/* Profile */
+.pf-stats-card { gap: 0.5rem; }
+.pf-stat-item { padding: 0.5rem; }
+.pf-stat-value { font-size: 1rem; }
+.pf-stat-label { font-size: 0.65rem; }
+.pf-menu-item-lg { padding: 12px 14px; }
+.pf-menu-label { font-size: 0.85rem; }
+.pf-menu-sublabel { font-size: 0.7rem; }
+.mgmt-stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+.mgmt-stat-card { padding: 14px; }
+.mgmt-stat-card .value { font-size: 18px; }
 }
 @media (max-width:480px) {
 .fp-hero-logo-text { font-size: 48px; }
