@@ -1730,15 +1730,7 @@ Email
 <li id="appOrdersLink" style="cursor:pointer;" onclick="navigateToView('orders')"><i class="fa fa-receipt"></i><span>Orders</span></li>
 <li onclick="toggleCart()" style="cursor:pointer;"><i class="fa fa-shopping-cart"></i><span id="appCartCount" class="cart-badge" style="display:none;">0</span><span>Cart</span></li>
 <li id="appUserArea" style="display:block; position:relative;">
-<button class="user-avatar-btn" onclick="toggleUserDropdown(event)"><div class="avatar-circle" id="appUserAvatar">G</div><span class="user-name" id="appUserName">Google User</span></button>
-<div class="user-dropdown" id="appUserDropdown">
-<div class="user-dropdown-header"><div class="user-name-big" id="appUserDropdownName">Google User</div><div class="user-email" id="appUserDropdownEmail">user@gmail.com</div></div>
-<button class="user-dropdown-item" onclick="navigateToView('home')"><i class="fas fa-home"></i> Home</button>
-<button class="user-dropdown-item" onclick="navigateToView('profile')"><i class="fas fa-user"></i> My Profile</button>
-<button class="user-dropdown-item" onclick="openTrackingModal()"><i class="fas fa-map-marked-alt"></i> Track Order</button>
-<button class="user-dropdown-item" onclick="openAdminLoginFromApp()"><i class="fas fa-shield-halved"></i> Admin Dashboard</button>
-<button class="user-dropdown-item danger" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-</div>
+<button class="user-avatar-btn" onclick="navigateToView('profile')"><div class="avatar-circle" id="appUserAvatar">G</div><span class="user-name" id="appUserName">Google User</span></button>
 </li>
 </ul>
 </div>
@@ -1820,6 +1812,13 @@ Email
 <div class="pf-menu-item pf-menu-item-lg" onclick="navigateToView('orders')"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#fef3c7;color:#d97706;"><i class="fas fa-bag-shopping"></i></div><div class="pf-menu-text"><div class="pf-menu-label">My Orders</div><div class="pf-menu-sublabel">View order history & track</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
 <div class="pf-menu-item pf-menu-item-lg" onclick="showAppToast('Addresses coming soon!')"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-location-dot"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Saved Addresses</div><div class="pf-menu-sublabel">Manage delivery addresses</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
 <div class="pf-menu-item pf-menu-item-lg" onclick="showAppToast('Payment coming soon!')"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-credit-card"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Payment Methods</div><div class="pf-menu-sublabel">Manage cards & wallets</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
+</div>
+<!-- Quick Actions -->
+<div class="pf-card pf-card-large">
+<div class="pf-card-header"><div class="pf-card-title"><div class="pf-title-icon pf-title-icon-lg" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);"><i class="fas fa-bolt"></i></div> Quick Actions</div></div>
+<div class="pf-menu-item pf-menu-item-lg" onclick="navigateToView('home')"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#f0fdf4;color:#16a34a;"><i class="fas fa-home"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Home</div><div class="pf-menu-sublabel">Browse restaurants & order food</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
+<div class="pf-menu-item pf-menu-item-lg" onclick="openTrackingModal()"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#fef3c7;color:#d97706;"><i class="fas fa-map-marked-alt"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Track Order</div><div class="pf-menu-sublabel">Track your active delivery</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
+<div class="pf-menu-item pf-menu-item-lg" onclick="openAdminLoginFromApp()"><div class="pf-menu-icon pf-menu-icon-lg" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-shield-halved"></i></div><div class="pf-menu-text"><div class="pf-menu-label">Admin Dashboard</div><div class="pf-menu-sublabel">Access management panel</div></div><i class="fas fa-chevron-right pf-menu-arrow"></i></div>
 </div>
 <!-- Support & Settings -->
 <div class="pf-card pf-card-large">
@@ -3490,7 +3489,7 @@ currentUser = null;
 localStorage.removeItem('gopoint_user');
 document.getElementById('appContainer').classList.remove('active');
 document.getElementById('frontPageContainer').style.display = 'block';
-document.getElementById('appUserDropdown').classList.remove('active');
+document.getElementById('appUserDropdown')?.classList.remove('active');
 window.scrollTo({ top: 0 });
 showAppToast('👋 Logged out successfully');
 }
@@ -3509,7 +3508,7 @@ if (document.getElementById('appOrdersView').classList.contains('active')) rende
 if (document.getElementById('appAddressesView').classList.contains('active')) renderAddressesView();
 }
 
-function toggleUserDropdown(event) { event.stopPropagation(); document.getElementById('appUserDropdown').classList.toggle('active'); }
+function toggleUserDropdown(event) { event.stopPropagation(); document.getElementById('appUserDropdown')?.classList.toggle('active'); }
 document.addEventListener('click', (e) => { const dropdown = document.getElementById('appUserDropdown'); if (dropdown && !e.target.closest('#appUserArea')) { dropdown.classList.remove('active'); } });
 
 function navigateToView(view) {
@@ -3525,7 +3524,7 @@ else if (view === 'addresses') { document.getElementById('appAddressesView').cla
 document.querySelectorAll('.app-nav-right ul li').forEach(li => li.classList.remove('active-nav'));
 const navMap = { home:'appHomeLink', profile:'appProfileLink', orders:'appOrdersLink' };
 if (navMap[view]) { const el = document.getElementById(navMap[view]); if (el) el.classList.add('active-nav'); }
-document.getElementById('appUserDropdown').classList.remove('active');
+document.getElementById('appUserDropdown')?.classList.remove('active');
 if (cartVisible) toggleCart();
 }
 
@@ -4355,7 +4354,7 @@ function openAdminLogin() {
 }
 
 function openAdminLoginFromApp() {
-  document.getElementById('appUserDropdown').classList.remove('active');
+  document.getElementById('appUserDropdown')?.classList.remove('active');
   document.getElementById('appContainer').classList.remove('active');
   document.getElementById('frontPageContainer').style.display = 'block';
   openFrontLogin();
