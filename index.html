@@ -3332,10 +3332,9 @@ e._t = setTimeout(() => { e.classList.remove('show'); }, 3000);
 // ─── FRONT PAGE LOGIN FUNCTIONS ───
 function openFrontLogin() {
 document.getElementById('fpLoginModal').classList.add('active');
-document.getElementById('fpRegisterSection').style.display = 'none';
-document.getElementById('fpLoginStep').style.display = 'block';
+switchLoginTab('customer');
 document.body.style.overflow = 'hidden';
-setTimeout(() => { document.getElementById('fpFplPhone').focus(); }, 300);
+setTimeout(() => { document.getElementById('fpCustomerPhone').focus(); }, 300);
 }
 
 function closeFrontLogin() {
@@ -3425,9 +3424,6 @@ goToMarketplace();
 function toggleFpMobileMenu() { document.getElementById('fpMobileMenu').classList.toggle('active'); }
 
 function switchLoginTab(type) {
-document.getElementById('tabCustomer').classList.toggle('active', type === 'customer');
-document.getElementById('tabDriver').classList.toggle('active', type === 'driver');
-document.getElementById('tabAdmin').classList.toggle('active', type === 'admin');
 document.getElementById('fpCustomerLoginSection').style.display = type === 'customer' ? 'block' : 'none';
 document.getElementById('fpDriverLoginSection').style.display = type === 'driver' ? 'block' : 'none';
 document.getElementById('fpAdminLoginSection').style.display = type === 'admin' ? 'block' : 'none';
