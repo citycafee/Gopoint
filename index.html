@@ -1155,17 +1155,6 @@ Facebook
 <a><i class="fas fa-globe"></i> English</a>
 </div>
 
-<!-- Location Prompt -->
-<div class="fp-login-modal" id="fpFrontLocationPrompt">
-<div class="fp-login-card" style="text-align:center; max-width:380px;">
-<div style="width:70px; height:70px; background:linear-gradient(135deg,#22c55e,#16a34a); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; box-shadow:0 6px 20px rgba(34,197,94,0.3);"><i class="fas fa-location-dot" style="font-size:28px; color:white;"></i></div>
-<h2 style="font-size:20px; font-weight:800; color:#1a1a1a; margin-bottom:8px;">Enable Location</h2>
-<p style="font-size:13px; color:#888; margin-bottom:24px; line-height:1.5;">We need your location to find nearby restaurants and deliver your food faster.</p>
-<button onclick="fpRequestLocation()" style="width:100%; padding:14px; background:linear-gradient(135deg,var(--theme),var(--theme-dark)); color:white; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; margin-bottom:10px; font-family:inherit;"><i class="fas fa-location-crosshairs"></i> Allow Location Access</button>
-<button onclick="fpSkipLocation()" style="width:100%; padding:12px; background:none; border:1px solid #e5e7eb; border-radius:12px; font-size:13px; font-weight:600; cursor:pointer; color:#888; font-family:inherit;">Skip for now</button>
-</div>
-</div>
-
 <!-- Login Modal -->
 <div class="fp-login-modal" id="fpLoginModal">
 <div class="fp-login-card">
@@ -3330,44 +3319,11 @@ e._t = setTimeout(() => { e.classList.remove('show'); }, 3000);
 
 // ─── FRONT PAGE LOGIN FUNCTIONS ───
 function openFrontLogin() {
-const saved = localStorage.getItem('gopoint_customer_location');
-if (saved) {
-try { customerLocation = JSON.parse(saved); if (customerLocation.area) { document.getElementById('fpLoginModal').classList.add('active'); document.getElementById('fpRegisterSection').style.display = 'none'; document.getElementById('fpLoginStep').style.display = 'block'; setTimeout(() => { document.getElementById('fpFplPhone').focus(); }, 300); return; } } catch(e) {}
-}
-if (!navigator.geolocation) { openFrontLoginModal(); return; }
-document.getElementById('fpFrontLocationPrompt').classList.add('active');
-}
-function openFrontLoginModal() {
 document.getElementById('fpLoginModal').classList.add('active');
 document.getElementById('fpRegisterSection').style.display = 'none';
 document.getElementById('fpLoginStep').style.display = 'block';
 document.body.style.overflow = 'hidden';
 setTimeout(() => { document.getElementById('fpFplPhone').focus(); }, 300);
-}
-function fpRequestLocation() {
-document.getElementById('fpFrontLocationPrompt').classList.remove('active');
-if (!navigator.geolocation) { openFrontLoginModal(); return; }
-showAppToast('📍 Detecting your location...');
-navigator.geolocation.getCurrentPosition(async (pos) => {
-const lat = pos.coords.latitude, lng = pos.coords.longitude;
-customerLocation = { lat, lng, area: 'Detecting...' };
-try {
-const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
-const data = await res.json();
-const a = data.address || {};
-const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
-const landmark = a.amenity || a.shop || a.tourism || a.landmark || '';
-customerLocation.area = landmark ? `${landmark}, ${area}` : area;
-customerLocation.fullAddress = data.display_name || '';
-localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-showAppToast('📍 ' + customerLocation.area);
-} catch (e) { customerLocation.area = 'Detected Location'; localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation)); }
-openFrontLoginModal();
-}, () => { showAppToast('⚠️ Location denied — you can set it later'); openFrontLoginModal(); }, { enableHighAccuracy: true, timeout: 15000 });
-}
-function fpSkipLocation() {
-document.getElementById('fpFrontLocationPrompt').classList.remove('active');
-openFrontLoginModal();
 }
 
 function closeFrontLogin() {
@@ -3678,7 +3634,7 @@ completeLogin({ name, email, phone: '', provider: 'email' });
 }
 
 function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
-function goToMarketplace() { document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('fpDriverLoginPopup').classList.remove('active'); document.getElementById('fpAdminLoginPopup').classList.remove('active'); document.getElementById('fpLoginModal').classList.remove('active'); document.getElementById('fpFrontLocationPrompt').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); if (customerLocation && customerLocation.area) { document.getElementById('appHomeSearchInput').placeholder = '📍 ' + customerLocation.area + ' — Search restaurants...'; } detectFrontLocation(); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
+function goToMarketplace() { document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('fpDriverLoginPopup').classList.remove('active'); document.getElementById('fpAdminLoginPopup').classList.remove('active'); document.getElementById('fpLoginModal').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); if (customerLocation && customerLocation.area) { document.getElementById('appHomeSearchInput').placeholder = '📍 ' + customerLocation.area + ' — Search restaurants...'; } detectFrontLocation(); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
 
 async function logoutUser() {
 if (!confirm('Are you sure you want to logout?')) return;
