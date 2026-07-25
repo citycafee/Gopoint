@@ -1117,6 +1117,8 @@ function renderProfileView() {
 if (!currentUser) return;
 const name = currentUser.name || 'User';
 const phone = currentUser.phone || 'Not set';
+const email = currentUser.email || 'Not set';
+const provider = currentUser.provider === 'google' ? 'Google' : currentUser.provider === 'whatsapp' ? 'WhatsApp' : 'Phone + OTP';
 document.getElementById('pfProfileAvatar').textContent = name.charAt(0).toUpperCase();
 document.getElementById('pfProfileName').textContent = name;
 document.getElementById('pfProfilePhone').textContent = phone;
@@ -1125,6 +1127,25 @@ const totalSpent = userOrders.reduce((s, o) => s + (o.total || 0), 0);
 document.getElementById('pfStatOrders').textContent = userOrders.length;
 document.getElementById('pfStatSpent').textContent = '$' + totalSpent.toFixed(2);
 document.getElementById('pfStatSaved').textContent = '$' + (totalSpent * 0.05).toFixed(2);
+document.getElementById('pfInfoName').textContent = name;
+document.getElementById('pfInfoPhone').textContent = phone;
+document.getElementById('pfInfoEmail').textContent = email;
+document.getElementById('pfInfoProvider').textContent = provider;
+const created = currentUser.created || currentUser.registeredAt;
+document.getElementById('pfInfoSince').textContent = created ? new Date(created).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) : '-';
+const container = document.getElementById('pfRecentOrders');
+const recent = userOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
+if (!recent.length) { container.innerHTML = '<div class="pf-empty"><i class="fas fa-receipt"></i><p>No orders yet. Start ordering!</p></div>'; return; }
+container.innerHTML = recent.map(o => {
+const st = o.status || 'pending';
+let sc = 'pf-status-active', sl = st.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+if (st === 'delivered') { sc = 'pf-status-delivered'; sl = 'Delivered'; }
+if (st === 'cancelled') { sc = 'pf-status-cancelled'; sl = 'Cancelled'; }
+const date = new Date(o.timestamp).toLocaleDateString('en-US', { month:'short', day:'numeric' });
+const time = new Date(o.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+const items = o.items?.map(i => i.name).join(', ') || 'Order';
+return `<div class="pf-order-item"><div class="pf-order-icon" style="background:${st==='delivered'?'#dcfce7':'#fef3c7'};color:${st==='delivered'?'#16a34a':'#d97706'};"><i class="fas fa-${st==='delivered'?'check-circle':'clock'}"></i></div><div class="pf-order-details"><div class="pf-order-id">#${String(o.id).slice(-6)}</div><div class="pf-order-meta">${date} at ${time} &bull; ${items}</div></div><span class="pf-order-status ${sc}">${sl}</span><div class="pf-order-price">$${(o.total||0).toFixed(2)}</div></div>`;
+}).join('');
 }
 
 
@@ -1157,6 +1178,7 @@ if (!currentUser) return;
 document.getElementById('pfEditName').value = currentUser.name || '';
 document.getElementById('pfEditPhone').value = currentUser.phone || '';
 document.getElementById('pfEditEmail').value = currentUser.email || '';
+document.getElementById('pfEditAddress').value = currentUser.address || '';
 document.getElementById('pfEditModal').classList.add('active');
 }
 
@@ -1168,10 +1190,12 @@ async function saveProfileFromModal() {
 const name = document.getElementById('pfEditName').value.trim();
 const phone = document.getElementById('pfEditPhone').value.trim();
 const email = document.getElementById('pfEditEmail').value.trim();
+const address = document.getElementById('pfEditAddress').value.trim();
 if (!name) { showAppToast('⚠️ Name required'); return; }
 currentUser.name = name;
 currentUser.phone = phone || currentUser.phone;
 currentUser.email = email || currentUser.email;
+currentUser.address = address;
 localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
 if (supaConnected && currentUser.id) { await sb.from('profiles').upsert({ id: currentUser.id, full_name: name, phone: phone || '' }); }
 updateUserUI();
