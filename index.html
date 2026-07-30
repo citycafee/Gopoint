@@ -1164,17 +1164,17 @@ Facebook
 <button class="fp-login-close" onclick="closeFrontLogin()">×</button>
 <div class="fp-login-logo">
 <div style="font-size:3rem; margin-bottom:4px;">🛵</div>
-<h2>Welcome to Go!point</h2>
-<p>Sign in to order or manage deliveries</p>
+<h2>Sign in to continue</h2>
+<p>Login to your Go!point account</p>
 </div>
 
 <!-- Customer Tab (default) -->
 <div id="fpCustomerLoginSection">
 <div id="fpLoginStep" style="display:block;">
-<h3 style="text-align:center; font-size:17px; font-weight:700; color:#1a1a1a; margin-bottom:6px;">What's your phone number?</h3>
-<p style="text-align:center; font-size:13px; color:#888; margin-bottom:20px;">We'll send you a verification code to get started</p>
 
+<!-- Phone Number -->
 <div style="margin-bottom:16px;">
+<label class="fp-form-label"><i class="fas fa-phone" style="color:var(--theme); margin-right:6px;"></i> Phone</label>
 <div class="fp-phone-row">
 <div class="fp-phone-prefix">
 <select id="fpPhonePrefix">
@@ -1189,28 +1189,47 @@ Facebook
 </div>
 </div>
 
-<button class="fp-btn fp-btn-whatsapp" onclick="loginWithPhone()" style="border-radius:30px; padding:15px; font-size:16px; font-weight:700; width:100%; box-shadow:0 4px 15px rgba(34,197,94,0.3);">
-Continue
+<!-- Password -->
+<div style="margin-bottom:16px;">
+<label class="fp-form-label"><i class="fas fa-lock" style="color:var(--theme); margin-right:6px;"></i> Password</label>
+<div style="position:relative;">
+<input type="password" class="fp-phone-input" id="fpCustomerPassword" placeholder="Enter your password" style="border:2px solid #e5e7eb; border-radius:14px; padding:14px 44px 14px 14px; font-size:15px; width:100%; transition:all 0.2s ease;">
+<button onclick="togglePasswordVisibility('fpCustomerPassword', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:#999; cursor:pointer; font-size:16px; padding:4px;"><i class="fas fa-eye"></i></button>
+</div>
+</div>
+
+<!-- Sign In Button -->
+<button class="fp-btn fp-btn-whatsapp" onclick="loginWithPhone()" style="border-radius:30px; padding:15px; font-size:16px; font-weight:700; width:100%; box-shadow:0 4px 15px rgba(34,197,94,0.3); margin-bottom:8px;">
+<i class="fas fa-sign-in-alt"></i> Sign In
 </button>
 
-<div class="fp-or-divider"><span>or continue with</span></div>
+<!-- Forgot Password -->
+<div style="text-align:center; margin-bottom:16px;">
+<a onclick="showForgotPassword()" style="font-size:13px; color:var(--theme); cursor:pointer; font-weight:600;">Forgot Password?</a>
+</div>
 
-<div style="display:flex; flex-direction:column; gap:10px;">
-<button class="fp-social-btn" onclick="fplContinueWithPhone()" style="border-color:#25D366; color:#25D366; border-radius:12px; padding:12px; font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
-<svg viewBox="0 0 24 24" width="20" height="20" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+<div class="fp-or-divider"><span>Or login using</span></div>
+
+<!-- Social Login Buttons -->
+<div style="display:flex; gap:10px; margin-bottom:16px;">
+<button class="fp-social-btn" onclick="fplContinueWithPhone()" style="flex:1; border-color:#25D366; color:#25D366; border-radius:12px; padding:12px 8px; font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; gap:6px;">
+<svg viewBox="0 0 24 24" width="18" height="18" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 WhatsApp
 </button>
-<button class="fp-social-btn" onclick="loginWithGmail()" style="border-radius:12px; padding:12px; font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
-<svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-Google
-</button>
-<button class="fp-social-btn" onclick="loginWithFacebook()" style="border-color:#1877F2; color:#1877F2; border-radius:12px; padding:12px; font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
-<svg viewBox="0 0 24 24" width="20" height="20" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-Facebook
+<button class="fp-social-btn" onclick="loginWithGmail()" style="flex:1; border-radius:12px; padding:12px 8px; font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; gap:6px;">
+<svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+Gmail
 </button>
 </div>
 
-<div style="display:flex; justify-content:center; gap:20px; margin-top:20px; padding-top:16px; border-top:1px solid #f0f0f0;">
+<!-- Sign Up Link -->
+<div style="text-align:center; margin-bottom:16px; padding-top:16px; border-top:1px solid #f0f0f0;">
+<span style="font-size:13px; color:#888;">Don't have an account? </span>
+<a onclick="showRegisterStep()" style="font-size:13px; color:var(--theme); cursor:pointer; font-weight:700;">Sign Up Here</a>
+</div>
+
+<!-- Driver & Admin Links -->
+<div style="display:flex; justify-content:center; gap:20px; padding-top:12px; border-top:1px solid #f0f0f0;">
 <a onclick="switchLoginTab('driver')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-motorcycle"></i> Driver</a>
 <a onclick="switchLoginTab('admin')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-shield-halved"></i> Admin</a>
 <a onclick="goToMarketplace()" style="font-size:13px; color:var(--theme); cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-store"></i> Guest</a>
@@ -3530,6 +3549,36 @@ users[key] = user;
 localStorage.setItem('gopoint_users', JSON.stringify(users));
 completeLogin(user);
 }
+}
+
+function togglePasswordVisibility(inputId, btn) {
+const input = document.getElementById(inputId);
+const icon = btn.querySelector('i');
+if (input.type === 'password') {
+input.type = 'text';
+icon.classList.remove('fa-eye');
+icon.classList.add('fa-eye-slash');
+} else {
+input.type = 'password';
+icon.classList.remove('fa-eye-slash');
+icon.classList.add('fa-eye');
+}
+}
+
+function showForgotPassword() {
+showAppToast('📧 Password reset link sent to your phone!');
+}
+
+function showRegisterStep() {
+document.getElementById('fpLoginStep').style.display = 'none';
+document.getElementById('fpEmailLoginStep').style.display = 'none';
+document.getElementById('fpRegisterSection').style.display = 'block';
+}
+
+function showLoginStep() {
+document.getElementById('fpRegisterSection').style.display = 'none';
+document.getElementById('fpEmailLoginStep').style.display = 'none';
+document.getElementById('fpLoginStep').style.display = 'block';
 }
 
 function loginWithFacebook() {
