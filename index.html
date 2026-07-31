@@ -808,6 +808,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .dp-call-pulse::after { animation-delay: 0.5s; }
 @keyframes dpPulseRing { 0% { transform: scale(0.8); opacity: 0.8; } 100% { transform: scale(2.2); opacity: 0; } }
+@keyframes dpPulseMarker { 0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,.3); } 50% { box-shadow: 0 4px 20px rgba(34,197,94,.6); } }
 .dp-call-title { font-size: 1.1rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin-bottom: 8px; }
 .dp-call-restaurant { font-size: 1.6rem; font-weight: 800; color: #f8fafc; margin-bottom: 4px; }
 .dp-call-customer { font-size: 1rem; color: #cbd5e1; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -987,9 +988,53 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .ad-stat .value { font-size: 1.4rem; }
 .ad-report-summary { grid-template-columns: repeat(2, 1fr); }
 }
+/* ─── LOCATION PERMISSION NOTIFICATION ─── */
+.fp-location-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.55); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; padding: 20px; }
+.fp-location-overlay.active { display: flex; }
+.fp-location-card { background: var(--white); border-radius: 24px; width: 92%; max-width: 380px; padding: 36px 28px 28px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.25); position: relative; animation: fpLocSlideUp 0.4s cubic-bezier(.16,1,.3,1); }
+@keyframes fpLocSlideUp { from { opacity: 0; transform: translateY(30px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.fp-location-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--theme), #3b82f6); border-radius: 24px 24px 0 0; }
+.fp-loc-icon-wrap { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(34,197,94,0.12)); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; position: relative; }
+.fp-loc-icon-wrap::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px dashed rgba(59,130,246,0.3); animation: fpLocSpin 12s linear infinite; }
+@keyframes fpLocSpin { to { transform: rotate(360deg); } }
+.fp-loc-icon { font-size: 2rem; color: #3b82f6; animation: fpLocBounce 1.5s ease-in-out infinite; }
+@keyframes fpLocBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.fp-location-card h2 { font-size: 1.2rem; font-weight: 800; color: var(--black); margin-bottom: 8px; }
+.fp-location-card p { font-size: 0.85rem; color: #777; line-height: 1.6; margin-bottom: 24px; }
+.fp-location-card p i { color: #3b82f6; margin-right: 4px; }
+.fp-loc-btn-allow { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--theme), var(--theme-dark)); color: white; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(255,107,0,0.3); transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.fp-loc-btn-allow:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,0,0.4); }
+.fp-loc-btn-skip { background: none; border: none; color: #aaa; font-size: 0.82rem; font-weight: 500; cursor: pointer; font-family: inherit; padding: 8px; }
+.fp-loc-btn-skip:hover { color: #666; }
+.fp-loc-gps-alert { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 14px 24px; border-radius: 16px; box-shadow: 0 8px 30px rgba(239,68,68,0.35); z-index: 99998; max-width: 90%; width: 360px; display: none; align-items: center; gap: 12px; font-size: 0.88rem; font-weight: 500; animation: fpLocSlideUp 0.3s ease; }
+.fp-loc-gps-alert.show { display: flex; }
+.fp-loc-gps-alert i { font-size: 1.4rem; flex-shrink: 0; }
+.fp-loc-gps-alert .fp-gps-alert-close { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+.fp-loc-gps-alert .fp-gps-alert-close:hover { background: rgba(255,255,255,0.35); }
 </style>
 </head>
 <body>
+<!-- ─── LOCATION PERMISSION NOTIFICATION ─── -->
+<div class="fp-location-overlay" id="fpLocationOverlay">
+<div class="fp-location-card">
+<div class="fp-loc-icon-wrap"><div class="fp-loc-icon"><i class="fas fa-location-dot"></i></div></div>
+<h2>Enable Location Access</h2>
+<p>We need your location to find nearby restaurants and deliver your food as fast as possible. Your location is only used for delivery.</p>
+<button class="fp-loc-btn-allow" onclick="fpRequestLocation()"><i class="fas fa-crosshairs"></i> Allow Location Access</button>
+<button class="fp-loc-btn-skip" onclick="fpSkipLocation()">Skip for now</button>
+</div>
+</div>
+
+<!-- GPS OFF ALERT -->
+<div class="fp-loc-gps-alert" id="fpGpsAlert">
+<i class="fas fa-satellite-dish"></i>
+<div style="flex:1;">
+<b>GPS is turned off</b><br>
+<span style="font-size:0.78rem; opacity:0.9;">Please enable Location/GPS in your device settings to use delivery features.</span>
+</div>
+<button class="fp-gps-alert-close" onclick="document.getElementById('fpGpsAlert').classList.remove('show')">&times;</button>
+</div>
+
 <!-- ─── SYNC INDICATOR ─── -->
 <div class="app-sync-indicator" id="appSyncIndicator">
 <span class="app-sync-dot" id="appSyncDot"></span>
@@ -2417,6 +2462,85 @@ clearTimeout(toast._timer);
 toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
+// ─── LOCATION PERMISSION NOTIFICATION ───
+function fpShowLocationOverlay() {
+  if (localStorage.getItem('gopoint_loc_permitted') === '1') {
+    if (!customerLocation) detectFrontLocation();
+    return;
+  }
+  if (localStorage.getItem('gopoint_loc_skipped') === '1') return;
+  const overlay = document.getElementById('fpLocationOverlay');
+  if (overlay) setTimeout(() => overlay.classList.add('active'), 800);
+}
+
+function fpRequestLocation() {
+  const overlay = document.getElementById('fpLocationOverlay');
+  if (!navigator.geolocation) {
+    showAppToast('⚠️ Geolocation is not supported by your browser');
+    fpCheckGpsEnabled();
+    if (overlay) overlay.classList.remove('active');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      localStorage.setItem('gopoint_loc_permitted', '1');
+      localStorage.removeItem('gopoint_loc_skipped');
+      if (overlay) overlay.classList.remove('active');
+      const lat = pos.coords.latitude, lng = pos.coords.longitude;
+      customerLocation = { lat, lng, area: 'Detecting...' };
+      localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+      (async () => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
+          const data = await res.json();
+          const a = data.address || {};
+          const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
+          const landmark = a.amenity || a.shop || a.tourism || '';
+          customerLocation.area = landmark ? `${landmark}, ${area}` : area;
+          customerLocation.fullAddress = data.display_name || '';
+          localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+          showAppToast('📍 Location: ' + customerLocation.area);
+        } catch(e) { showAppToast('📍 GPS location captured'); }
+      })();
+    },
+    (err) => {
+      localStorage.setItem('gopoint_loc_permitted', '0');
+      if (overlay) overlay.classList.remove('active');
+      if (err.code === err.PERMISSION_DENIED) {
+        showAppToast('⚠️ Location permission denied. You can enable it in browser settings.');
+      } else if (err.code === err.POSITION_UNAVAILABLE) {
+        fpCheckGpsEnabled();
+      } else {
+        showAppToast('⚠️ Location request timed out. Please try again.');
+      }
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
+function fpSkipLocation() {
+  const overlay = document.getElementById('fpLocationOverlay');
+  if (overlay) overlay.classList.remove('active');
+  localStorage.setItem('gopoint_loc_skipped', '1');
+}
+
+function fpCheckGpsEnabled() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    () => {},
+    (err) => {
+      if (err.code === err.POSITION_UNAVAILABLE) {
+        const alert = document.getElementById('fpGpsAlert');
+        if (alert) {
+          alert.classList.add('show');
+          setTimeout(() => alert.classList.remove('show'), 8000);
+        }
+      }
+    },
+    { enableHighAccuracy: false, timeout: 5000 }
+  );
+}
+
 function appCalculateDistance(lat1, lng1, lat2, lng2) {
 const R = 6371;
 const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -2473,6 +2597,8 @@ let dpActiveMap = null, dpActiveDriverMarker = null, dpCustomerMarker = null, dp
 let dpPickupToCustLabel = null;
 let dpCurrentCallOrderId = null;
 let dpPollInterval = null;
+let dpLocationWatchId = null;
+let dpLocationUpdateInterval = null;
 const DP_CONFIG = { commissionRate: 0.20, currency: '$', defaultLat: 9.56, defaultLng: 44.065 };
 
 const restaurantImages = ['https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=350&fit=crop', 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&h=350&fit=crop', 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=500&h=350&fit=crop', 'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=500&h=350&fit=crop'];
@@ -2579,6 +2705,7 @@ const header = document.getElementById('fpHeader');
 if (header) { if (window.scrollY > 50) header.classList.add('scrolled'); else header.classList.remove('scrolled'); }
 });
 initApp();
+fpShowLocationOverlay();
 
 // ─── DRIVER LOGIN ENTER KEY SUPPORT ───
 const driverUsernameInput = document.getElementById('fpDriverUsername');
@@ -2649,6 +2776,8 @@ dpOnline = true;
 dpLoadData();
 dpLoadRingtone();
 dpSyncVehicleStatus();
+const dpMapWrap1 = document.getElementById('dpActiveMapWrap');
+if (dpMapWrap1) dpMapWrap1.style.display = 'block';
 document.getElementById('dpWelcomeMsg').textContent = dpDriver.driverName + ' • ' + (dpDriver.plateNumber || dpDriver.plate);
 dpUpdateUI();
 dpRefresh();
@@ -2731,6 +2860,8 @@ dpOnline = true;
 dpLoadData();
 dpLoadRingtone();
 dpSyncVehicleStatus();
+const dpMapWrap2 = document.getElementById('dpActiveMapWrap');
+if (dpMapWrap2) dpMapWrap2.style.display = 'block';
 document.getElementById('dpWelcomeMsg').textContent = dpDriver.driverName + ' • ' + (dpDriver.plateNumber || dpDriver.plate);
 dpUpdateUI();
 dpRefresh();
@@ -2788,6 +2919,7 @@ function dpSyncVehicleStatus() {
 
 function dpCleanupMap() {
 dpStopRingtone();
+dpStopContinuousTracking();
 hideIncomingCall();
 if (dpActiveMap) { dpActiveMap.remove(); dpActiveMap = null; dpActiveDriverMarker = null; }
 dpCustomerMarker = null; dpPickupMarker = null; dpRouteLine = null; dpActiveMidLabel = null; dpPickupToCustLabel = null;
@@ -2909,7 +3041,7 @@ if (tab === 'earnings') dpRenderEarnings();
 if (tab === 'fleet') dpRenderFleet();
 }
 
-function dpRefresh() { dpSyncVehicleStatus(); dpRenderIncoming(); dpRenderActive(); dpRenderStats(); dpUpdateTabCounts(); }
+function dpRefresh() { dpSyncVehicleStatus(); dpRenderIncoming(); dpRenderActive(); dpRenderStats(); dpUpdateTabCounts(); const wrap = document.getElementById('dpActiveMapWrap'); if (wrap && dpDriver) wrap.style.display = 'block'; }
 
 function dpRenderStats() {
 if (!dpDriver) return;
@@ -3239,18 +3371,69 @@ const box = document.getElementById('dpActiveMapBox');
 if (!box) return;
 const la = dpDriver?.lat || DP_CONFIG.defaultLat;
 const lo = dpDriver?.lng || DP_CONFIG.defaultLng;
-dpActiveMap = L.map('dpActiveMapBox', { zoomControl: true }).setView([la, lo], 14);
+dpActiveMap = L.map('dpActiveMapBox', { zoomControl: true }).setView([la, lo], 15);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(dpActiveMap);
-const ico = L.divIcon({ html: `<div style="width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.3);font-size:14px"><i class="fas fa-motorcycle"></i></div>`, className: '', iconSize: [36, 36], iconAnchor: [18, 18] });
-dpActiveDriverMarker = L.marker([la, lo], { icon: ico }).addTo(dpActiveMap);
-if (navigator.geolocation) {
-navigator.geolocation.getCurrentPosition(p => {
-const la2 = p.coords.latitude, lo2 = p.coords.longitude;
-if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la2, lo2]);
-if (dpActiveMap) dpActiveMap.setView([la2, lo2], 15);
-if (dpDriver) { dpDriver.lat = la2; dpDriver.lng = lo2; }
-}, () => {}, { enableHighAccuracy: true, timeout: 10000 });
+const ico = L.divIcon({ html: `<div style="width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.3);font-size:16px;animation:dpPulseMarker 2s infinite"><i class="fas fa-motorcycle"></i></div>`, className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
+dpActiveDriverMarker = L.marker([la, lo], { icon: ico }).addTo(dpActiveMap).bindPopup('<b>You</b> — Current location');
+dpStartContinuousTracking();
 }
+
+// ─── DRIVER CONTINUOUS LOCATION TRACKING ───
+function dpStartContinuousTracking() {
+if (!navigator.geolocation) {
+dpToast('⚠️ GPS not supported on this device', 'error');
+return;
+}
+// Get initial position immediately
+navigator.geolocation.getCurrentPosition(
+(pos) => { dpUpdateDriverPosition(pos.coords.latitude, pos.coords.longitude); },
+(err) => { dpHandleLocationError(err); },
+{ enableHighAccuracy: true, timeout: 10000 }
+);
+// Watch position continuously (updates every move)
+if (dpLocationWatchId != null) navigator.geolocation.clearWatch(dpLocationWatchId);
+dpLocationWatchId = navigator.geolocation.watchPosition(
+(pos) => { dpUpdateDriverPosition(pos.coords.latitude, pos.coords.longitude); },
+(err) => { dpHandleLocationError(err); },
+{ enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+);
+// Sync location to Supabase every 10 seconds
+if (dpLocationUpdateInterval) clearInterval(dpLocationUpdateInterval);
+dpLocationUpdateInterval = setInterval(() => {
+if (dpDriver && dpDriver.lat && dpDriver.lng && supaConnected) {
+sb.from('vehicles').update({ lat: dpDriver.lat, lng: dpDriver.lng }).eq('id', dpDriver.id).then(() => {}).catch(() => {});
+}
+}, 10000);
+}
+
+function dpUpdateDriverPosition(lat, lng) {
+if (dpDriver) { dpDriver.lat = lat; dpDriver.lng = lng; }
+if (dpActiveDriverMarker) { dpActiveDriverMarker.setLatLng([lat, lng]); }
+if (dpActiveMap) { dpActiveMap.setView([lat, lng], dpActiveMap.getZoom()); }
+// Update vehicle in local array
+const vi = vehicles.find(v => v.id === dpDriver?.id);
+if (vi) { vi.lat = lat; vi.lng = lng; }
+// Update localStorage
+try {
+const saved = JSON.parse(localStorage.getItem('gopoint_vehicles') || '[]');
+const si = saved.find(v => v.id === dpDriver?.id);
+if (si) { si.lat = lat; si.lng = lng; localStorage.setItem('gopoint_vehicles', JSON.stringify(saved)); }
+} catch(_) {}
+}
+
+function dpHandleLocationError(err) {
+if (err.code === err.PERMISSION_DENIED) {
+dpToast('⚠️ Location permission denied. Enable in browser settings.', 'error');
+} else if (err.code === err.POSITION_UNAVAILABLE) {
+dpToast('⚠️ GPS is OFF. Please enable Location/GPS on your device.', 'error');
+} else {
+dpToast('⚠️ Location request timed out', 'error');
+}
+}
+
+function dpStopContinuousTracking() {
+if (dpLocationWatchId != null) { navigator.geolocation.clearWatch(dpLocationWatchId); dpLocationWatchId = null; }
+if (dpLocationUpdateInterval) { clearInterval(dpLocationUpdateInterval); dpLocationUpdateInterval = null; }
 }
 
 function dpShowCustomerOnMap(orderId, opts = {}) {
@@ -3520,7 +3703,18 @@ customerLocation.fullAddress = data.display_name || '';
 localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
 showAppToast('📍 Location: ' + customerLocation.area);
 } catch (e) { showAppToast('📍 GPS captured'); localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation)); }
-}, () => { showAppToast('⚠️ Location permission denied'); }, { enableHighAccuracy: true, timeout: 15000 });
+}, (err) => {
+if (err.code === err.PERMISSION_DENIED) {
+  showAppToast('⚠️ Location permission denied. Enable it in browser settings.');
+  localStorage.setItem('gopoint_loc_permitted', '0');
+} else if (err.code === err.POSITION_UNAVAILABLE) {
+  showAppToast('⚠️ GPS is off. Please enable Location/GPS in your device settings.');
+  const alert = document.getElementById('fpGpsAlert');
+  if (alert) { alert.classList.add('show'); setTimeout(() => alert.classList.remove('show'), 8000); }
+} else {
+  showAppToast('⚠️ Location request timed out');
+}
+}, { enableHighAccuracy: true, timeout: 15000 });
 }
 
 function loginWithWhatsApp() {
@@ -4026,7 +4220,16 @@ showAppToast('📍 ' + fullArea);
 if (appMap) { appMap.setView([detectedCoordinates.lat, detectedCoordinates.lng], 14); appUpdateCustomerMarker(); appUpdateMapMarkers(appGetFilteredRestaurants()); }
 appRenderRestaurantList();
 if (btnText) btnText.innerHTML = '<i class="fas fa-location-crosshairs"></i> Detect My Location';
-}, (err) => { if (statusBox) { statusBox.className = 'app-location-status error'; statusBox.innerHTML = '<i class="fas fa-ban"></i> Permission denied'; } if (btnText) btnText.innerHTML = '<i class="fas fa-location-crosshairs"></i> Detect My Location'; }, { enableHighAccuracy: true, timeout: 15000 });
+}, (err) => {
+let msg = '<i class="fas fa-ban"></i> Permission denied';
+if (err.code === err.POSITION_UNAVAILABLE) {
+  msg = '<i class="fas fa-satellite-dish"></i> GPS is off';
+  const alert = document.getElementById('fpGpsAlert');
+  if (alert) { alert.classList.add('show'); setTimeout(() => alert.classList.remove('show'), 8000); }
+}
+if (statusBox) { statusBox.className = 'app-location-status error'; statusBox.innerHTML = msg; }
+if (btnText) btnText.innerHTML = '<i class="fas fa-location-crosshairs"></i> Detect My Location';
+}, { enableHighAccuracy: true, timeout: 15000 });
 }
 
 function proceedToDelivery() {
