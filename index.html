@@ -3119,7 +3119,20 @@ ${isNew ? '<div class="dp-ring-tag"><i class="fas fa-bell"></i> NEW ORDER</div>'
 }).join('');
 }
 
-function dpCalcEarnings(order) { const total = order.total || 0; const appFee = total * DP_CONFIG.commissionRate; return { total, appFee, driverEarn: total - appFee }; }
+function dpCalcEarnings(order) {
+const total = order.total || 0;
+const appFee = total * DP_CONFIG.commissionRate;
+const rest = restaurants[order.restaurant] || {};
+const custLat = order.coordinates?.lat, custLng = order.coordinates?.lng;
+let deliveryFee = 0;
+let distRtoC = null;
+if (rest.lat && rest.lng && custLat != null && custLng != null) {
+distRtoC = appCalculateDistance(rest.lat, rest.lng, custLat, custLng);
+deliveryFee = Math.max(1.00, distRtoC * 0.50);
+}
+const driverEarn = total - appFee + deliveryFee;
+return { total, appFee, deliveryFee, driverEarn, distRtoC };
+}
 
 async function dpAccept(id) {
 const i = orders.findIndex(x => x.id === id);
@@ -3174,6 +3187,7 @@ return `<div class="dp-ocard active">
 <div><div class="dp-dist-label"><i class="fas fa-route"></i> To Customer</div><div class="dp-dist-val">${distToCustomer == null ? '—' : distToCustomer.toFixed(1) + ' km'}</div><div class="dp-dist-sub"><i class="fas fa-location-arrow"></i> ${o.customer?.name || 'customer'}</div></div>
 ${distToPickup != null ? `<div class="dp-dist-right"><div class="dp-dist-label">Pickup</div><div class="dp-dist-val">${distToPickup.toFixed(1)} km</div></div>` : ''}
 </div>
+${earn.distRtoC != null ? `<div class="dp-dist-card" style="border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.05)"><div><div class="dp-dist-label" style="color:#22c55e"><i class="fas fa-store"></i> Restaurant → Customer</div><div class="dp-dist-val" style="color:#22c55e">${earn.distRtoC.toFixed(1)} km</div><div class="dp-dist-sub">Delivery fee: +${formatPrice(earn.deliveryFee)}</div></div></div>` : ''}
 <div class="dp-ibox"><h4><i class="fas fa-user"></i> ${o.customer?.name || 'Customer'}</h4>
 <p><i class="fas fa-phone"></i> ${o.customer?.phone || '-'}</p>
 <p><i class="fas fa-map-marker-alt"></i> ${o.customer?.address || '-'}</p>
@@ -3181,6 +3195,7 @@ ${rest.lat ? `<p><i class="fas fa-store"></i> ${rest.name}</p>` : ''}</div>
 <div class="dp-earnings-box"><h5><i class="fas fa-wallet"></i> Earnings</h5>
 <div class="dp-earn-row"><span class="label">Total</span><span class="value">${formatPrice(earn.total)}</span></div>
 <div class="dp-earn-row fee"><span class="label">Fee (${(DP_CONFIG.commissionRate*100).toFixed(0)}%)</span><span class="value">-${formatPrice(earn.appFee)}</span></div>
+${earn.deliveryFee > 0 ? `<div class="dp-earn-row" style="color:#22c55e"><span class="label"><i class="fas fa-motorcycle"></i> Delivery (${earn.distRtoC != null ? earn.distRtoC.toFixed(1) + ' km' : ''})</span><span class="value">+${formatPrice(earn.deliveryFee)}</span></div>` : ''}
 <div class="dp-earn-row total"><span class="label">You Earn</span><span class="value">${formatPrice(earn.driverEarn)}</span></div>
 </div>
 <div class="dp-oacts">
@@ -3198,20 +3213,33 @@ if (i === -1) return;
 const o = orders[i];
 const h = o.statusHistory || [];
 h.push({ status: ns, time: new Date().toISOString() });
-orders[i] = { ...o, status: ns, statusHistory: h };
+let dispatchData = {};
+if (ns === 'out_for_delivery') {
+const rest = restaurants[o.restaurant] || {};
+const custLat = o.coordinates?.lat, custLng = o.coordinates?.lng;
+let distRtoC = null;
+if (rest.lat && rest.lng && custLat != null && custLng != null) {
+distRtoC = appCalculateDistance(rest.lat, rest.lng, custLat, custLng);
+}
+dispatchData = { dispatchedAt: new Date().toISOString(), distRestaurantToCustomer: distRtoC };
+dpToast(`🚀 Dispatched! ${distRtoC != null ? distRtoC.toFixed(1) + ' km to deliver' : ''}`, 'success');
+}
+orders[i] = { ...o, ...dispatchData, status: ns, statusHistory: h };
 let vehicleUpdate = null;
 if (ns === 'completed' && o.vehicleId) {
 const v = vehicles.find(v => v.id == o.vehicleId);
 if (v) { v.status = 'available'; vehicleUpdate = v; }
-const earn = dpCalcEarnings(o);
+const earn = dpCalcEarnings(orders[i]);
 dpToast(`✅ Delivered! You earned ${formatPrice(earn.driverEarn)}`, 'success');
 if (dpActiveOrderId === id) { dpClearRouteLayers(dpActiveMap); const wrap = document.getElementById('dpActiveMapWrap'); if (wrap) wrap.style.display = 'none'; dpActiveOrderId = null; }
-} else {
+} else if (ns !== 'out_for_delivery') {
 dpToast('✅ Status updated to ' + ns.replace(/_/g, ' '), 'success');
+if (dpActiveOrderId === id) setTimeout(() => dpShowCustomerOnMap(id, { useActiveMap: true }), 200);
+} else if (ns === 'out_for_delivery') {
 if (dpActiveOrderId === id) setTimeout(() => dpShowCustomerOnMap(id, { useActiveMap: true }), 200);
 }
 saveLocalData();
-if (supaConnected) { await supaUpdateOrder(id, { status: ns, statusHistory: h }); if (vehicleUpdate) await supaSaveVehicle(vehicleUpdate); }
+if (supaConnected) { await supaUpdateOrder(id, { ...dispatchData, status: ns, statusHistory: h }); if (vehicleUpdate) await supaSaveVehicle(vehicleUpdate); }
 dpRefresh();
 }
 
