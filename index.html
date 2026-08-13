@@ -4344,6 +4344,7 @@ container.style.display = 'block';
 }
 
 function backToCart() { document.getElementById('appPaymentForm').classList.add('hidden'); document.getElementById('appCartWindow').classList.add('visible'); cartVisible = true; }
+function backToDelivery() { document.getElementById('appPaymentForm').classList.add('hidden'); document.getElementById('appDeliveryForm').classList.remove('hidden'); }
 function backToPayment() {
 if (driverRefreshInterval) { clearInterval(driverRefreshInterval); driverRefreshInterval = null; }
 document.getElementById('appDeliveryForm').classList.add('hidden');
