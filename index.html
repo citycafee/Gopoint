@@ -1021,7 +1021,6 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <h2>Enable Location Access</h2>
 <p>We need your location to find nearby restaurants and deliver your food as fast as possible. Your location is only used for delivery.</p>
 <button class="fp-loc-btn-allow" onclick="fpRequestLocation()"><i class="fas fa-crosshairs"></i> Allow Location Access</button>
-<button class="fp-loc-btn-skip" onclick="fpSkipLocation()">Skip for now</button>
 </div>
 </div>
 
@@ -2467,7 +2466,6 @@ function fpShowLocationOverlay() {
     if (!customerLocation) detectFrontLocation();
     return;
   }
-  if (localStorage.getItem('gopoint_loc_skipped') === '1') return;
   const overlay = document.getElementById('fpLocationOverlay');
   if (overlay) setTimeout(() => overlay.classList.add('active'), 800);
 }
@@ -2504,9 +2502,8 @@ function fpRequestLocation() {
     },
     (err) => {
       localStorage.setItem('gopoint_loc_permitted', '0');
-      if (overlay) overlay.classList.remove('active');
       if (err.code === err.PERMISSION_DENIED) {
-        showAppToast('⚠️ Location permission denied. You can enable it in browser settings.');
+        showAppToast('⚠️ Location permission denied. Please allow location to use Go!Point.');
       } else if (err.code === err.POSITION_UNAVAILABLE) {
         fpCheckGpsEnabled();
       } else {
@@ -2518,9 +2515,7 @@ function fpRequestLocation() {
 }
 
 function fpSkipLocation() {
-  const overlay = document.getElementById('fpLocationOverlay');
-  if (overlay) overlay.classList.remove('active');
-  localStorage.setItem('gopoint_loc_skipped', '1');
+showAppToast('⚠️ Location access is required to use Go!Point');
 }
 
 function fpCheckGpsEnabled() {
