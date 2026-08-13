@@ -4,6 +4,7 @@
     { "src": "index.html", "use": "@vercel/static" },
     { "src": "admin.html", "use": "@vercel/static" },
     { "src": "driver.html", "use": "@vercel/static" },
-    { "src": "styles.css", "use": "@vercel/static" }
+    { "src": "styles.css", "use": "@vercel/static" },
+    { "src": "rider.jpg", "use": "@vercel/static" }
   ]
 }
