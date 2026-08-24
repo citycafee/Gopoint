@@ -993,13 +993,19 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-location-overlay.active { display: flex; }
 .fp-location-card { background: #ffffff; width: 100%; max-width: 360px; padding: 0; border-radius: 14px; box-shadow: 0 14px 50px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.15); overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; animation: fpLocSlideDown 0.28s cubic-bezier(.16,1,.3,1); border: 1px solid rgba(0,0,0,0.06); }
 @keyframes fpLocSlideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.fp-loc-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px 10px; }
-.fp-loc-favicon { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--theme, #ff6b00), #ff9540); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(255,107,0,0.25); letter-spacing: -0.5px; }
+.fp-loc-header { display: flex; align-items: center; gap: 12px; padding: 18px 16px 10px; }
+.fp-loc-favicon { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, var(--theme, #ff6b00), #ff9540); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 17px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(255,107,0,0.3); letter-spacing: -0.5px; }
 .fp-loc-meta { flex: 1; min-width: 0; }
-.fp-loc-origin { font-size: 12px; color: #5f6368; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
-.fp-loc-title { font-size: 15px; font-weight: 600; color: #202124; line-height: 1.3; }
-.fp-loc-body { padding: 0 16px 14px 64px; font-size: 13px; color: #5f6368; line-height: 1.5; }
+.fp-loc-origin { font-size: 13px; color: #5f6368; margin-bottom: 3px; }
+.fp-loc-title { font-size: 15px; font-weight: 600; color: #202124; line-height: 1.35; }
+.fp-loc-body { padding: 4px 16px 10px 68px; font-size: 13px; color: #5f6368; line-height: 1.5; }
 .fp-loc-body strong { color: #202124; }
+.fp-loc-features { padding: 0 16px 12px 68px; display: flex; flex-direction: column; gap: 8px; }
+.fp-loc-feature { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #3c4043; line-height: 1.3; }
+.fp-loc-feature i { width: 28px; height: 28px; border-radius: 8px; background: #f1f3f4; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #5f6368; flex-shrink: 0; }
+.fp-loc-remember { padding: 0 16px 12px 68px; }
+.fp-loc-remember-label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #5f6368; cursor: pointer; user-select: none; }
+.fp-loc-remember-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--theme, #ff6b00); cursor: pointer; border-radius: 3px; }
 .fp-loc-divider { height: 1px; background: #e8eaed; margin: 0; }
 .fp-loc-actions { display: flex; justify-content: flex-end; gap: 4px; padding: 8px 8px 8px 0; background: #fff; }
 .fp-loc-btn { background: transparent; border: none; padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; border-radius: 6px; color: #1a73e8; transition: background 0.15s ease; letter-spacing: 0.2px; }
@@ -1007,7 +1013,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-loc-btn-block { color: #5f6368; font-weight: 500; }
 .fp-loc-btn-block:hover { background: rgba(0,0,0,0.05); }
 .fp-loc-permicon { position: absolute; right: 14px; top: 14px; font-size: 14px; color: #bdc1c6; }
-@media (max-width: 480px) { .fp-location-overlay { padding-top: 8vh; } .fp-location-card { max-width: 92%; } }
+@media (max-width: 480px) { .fp-location-overlay { padding-top: 8vh; } .fp-location-card { max-width: 92%; } .fp-loc-body, .fp-loc-features, .fp-loc-remember { padding-left: 16px; } }
 @keyframes fpLocSpin { to { transform: rotate(360deg); } }
 @keyframes fpLocBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 .fp-loc-gps-alert { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 14px 24px; border-radius: 16px; box-shadow: 0 8px 30px rgba(239,68,68,0.35); z-index: 99998; max-width: 90%; width: 360px; display: none; align-items: center; gap: 12px; font-size: 0.88rem; font-weight: 500; animation: fpLocSlideUp 0.3s ease; }
@@ -1021,14 +1027,16 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-notif-overlay.active { display: flex; }
 .fp-notif-card { background: #ffffff; width: 100%; max-width: 360px; padding: 0; border-radius: 14px; box-shadow: 0 14px 50px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.15); overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; animation: fpNotifSlideDown 0.28s cubic-bezier(.16,1,.3,1); border: 1px solid rgba(0,0,0,0.06); }
 @keyframes fpNotifSlideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.fp-notif-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px 10px; }
-.fp-notif-favicon { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--theme, #ff6b00), #ff9540); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(255,107,0,0.25); letter-spacing: -0.5px; }
+.fp-notif-header { display: flex; align-items: center; gap: 12px; padding: 18px 16px 10px; }
+.fp-notif-favicon { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, var(--theme, #ff6b00), #ff9540); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 17px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(255,107,0,0.3); letter-spacing: -0.5px; }
 .fp-notif-meta { flex: 1; min-width: 0; }
-.fp-notif-origin { font-size: 12px; color: #5f6368; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
-.fp-notif-origin::before { content: ''; width: 10px; height: 10px; display: inline-block; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235f6368'><path d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z'/></svg>") center/contain no-repeat; }
-.fp-notif-title { font-size: 15px; font-weight: 600; color: #202124; line-height: 1.3; }
-.fp-notif-body { padding: 0 16px 14px 64px; font-size: 13px; color: #5f6368; line-height: 1.5; }
+.fp-notif-origin { font-size: 13px; color: #5f6368; margin-bottom: 3px; }
+.fp-notif-title { font-size: 15px; font-weight: 600; color: #202124; line-height: 1.35; }
+.fp-notif-body { padding: 4px 16px 10px 68px; font-size: 13px; color: #5f6368; line-height: 1.5; }
 .fp-notif-body strong { color: #202124; }
+.fp-notif-features { padding: 0 16px 12px 68px; display: flex; flex-direction: column; gap: 8px; }
+.fp-notif-feature { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #3c4043; line-height: 1.3; }
+.fp-notif-feature i { width: 28px; height: 28px; border-radius: 8px; background: #f1f3f4; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #5f6368; flex-shrink: 0; }
 .fp-notif-divider { height: 1px; background: #e8eaed; margin: 0; }
 .fp-notif-actions { display: flex; justify-content: flex-end; gap: 4px; padding: 8px 8px 8px 0; background: #fff; }
 .fp-notif-btn { background: transparent; border: none; padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; border-radius: 6px; color: #1a73e8; transition: background 0.15s ease; letter-spacing: 0.2px; }
@@ -1036,7 +1044,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-notif-btn-block { color: #5f6368; font-weight: 500; }
 .fp-notif-btn-block:hover { background: rgba(0,0,0,0.05); }
 .fp-notif-permicon { position: absolute; right: 14px; top: 14px; font-size: 14px; color: #bdc1c6; }
-@media (max-width: 480px) { .fp-notif-overlay { padding-top: 8vh; } .fp-notif-card { max-width: 92%; } }
+@media (max-width: 480px) { .fp-notif-overlay { padding-top: 8vh; } .fp-notif-card { max-width: 92%; } .fp-notif-body, .fp-notif-features { padding-left: 16px; } }
 </style>
 </head>
 <body>
@@ -1046,12 +1054,22 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <div class="fp-loc-header">
 <div class="fp-loc-favicon" aria-hidden="true">G!</div>
 <div class="fp-loc-meta">
-<div class="fp-loc-origin" id="fpLocOrigin">gopoint.app wants to know your location</div>
-<div class="fp-loc-title" id="fpLocTitle">Allow Gopoint to access your location?</div>
+<div class="fp-loc-origin" id="fpLocOrigin">Go!point wants to</div>
+<div class="fp-loc-title" id="fpLocTitle">Allow Go!point to access this device's location?</div>
 </div>
 <i class="fas fa-location-crosshairs fp-loc-permicon" aria-hidden="true"></i>
 </div>
-<div class="fp-loc-body" id="fpLocBody">Location is used to <strong>find nearby restaurants</strong>, show <strong>accurate delivery times</strong>, and let riders reach you faster. We only use it while you order.</div>
+<div class="fp-loc-body" id="fpLocBody">While using the app</div>
+<div class="fp-loc-features">
+<div class="fp-loc-feature"><i class="fas fa-store"></i> Find nearby restaurants &amp; stores</div>
+<div class="fp-loc-feature"><i class="fas fa-clock"></i> Show accurate delivery times</div>
+<div class="fp-loc-feature"><i class="fas fa-motorcycle"></i> Help riders reach you faster</div>
+</div>
+<div class="fp-loc-remember">
+<label class="fp-loc-remember-label">
+<input type="checkbox" id="fpLocRemember" checked> Remember my decision
+</label>
+</div>
 <div class="fp-loc-divider"></div>
 <div class="fp-loc-actions">
 <button class="fp-loc-btn fp-loc-btn-block" onclick="fpSkipLocation()" aria-label="Block location access">Block</button>
@@ -1076,12 +1094,17 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <div class="fp-notif-header">
 <div class="fp-notif-favicon" aria-hidden="true">G!</div>
 <div class="fp-notif-meta">
-<div class="fp-notif-origin" id="fpNotifOrigin">gopoint.app wants to</div>
-<div class="fp-notif-title" id="fpNotifTitle">Allow Gopoint to send you notifications?</div>
+<div class="fp-notif-origin" id="fpNotifOrigin">Go!point wants to</div>
+<div class="fp-notif-title" id="fpNotifTitle">Allow Go!point to send you notifications?</div>
 </div>
 <i class="fas fa-bell fp-notif-permicon" aria-hidden="true"></i>
 </div>
-<div class="fp-notif-body" id="fpNotifBody">Notifications let us tell you when your <strong>order status changes</strong>, when the <strong>rider is nearby</strong>, and about <strong>exclusive deals</strong> on Gopoint.</div>
+<div class="fp-notif-body" id="fpNotifBody">While using the app</div>
+<div class="fp-notif-features">
+<div class="fp-notif-feature"><i class="fas fa-box"></i> Track your order status in real-time</div>
+<div class="fp-notif-feature"><i class="fas fa-motorcycle"></i> Get alerts when rider is nearby</div>
+<div class="fp-notif-feature"><i class="fas fa-tag"></i> Receive exclusive deals &amp; offers</div>
+</div>
 <div class="fp-notif-divider"></div>
 <div class="fp-notif-actions">
 <button class="fp-notif-btn fp-notif-btn-block" onclick="fpSkipNotification()" aria-label="Block notifications">Block</button>
@@ -1327,7 +1350,7 @@ Gmail
 <div style="display:flex; justify-content:center; gap:20px; padding-top:12px; border-top:1px solid #f0f0f0;">
 <a onclick="switchLoginTab('driver')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-motorcycle"></i> Driver</a>
 <a onclick="switchLoginTab('admin')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-shield-halved"></i> Admin</a>
-<a onclick="goToMarketplace()" style="font-size:13px; color:var(--theme); cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-store"></i> Guest</a>
+<a onclick="closeFullpageLogin(); document.getElementById('fpLoginModal').classList.remove('active'); window._guestFlow = true; fpShowLocationOverlay();" style="font-size:13px; color:var(--theme); cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-store"></i> Guest</a>
 </div>
 
 <p style="text-align:center; font-size:11px; color:#aaa; margin-top:14px; line-height:1.5;">By continuing, you agree to our <a href="#" style="color:#888;">Terms of Service</a> and <a href="#" style="color:#888;">Privacy Policy</a></p>
@@ -2514,21 +2537,17 @@ toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
 
 // ─── LOCATION PERMISSION NOTIFICATION ───
 function fpShowLocationOverlay() {
-  // Fill in the chrome-style "<host> wants to know your location" line
   const originEl = document.getElementById('fpLocOrigin');
-  if (originEl) {
-    const host = (window.location.hostname || 'gopoint.app').replace(/^www\./, '');
-    originEl.textContent = host + ' wants to know your location';
-  }
+  if (originEl) originEl.textContent = 'Go!point wants to';
   if (localStorage.getItem('gopoint_loc_permitted') === '1') {
     if (!customerLocation) detectFrontLocation();
-    if (window._fpLoginFlowPending) fpChainNotifOrLogin();
+    if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
     return;
   }
   const overlay = document.getElementById('fpLocationOverlay');
   if (!overlay) return;
-  // Show immediately when user-initiated (after Get Started), otherwise wait
-  const delay = window._fpLoginFlowPending ? 0 : 800;
+  // Show immediately when user-initiated (after Get Started or Guest), otherwise wait
+  const delay = (window._fpLoginFlowPending || window._guestFlow) ? 0 : 800;
   setTimeout(() => overlay.classList.add('active'), delay);
 }
 
@@ -2538,7 +2557,7 @@ function fpRequestLocation() {
     showAppToast('⚠️ Geolocation is not supported by your browser');
     fpCheckGpsEnabled();
     if (overlay) overlay.classList.remove('active');
-    if (window._fpLoginFlowPending) fpChainNotifOrLogin();
+    if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
     return;
   }
   navigator.geolocation.getCurrentPosition(
@@ -2560,7 +2579,7 @@ function fpRequestLocation() {
           customerLocation.fullAddress = data.display_name || '';
           localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
         } catch(e) {}
-        if (window._fpLoginFlowPending) {
+        if (window._fpLoginFlowPending || window._guestFlow) {
           fpChainNotifOrLogin();
         } else {
           showAppToast('📍 Location: ' + customerLocation.area);
@@ -2576,7 +2595,7 @@ function fpRequestLocation() {
       } else {
         showAppToast('⚠️ Location request timed out. Please try again.');
       }
-      if (window._fpLoginFlowPending) fpChainNotifOrLogin();
+      if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
     },
     { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
   );
@@ -2584,7 +2603,7 @@ function fpRequestLocation() {
 
 function fpSkipLocation() {
   showAppToast('⚠️ Location access is required to use Go!Point');
-  if (window._fpLoginFlowPending) fpChainNotifOrLogin();
+  if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
 }
 
 function fpChainNotifOrLogin() {
@@ -2592,6 +2611,7 @@ function fpChainNotifOrLogin() {
     fpShowNotifOverlay();
   } else {
     window._fpLoginFlowPending = false;
+    if (window._guestFlow) { window._guestFlow = false; goToMarketplace(); return; }
     document.getElementById('fpLoginModal').classList.add('active');
     switchLoginTab('customer');
     document.body.style.overflow = 'hidden';
@@ -2622,12 +2642,8 @@ function fpShowNotifOverlay() {
   if (!('Notification' in window)) return;
   const overlay = document.getElementById('fpNotifOverlay');
   if (overlay) {
-    // Mimic the chrome-style "origin wants to" header that browsers display
     const originEl = document.getElementById('fpNotifOrigin');
-    if (originEl) {
-      const host = (window.location.hostname || 'gopoint.app').replace(/^www\./, '');
-      originEl.textContent = host + ' wants to';
-    }
+    if (originEl) originEl.textContent = 'Go!point wants to';
     setTimeout(() => overlay.classList.add('active'), 1200);
   }
 }
@@ -2637,6 +2653,7 @@ function fpRequestNotification() {
   if (!('Notification' in window)) {
     showAppToast('⚠️ Notifications are not supported by your browser');
     if (overlay) overlay.classList.remove('active');
+    if (window._guestFlow) { window._guestFlow = false; goToMarketplace(); return; }
     if (window._fpLoginFlowPending) { window._fpLoginFlowPending = false; openFrontLoginModal(); }
     return;
   }
@@ -2644,6 +2661,7 @@ function fpRequestNotification() {
     localStorage.setItem('gopoint_notif_permitted', '1');
     if (overlay) overlay.classList.remove('active');
     showAppToast('✅ Notifications enabled!');
+    if (window._guestFlow) { window._guestFlow = false; goToMarketplace(); return; }
     if (window._fpLoginFlowPending) { window._fpLoginFlowPending = false; openFrontLoginModal(); }
     return;
   }
@@ -2651,6 +2669,7 @@ function fpRequestNotification() {
     localStorage.setItem('gopoint_notif_permitted', '0');
     if (overlay) overlay.classList.remove('active');
     showAppToast('⚠️ Notifications blocked. Enable them in browser settings.');
+    if (window._guestFlow) { window._guestFlow = false; goToMarketplace(); return; }
     if (window._fpLoginFlowPending) { window._fpLoginFlowPending = false; openFrontLoginModal(); }
     return;
   }
@@ -2665,6 +2684,7 @@ function fpRequestNotification() {
       if (overlay) overlay.classList.remove('active');
       showAppToast('⚠️ Notifications permission denied');
     }
+    if (window._guestFlow) { window._guestFlow = false; goToMarketplace(); return; }
     if (window._fpLoginFlowPending) { window._fpLoginFlowPending = false; openFrontLoginModal(); }
   });
 }
@@ -2673,6 +2693,7 @@ function fpSkipNotification() {
   localStorage.setItem('gopoint_notif_permitted', '0');
   const overlay = document.getElementById('fpNotifOverlay');
   if (overlay) overlay.classList.remove('active');
+  if (window._guestFlow) { window._guestFlow = false; goToMarketplace(); return; }
   if (window._fpLoginFlowPending) { window._fpLoginFlowPending = false; openFrontLoginModal(); }
 }
 
@@ -3793,7 +3814,8 @@ adminLoginFromModal();
 
 function fplBrowseMarketplace() {
 closeFullpageLogin();
-goToMarketplace();
+window._guestFlow = true;
+fpShowLocationOverlay();
 }
 
 function toggleFpMobileMenu() {
