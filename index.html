@@ -988,39 +988,75 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .ad-stat .value { font-size: 1.4rem; }
 .ad-report-summary { grid-template-columns: repeat(2, 1fr); }
 }
-/* ─── LOCATION PERMISSION NOTIFICATION ─── */
-.fp-location-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.55); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; padding: 20px; }
+/* ─── LOCATION PERMISSION NOTIFICATION (native browser-style prompt) ─── */
+.fp-location-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: none; align-items: flex-start; justify-content: center; padding: 16px; padding-top: 14vh; }
 .fp-location-overlay.active { display: flex; }
-.fp-location-card { background: var(--white); border-radius: 24px; width: 92%; max-width: 380px; padding: 36px 28px 28px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.25); position: relative; animation: fpLocSlideUp 0.4s cubic-bezier(.16,1,.3,1); }
-@keyframes fpLocSlideUp { from { opacity: 0; transform: translateY(30px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-.fp-location-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--theme), #3b82f6); border-radius: 24px 24px 0 0; }
-.fp-loc-icon-wrap { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(34,197,94,0.12)); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; position: relative; }
-.fp-loc-icon-wrap::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px dashed rgba(59,130,246,0.3); animation: fpLocSpin 12s linear infinite; }
+.fp-location-card { background: #ffffff; width: 100%; max-width: 360px; padding: 0; border-radius: 14px; box-shadow: 0 14px 50px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.15); overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; animation: fpLocSlideDown 0.28s cubic-bezier(.16,1,.3,1); border: 1px solid rgba(0,0,0,0.06); }
+@keyframes fpLocSlideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.fp-loc-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px 10px; }
+.fp-loc-favicon { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--theme, #ff6b00), #ff9540); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(255,107,0,0.25); letter-spacing: -0.5px; }
+.fp-loc-meta { flex: 1; min-width: 0; }
+.fp-loc-origin { font-size: 12px; color: #5f6368; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
+.fp-loc-title { font-size: 15px; font-weight: 600; color: #202124; line-height: 1.3; }
+.fp-loc-body { padding: 0 16px 14px 64px; font-size: 13px; color: #5f6368; line-height: 1.5; }
+.fp-loc-body strong { color: #202124; }
+.fp-loc-divider { height: 1px; background: #e8eaed; margin: 0; }
+.fp-loc-actions { display: flex; justify-content: flex-end; gap: 4px; padding: 8px 8px 8px 0; background: #fff; }
+.fp-loc-btn { background: transparent; border: none; padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; border-radius: 6px; color: #1a73e8; transition: background 0.15s ease; letter-spacing: 0.2px; }
+.fp-loc-btn:hover { background: rgba(26,115,232,0.08); }
+.fp-loc-btn-block { color: #5f6368; font-weight: 500; }
+.fp-loc-btn-block:hover { background: rgba(0,0,0,0.05); }
+.fp-loc-permicon { position: absolute; right: 14px; top: 14px; font-size: 14px; color: #bdc1c6; }
+@media (max-width: 480px) { .fp-location-overlay { padding-top: 8vh; } .fp-location-card { max-width: 92%; } }
 @keyframes fpLocSpin { to { transform: rotate(360deg); } }
-.fp-loc-icon { font-size: 2rem; color: #3b82f6; animation: fpLocBounce 1.5s ease-in-out infinite; }
 @keyframes fpLocBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-.fp-location-card h2 { font-size: 1.2rem; font-weight: 800; color: var(--black); margin-bottom: 8px; }
-.fp-location-card p { font-size: 0.85rem; color: #777; line-height: 1.6; margin-bottom: 24px; }
-.fp-location-card p i { color: #3b82f6; margin-right: 4px; }
-.fp-loc-btn-allow { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--theme), var(--theme-dark)); color: white; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(255,107,0,0.3); transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.fp-loc-btn-allow:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,0,0.4); }
-.fp-loc-btn-skip { background: none; border: none; color: #aaa; font-size: 0.82rem; font-weight: 500; cursor: pointer; font-family: inherit; padding: 8px; }
-.fp-loc-btn-skip:hover { color: #666; }
 .fp-loc-gps-alert { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 14px 24px; border-radius: 16px; box-shadow: 0 8px 30px rgba(239,68,68,0.35); z-index: 99998; max-width: 90%; width: 360px; display: none; align-items: center; gap: 12px; font-size: 0.88rem; font-weight: 500; animation: fpLocSlideUp 0.3s ease; }
 .fp-loc-gps-alert.show { display: flex; }
 .fp-loc-gps-alert i { font-size: 1.4rem; flex-shrink: 0; }
 .fp-loc-gps-alert .fp-gps-alert-close { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
 .fp-loc-gps-alert .fp-gps-alert-close:hover { background: rgba(255,255,255,0.35); }
+
+/* ─── NOTIFICATION PERMISSION OVERLAY (Glovo-style native prompt) ─── */
+.fp-notif-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: none; align-items: flex-start; justify-content: center; padding: 16px; padding-top: 14vh; }
+.fp-notif-overlay.active { display: flex; }
+.fp-notif-card { background: #ffffff; width: 100%; max-width: 360px; padding: 0; border-radius: 14px; box-shadow: 0 14px 50px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.15); overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; animation: fpNotifSlideDown 0.28s cubic-bezier(.16,1,.3,1); border: 1px solid rgba(0,0,0,0.06); }
+@keyframes fpNotifSlideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.fp-notif-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px 10px; }
+.fp-notif-favicon { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--theme, #ff6b00), #ff9540); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(255,107,0,0.25); letter-spacing: -0.5px; }
+.fp-notif-meta { flex: 1; min-width: 0; }
+.fp-notif-origin { font-size: 12px; color: #5f6368; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
+.fp-notif-origin::before { content: ''; width: 10px; height: 10px; display: inline-block; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235f6368'><path d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z'/></svg>") center/contain no-repeat; }
+.fp-notif-title { font-size: 15px; font-weight: 600; color: #202124; line-height: 1.3; }
+.fp-notif-body { padding: 0 16px 14px 64px; font-size: 13px; color: #5f6368; line-height: 1.5; }
+.fp-notif-body strong { color: #202124; }
+.fp-notif-divider { height: 1px; background: #e8eaed; margin: 0; }
+.fp-notif-actions { display: flex; justify-content: flex-end; gap: 4px; padding: 8px 8px 8px 0; background: #fff; }
+.fp-notif-btn { background: transparent; border: none; padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; border-radius: 6px; color: #1a73e8; transition: background 0.15s ease; letter-spacing: 0.2px; }
+.fp-notif-btn:hover { background: rgba(26,115,232,0.08); }
+.fp-notif-btn-block { color: #5f6368; font-weight: 500; }
+.fp-notif-btn-block:hover { background: rgba(0,0,0,0.05); }
+.fp-notif-permicon { position: absolute; right: 14px; top: 14px; font-size: 14px; color: #bdc1c6; }
+@media (max-width: 480px) { .fp-notif-overlay { padding-top: 8vh; } .fp-notif-card { max-width: 92%; } }
 </style>
 </head>
 <body>
-<!-- ─── LOCATION PERMISSION NOTIFICATION ─── -->
+<!-- ─── LOCATION PERMISSION NOTIFICATION (native browser-style prompt) ─── -->
 <div class="fp-location-overlay" id="fpLocationOverlay">
-<div class="fp-location-card">
-<div class="fp-loc-icon-wrap"><div class="fp-loc-icon"><i class="fas fa-location-dot"></i></div></div>
-<h2>Enable Location Access</h2>
-<p>We need your location to find nearby restaurants and deliver your food as fast as possible. Your location is only used for delivery.</p>
-<button class="fp-loc-btn-allow" onclick="fpRequestLocation()"><i class="fas fa-crosshairs"></i> Allow Location Access</button>
+<div class="fp-location-card" role="alertdialog" aria-labelledby="fpLocTitle" aria-describedby="fpLocBody">
+<div class="fp-loc-header">
+<div class="fp-loc-favicon" aria-hidden="true">G!</div>
+<div class="fp-loc-meta">
+<div class="fp-loc-origin" id="fpLocOrigin">gopoint.app wants to know your location</div>
+<div class="fp-loc-title" id="fpLocTitle">Allow Gopoint to access your location?</div>
+</div>
+<i class="fas fa-location-crosshairs fp-loc-permicon" aria-hidden="true"></i>
+</div>
+<div class="fp-loc-body" id="fpLocBody">Location is used to <strong>find nearby restaurants</strong>, show <strong>accurate delivery times</strong>, and let riders reach you faster. We only use it while you order.</div>
+<div class="fp-loc-divider"></div>
+<div class="fp-loc-actions">
+<button class="fp-loc-btn fp-loc-btn-block" onclick="fpSkipLocation()" aria-label="Block location access">Block</button>
+<button class="fp-loc-btn" onclick="fpRequestLocation()" aria-label="Allow location access">Allow</button>
+</div>
 </div>
 </div>
 
@@ -1034,11 +1070,27 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <button class="fp-gps-alert-close" onclick="document.getElementById('fpGpsAlert').classList.remove('show')">&times;</button>
 </div>
 
-<!-- ─── SYNC INDICATOR ─── -->
-<div class="app-sync-indicator" id="appSyncIndicator">
-<span class="app-sync-dot" id="appSyncDot"></span>
-<span id="appSyncText">Local Mode</span>
+<!-- ─── NOTIFICATION PERMISSION OVERLAY (native browser-style prompt) ─── -->
+<div class="fp-notif-overlay" id="fpNotifOverlay">
+<div class="fp-notif-card" role="alertdialog" aria-labelledby="fpNotifTitle" aria-describedby="fpNotifBody">
+<div class="fp-notif-header">
+<div class="fp-notif-favicon" aria-hidden="true">G!</div>
+<div class="fp-notif-meta">
+<div class="fp-notif-origin" id="fpNotifOrigin">gopoint.app wants to</div>
+<div class="fp-notif-title" id="fpNotifTitle">Allow Gopoint to send you notifications?</div>
 </div>
+<i class="fas fa-bell fp-notif-permicon" aria-hidden="true"></i>
+</div>
+<div class="fp-notif-body" id="fpNotifBody">Notifications let us tell you when your <strong>order status changes</strong>, when the <strong>rider is nearby</strong>, and about <strong>exclusive deals</strong> on Gopoint.</div>
+<div class="fp-notif-divider"></div>
+<div class="fp-notif-actions">
+<button class="fp-notif-btn fp-notif-btn-block" onclick="fpSkipNotification()" aria-label="Block notifications">Block</button>
+<button class="fp-notif-btn fp-notif-btn-allow" onclick="fpRequestNotification()" aria-label="Allow notifications">Allow</button>
+</div>
+</div>
+</div>
+
+<!-- ─── SYNC INDICATOR (hidden) ─── -->
 
 <!-- ─── FRONT PAGE ─── -->
 <div id="frontPageContainer" style="display:block;">
@@ -2462,12 +2514,22 @@ toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
 
 // ─── LOCATION PERMISSION NOTIFICATION ───
 function fpShowLocationOverlay() {
+  // Fill in the chrome-style "<host> wants to know your location" line
+  const originEl = document.getElementById('fpLocOrigin');
+  if (originEl) {
+    const host = (window.location.hostname || 'gopoint.app').replace(/^www\./, '');
+    originEl.textContent = host + ' wants to know your location';
+  }
   if (localStorage.getItem('gopoint_loc_permitted') === '1') {
     if (!customerLocation) detectFrontLocation();
+    if (window._fpLoginFlowPending) fpChainNotifOrLogin();
     return;
   }
   const overlay = document.getElementById('fpLocationOverlay');
-  if (overlay) setTimeout(() => overlay.classList.add('active'), 800);
+  if (!overlay) return;
+  // Show immediately when user-initiated (after Get Started), otherwise wait
+  const delay = window._fpLoginFlowPending ? 0 : 800;
+  setTimeout(() => overlay.classList.add('active'), delay);
 }
 
 function fpRequestLocation() {
@@ -2476,6 +2538,7 @@ function fpRequestLocation() {
     showAppToast('⚠️ Geolocation is not supported by your browser');
     fpCheckGpsEnabled();
     if (overlay) overlay.classList.remove('active');
+    if (window._fpLoginFlowPending) fpChainNotifOrLogin();
     return;
   }
   navigator.geolocation.getCurrentPosition(
@@ -2496,8 +2559,12 @@ function fpRequestLocation() {
           customerLocation.area = landmark ? `${landmark}, ${area}` : area;
           customerLocation.fullAddress = data.display_name || '';
           localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+        } catch(e) {}
+        if (window._fpLoginFlowPending) {
+          fpChainNotifOrLogin();
+        } else {
           showAppToast('📍 Location: ' + customerLocation.area);
-        } catch(e) { showAppToast('📍 GPS location captured'); }
+        }
       })();
     },
     (err) => {
@@ -2509,13 +2576,27 @@ function fpRequestLocation() {
       } else {
         showAppToast('⚠️ Location request timed out. Please try again.');
       }
+      if (window._fpLoginFlowPending) fpChainNotifOrLogin();
     },
     { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
   );
 }
 
 function fpSkipLocation() {
-showAppToast('⚠️ Location access is required to use Go!Point');
+  showAppToast('⚠️ Location access is required to use Go!Point');
+  if (window._fpLoginFlowPending) fpChainNotifOrLogin();
+}
+
+function fpChainNotifOrLogin() {
+  if (localStorage.getItem('gopoint_notif_permitted') !== '1' && 'Notification' in window) {
+    fpShowNotifOverlay();
+  } else {
+    window._fpLoginFlowPending = false;
+    document.getElementById('fpLoginModal').classList.add('active');
+    switchLoginTab('customer');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => { document.getElementById('fpCustomerPhone').focus(); }, 300);
+  }
 }
 
 function fpCheckGpsEnabled() {
@@ -2533,6 +2614,77 @@ function fpCheckGpsEnabled() {
     },
     { enableHighAccuracy: false, timeout: 5000 }
   );
+}
+
+// ─── NOTIFICATION PERMISSION ───
+function fpShowNotifOverlay() {
+  if (localStorage.getItem('gopoint_notif_permitted') === '1') return;
+  if (!('Notification' in window)) return;
+  const overlay = document.getElementById('fpNotifOverlay');
+  if (overlay) {
+    // Mimic the chrome-style "origin wants to" header that browsers display
+    const originEl = document.getElementById('fpNotifOrigin');
+    if (originEl) {
+      const host = (window.location.hostname || 'gopoint.app').replace(/^www\./, '');
+      originEl.textContent = host + ' wants to';
+    }
+    setTimeout(() => overlay.classList.add('active'), 1200);
+  }
+}
+
+function fpRequestNotification() {
+  const overlay = document.getElementById('fpNotifOverlay');
+  if (!('Notification' in window)) {
+    showAppToast('⚠️ Notifications are not supported by your browser');
+    if (overlay) overlay.classList.remove('active');
+    if (window._fpLoginFlowPending) { window._fpLoginFlowPending = false; openFrontLoginModal(); }
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    localStorage.setItem('gopoint_notif_permitted', '1');
+    if (overlay) overlay.classList.remove('active');
+    showAppToast('✅ Notifications enabled!');
+    if (window._fpLoginFlowPending) { window._fpLoginFlowPending = false; openFrontLoginModal(); }
+    return;
+  }
+  if (Notification.permission === 'denied') {
+    localStorage.setItem('gopoint_notif_permitted', '0');
+    if (overlay) overlay.classList.remove('active');
+    showAppToast('⚠️ Notifications blocked. Enable them in browser settings.');
+    if (window._fpLoginFlowPending) { window._fpLoginFlowPending = false; openFrontLoginModal(); }
+    return;
+  }
+  Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+      localStorage.setItem('gopoint_notif_permitted', '1');
+      if (overlay) overlay.classList.remove('active');
+      showAppToast('✅ Notifications enabled!');
+      try { new Notification('Go!point', { body: 'You will now receive order updates and delivery alerts!', icon: '🔔' }); } catch(e) {}
+    } else {
+      localStorage.setItem('gopoint_notif_permitted', '0');
+      if (overlay) overlay.classList.remove('active');
+      showAppToast('⚠️ Notifications permission denied');
+    }
+    if (window._fpLoginFlowPending) { window._fpLoginFlowPending = false; openFrontLoginModal(); }
+  });
+}
+
+function fpSkipNotification() {
+  localStorage.setItem('gopoint_notif_permitted', '0');
+  const overlay = document.getElementById('fpNotifOverlay');
+  if (overlay) overlay.classList.remove('active');
+  if (window._fpLoginFlowPending) { window._fpLoginFlowPending = false; openFrontLoginModal(); }
+}
+
+// ─── LOCATION CONFIRMATION OVERLAY REMOVED ───
+// The "Location Detected" interstitial was removed; the flow now proceeds
+// directly through fpChainNotifOrLogin() after a successful location grant.
+
+function openFrontLoginModal() {
+  document.getElementById('fpLoginModal').classList.add('active');
+  switchLoginTab('customer');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { document.getElementById('fpCustomerPhone').focus(); }, 300);
 }
 
 function appCalculateDistance(lat1, lng1, lat2, lng2) {
@@ -3542,10 +3694,22 @@ e._t = setTimeout(() => { e.classList.remove('show'); }, 3000);
 
 // ─── FRONT PAGE LOGIN FUNCTIONS ───
 function openFrontLogin() {
-document.getElementById('fpLoginModal').classList.add('active');
-switchLoginTab('customer');
-document.body.style.overflow = 'hidden';
-setTimeout(() => { document.getElementById('fpCustomerPhone').focus(); }, 300);
+  window._fpLoginFlowPending = true;
+  if (localStorage.getItem('gopoint_loc_permitted') !== '1') {
+    fpShowLocationOverlay();
+  } else {
+    const saved = localStorage.getItem('gopoint_customer_location');
+    if (saved) {
+      try { customerLocation = JSON.parse(saved); } catch(e) {}
+    }
+    if (customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...') {
+      fpChainNotifOrLogin();
+    } else if (customerLocation && customerLocation.lat) {
+      fpChainNotifOrLogin();
+    } else {
+      fpShowLocationOverlay();
+    }
+  }
 }
 
 function closeFrontLogin() {
@@ -4150,6 +4314,13 @@ filtered = Object.fromEntries(Object.entries(filtered).filter(([k, r]) => allowe
 }
 const term = document.getElementById('appHomeSearchInput')?.value.toLowerCase().trim() || '';
 if (term) { filtered = Object.fromEntries(Object.entries(filtered).filter(([k, r]) => r.name.toLowerCase().includes(term) || (r.cuisine && r.cuisine.toLowerCase().includes(term)) || (r.address && r.address.toLowerCase().includes(term)))); }
+// Sort by distance from the customer's detected location (Glovo-style "nearest first")
+if (customerLocation && customerLocation.lat) {
+const sorted = Object.entries(filtered)
+  .map(([k, r]) => ({ k, r, d: appCalculateDistance(customerLocation.lat, customerLocation.lng, r.lat || 0, r.lng || 0) }))
+  .sort((a, b) => a.d - b.d);
+filtered = Object.fromEntries(sorted.map(e => [e.k, e.r]));
+}
 return filtered;
 }
 
