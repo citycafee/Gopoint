@@ -1003,6 +1003,11 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-loc-features { padding: 0 16px 12px 68px; display: flex; flex-direction: column; gap: 8px; }
 .fp-loc-feature { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #3c4043; line-height: 1.3; }
 .fp-loc-feature i { width: 28px; height: 28px; border-radius: 8px; background: #f1f3f4; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #5f6368; flex-shrink: 0; }
+.fp-loc-detected { display: flex; align-items: center; gap: 10px; padding: 10px 16px 10px 68px; }
+.fp-loc-detected i { width: 28px; height: 28px; border-radius: 8px; background: #e8f5e9; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #2e7d32; flex-shrink: 0; }
+.fp-loc-detected-text { flex: 1; min-width: 0; }
+.fp-loc-detected-label { font-size: 11px; color: #5f6368; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+.fp-loc-detected-address { font-size: 13px; color: #1a1a1a; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fp-loc-divider { height: 1px; background: #e8eaed; margin: 0; }
 .fp-loc-actions { display: flex; justify-content: flex-end; gap: 4px; padding: 8px 8px 8px 0; background: #fff; }
 .fp-loc-btn { background: transparent; border: none; padding: 8px 16px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; border-radius: 6px; color: #1a73e8; transition: background 0.15s ease; letter-spacing: 0.2px; }
@@ -1036,6 +1041,13 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <i class="fas fa-location-crosshairs fp-loc-permicon" aria-hidden="true"></i>
 </div>
 <div class="fp-loc-body" id="fpLocBody">While using the app</div>
+<div class="fp-loc-detected" id="fpLocDetected" style="display:none;">
+<i class="fas fa-map-marker-alt"></i>
+<div class="fp-loc-detected-text">
+<div class="fp-loc-detected-label">Detected location</div>
+<div class="fp-loc-detected-address" id="fpLocDetectedAddress"></div>
+</div>
+</div>
 <div class="fp-loc-features">
 <div class="fp-loc-feature"><i class="fas fa-store"></i> Find nearby restaurants &amp; stores</div>
 <div class="fp-loc-feature"><i class="fas fa-clock"></i> Show accurate delivery times</div>
@@ -2494,6 +2506,18 @@ function fpShowLocationOverlay() {
   }
   const overlay = document.getElementById('fpLocationOverlay');
   if (!overlay) return;
+  const detectedEl = document.getElementById('fpLocDetected');
+  const detectedAddr = document.getElementById('fpLocDetectedAddress');
+  const saved = localStorage.getItem('gopoint_customer_location');
+  if (saved && detectedEl && detectedAddr) {
+    try {
+      const loc = JSON.parse(saved);
+      if (loc.area && loc.area !== 'Detecting...') {
+        detectedEl.style.display = 'flex';
+        detectedAddr.textContent = loc.area;
+      }
+    } catch(e) {}
+  }
   // Show immediately when user-initiated (after Get Started or Guest), otherwise wait
   const delay = (window._fpLoginFlowPending || window._guestFlow) ? 0 : 800;
   setTimeout(() => overlay.classList.add('active'), delay);
@@ -2501,6 +2525,8 @@ function fpShowLocationOverlay() {
 
 function fpRequestLocation() {
   const overlay = document.getElementById('fpLocationOverlay');
+  const detectedEl = document.getElementById('fpLocDetected');
+  const detectedAddr = document.getElementById('fpLocDetectedAddress');
   if (!navigator.geolocation) {
     showAppToast('⚠️ Geolocation is not supported by your browser');
     fpCheckGpsEnabled();
@@ -2508,11 +2534,14 @@ function fpRequestLocation() {
     if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
     return;
   }
+  if (overlay) {
+    overlay.querySelector('.fp-loc-actions').style.display = 'none';
+    overlay.querySelector('.fp-loc-body').textContent = 'Detecting your location...';
+  }
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       localStorage.setItem('gopoint_loc_permitted', '1');
       localStorage.removeItem('gopoint_loc_skipped');
-      if (overlay) overlay.classList.remove('active');
       const lat = pos.coords.latitude, lng = pos.coords.longitude;
       customerLocation = { lat, lng, area: 'Detecting...' };
       localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
@@ -2527,15 +2556,27 @@ function fpRequestLocation() {
           customerLocation.fullAddress = data.display_name || '';
           localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
         } catch(e) {}
-        if (window._fpLoginFlowPending || window._guestFlow) {
-          fpChainNotifOrLogin();
-        } else {
-          showAppToast('📍 Location: ' + customerLocation.area);
+        if (overlay) {
+          overlay.querySelector('.fp-loc-body').textContent = 'While using the app';
+          overlay.querySelector('.fp-loc-actions').style.display = '';
+          if (detectedEl && customerLocation.area && customerLocation.area !== 'Detecting...') {
+            detectedEl.style.display = 'flex';
+            detectedAddr.textContent = customerLocation.area;
+          }
         }
+        setTimeout(() => {
+          if (overlay) overlay.classList.remove('active');
+          if (detectedEl) detectedEl.style.display = 'none';
+          if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
+        }, 1500);
       })();
     },
     (err) => {
       localStorage.setItem('gopoint_loc_permitted', '0');
+      if (overlay) {
+        overlay.querySelector('.fp-loc-body').textContent = 'While using the app';
+        overlay.querySelector('.fp-loc-actions').style.display = '';
+      }
       if (err.code === err.PERMISSION_DENIED) {
         showAppToast('⚠️ Location permission denied. Please allow location to use Go!Point.');
       } else if (err.code === err.POSITION_UNAVAILABLE) {
