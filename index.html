@@ -3701,7 +3701,11 @@ e._t = setTimeout(() => { e.classList.remove('show'); }, 3000);
 // ─── FRONT PAGE LOGIN FUNCTIONS ───
 function openFrontLogin() {
   window._fpLoginFlowPending = true;
-  fpChainNotifOrLogin();
+  if (localStorage.getItem('gopoint_loc_permitted') === '1' && localStorage.getItem('gopoint_customer_location')) {
+    fpChainNotifOrLogin();
+  } else {
+    fpShowLocationOverlay();
+  }
 }
 
 function closeFrontLogin() {
