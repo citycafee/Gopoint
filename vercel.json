@@ -5,6 +5,15 @@
     { "src": "admin.html", "use": "@vercel/static" },
     { "src": "driver.html", "use": "@vercel/static" },
     { "src": "styles.css", "use": "@vercel/static" },
-    { "src": "rider.jpg", "use": "@vercel/static" }
+    { "src": "rider.jpg", "use": "@vercel/static" },
+    { "src": "manifest.json", "use": "@vercel/static" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Permissions-Policy", "value": "geolocation=(self)" }
+      ]
+    }
   ]
 }
