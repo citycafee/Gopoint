@@ -4499,37 +4499,35 @@ document.getElementById('appMiniCartTotal').textContent = total.toFixed(2);
 function toggleCart() { cartVisible = !cartVisible; document.getElementById('appCartWindow').classList.toggle('visible', cartVisible); }
 
 async function detectAppLocation() {
-const statusBox = document.getElementById('appLocationStatusBox'), btnText = document.getElementById('appDetectBtnText'), input = document.getElementById('appDetectedLocation');
-if (btnText) btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
-if (statusBox) { statusBox.style.display = 'block'; statusBox.className = 'app-location-status loading'; statusBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Requesting GPS...'; }
-if (!navigator.geolocation) { if (statusBox) statusBox.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Not supported'; return; }
+const input = document.getElementById('appHomeSearchInput');
+showAppToast('📍 Detecting your location...');
+if (!navigator.geolocation) { showAppToast('⚠️ Geolocation not supported'); return; }
 navigator.geolocation.getCurrentPosition(async (pos) => {
-detectedCoordinates = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-customerLocation = { lat: detectedCoordinates.lat, lng: detectedCoordinates.lng, area: 'Detecting...' };
+const lat = pos.coords.latitude, lng = pos.coords.longitude;
+customerLocation = { lat, lng, area: 'Detecting...' };
 try {
-const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${detectedCoordinates.lat}&lon=${detectedCoordinates.lng}&addressdetails=1`);
-const data = await res.json();
-const area = data.address?.neighbourhood || data.address?.suburb || data.address?.quarter || data.address?.city_district || data.address?.building || data.address?.road || data.address?.city || data.address?.town || data.address?.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
-const landmark = data.address?.amenity || data.address?.shop || data.address?.tourism || '';
-const fullArea = landmark ? `${landmark}, ${area}` : area;
-customerLocation.area = fullArea;
-if (input) input.value = fullArea;
-if (statusBox) { statusBox.className = 'app-location-status success'; statusBox.innerHTML = `<i class="fas fa-check-circle"></i> Location: <b>${fullArea}</b>`; }
-showAppToast('📍 ' + fullArea);
-} catch (e) { if (input) input.value = `${detectedCoordinates.lat.toFixed(4)}, ${detectedCoordinates.lng.toFixed(4)}`; if (statusBox) { statusBox.className = 'app-location-status success'; statusBox.innerHTML = '<i class="fas fa-check-circle"></i> GPS captured'; } }
-if (appMap) { appMap.setView([detectedCoordinates.lat, detectedCoordinates.lng], 14); appUpdateCustomerMarker(); appUpdateMapMarkers(appGetFilteredRestaurants()); }
-appRenderRestaurantList();
-if (btnText) btnText.innerHTML = '<i class="fas fa-location-crosshairs"></i> Detect My Location';
-}, (err) => {
-let msg = '<i class="fas fa-ban"></i> Permission denied';
-if (err.code === err.POSITION_UNAVAILABLE) {
-  msg = '<i class="fas fa-satellite-dish"></i> GPS is off';
-  const alert = document.getElementById('fpGpsAlert');
-  if (alert) { alert.classList.add('show'); setTimeout(() => alert.classList.remove('show'), 8000); }
+  if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
+    customerLocation.area = await resolveHargeisaLocation(lat, lng);
+  } else {
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
+    const data = await res.json();
+    const a = data.address || {};
+    const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
+    const landmark = a.amenity || a.shop || a.tourism || '';
+    customerLocation.area = landmark ? `${landmark}, ${area}` : area;
+  }
+} catch(e) {
+  if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
+    customerLocation.area = getHargeisaArea(lat, lng);
+  }
 }
-if (statusBox) { statusBox.className = 'app-location-status error'; statusBox.innerHTML = msg; }
-if (btnText) btnText.innerHTML = '<i class="fas fa-location-crosshairs"></i> Detect My Location';
-}, { enableHighAccuracy: true, timeout: 15000 });
+localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+updateSearchPlaceholder();
+showAppToast('📍 Location: ' + customerLocation.area);
+if (appMap) { appMap.setView([lat, lng], 14); appUpdateCustomerMarker(); }
+}, (err) => {
+showAppToast('⚠️ Location permission denied');
+}, { enableHighAccuracy: true, timeout: 10000 });
 }
 
 function proceedToDelivery() {
