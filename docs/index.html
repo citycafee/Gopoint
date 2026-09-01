@@ -1995,7 +1995,6 @@ Gmail
 <input type="text" placeholder="Search restaurants..." id="appHomeSearchInput">
 <div style="cursor:pointer; color:var(--primary); font-weight:500; font-size:0.85rem; display:flex; align-items:center; gap:6px; white-space:nowrap;" onclick="detectAppLocation()"><i class="fa fa-location-dot"></i><span>Locate</span></div>
 </div>
-<div id="appDetectedLocation" style="display:none; padding:4px 12px 2px; font-size:0.78rem; color:#5f6368; align-items:center; gap:5px;"><i class="fas fa-location-dot" style="color:var(--primary); font-size:0.7rem;"></i><span id="appDetectedLocationText"></span></div>
 </div>
 <div class="app-nav-right">
 <ul>
@@ -2010,6 +2009,15 @@ Gmail
 </div>
 </div>
 </nav>
+
+<div id="appCustomerLocationBar" style="display:none; background:linear-gradient(135deg, #f0fdf4, #ecfdf5); border-bottom:1px solid #d1fae5; padding:8px 2rem; position:fixed; top:70px; left:0; right:0; z-index:999;">
+<div style="max-width:1400px; margin:0 auto; display:flex; align-items:center; gap:8px; font-size:0.85rem;">
+<i class="fas fa-location-dot" style="color:#22c55e; font-size:0.9rem;"></i>
+<span style="color:#166534; font-weight:600;">Delivering to:</span>
+<span id="appCustomerLocationText" style="color:#15803d; font-weight:500;"></span>
+<span onclick="detectAppLocation()" style="cursor:pointer; color:#22c55e; font-weight:700; font-size:0.8rem; margin-left:auto; text-decoration:underline;">Change</span>
+</div>
+</div>
 
 <!-- Home View -->
 <div id="appHomeView" class="app-view active">
@@ -3928,11 +3936,11 @@ function resolveHargeisaLocation(lat, lng) {
 
 function updateSearchPlaceholder() {
   const input = document.getElementById('appHomeSearchInput');
-  const locTag = document.getElementById('appDetectedLocation');
-  const locText = document.getElementById('appDetectedLocationText');
+  const locBar = document.getElementById('appCustomerLocationBar');
+  const locText = document.getElementById('appCustomerLocationText');
   if (customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...') {
     if (input) input.placeholder = '📍 ' + customerLocation.area + ' — Search restaurants...';
-    if (locTag && locText) { locText.textContent = customerLocation.area; locTag.style.display = 'flex'; }
+    if (locBar && locText) { locText.textContent = customerLocation.area; locBar.style.display = 'block'; }
     if (typeof appMap !== 'undefined' && appMap && customerLocation.lat && customerLocation.lng) {
       appUpdateCustomerMarker();
       appMap.setView([customerLocation.lat, customerLocation.lng], 14);
