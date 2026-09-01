@@ -2600,7 +2600,7 @@ function fpRequestLocation() {
         (async () => {
           try {
             if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
-              customerLocation.area = getHargeisaArea(lat, lng);
+              customerLocation.area = await resolveHargeisaLocation(lat, lng);
             } else {
               const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
               const data = await res.json();
@@ -3909,6 +3909,23 @@ function getHargeisaArea(lat, lng) {
   return subArea + ', ' + closest.name + ', Hargeisa';
 }
 
+function resolveHargeisaLocation(lat, lng) {
+  let minDist = Infinity, closest = hargeisaDistricts[0];
+  for (const d of hargeisaDistricts) {
+    const dist = Math.sqrt(Math.pow(lat - d.lat, 2) + Math.pow(lng - d.lng, 2));
+    if (dist < minDist) { minDist = dist; closest = d; }
+  }
+  return fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`)
+    .then(r => r.json())
+    .then(data => {
+      const a = data.address || {};
+      const road = a.road || a.neighbourhood || a.suburb || a.quarter || '';
+      const matchedSub = closest.areas.find(sa => road.toLowerCase().includes(sa.toLowerCase().split(' ')[0])) || closest.areas[Math.floor(Math.random() * closest.areas.length)];
+      return matchedSub + ', ' + closest.name + ', Hargeisa';
+    })
+    .catch(() => closest.areas[Math.floor(Math.random() * closest.areas.length)] + ', ' + closest.name + ', Hargeisa');
+}
+
 function updateSearchPlaceholder() {
   const input = document.getElementById('appHomeSearchInput');
   const locTag = document.getElementById('appDetectedLocation');
@@ -3935,7 +3952,7 @@ if (localStorage.getItem('gopoint_loc_permitted') === '1') {
     customerLocation = { lat, lng, area: 'Detecting...' };
     try {
       if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
-        customerLocation.area = getHargeisaArea(lat, lng);
+        customerLocation.area = await resolveHargeisaLocation(lat, lng);
       } else {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
         const data = await res.json();
