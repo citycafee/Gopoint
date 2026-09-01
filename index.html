@@ -1992,13 +1992,8 @@ Gmail
 <div class="app-nav-left">
 <div class="app-merchant-logo"><span id="appMainTitle">Go!point</span></div>
 <div class="app-search-box">
-<div id="appCustomerLocationBar" style="display:none; padding:4px 0 2px; font-size:0.8rem; align-items:center; gap:5px;">
-<i class="fas fa-location-dot" style="color:#22c55e; font-size:0.8rem;"></i>
-<span style="color:#166534; font-weight:600;">Delivering to:</span>
-<span id="appCustomerLocationText" style="color:#15803d; font-weight:500;"></span>
-<span onclick="detectAppLocation()" style="cursor:pointer; color:var(--primary); font-weight:700; font-size:0.75rem; margin-left:auto; text-decoration:underline;">Change</span>
-</div>
 <input type="text" placeholder="Search restaurants..." id="appHomeSearchInput">
+<div style="cursor:pointer; color:var(--primary); font-weight:500; font-size:0.85rem; display:flex; align-items:center; gap:6px; white-space:nowrap;" onclick="detectAppLocation()"><i class="fa fa-location-dot"></i><span>Locate</span></div>
 </div>
 </div>
 <div class="app-nav-right">
@@ -3937,11 +3932,8 @@ function resolveHargeisaLocation(lat, lng) {
 
 function updateSearchPlaceholder() {
   const input = document.getElementById('appHomeSearchInput');
-  const locBar = document.getElementById('appCustomerLocationBar');
-  const locText = document.getElementById('appCustomerLocationText');
   if (customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...') {
     if (input) input.placeholder = '📍 ' + customerLocation.area + ' — Search restaurants...';
-    if (locBar && locText) { locText.textContent = customerLocation.area; locBar.style.display = 'flex'; }
     if (typeof appMap !== 'undefined' && appMap && customerLocation.lat && customerLocation.lng) {
       appUpdateCustomerMarker();
       appMap.setView([customerLocation.lat, customerLocation.lng], 14);
