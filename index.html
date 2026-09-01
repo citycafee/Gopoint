@@ -2584,6 +2584,7 @@ function fpRequestLocation() {
     if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
     return;
   }
+  localStorage.setItem('gopoint_loc_permitted', '1');
   if (overlay) {
     overlay.querySelector('.fp-loc-actions').style.display = 'none';
     overlay.querySelector('.fp-loc-body').textContent = 'Detecting your location...';
@@ -2592,7 +2593,6 @@ function fpRequestLocation() {
     if (overlay) overlay.classList.remove('active');
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        localStorage.setItem('gopoint_loc_permitted', '1');
         localStorage.removeItem('gopoint_loc_skipped');
         const lat = pos.coords.latitude, lng = pos.coords.longitude;
         customerLocation = { lat, lng, area: 'Detecting...' };
@@ -2617,7 +2617,6 @@ function fpRequestLocation() {
         })();
       },
       (err) => {
-        localStorage.setItem('gopoint_loc_permitted', '0');
         if (err.code === err.PERMISSION_DENIED) {
           showAppToast('⚠️ Location permission denied. Please allow location to use Go!Point.');
           if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
@@ -3892,38 +3891,27 @@ const saved = localStorage.getItem('gopoint_customer_location');
 if (saved) {
   try { customerLocation = JSON.parse(saved); updateSearchPlaceholder(); showAppToast('📍 Location: ' + customerLocation.area); return; } catch(e) {}
 }
-if (localStorage.getItem('gopoint_loc_permitted') !== '1') {
-  fpShowLocationOverlay();
+if (localStorage.getItem('gopoint_loc_permitted') === '1') {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const lat = pos.coords.latitude, lng = pos.coords.longitude;
+    customerLocation = { lat, lng, area: 'Detecting...' };
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
+      const data = await res.json();
+      const a = data.address || {};
+      const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
+      const landmark = a.amenity || a.shop || a.tourism || a.landmark || '';
+      customerLocation.area = landmark ? `${landmark}, ${area}` : area;
+      customerLocation.fullAddress = data.display_name || '';
+      localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+      updateSearchPlaceholder();
+      showAppToast('📍 Location: ' + customerLocation.area);
+    } catch (e) { showAppToast('📍 GPS captured'); localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation)); }
+  }, (err) => {}, { enableHighAccuracy: true, timeout: 15000 });
   return;
 }
-if (!navigator.geolocation) { showAppToast('⚠️ Geolocation not supported'); return; }
-navigator.geolocation.getCurrentPosition(async (pos) => {
-const lat = pos.coords.latitude, lng = pos.coords.longitude;
-customerLocation = { lat, lng, area: 'Detecting...' };
-try {
-const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
-const data = await res.json();
-const a = data.address || {};
-const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
-const landmark = a.amenity || a.shop || a.tourism || a.landmark || '';
-customerLocation.area = landmark ? `${landmark}, ${area}` : area;
-customerLocation.fullAddress = data.display_name || '';
-localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-updateSearchPlaceholder();
-showAppToast('📍 Location: ' + customerLocation.area);
-} catch (e) { showAppToast('📍 GPS captured'); localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation)); }
-}, (err) => {
-if (err.code === err.PERMISSION_DENIED) {
-  showAppToast('⚠️ Location permission denied. Enable it in browser settings.');
-  localStorage.setItem('gopoint_loc_permitted', '0');
-} else if (err.code === err.POSITION_UNAVAILABLE) {
-  showAppToast('⚠️ GPS is off. Please enable Location/GPS in your device settings.');
-  const alert = document.getElementById('fpGpsAlert');
-  if (alert) { alert.classList.add('show'); setTimeout(() => alert.classList.remove('show'), 8000); }
-} else {
-  showAppToast('⚠️ Location request timed out');
-}
-}, { enableHighAccuracy: true, timeout: 15000 });
+fpShowLocationOverlay();
 }
 
 function loginWithWhatsApp() {
