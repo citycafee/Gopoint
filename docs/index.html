@@ -2606,6 +2606,7 @@ function fpRequestLocation() {
             customerLocation.area = landmark ? `${landmark}, ${area}` : area;
             customerLocation.fullAddress = data.display_name || '';
             localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+            updateSearchPlaceholder();
             showAppToast('📍 Location: ' + customerLocation.area);
           } catch(e) {
             showAppToast('📍 GPS captured');
@@ -3875,10 +3876,17 @@ showAppToast('⚠️ Invalid admin credentials');
 }
 }
 
+function updateSearchPlaceholder() {
+  const input = document.getElementById('appHomeSearchInput');
+  if (input && customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...') {
+    input.placeholder = '📍 ' + customerLocation.area + ' — Search restaurants...';
+  }
+}
+
 function detectFrontLocation() {
 const saved = localStorage.getItem('gopoint_customer_location');
 if (saved) {
-  try { customerLocation = JSON.parse(saved); showAppToast('📍 Location: ' + customerLocation.area); return; } catch(e) {}
+  try { customerLocation = JSON.parse(saved); updateSearchPlaceholder(); showAppToast('📍 Location: ' + customerLocation.area); return; } catch(e) {}
 }
 if (localStorage.getItem('gopoint_loc_permitted') !== '1') {
   fpShowLocationOverlay();
@@ -3897,6 +3905,7 @@ const landmark = a.amenity || a.shop || a.tourism || a.landmark || '';
 customerLocation.area = landmark ? `${landmark}, ${area}` : area;
 customerLocation.fullAddress = data.display_name || '';
 localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+updateSearchPlaceholder();
 showAppToast('📍 Location: ' + customerLocation.area);
 } catch (e) { showAppToast('📍 GPS captured'); localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation)); }
 }, (err) => {
@@ -4068,7 +4077,7 @@ completeLogin({ name, email, phone: '', provider: 'email' });
 }
 
 function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
-function goToMarketplace() { document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('fpDriverLoginPopup').classList.remove('active'); document.getElementById('fpAdminLoginPopup').classList.remove('active'); document.getElementById('fpLoginModal').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); if (customerLocation && customerLocation.area) { document.getElementById('appHomeSearchInput').placeholder = '📍 ' + customerLocation.area + ' — Search restaurants...'; } detectFrontLocation(); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
+function goToMarketplace() { document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('fpDriverLoginPopup').classList.remove('active'); document.getElementById('fpAdminLoginPopup').classList.remove('active'); document.getElementById('fpLoginModal').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); updateSearchPlaceholder(); detectFrontLocation(); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
 
 async function logoutUser() {
 if (!confirm('Are you sure you want to logout?')) return;
