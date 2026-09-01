@@ -3648,21 +3648,7 @@ e._t = setTimeout(() => { e.classList.remove('show'); }, 3000);
 // ─── FRONT PAGE LOGIN FUNCTIONS ───
 function openFrontLogin() {
   window._fpLoginFlowPending = true;
-  if (localStorage.getItem('gopoint_loc_permitted') !== '1') {
-    fpShowLocationOverlay();
-  } else {
-    const saved = localStorage.getItem('gopoint_customer_location');
-    if (saved) {
-      try { customerLocation = JSON.parse(saved); } catch(e) {}
-    }
-    if (customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...') {
-      fpChainNotifOrLogin();
-    } else if (customerLocation && customerLocation.lat) {
-      fpChainNotifOrLogin();
-    } else {
-      fpShowLocationOverlay();
-    }
-  }
+  fpChainNotifOrLogin();
 }
 
 function closeFrontLogin() {
@@ -3849,6 +3835,10 @@ function detectFrontLocation() {
 const saved = localStorage.getItem('gopoint_customer_location');
 if (saved) {
   try { customerLocation = JSON.parse(saved); showAppToast('📍 Location: ' + customerLocation.area); return; } catch(e) {}
+}
+if (localStorage.getItem('gopoint_loc_permitted') !== '1') {
+  fpShowLocationOverlay();
+  return;
 }
 if (!navigator.geolocation) { showAppToast('⚠️ Geolocation not supported'); return; }
 navigator.geolocation.getCurrentPosition(async (pos) => {
