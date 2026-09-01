@@ -3709,7 +3709,12 @@ e._t = setTimeout(() => { e.classList.remove('show'); }, 3000);
 // ─── FRONT PAGE LOGIN FUNCTIONS ───
 function openFrontLogin() {
   window._fpLoginFlowPending = true;
-  if (localStorage.getItem('gopoint_loc_permitted') === '1' && localStorage.getItem('gopoint_customer_location')) {
+  const saved = localStorage.getItem('gopoint_customer_location');
+  let hasValidArea = false;
+  if (saved) {
+    try { const loc = JSON.parse(saved); hasValidArea = loc.area && loc.area !== 'Detecting...'; } catch(e) {}
+  }
+  if (localStorage.getItem('gopoint_loc_permitted') === '1' && hasValidArea) {
     fpChainNotifOrLogin();
   } else {
     fpShowLocationOverlay();
@@ -3951,7 +3956,36 @@ function updateSearchPlaceholder() {
 function detectFrontLocation() {
 const saved = localStorage.getItem('gopoint_customer_location');
 if (saved) {
-  try { customerLocation = JSON.parse(saved); updateSearchPlaceholder(); showAppToast('📍 Location: ' + customerLocation.area); return; } catch(e) {}
+  try {
+    customerLocation = JSON.parse(saved);
+    if (customerLocation.area && customerLocation.area !== 'Detecting...') {
+      updateSearchPlaceholder();
+      showAppToast('📍 Location: ' + customerLocation.area);
+      return;
+    }
+    if (customerLocation.lat && customerLocation.lng) {
+      (async () => {
+        try {
+          if (customerLocation.lat >= 9.54 && customerLocation.lat <= 9.58 && customerLocation.lng >= 44.05 && customerLocation.lng <= 44.08) {
+            customerLocation.area = await resolveHargeisaLocation(customerLocation.lat, customerLocation.lng);
+          } else {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${customerLocation.lat}&lon=${customerLocation.lng}&addressdetails=1`);
+            const data = await res.json();
+            const a = data.address || {};
+            customerLocation.area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
+          }
+        } catch(e) {
+          if (customerLocation.lat >= 9.54 && customerLocation.lat <= 9.58 && customerLocation.lng >= 44.05 && customerLocation.lng <= 44.08) {
+            customerLocation.area = getHargeisaArea(customerLocation.lat, customerLocation.lng);
+          }
+        }
+        localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+        updateSearchPlaceholder();
+        showAppToast('📍 Location: ' + customerLocation.area);
+      })();
+      return;
+    }
+  } catch(e) {}
 }
 if (localStorage.getItem('gopoint_loc_permitted') === '1') {
   if (!navigator.geolocation) return;
