@@ -2546,56 +2546,47 @@ function fpRequestLocation() {
     overlay.querySelector('.fp-loc-actions').style.display = 'none';
     overlay.querySelector('.fp-loc-body').textContent = 'Detecting your location...';
   }
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      localStorage.setItem('gopoint_loc_permitted', '1');
-      localStorage.removeItem('gopoint_loc_skipped');
-      const lat = pos.coords.latitude, lng = pos.coords.longitude;
-      customerLocation = { lat, lng, area: 'Detecting...' };
-      localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-      (async () => {
-        try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
-          const data = await res.json();
-          const a = data.address || {};
-          const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
-          const landmark = a.amenity || a.shop || a.tourism || '';
-          customerLocation.area = landmark ? `${landmark}, ${area}` : area;
-          customerLocation.fullAddress = data.display_name || '';
-          localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-        } catch(e) {}
-        if (overlay) {
-          overlay.querySelector('.fp-loc-body').textContent = 'While using the app';
-          overlay.querySelector('.fp-loc-actions').style.display = '';
-          if (detectedEl && customerLocation.area && customerLocation.area !== 'Detecting...') {
-            detectedEl.style.display = 'flex';
-            detectedAddr.textContent = customerLocation.area;
+  setTimeout(() => {
+    if (overlay) overlay.classList.remove('active');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        localStorage.setItem('gopoint_loc_permitted', '1');
+        localStorage.removeItem('gopoint_loc_skipped');
+        const lat = pos.coords.latitude, lng = pos.coords.longitude;
+        customerLocation = { lat, lng, area: 'Detecting...' };
+        localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+        (async () => {
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
+            const data = await res.json();
+            const a = data.address || {};
+            const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
+            const landmark = a.amenity || a.shop || a.tourism || '';
+            customerLocation.area = landmark ? `${landmark}, ${area}` : area;
+            customerLocation.fullAddress = data.display_name || '';
+            localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+            showAppToast('📍 Location: ' + customerLocation.area);
+          } catch(e) {
+            showAppToast('📍 GPS captured');
+            localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
           }
-        }
-        setTimeout(() => {
-          if (overlay) overlay.classList.remove('active');
-          if (detectedEl) detectedEl.style.display = 'none';
           if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
-        }, 1500);
-      })();
-    },
-    (err) => {
-      localStorage.setItem('gopoint_loc_permitted', '0');
-      if (overlay) {
-        overlay.querySelector('.fp-loc-body').textContent = 'While using the app';
-        overlay.querySelector('.fp-loc-actions').style.display = '';
-      }
-      if (err.code === err.PERMISSION_DENIED) {
-        showAppToast('⚠️ Location permission denied. Please allow location to use Go!Point.');
-      } else if (err.code === err.POSITION_UNAVAILABLE) {
-        fpCheckGpsEnabled();
-      } else {
-        showAppToast('⚠️ Location request timed out. Please try again.');
-      }
-      if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
-    },
-    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-  );
+        })();
+      },
+      (err) => {
+        localStorage.setItem('gopoint_loc_permitted', '0');
+        if (err.code === err.PERMISSION_DENIED) {
+          showAppToast('⚠️ Location permission denied. Please allow location to use Go!Point.');
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          fpCheckGpsEnabled();
+        } else {
+          showAppToast('⚠️ Location request timed out. Please try again.');
+        }
+        if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  }, 300);
 }
 
 function fpSkipLocation() {
