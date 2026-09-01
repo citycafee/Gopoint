@@ -1995,7 +1995,7 @@ Gmail
 <input type="text" placeholder="Search restaurants..." id="appHomeSearchInput">
 <div style="cursor:pointer; color:var(--primary); font-weight:500; font-size:0.85rem; display:flex; align-items:center; gap:6px; white-space:nowrap;" onclick="detectAppLocation()"><i class="fa fa-location-dot"></i><span>Locate</span></div>
 </div>
-<div id="appDetectedLocation" style="display:none; padding:4px 12px 2px; font-size:0.78rem; color:#5f6368; display:flex; align-items:center; gap:5px;"><i class="fas fa-location-dot" style="color:var(--primary); font-size:0.7rem;"></i><span id="appDetectedLocationText"></span></div>
+<div id="appDetectedLocation" style="display:none; padding:4px 12px 2px; font-size:0.78rem; color:#5f6368; align-items:center; gap:5px;"><i class="fas fa-location-dot" style="color:var(--primary); font-size:0.7rem;"></i><span id="appDetectedLocationText"></span></div>
 </div>
 <div class="app-nav-right">
 <ul>
@@ -3883,6 +3883,10 @@ function updateSearchPlaceholder() {
   if (customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...') {
     if (input) input.placeholder = '📍 ' + customerLocation.area + ' — Search restaurants...';
     if (locTag && locText) { locText.textContent = customerLocation.area; locTag.style.display = 'flex'; }
+    if (typeof appMap !== 'undefined' && appMap && customerLocation.lat && customerLocation.lng) {
+      appUpdateCustomerMarker();
+      appMap.setView([customerLocation.lat, customerLocation.lng], 14);
+    }
   }
 }
 
