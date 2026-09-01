@@ -2555,18 +2555,17 @@ toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
 
 // ─── LOCATION PERMISSION NOTIFICATION ───
 function fpShowLocationOverlay() {
+  const originEl = document.getElementById('fpLocOrigin');
+  if (originEl) originEl.textContent = 'Go!point wants to';
+  if (localStorage.getItem('gopoint_loc_permitted') === '1') {
+    if (!customerLocation) detectFrontLocation();
+    if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
+    return;
+  }
   const overlay = document.getElementById('fpLocationOverlay');
   if (!overlay) return;
-
   const detectedEl = document.getElementById('fpLocDetected');
   const detectedAddr = document.getElementById('fpLocDetectedAddress');
-  const actionsEl = overlay.querySelector('.fp-loc-actions');
-  const bodyEl = overlay.querySelector('.fp-loc-body');
-
-  if (detectedEl) detectedEl.style.display = 'none';
-  if (actionsEl) actionsEl.style.display = 'flex';
-  if (bodyEl) bodyEl.textContent = 'While using the app';
-
   const saved = localStorage.getItem('gopoint_customer_location');
   if (saved && detectedEl && detectedAddr) {
     try {
@@ -2577,14 +2576,15 @@ function fpShowLocationOverlay() {
       }
     } catch(e) {}
   }
-
+  // Show immediately when user-initiated (after Get Started or Guest), otherwise wait
   const delay = (window._fpLoginFlowPending || window._guestFlow) ? 0 : 800;
   setTimeout(() => overlay.classList.add('active'), delay);
 }
 
 function fpRequestLocation() {
   const overlay = document.getElementById('fpLocationOverlay');
-
+  const detectedEl = document.getElementById('fpLocDetected');
+  const detectedAddr = document.getElementById('fpLocDetectedAddress');
   if (!navigator.geolocation) {
     showAppToast('⚠️ Geolocation is not supported by your browser');
     fpCheckGpsEnabled();
@@ -2592,84 +2592,60 @@ function fpRequestLocation() {
     if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
     return;
   }
-
   localStorage.setItem('gopoint_loc_permitted', '1');
-
   if (overlay) {
-    const actionsEl = overlay.querySelector('.fp-loc-actions');
-    const bodyEl = overlay.querySelector('.fp-loc-body');
-    if (actionsEl) actionsEl.style.display = 'none';
-    if (bodyEl) bodyEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px; color:var(--theme);"></i> Detecting your exact location...';
+    overlay.querySelector('.fp-loc-actions').style.display = 'none';
+    overlay.querySelector('.fp-loc-body').textContent = 'Detecting your location...';
   }
-
-  navigator.geolocation.getCurrentPosition(
-    async (pos) => {
-      localStorage.removeItem('gopoint_loc_skipped');
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-
-      customerLocation = { lat, lng, area: 'Detecting...' };
-      localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-
-      if (overlay) {
-        const detectedEl = document.getElementById('fpLocDetected');
-        const detectedAddr = document.getElementById('fpLocDetectedAddress');
-        if (detectedEl) detectedEl.style.display = 'flex';
-        if (detectedAddr) detectedAddr.textContent = 'GPS Acquired. Resolving address...';
-      }
-
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000);
-
-        if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
-          customerLocation.area = await resolveHargeisaLocation(lat, lng);
-        } else {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`, { signal: controller.signal });
-          clearTimeout(timeoutId);
-          const data = await res.json();
-          const a = data.address || {};
-          const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || 'Detected Location';
-          const landmark = a.amenity || a.shop || a.tourism || '';
-          customerLocation.area = landmark ? `${landmark}, ${area}` : area;
-          customerLocation.fullAddress = data.display_name || '';
-        }
-      } catch(e) {
-        if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
-          customerLocation.area = getHargeisaArea(lat, lng);
-        } else {
-          customerLocation.area = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-        }
-      }
-
-      localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-      updateSearchPlaceholder();
-
-      if (overlay) overlay.classList.remove('active');
-      showAppToast('📍 Location set: ' + customerLocation.area);
-
-      if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
-    },
-    (err) => {
-      if (overlay) overlay.classList.remove('active');
-
-      if (err.code === err.PERMISSION_DENIED) {
-        showAppToast('⚠️ Location permission denied. Using default location.');
-        customerLocation = { lat: 9.56, lng: 44.065, area: 'Hargeisa (Default)' };
+  setTimeout(() => {
+    if (overlay) overlay.classList.remove('active');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        localStorage.removeItem('gopoint_loc_skipped');
+        const lat = pos.coords.latitude, lng = pos.coords.longitude;
+        customerLocation = { lat, lng, area: 'Detecting...' };
         localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-      } else if (err.code === err.POSITION_UNAVAILABLE) {
-        fpCheckGpsEnabled();
-        return;
-      } else {
-        showAppToast('⚠️ Location request timed out. Using default location.');
-        customerLocation = { lat: 9.56, lng: 44.065, area: 'Hargeisa (Default)' };
-        localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-      }
-
-      if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
-    },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-  );
+        (async () => {
+          try {
+            if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
+              customerLocation.area = await resolveHargeisaLocation(lat, lng);
+            } else {
+              const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
+              const data = await res.json();
+              const a = data.address || {};
+              const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
+              const landmark = a.amenity || a.shop || a.tourism || '';
+              customerLocation.area = landmark ? `${landmark}, ${area}` : area;
+              customerLocation.fullAddress = data.display_name || '';
+            }
+            localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+            updateSearchPlaceholder();
+            showAppToast('📍 Location: ' + customerLocation.area);
+          } catch(e) {
+            if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
+              customerLocation.area = getHargeisaArea(lat, lng);
+            }
+            localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+            updateSearchPlaceholder();
+            showAppToast('📍 GPS captured');
+          }
+          if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
+        })();
+      },
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          showAppToast('⚠️ Location permission denied. Please allow location to use Go!Point.');
+          if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          fpCheckGpsEnabled();
+        } else {
+          showAppToast('⚠️ Location request timed out. Please try again.');
+          if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
+        }
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  }, 300);
 }
 
 function fpSkipLocation() {
@@ -3735,14 +3711,9 @@ function openFrontLogin() {
   window._fpLoginFlowPending = true;
   const saved = localStorage.getItem('gopoint_customer_location');
   let hasValidArea = false;
-
   if (saved) {
-    try {
-      const loc = JSON.parse(saved);
-      hasValidArea = loc.area && loc.area !== 'Detecting...' && loc.lat && loc.lng;
-    } catch(e) {}
+    try { const loc = JSON.parse(saved); hasValidArea = loc.area && loc.area !== 'Detecting...'; } catch(e) {}
   }
-
   if (localStorage.getItem('gopoint_loc_permitted') === '1' && hasValidArea) {
     fpChainNotifOrLogin();
   } else {
