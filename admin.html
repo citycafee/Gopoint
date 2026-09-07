@@ -1572,6 +1572,7 @@ function restToggleStatus(key) {
   r.active = r.active !== undefined ? !r.active : false;
   adSaveData(); restRenderRestaurants();
   restToast(r.name + ' is now ' + (r.active ? 'Active' : 'Inactive'));
+  if (supaConnected) supaSaveRestaurant(key, r);
 }
 
 function restAddRestaurant() {
