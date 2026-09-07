@@ -350,6 +350,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-profile-view .pf-modal-actions button { flex: 1; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .2s; }
 .app-profile-view .pf-modal-cancel { background: #f1f5f9; color: #555; }
 .app-profile-view .pf-modal-save { background: linear-gradient(135deg, #00A19B, #008F8A); color: #fff; box-shadow: 0 4px 16px rgba(0,161,155,0.3); }
+.app-profile-view .pf-modal-save:disabled { opacity: 0.7; cursor: not-allowed; }
 .app-orders-list, .app-addresses-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
 .app-order-card, .app-address-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); border: 1px solid #e5e7eb; }
 .app-order-card .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -4629,16 +4630,26 @@ const phone = document.getElementById('pfEditPhone').value.trim();
 const email = document.getElementById('pfEditEmail').value.trim();
 const address = document.getElementById('pfEditAddress').value.trim();
 if (!name) { showAppToast('⚠️ Name required'); return; }
+const saveBtn = document.querySelector('.pf-modal-save');
+saveBtn.textContent = 'Saving...';
+saveBtn.disabled = true;
 currentUser.name = name;
 currentUser.phone = phone || currentUser.phone;
 currentUser.email = email || currentUser.email;
 currentUser.address = address;
 localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
 if (supaConnected && currentUser.id) { await sb.from('profiles').upsert({ id: currentUser.id, full_name: name, phone: phone || '', email: email || '', address: address || '' }, { onConflict: 'id' }); }
+saveBtn.textContent = '✓ Saved';
+saveBtn.style.background = '#16a34a';
+setTimeout(() => {
 updateUserUI();
-showAppToast('✅ Profile updated');
-closeProfileEditModal();
 renderProfileView();
+closeProfileEditModal();
+saveBtn.textContent = 'Save Changes';
+saveBtn.style.background = '';
+saveBtn.disabled = false;
+showAppToast('✅ Profile updated');
+}, 800);
 }
 
 async function initApp() { loadFromLocalStorage(); await initSupabaseData(); appInitMap(); appStartBannerCarousel(); setupAppEventListeners(); appRenderRestaurantList(); supaSubscribeToOrders((payload) => { loadFromLocalStorage(); if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); } }); }
