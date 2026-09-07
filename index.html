@@ -1204,6 +1204,121 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .fp-wa-qr-btn-ghost:hover { color: #1a1a1a; }
 
+/* ─── SETTINGS PAGE ─── */
+#adSettingsSection .set-wrap{padding:0;margin:0}
+.set-tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:2px solid var(--border-light);flex-wrap:wrap}
+.set-tab{padding:10px 18px;font-weight:600;font-size:0.85rem;color:var(--text-sec);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:var(--transition)}
+.set-tab:hover{color:var(--text)}
+.set-tab.active{color:var(--theme);border-bottom-color:var(--theme)}
+.set-panel{display:none}.set-panel.active{display:block}
+.set-card{background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow-xs);border:1px solid var(--border-light);overflow:hidden}
+.set-card-header{padding:16px 20px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between}
+.set-card-header h3{font-family:'Poppins',sans-serif;font-weight:700;font-size:1rem}
+.set-card-body{padding:20px}
+.set-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.set-fg{margin-bottom:16px}
+.set-fg label{display:block;font-weight:600;font-size:0.82rem;margin-bottom:6px;color:var(--text)}
+.set-fg input,.set-fg select,.set-fg textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.88rem;outline:none;transition:var(--transition);background:var(--white);font-family:inherit}
+.set-fg input:focus,.set-fg select:focus{border-color:var(--theme);box-shadow:0 0 0 3px rgba(255,107,0,0.08)}
+.set-btn{padding:8px 16px;border-radius:var(--radius-sm);font-weight:700;font-size:0.82rem;border:none;transition:var(--transition);display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-family:inherit}
+.set-btn-primary{background:var(--theme);color:white}.set-btn-primary:hover{background:var(--theme-dark)}
+.set-btn-secondary{background:var(--bg);color:var(--text);border:1px solid var(--border)}.set-btn-secondary:hover{background:var(--border-light)}
+.set-btn-danger{background:var(--danger);color:white}.set-btn-danger:hover{opacity:0.9}
+.set-btn-sm{padding:5px 10px;font-size:0.72rem}
+.set-toggle{width:40px;height:22px;background:var(--border);border-radius:11px;position:relative;cursor:pointer;transition:var(--transition);flex-shrink:0}
+.set-toggle.on{background:var(--success)}
+.set-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:white;border-radius:50%;transition:var(--transition);box-shadow:var(--shadow-xs)}
+.set-toggle.on::after{left:20px}
+.set-pay-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-light)}
+.set-pay-row:last-child{border-bottom:none}
+.set-pay-row .pay-info{display:flex;align-items:center;gap:12px}
+.set-pay-row .pay-icon{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.set-pay-row .pay-name{font-weight:700;font-size:0.95rem}
+.set-pay-row .pay-desc{font-size:0.78rem;color:var(--text-sec)}
+.set-table-wrap{overflow-x:auto}
+.set-table{width:100%;border-collapse:collapse}
+.set-table th{text-align:left;padding:10px 16px;font-size:0.72rem;font-weight:700;color:var(--text-sec);text-transform:uppercase;letter-spacing:0.5px;background:var(--bg);border-bottom:1px solid var(--border)}
+.set-table td{padding:12px 16px;font-size:0.85rem;border-bottom:1px solid var(--border-light)}
+.set-table tr:hover td{background:var(--bg)}
+.set-status-btn{padding:4px 12px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:700;border:none;cursor:pointer;transition:var(--transition)}
+.set-status-btn.active{background:var(--success-bg);color:#065f46}
+.set-status-btn.inactive{background:var(--danger-bg);color:#991b1b}
+.set-status-btn:hover{opacity:0.85}
+.set-danger-zone{border:2px solid var(--danger);border-radius:var(--radius-md);padding:24px;background:var(--danger-bg)}
+.set-danger-zone h4{color:var(--danger);font-weight:800;margin-bottom:8px}
+.set-danger-zone p{font-size:0.85rem;color:var(--text-sec);margin-bottom:16px}
+@keyframes setFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.set-fade-in{animation:setFadeIn 0.4s ease both}
+@media(max-width:1024px){.set-grid-2{grid-template-columns:1fr}}
+@media(max-width:768px){.set-wrap{padding:20px 16px}.set-tabs{gap:2px}.set-tab{padding:8px 12px;font-size:0.8rem}}
+
+/* ─── RESTAURANTS PAGE UPGRADE ─── */
+.rest-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.rest-stat-card{background:var(--white);border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-xs);border:1px solid var(--border-light);transition:var(--transition)}
+.rest-stat-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.rest-stat-card .rest-stat-icon{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:10px}
+.rest-stat-card .rest-stat-icon.orange{background:var(--primary-soft);color:var(--primary)}
+.rest-stat-card .rest-stat-icon.green{background:var(--green-soft);color:var(--green)}
+.rest-stat-card .rest-stat-icon.blue{background:#E0E7FF;color:#3B82F6}
+.rest-stat-card .rest-stat-icon.yellow{background:#FEF3C7;color:#D97706}
+.rest-stat-card .rest-stat-value{font-family:'Poppins',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:2px}
+.rest-stat-card .rest-stat-label{font-size:.78rem;color:var(--gray);font-weight:500}
+.rest-filter-bar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.rest-search-box{display:flex;align-items:center;gap:8px;background:var(--white);padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);transition:var(--transition);flex:1;min-width:200px}
+.rest-search-box:focus-within{border-color:var(--primary)}
+.rest-search-box i{color:var(--gray);font-size:.85rem}
+.rest-search-box input{border:none;background:none;outline:none;font-size:.85rem;flex:1;color:var(--text)}
+.rest-filter-bar select{padding:9px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.85rem;font-weight:600;color:var(--text);background:var(--white);outline:none;cursor:pointer}
+.rest-filter-bar select:focus{border-color:var(--primary)}
+.rest-view-toggle{display:flex;gap:4px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:3px}
+.rest-view-toggle button{padding:6px 12px;border:none;border-radius:6px;font-size:.8rem;font-weight:600;color:var(--gray);background:transparent;transition:var(--transition);cursor:pointer}
+.rest-view-toggle button.active{background:var(--primary);color:white}
+.rest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rest-card{background:var(--white);border-radius:var(--radius-md);border:1px solid var(--border-light);overflow:hidden;transition:var(--transition)}
+.rest-card:hover{box-shadow:var(--shadow-md)}
+.rest-card .rest-card-img{height:130px;display:flex;align-items:center;justify-content:center;color:white;font-size:2.2rem}
+.rest-card .rest-card-body{padding:16px}
+.rest-card .rest-card-name{font-weight:700;font-size:1rem;margin-bottom:4px}
+.rest-card .rest-card-meta{font-size:.78rem;color:var(--gray);display:flex;gap:12px;margin-bottom:8px}
+.rest-card .rest-card-meta span{display:flex;align-items:center;gap:4px}
+.rest-card .rest-card-info{font-size:.75rem;color:var(--gray);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.rest-card .rest-card-actions{display:flex;gap:8px;align-items:center;margin-top:10px}
+.rest-card .rest-card-actions .rest-toggle{margin-left:auto}
+.rest-toggle{width:40px;height:22px;background:var(--border);border-radius:11px;position:relative;cursor:pointer;transition:var(--transition);flex-shrink:0;border:none}
+.rest-toggle.on{background:var(--green)}
+.rest-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:white;border-radius:50%;transition:var(--transition);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.rest-toggle.on::after{left:20px}
+.rest-table-wrap{overflow-x:auto}
+.rest-status-btn{padding:4px 12px;border-radius:9999px;font-size:.72rem;font-weight:700;border:none;cursor:pointer;transition:var(--transition)}
+.rest-status-btn.active{background:var(--green-soft);color:#065f46}
+.rest-status-btn.inactive{background:var(--red-soft);color:#991b1b}
+.rest-status-btn:hover{opacity:.85}
+.rest-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.rest-modal-overlay.show{opacity:1;pointer-events:auto}
+.rest-modal-box{background:var(--white);border-radius:var(--radius-lg);width:90%;max-width:520px;max-height:90vh;overflow-y:auto;transform:scale(.95);transition:transform .25s ease}
+.rest-modal-overlay.show .rest-modal-box{transform:scale(1)}
+.rest-modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.rest-modal-header h3{font-family:'Poppins',sans-serif;font-weight:800;font-size:1.1rem}
+.rest-modal-close{width:32px;height:32px;border-radius:9999px;background:var(--bg);border:none;display:flex;align-items:center;justify-content:center;color:var(--gray);transition:var(--transition);cursor:pointer}
+.rest-modal-close:hover{background:var(--red);color:white}
+.rest-modal-body{padding:24px}
+.rest-modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+.rest-form-group{margin-bottom:16px}
+.rest-form-group label{display:block;font-weight:600;font-size:.82rem;margin-bottom:6px;color:var(--text)}
+.rest-form-group input,.rest-form-group select,.rest-form-group textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.88rem;outline:none;transition:var(--transition);background:var(--white);font-family:inherit}
+.rest-form-group input:focus,.rest-form-group select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(255,107,0,.08)}
+.rest-tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid var(--border-light);flex-wrap:wrap}
+.rest-tab{padding:10px 18px;font-weight:600;font-size:.85rem;color:var(--gray);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:var(--transition);background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}
+.rest-tab:hover{color:var(--text)}
+.rest-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.rest-menu-img-upload{width:100px;height:100px;border-radius:12px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;position:relative;background:var(--bg);cursor:pointer}
+.rest-menu-img-upload img{display:none;width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0}
+.rest-toast-container{position:fixed;bottom:24px;right:24px;z-index:300}
+.rest-toast-item{background:#0f1419;color:white;padding:12px 20px;border-radius:12px;font-weight:600;font-size:.85rem;margin-top:8px;box-shadow:0 8px 24px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1024px){.rest-stats-grid{grid-template-columns:repeat(2,1fr)}.rest-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.rest-stats-grid,.rest-grid{grid-template-columns:1fr}.rest-filter-bar{flex-direction:column;align-items:stretch}.rest-search-box{min-width:auto}}
+
 </style>
 </head>
 <body>
@@ -1883,7 +1998,7 @@ Gmail
 <a onclick="adSwitchTab('restaurants')"><span>🍽️</span> Restaurants</a>
 <a onclick="adSwitchTab('restaurantReport')"><span>📈</span> Restaurant Report</a>
 <a onclick="adSwitchTab('fleetReport')"><span>🚚</span> Fleet Report</a>
-<a onclick="adOpenSettings()"><span>⚙️</span> Settings</a>
+<a onclick="adSwitchTab('settings')"><span>⚙️</span> Settings</a>
 <a onclick="adLogout()"><span>🚪</span> Logout</a>
 </nav>
 </aside>
@@ -1912,9 +2027,37 @@ Gmail
 <div class="ad-section-header"><h2><i class="fas fa-check-circle"></i> Completed Orders</h2></div>
 <div class="ad-section-body"><table class="ad-table"><thead><tr><th>Order ID</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody id="adCompletedBody"><tr><td colspan="5" class="ad-empty">No completed orders</td></tr></tbody></table></div>
 </div>
-<div class="ad-section" id="adRestaurantsSection" style="display:none;">
-<div class="ad-section-header"><h2><i class="fas fa-utensils"></i> All Restaurants</h2><span class="ad-badge" id="adRestaurantCount">0</span></div>
-<div class="ad-section-body" id="adRestaurantsList"><div class="ad-empty"><i class="fas fa-store"></i><p>No restaurants</p></div></div>
+<div id="adRestaurantsSection" style="display:none;">
+<!-- RESTAURANT STATS -->
+<div class="rest-stats-grid" id="restStatsGrid">
+<div class="rest-stat-card"><div class="rest-stat-icon orange"><i class="fas fa-store"></i></div><div class="rest-stat-value" id="restStatTotal">0</div><div class="rest-stat-label">Total Restaurants</div></div>
+<div class="rest-stat-card"><div class="rest-stat-icon green"><i class="fas fa-check-circle"></i></div><div class="rest-stat-value" id="restStatActive">0</div><div class="rest-stat-label">Active</div></div>
+<div class="rest-stat-card"><div class="rest-stat-icon blue"><i class="fas fa-receipt"></i></div><div class="rest-stat-value" id="restStatOrders">0</div><div class="rest-stat-label">Total Orders</div></div>
+<div class="rest-stat-card"><div class="rest-stat-icon yellow"><i class="fas fa-star"></i></div><div class="rest-stat-value" id="restStatAvgRating">0</div><div class="rest-stat-label">Avg. Rating</div></div>
+</div>
+<!-- FILTER BAR -->
+<div class="rest-filter-bar">
+<div class="rest-search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search by name, address..." id="restSearchInput" oninput="restRenderRestaurants()"></div>
+<select id="restFilterStatus" onchange="restRenderRestaurants()">
+<option value="all">All Status</option>
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+<select id="restFilterCuisine" onchange="restRenderRestaurants()"><option value="all">All Cuisines</option></select>
+<div class="rest-view-toggle">
+<button class="active" id="restViewGrid" onclick="restSetView('grid')"><i class="fas fa-th"></i></button>
+<button id="restViewList" onclick="restSetView('list')"><i class="fas fa-list"></i></button>
+</div>
+</div>
+<!-- GRID VIEW -->
+<div class="rest-grid" id="restRestaurantsGrid"></div>
+<!-- LIST VIEW -->
+<div class="rest-table-wrap" id="restRestaurantsListWrap" style="display:none">
+<table class="ad-table" style="width:100%">
+<thead><tr><th>Restaurant</th><th>Cuisine</th><th>Address</th><th>Phone</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody id="restRestaurantsListBody"></tbody>
+</table>
+</div>
 </div>
 <div class="ad-section" id="adRestReportSection" style="display:none;">
 <div class="ad-section-header"><h2><i class="fas fa-file-invoice-dollar"></i> Daily Restaurant Report</h2><span class="ad-badge" id="adReportDate">Today</span></div>
@@ -1924,68 +2067,195 @@ Gmail
 <div class="ad-section-header"><h2><i class="fas fa-truck"></i> Daily Fleet Report</h2><span class="ad-badge" id="adFleetReportDate">Today</span></div>
 <div class="ad-section-body"><div class="ad-report-summary" id="adFleetReportSummary"></div><div id="adFleetReportTable"></div></div>
 </div>
+<div id="adSettingsSection" style="display:none">
+<div class="set-wrap">
+<div class="set-tabs set-fade-in" id="setTabsBar">
+<div class="set-tab active" onclick="setTab('general',this)"><i class="fas fa-cog"></i> General</div>
+<div class="set-tab" onclick="setTab('restaurants',this)"><i class="fas fa-store"></i> Restaurants</div>
+<div class="set-tab" onclick="setTab('vehicles',this)"><i class="fas fa-motorcycle"></i> Vehicles</div>
+<div class="set-tab" onclick="setTab('payment',this)"><i class="fas fa-credit-card"></i> Payment</div>
+<div class="set-tab" onclick="setTab('notifications',this)"><i class="fas fa-bell"></i> Notifications</div>
+<div class="set-tab" onclick="setTab('danger',this)"><i class="fas fa-exclamation-triangle"></i> Danger Zone</div>
+</div>
+<div class="set-panel active" id="setPanel-general">
+<div class="set-grid-2 set-fade-in">
+<div class="set-card">
+<div class="set-card-header"><h3><i class="fas fa-truck" style="color:var(--theme);margin-right:8px"></i> Delivery Settings</h3></div>
+<div class="set-card-body">
+<div class="set-fg"><label>Restaurant Commission Rate (%)</label><input type="number" id="setCommissionRate" value="15"></div>
+<div class="set-fg"><label>Default Delivery Fee (sh.)</label><input type="number" id="setDeliveryFee" value="2000"></div>
+<div class="set-fg"><label>Free Delivery Threshold (sh.)</label><input type="number" id="setFreeDeliveryThreshold" value="50000"></div>
+<div class="set-fg"><label>Minimum Order (sh.)</label><input type="number" id="setMinimumOrder" value="10000"></div>
+<div class="set-fg"><label>Max Delivery Radius (km)</label><input type="number" id="setMaxRadius" value="10"></div>
+<button class="set-btn set-btn-primary" onclick="setSaveDelivery()"><i class="fas fa-save"></i> Save Changes</button>
+</div>
+</div>
+<div class="set-card">
+<div class="set-card-header"><h3><i class="fas fa-info-circle" style="color:var(--info);margin-right:8px"></i> Platform Info</h3></div>
+<div class="set-card-body">
+<div class="set-fg"><label>Platform Name</label><input type="text" id="setPlatformName" value="Go!Point"></div>
+<div class="set-fg"><label>Contact Phone</label><input type="text" id="setContactPhone" value="+252 61 XXX XXXX"></div>
+<div class="set-fg"><label>Support Email</label><input type="email" id="setSupportEmail" value="info@gopoint.com"></div>
+<div class="set-fg"><label>Address</label><input type="text" id="setPlatformAddress" value="Hargeisa, Somaliland"></div>
+<div class="set-fg"><label>Working Hours</label><input type="text" id="setWorkingHours" value="10:00 AM - 11:00 PM"></div>
+<button class="set-btn set-btn-primary" onclick="setSavePlatform()"><i class="fas fa-save"></i> Save Changes</button>
+</div>
+</div>
+</div>
+</div>
+<div class="set-panel" id="setPanel-restaurants">
+<div class="set-card set-fade-in">
+<div class="set-card-header"><h3><i class="fas fa-store" style="color:var(--theme);margin-right:8px"></i> Manage Restaurants</h3></div>
+<div class="set-card-body" style="padding:0">
+<div class="set-table-wrap">
+<table class="set-table">
+<thead><tr><th>Restaurant</th><th>Cuisine</th><th>Rating</th><th>Orders</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody id="setRestaurantsBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="set-card set-fade-in" style="margin-top:20px">
+<div class="set-card-header"><h3><i class="fas fa-sliders-h" style="color:var(--info);margin-right:8px"></i> Restaurant Defaults</h3></div>
+<div class="set-card-body">
+<div class="set-grid-2">
+<div>
+<div class="set-fg"><label>Default Commission Rate (%)</label><input type="number" value="15"></div>
+<div class="set-fg"><label>Auto-approve New Restaurants</label><select><option>Yes</option><option>No</option></select></div>
+<div class="set-fg"><label>Max Menu Items per Restaurant</label><input type="number" value="100"></div>
+</div>
+<div>
+<div class="set-fg"><label>Required Documents</label>
+<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+<label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;cursor:pointer"><input type="checkbox" checked> Business License</label>
+<label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;cursor:pointer"><input type="checkbox" checked> Food Permit</label>
+<label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;cursor:pointer"><input type="checkbox"> Health Certificate</label>
+</div>
+</div>
+</div>
+</div>
+<button class="set-btn set-btn-primary" onclick="adToast('Restaurant defaults saved!')"><i class="fas fa-save"></i> Save Defaults</button>
+</div>
+</div>
+</div>
+<div class="set-panel" id="setPanel-vehicles">
+<div class="set-card set-fade-in">
+<div class="set-card-header"><h3><i class="fas fa-motorcycle" style="color:var(--theme);margin-right:8px"></i> Manage Vehicles</h3></div>
+<div class="set-card-body" style="padding:0">
+<div class="set-table-wrap">
+<table class="set-table">
+<thead><tr><th>Vehicle</th><th>Plate</th><th>Driver</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody id="setVehiclesBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="set-card set-fade-in" style="margin-top:20px">
+<div class="set-card-header"><h3><i class="fas fa-sliders-h" style="color:var(--info);margin-right:8px"></i> Vehicle Types</h3></div>
+<div class="set-card-body">
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+<div style="display:flex;align-items:center;gap:8px;background:var(--bg);padding:8px 14px;border-radius:var(--radius-sm);font-weight:600;font-size:0.85rem"><i class="fas fa-motorcycle"></i> Bike <div class="set-toggle on" onclick="this.classList.toggle('on')" style="margin-left:8px"></div></div>
+<div style="display:flex;align-items:center;gap:8px;background:var(--bg);padding:8px 14px;border-radius:var(--radius-sm);font-weight:600;font-size:0.85rem"><i class="fas fa-car"></i> Taxi <div class="set-toggle on" onclick="this.classList.toggle('on')" style="margin-left:8px"></div></div>
+<div style="display:flex;align-items:center;gap:8px;background:var(--bg);padding:8px 14px;border-radius:var(--radius-sm);font-weight:600;font-size:0.85rem"><i class="fas fa-bicycle"></i> Scooter <div class="set-toggle" onclick="this.classList.toggle('on')" style="margin-left:8px"></div></div>
+</div>
+<div class="set-fg"><label>Max Delivery Distance per Vehicle (km)</label><input type="number" value="15"></div>
+<button class="set-btn set-btn-primary" onclick="adToast('Vehicle settings saved!')"><i class="fas fa-save"></i> Save Changes</button>
+</div>
+</div>
+</div>
+<div class="set-panel" id="setPanel-payment">
+<div class="set-card set-fade-in">
+<div class="set-card-header"><h3><i class="fas fa-credit-card" style="color:var(--theme);margin-right:8px"></i> Payment Methods</h3></div>
+<div class="set-card-body">
+<div class="set-pay-row">
+<div class="pay-info"><div class="pay-icon" style="background:var(--success-bg);color:var(--success)"><i class="fas fa-money-bill-wave"></i></div><div><div class="pay-name">Cash on Delivery</div><div class="pay-desc">Pay with cash when order arrives</div></div></div>
+<div class="set-toggle on" onclick="this.classList.toggle('on')"></div>
+</div>
+<div class="set-pay-row">
+<div class="pay-info"><div class="pay-icon" style="background:var(--info-bg);color:var(--info)"><i class="fas fa-wallet"></i></div><div><div class="pay-name">Zaad Mobile Money</div><div class="pay-desc">Number: 464443</div></div></div>
+<div class="set-toggle on" onclick="this.classList.toggle('on')"></div>
+</div>
+<div class="set-pay-row">
+<div class="pay-info"><div class="pay-icon" style="background:var(--warning-bg);color:var(--warning)"><i class="fas fa-money-bill"></i></div><div><div class="pay-name">Edahab Mobile Money</div><div class="pay-desc">Number: 734058</div></div></div>
+<div class="set-toggle on" onclick="this.classList.toggle('on')"></div>
+</div>
+<div class="set-pay-row">
+<div class="pay-info"><div class="pay-icon" style="background:var(--primary-soft);color:var(--primary)"><i class="fas fa-university"></i></div><div><div class="pay-name">Bank Transfer</div><div class="pay-desc">Direct bank transfer payments</div></div></div>
+<div class="set-toggle" onclick="this.classList.toggle('on')"></div>
+</div>
+</div>
+</div>
+<div class="set-card set-fade-in" style="margin-top:20px">
+<div class="set-card-header"><h3><i class="fas fa-file-invoice-dollar" style="color:var(--success);margin-right:8px"></i> Payout Settings</h3></div>
+<div class="set-card-body">
+<div class="set-grid-2">
+<div>
+<div class="set-fg"><label>Driver Payout Frequency</label><select><option>Daily</option><option>Weekly</option><option>Bi-weekly</option><option>Monthly</option></select></div>
+<div class="set-fg"><label>Minimum Payout Amount (sh.)</label><input type="number" value="50000"></div>
+</div>
+<div>
+<div class="set-fg"><label>Restaurant Payout Frequency</label><select><option>Weekly</option><option>Bi-weekly</option><option>Monthly</option></select></div>
+<div class="set-fg"><label>Auto-payout Enabled</label><select><option>Yes</option><option>No</option></select></div>
+</div>
+</div>
+<button class="set-btn set-btn-primary" onclick="adToast('Payout settings saved!')"><i class="fas fa-save"></i> Save Payout Settings</button>
+</div>
+</div>
+</div>
+<div class="set-panel" id="setPanel-notifications">
+<div class="set-card set-fade-in">
+<div class="set-card-header"><h3><i class="fas fa-bell" style="color:var(--theme);margin-right:8px"></i> Notification Preferences</h3></div>
+<div class="set-card-body">
+<div style="margin-bottom:20px">
+<h4 style="font-weight:700;font-size:0.95rem;margin-bottom:12px">Order Notifications</h4>
+<div class="set-pay-row"><div class="pay-info"><div class="pay-name">New Order Alert</div><div class="pay-desc">Get notified when a new order is placed</div></div><div class="set-toggle on" onclick="this.classList.toggle('on')"></div></div>
+<div class="set-pay-row"><div class="pay-info"><div class="pay-name">Order Cancelled</div><div class="pay-desc">Get notified when an order is cancelled</div></div><div class="set-toggle on" onclick="this.classList.toggle('on')"></div></div>
+<div class="set-pay-row"><div class="pay-info"><div class="pay-name">Order Completed</div><div class="pay-desc">Get notified when an order is delivered</div></div><div class="set-toggle" onclick="this.classList.toggle('on')"></div></div>
+</div>
+<div style="margin-bottom:20px">
+<h4 style="font-weight:700;font-size:0.95rem;margin-bottom:12px">Driver Notifications</h4>
+<div class="set-pay-row"><div class="pay-info"><div class="pay-name">Driver Online</div><div class="pay-desc">Alert when a driver comes online</div></div><div class="set-toggle" onclick="this.classList.toggle('on')"></div></div>
+<div class="set-pay-row"><div class="pay-info"><div class="pay-name">Driver Offline</div><div class="pay-desc">Alert when a driver goes offline</div></div><div class="set-toggle" onclick="this.classList.toggle('on')"></div></div>
+<div class="set-pay-row"><div class="pay-info"><div class="pay-name">New Driver Registration</div><div class="pay-desc">Alert when a new driver registers</div></div><div class="set-toggle on" onclick="this.classList.toggle('on')"></div></div>
+</div>
+<div>
+<h4 style="font-weight:700;font-size:0.95rem;margin-bottom:12px">System Notifications</h4>
+<div class="set-pay-row"><div class="pay-info"><div class="pay-name">Restaurant Registration</div><div class="pay-desc">Alert when a new restaurant registers</div></div><div class="set-toggle on" onclick="this.classList.toggle('on')"></div></div>
+<div class="set-pay-row"><div class="pay-info"><div class="pay-name">Low Driver Availability</div><div class="pay-desc">Alert when fewer than 3 drivers are online</div></div><div class="set-toggle on" onclick="this.classList.toggle('on')"></div></div>
+<div class="set-pay-row"><div class="pay-info"><div class="pay-name">Daily Summary Report</div><div class="pay-desc">Receive daily performance summary via email</div></div><div class="set-toggle" onclick="this.classList.toggle('on')"></div></div>
+</div>
+<button class="set-btn set-btn-primary" style="margin-top:20px" onclick="adToast('Notification preferences saved!')"><i class="fas fa-save"></i> Save Preferences</button>
+</div>
+</div>
+</div>
+<div class="set-panel" id="setPanel-danger">
+<div class="set-danger-zone set-fade-in">
+<h4><i class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
+<p>These actions are destructive and cannot be undone.</p>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;justify-content:space-between;background:white;padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border-light)">
+<div><strong>Reset All Orders</strong><br><span style="font-size:0.82rem;color:var(--text-sec)">Delete all order history</span></div>
+<button class="set-btn set-btn-danger" onclick="if(confirm('Delete all orders?')){adOrders=[];adSaveData();adRenderAll();adToast('Orders reset')}"><i class="fas fa-trash"></i> Reset</button>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:white;padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border-light)">
+<div><strong>Reset Driver Data</strong><br><span style="font-size:0.82rem;color:var(--text-sec)">Remove all drivers</span></div>
+<button class="set-btn set-btn-danger" onclick="if(confirm('Remove all drivers?')){adVehicles=[];adSaveData();adRenderAll();adToast('Drivers reset')}"><i class="fas fa-trash"></i> Reset</button>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:white;padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border-light)">
+<div><strong>Reset Settings</strong><br><span style="font-size:0.82rem;color:var(--text-sec)">Restore factory defaults</span></div>
+<button class="set-btn set-btn-danger" onclick="if(confirm('Reset all settings?')){localStorage.clear();adToast('Settings reset')}"><i class="fas fa-undo"></i> Reset</button>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:white;padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border-light)">
+<div><strong>Delete All Data</strong><br><span style="font-size:0.82rem;color:var(--text-sec)">Permanently delete all platform data</span></div>
+<button class="set-btn set-btn-danger" onclick="if(confirm('WARNING: This will delete ALL data. Continue?')){localStorage.clear();adOrders=[];adVehicles=[];adRestaurants={};adSaveData();adRenderAll();adToast('Data deletion initiated')}"><i class="fas fa-exclamation-triangle"></i> Delete All</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </main>
-</div>
-
-<!-- ADMIN SETTINGS MODAL -->
-<div class="ad-modal" id="adSettingsModal">
-<div class="ad-modal-box">
-<div class="ad-modal-header"><h2><i class="fas fa-cog" style="margin-right:8px;color:var(--primary)"></i>Settings</h2><button onclick="adCloseSettings()"><i class="fas fa-times"></i></button></div>
-<div class="ad-modal-body">
-<div class="ad-tabs">
-<button class="ad-tab-btn active" onclick="adSettingsTab('restaurants')">Restaurants</button>
-<button class="ad-tab-btn" onclick="adSettingsTab('fleet')">Fleet</button>
-<button class="ad-tab-btn" onclick="adSettingsTab('delivery')">Delivery</button>
-<button class="ad-tab-btn" onclick="adSettingsTab('system')">System</button>
-</div>
-<div class="ad-tab-content active" id="adSetRestTab">
-<h3 style="font-size:1rem;font-weight:700;margin-bottom:14px;">Restaurant Management</h3>
-<button onclick="adShowRestForm()" class="ad-btn ad-btn-green" style="margin-bottom:16px;"><i class="fas fa-plus"></i> Add Restaurant</button>
-<div id="adSettingsRestList"><p style="color:var(--gray);font-size:.88rem;">No restaurants added yet.</p></div>
-</div>
-<div class="ad-tab-content" id="adSetFleetTab">
-<h3 style="font-size:1rem;font-weight:700;margin-bottom:14px;">Fleet Management</h3>
-<button onclick="adShowFleetForm()" class="ad-btn ad-btn-green" style="margin-bottom:16px;"><i class="fas fa-plus"></i> Register Fleet</button>
-<div id="adSettingsFleetList"><p style="color:var(--gray);font-size:.88rem;">No fleet registered yet.</p></div>
-</div>
-<div class="ad-tab-content" id="adSetDeliveryTab">
-<div class="ad-delivery-section"><h4>Delivery Services</h4>
-<div class="ad-delivery-option"><label>Matorbike Delivery</label><label class="ad-toggle"><input type="checkbox" id="adSetMotorcycle" checked><span class="slider"></span></label></div>
-<div class="ad-delivery-option"><label>Taxi Delivery</label><label class="ad-toggle"><input type="checkbox" id="adSetTaxi" checked><span class="slider"></span></label></div>
-</div>
-<div class="ad-delivery-section"><h4>Delivery Zones</h4>
-<div class="ad-form-group"><label>Max Distance (km)</label><input type="number" class="ad-form-control" id="adSetMaxDist" value="10" min="1"></div>
-<div class="ad-form-group"><label>Base Delivery Fee ($)</label><input type="number" class="ad-form-control" id="adSetBaseFee" value="2.50" min="0" step="0.01"></div>
-<div class="ad-form-group"><label>Per km Fee ($)</label><input type="number" class="ad-form-control" id="adSetPerKm" value="0.50" min="0" step="0.01"></div>
-</div>
-<div class="ad-delivery-section"><h4>Delivery Hours</h4>
-<div class="ad-form-row">
-<div class="ad-form-group"><label>Start Time</label><input type="time" class="ad-form-control" id="adSetStart" value="08:00"></div>
-<div class="ad-form-group"><label>End Time</label><input type="time" class="ad-form-control" id="adSetEnd" value="22:00"></div>
-</div>
-</div>
-<div style="text-align:right;margin-top:14px;"><button onclick="adSaveDelivery()" class="ad-btn ad-btn-orange" style="padding:10px 24px;">Save Delivery Settings</button></div>
-</div>
-<div class="ad-tab-content" id="adSetSystemTab">
-<div class="ad-delivery-section"><h4>General Settings</h4>
-<div class="ad-form-group"><label>Business Name</label><input type="text" class="ad-form-control" id="adSetBizName" value="Go!Point"></div>
-<div class="ad-form-group"><label>Address</label><input type="text" class="ad-form-control" id="adSetBizAddr" value="Hargeisa, Somaliland"></div>
-<div class="ad-form-group"><label>Phone</label><input type="tel" class="ad-form-control" id="adSetBizPhone" value="+252 61 XXX XXXX"></div>
-<div class="ad-form-group"><label>Email</label><input type="email" class="ad-form-control" id="adSetBizEmail" value="info@gopoint.com"></div>
-</div>
-<div class="ad-delivery-section"><h4>Order Settings</h4>
-<div class="ad-form-group"><label>Min Order for Delivery ($)</label><input type="number" class="ad-form-control" id="adSetMinOrder" value="10" min="0" step="0.01"></div>
-<div class="ad-form-group"><label>Default Order Type</label><select class="ad-form-control" id="adSetDefaultOrder"><option value="dine-in">Dine In</option><option value="takeaway">Take Away</option><option value="delivery" selected>Delivery</option></select></div>
-</div>
-<div class="ad-delivery-section"><h4>Currency Settings</h4>
-<div class="ad-form-group"><label>1 USD = ? SLSH</label><input type="number" class="ad-form-control" id="adSetCurrencyRate" value="11000" min="0"></div>
-<div class="ad-form-group"><label>Show Currency</label><select class="ad-form-control" id="adSetShowCurrency"><option value="both" selected>Both ($ & SLSH)</option><option value="usd">USD Only ($)</option><option value="slsh">SLSH Only</option></select></div>
-</div>
-<div style="text-align:right;margin-top:14px;"><button onclick="adSaveSystem()" class="ad-btn ad-btn-orange" style="padding:10px 24px;">Save System Settings</button></div>
-</div>
-</div>
-</div>
 </div>
 
 <!-- RESTAURANT FORM MODAL -->
@@ -2055,6 +2325,76 @@ Gmail
 </div>
 </div>
 </div>
+
+<!-- RESTAURANT ADD/EDIT MODAL -->
+<div class="rest-modal-overlay" id="restModal-addRestaurant">
+<div class="rest-modal-box">
+<div class="rest-modal-header"><h3 id="restModalTitle">Add Restaurant</h3><button class="rest-modal-close" onclick="restCloseModal('addRestaurant')"><i class="fas fa-times"></i></button></div>
+<div class="rest-modal-body">
+<div class="rest-form-group"><label>Restaurant Name</label><input type="text" id="restAddName" placeholder="e.g., New Restaurant"></div>
+<div class="rest-form-group"><label>Address</label><input type="text" id="restAddAddress" placeholder="e.g., Downtown, Hargeisa"></div>
+<div class="rest-form-group"><label>Phone</label><input type="text" id="restAddPhone" placeholder="e.g., +252 63 123456"></div>
+<div class="rest-form-group"><label>Email</label><input type="email" id="restAddEmail" placeholder="e.g., info@restaurant.com"></div>
+<div class="rest-form-group"><label>Latitude</label><input type="number" id="restAddLat" step="any" placeholder="e.g., 9.5600"></div>
+<div class="rest-form-group"><label>Longitude</label><input type="number" id="restAddLng" step="any" placeholder="e.g., 44.0650"></div>
+<div class="rest-form-group"><label>Cuisine Type</label><select id="restAddCuisine"><option>Fast Food</option><option>Grilled Chicken</option><option>Shawarma</option><option>Pizza</option><option>Coffee & Food</option><option>Grilled</option><option>Juice & Drinks</option><option>Mediterranean</option><option>Italian</option><option>Cafe</option><option>Various</option></select></div>
+<div class="rest-form-group"><label>Rating</label><input type="number" id="restAddRating" step="0.1" min="0" max="5" value="4.5"></div>
+<div class="rest-form-group"><label>Icon</label><select id="restAddIcon"><option value="fa-utensils">Restaurant</option><option value="fa-mug-hot">Coffee</option><option value="fa-fire">Grilled</option><option value="fa-pizza-slice">Pizza</option><option value="fa-glass-water">Juice</option></select></div>
+</div>
+<div class="rest-modal-footer"><button class="btn btn-secondary" onclick="restCloseModal('addRestaurant')">Cancel</button><button class="btn btn-primary" onclick="restAddRestaurant()"><i class="fas fa-plus"></i> Add</button></div>
+</div>
+</div>
+
+<!-- MENU MANAGER MODAL -->
+<div class="rest-modal-overlay" id="restModal-menuManager" style="z-index:200">
+<div class="rest-modal-box" style="max-width:700px;max-height:85vh;display:flex;flex-direction:column">
+<div class="rest-modal-header">
+<h3 id="restMenuManagerTitle">Menu Items</h3>
+<button class="rest-modal-close" onclick="restCloseModal('menuManager')"><i class="fas fa-times"></i></button>
+</div>
+<div class="rest-modal-body" style="overflow-y:auto;flex:1">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<div class="rest-tabs" id="restMenuCategoryTabs" style="margin-bottom:0"></div>
+<button class="btn btn-primary" style="padding:5px 10px;font-size:.72rem" onclick="restOpenAddMenuItem()"><i class="fas fa-plus"></i> Add Item</button>
+</div>
+<div class="rest-table-wrap">
+<table class="ad-table" style="width:100%">
+<thead><tr><th>Image</th><th>Item</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody id="restMenuItemsBody"></tbody>
+</table>
+</div>
+</div>
+<div class="rest-modal-footer" style="border-top:1px solid var(--border)">
+<button class="btn btn-secondary" onclick="restCloseModal('menuManager')">Close</button>
+</div>
+</div>
+</div>
+
+<!-- ADD/EDIT MENU ITEM MODAL -->
+<div class="rest-modal-overlay" id="restModal-addMenuItem">
+<div class="rest-modal-box" style="max-width:450px">
+<div class="rest-modal-header"><h3 id="restMenuItemModalTitle">Add Menu Item</h3><button class="rest-modal-close" onclick="restCloseModal('addMenuItem')"><i class="fas fa-times"></i></button></div>
+<div class="rest-modal-body">
+<div style="display:flex;gap:16px;align-items:flex-start">
+<div class="rest-menu-img-upload" onclick="document.getElementById('restMenuItemImgInput').click()">
+<i class="fas fa-camera" style="font-size:1.5rem;color:var(--gray)" id="restMenuImgPlaceholder"></i>
+<img id="restMenuImgPreview" style="display:none">
+<input type="file" id="restMenuItemImgInput" accept="image/*" style="display:none" onchange="restPreviewMenuItemImage(event)">
+</div>
+<div style="flex:1">
+<div class="rest-form-group"><label>Item Name</label><input type="text" id="restMenuItemName"></div>
+<div class="rest-form-group"><label>Price ($)</label><input type="number" id="restMenuItemPrice" step="0.01"></div>
+<div class="rest-form-group"><label>Category</label><select id="restMenuItemCategory"></select></div>
+<div class="rest-form-group"><label>Description</label><input type="text" id="restMenuItemDesc" placeholder="Optional description"></div>
+</div>
+</div>
+</div>
+<div class="rest-modal-footer"><button class="btn btn-secondary" onclick="restCloseModal('addMenuItem')">Cancel</button><button class="btn btn-primary" onclick="restSaveMenuItem()"><i class="fas fa-save"></i> Save</button></div>
+</div>
+</div>
+
+<!-- RESTAURANT TOAST -->
+<div class="rest-toast-container" id="restToastContainer"></div>
 
 <!-- ADMIN TOAST -->
 <div class="ad-toast" id="adToast"></div>
@@ -5290,14 +5630,10 @@ function adRenderCompleted() {
 }
 
 function adRenderRestaurants() {
-  const el = document.getElementById('adRestaurantsList'); if (!el) return;
-  const keys = Object.keys(adRestaurants);
-  if (!keys.length) { el.innerHTML = '<div class="ad-empty"><i class="fas fa-store"></i><p>No restaurants registered</p></div>'; return; }
-  let html = '<table class="ad-table"><thead><tr><th>Name</th><th>Address</th><th>Phone</th><th>Cuisine</th><th>Rating</th><th>Status</th></tr></thead><tbody>';
-  keys.forEach(k => { const r = adRestaurants[k]; const active = r.active !== undefined ? r.active : true;
-    html += '<tr><td><strong>' + r.name + '</strong></td><td>' + (r.address || '-') + '</td><td>' + (r.phone || '-') + '</td><td>' + (r.cuisine || 'Various') + '</td><td>⭐ ' + (r.rating || '4.5') + '</td><td><span class="ad-active-badge ' + (active ? 'active' : 'inactive') + '">' + (active ? 'Active' : 'Inactive') + '</span></td></tr>';
-  });
-  html += '</tbody></table>'; el.innerHTML = html;
+  if (document.getElementById('adRestaurantsSection') && document.getElementById('adRestaurantsSection').style.display !== 'none') {
+    restPopulateCuisineFilter();
+    restRenderRestaurants();
+  }
 }
 
 function adRenderRestReport() {
@@ -5342,9 +5678,11 @@ function adSwitchTab(tab) {
   adCurrentTab = tab;
   document.querySelectorAll('.ad-sidebar-nav a').forEach(a => a.classList.remove('active'));
   const navLink = document.querySelector('.ad-sidebar-nav a[onclick*="' + tab + '"]'); if (navLink) navLink.classList.add('active');
-  ['adFleetSection', 'adOrdersSection', 'adCompletedSection', 'adRestaurantsSection', 'adRestReportSection', 'adFleetReportSection'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-  const titles = { dashboard: '📊 Dashboard', orders: '📦 Orders', fleet: '🛵 Fleet Management', restaurants: '🍽️ Restaurants', restaurantReport: '📈 Restaurant Report', fleetReport: '🚚 Fleet Report' };
+  ['adFleetSection', 'adOrdersSection', 'adCompletedSection', 'adRestaurantsSection', 'adRestReportSection', 'adFleetReportSection', 'adSettingsSection'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  const titles = { dashboard: '📊 Dashboard', orders: '📦 Orders', fleet: '🛵 Fleet Management', restaurants: '🍽️ Restaurants', restaurantReport: '📈 Restaurant Report', fleetReport: '🚚 Fleet Report', settings: '⚙️ Platform Settings' };
   document.getElementById('adPageTitle').textContent = titles[tab] || 'Dashboard';
+  const statsBar = document.querySelector('.ad-stats');
+  if (statsBar) statsBar.style.display = tab === 'settings' ? 'none' : 'grid';
   if (tab === 'dashboard' || tab === 'orders' || tab === 'fleet' || tab === 'restaurants') {
     document.getElementById('adFleetSection').style.display = 'block';
     document.getElementById('adOrdersSection').style.display = 'block';
@@ -5354,51 +5692,17 @@ function adSwitchTab(tab) {
     document.getElementById('adFleetReportSection').style.display = 'none';
     if (tab === 'fleet') { document.getElementById('adOrdersSection').style.display = 'none'; document.getElementById('adCompletedSection').style.display = 'none'; document.getElementById('adRestaurantsSection').style.display = 'none'; }
     else if (tab === 'orders') { document.getElementById('adFleetSection').style.display = 'none'; document.getElementById('adRestaurantsSection').style.display = 'none'; }
-    else if (tab === 'restaurants') { document.getElementById('adFleetSection').style.display = 'none'; document.getElementById('adOrdersSection').style.display = 'none'; document.getElementById('adCompletedSection').style.display = 'none'; }
+    else if (tab === 'restaurants') { document.getElementById('adFleetSection').style.display = 'none'; document.getElementById('adOrdersSection').style.display = 'none'; document.getElementById('adCompletedSection').style.display = 'none'; restPopulateCuisineFilter(); restRenderRestaurants(); }
     adRenderAll();
   } else if (tab === 'restaurantReport') { document.getElementById('adRestReportSection').style.display = 'block'; adRenderRestReport(); }
   else if (tab === 'fleetReport') { document.getElementById('adFleetReportSection').style.display = 'block'; adRenderFleetReport(); }
-}
-
-function adOpenSettings() { document.getElementById('adSettingsModal').classList.add('active'); adRenderSettingsRestList(); adRenderSettingsFleetList(); adLoadSettingsValues(); }
-function adCloseSettings() { document.getElementById('adSettingsModal').classList.remove('active'); }
-function adSettingsTab(tab) {
-  document.querySelectorAll('#adSettingsModal .ad-tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('#adSettingsModal .ad-tab-content').forEach(c => c.classList.remove('active'));
-  const btns = document.querySelectorAll('#adSettingsModal .ad-tab-btn');
-  const tabMap = { restaurants: 0, fleet: 1, delivery: 2, system: 3 }; if (tabMap[tab] !== undefined && btns[tabMap[tab]]) btns[tabMap[tab]].classList.add('active');
-  const contentMap = { restaurants: 'adSetRestTab', fleet: 'adSetFleetTab', delivery: 'adSetDeliveryTab', system: 'adSetSystemTab' };
-  const content = document.getElementById(contentMap[tab]); if (content) content.classList.add('active');
-}
-
-function adLoadSettingsValues() {
-  const ds = JSON.parse(localStorage.getItem('gopoint_delivery_settings') || '{"motorcycleDelivery":true,"taxiDelivery":true,"maxDistance":10,"baseFee":2.50,"perKmFee":0.50,"startTime":"08:00","endTime":"22:00"}');
-  document.getElementById('adSetMotorcycle').checked = ds.motorcycleDelivery !== undefined ? ds.motorcycleDelivery : true;
-  document.getElementById('adSetTaxi').checked = ds.taxiDelivery !== undefined ? ds.taxiDelivery : true;
-  document.getElementById('adSetMaxDist').value = ds.maxDistance || 10;
-  document.getElementById('adSetBaseFee').value = ds.baseFee || 2.50;
-  document.getElementById('adSetPerKm').value = ds.perKmFee || 0.50;
-  document.getElementById('adSetStart').value = ds.startTime || '08:00';
-  document.getElementById('adSetEnd').value = ds.endTime || '22:00';
-  const sys = JSON.parse(localStorage.getItem('gopoint_system_settings') || '{"businessName":"Go!Point","businessAddress":"Hargeisa, Somaliland","businessPhone":"+252 61 XXX XXXX","businessEmail":"info@gopoint.com","minOrder":10,"defaultOrder":"delivery"}');
-  document.getElementById('adSetBizName').value = sys.businessName || 'Go!Point';
-  document.getElementById('adSetBizAddr').value = sys.businessAddress || 'Hargeisa, Somaliland';
-  document.getElementById('adSetBizPhone').value = sys.businessPhone || '+252 61 XXX XXXX';
-  document.getElementById('adSetBizEmail').value = sys.businessEmail || 'info@gopoint.com';
-  document.getElementById('adSetMinOrder').value = sys.minOrder || 10;
-  document.getElementById('adSetDefaultOrder').value = sys.defaultOrder || 'delivery';
-}
-
-async function adSaveDelivery() {
-  const s = { motorcycleDelivery: document.getElementById('adSetMotorcycle').checked, taxiDelivery: document.getElementById('adSetTaxi').checked, maxDistance: parseFloat(document.getElementById('adSetMaxDist').value) || 10, baseFee: parseFloat(document.getElementById('adSetBaseFee').value) || 2.50, perKmFee: parseFloat(document.getElementById('adSetPerKm').value) || 0.50, startTime: document.getElementById('adSetStart').value || '08:00', endTime: document.getElementById('adSetEnd').value || '22:00' };
-  localStorage.setItem('gopoint_delivery_settings', JSON.stringify(s)); adToast('Delivery settings saved!');
-  if (supaConnected) await supaSaveSettings('delivery', s);
-}
-
-async function adSaveSystem() {
-  const s = { businessName: document.getElementById('adSetBizName').value.trim() || 'Go!Point', businessAddress: document.getElementById('adSetBizAddr').value.trim() || 'Hargeisa, Somaliland', businessPhone: document.getElementById('adSetBizPhone').value.trim(), businessEmail: document.getElementById('adSetBizEmail').value.trim(), minOrder: parseFloat(document.getElementById('adSetMinOrder').value) || 10, defaultOrder: document.getElementById('adSetDefaultOrder').value || 'delivery', currencyRate: parseFloat(document.getElementById('adSetCurrencyRate').value) || 11000, showCurrency: document.getElementById('adSetShowCurrency').value || 'both' };
-  localStorage.setItem('gopoint_system_settings', JSON.stringify(s)); adToast('System settings saved!');
-  if (supaConnected) await supaSaveSettings('system', s);
+  else if (tab === 'settings') {
+    document.getElementById('adSettingsSection').style.display = 'block';
+    setLoadDelivery();
+    setLoadPlatform();
+    setRenderRest();
+    setRenderVehicles();
+  }
 }
 
 function adRenderSettingsRestList() {
@@ -5422,17 +5726,24 @@ function adEditRest(key) {
   if (r.menu) { for (const cat in r.menu) { const el = document.getElementById('ad' + cat.charAt(0).toUpperCase() + cat.slice(1) + 'Items'); if (el) { r.menu[cat].forEach(item => { const div = document.createElement('div'); div.className = 'ad-menu-item'; div.innerHTML = '<button type="button" class="remove-btn" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button><div class="ad-form-row"><div class="ad-form-group"><label>Item Name *</label><input type="text" class="ad-form-control" name="admin-' + cat + '-name" value="' + item.name + '" required></div><div class="ad-form-group"><label>Price *</label><input type="number" class="ad-form-control" name="admin-' + cat + '-price" value="' + item.price + '" step="0.01" min="0" required></div></div><div class="ad-form-group"><label>Description</label><input type="text" class="ad-form-control" name="admin-' + cat + '-description" value="' + (item.description || '') + '"></div><div class="ad-form-group"><label>Image URL</label><input type="url" class="ad-form-control" name="admin-' + cat + '-image" value="' + (item.image || '') + '"></div>'; el.appendChild(div); }); } } }
   document.getElementById('adRestFormModal').classList.add('active');
 }
-async function adDeleteRest(key) { if (!adRestaurants[key]) return; if (confirm('Delete "' + adRestaurants[key].name + '"?')) { delete adRestaurants[key]; adSaveData(); adRenderSettingsRestList(); adRenderRestaurants(); adToast('Restaurant deleted'); if (supaConnected) await supaDeleteRestaurant(key); } }
+async function adDeleteRest(key) { if (!adRestaurants[key]) return; if (confirm('Delete "' + adRestaurants[key].name + '"?')) { delete adRestaurants[key]; delete restaurants[key]; adSaveData(); setRenderRest(); adRenderRestaurants(); adToast('Restaurant deleted'); if (supaConnected) await supaDeleteRestaurant(key); } }
 async function adSubmitRest() {
   const name = document.getElementById('adRestName').value.trim(); if (!name) { adToast('Restaurant name required'); return; }
-  const key = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const key = adEditRestKey || name.toLowerCase().replace(/[^a-z0-9]/g, '');
   const menu = { coffee: adCollectMenu('coffee'), food: adCollectMenu('food'), dessert: adCollectMenu('dessert'), juices: adCollectMenu('juices'), softdrinks: adCollectMenu('softdrinks') };
   if (!Object.values(menu).some(c => c.length > 0)) { adToast('Add at least one menu item'); return; }
-  const data = { name, address: document.getElementById('adRestAddress').value.trim(), lat: parseFloat(document.getElementById('adRestLat').value) || null, lng: parseFloat(document.getElementById('adRestLng').value) || null, phone: document.getElementById('adRestPhone').value.trim(), email: document.getElementById('adRestEmail').value.trim(), cuisine: document.getElementById('adRestCuisine').value.trim() || 'Various', rating: parseFloat(document.getElementById('adRestRating').value) || 4.5, logo: document.getElementById('adRestLogo').value.trim(), menu, active: true };
-  if (adEditRestKey) { adRestaurants[adEditRestKey] = data; adToast('"' + name + '" updated!'); }
-  else { if (adRestaurants[key]) { adToast('Restaurant already exists'); return; } adRestaurants[key] = data; adToast('"' + name + '" added!'); }
-  adSaveData(); adRenderSettingsRestList(); adRenderRestaurants(); adCloseRestForm();
-  if (supaConnected) await supaSaveRestaurant(adEditRestKey || key, data);
+  const data = { name, address: document.getElementById('adRestAddress').value.trim(), lat: parseFloat(document.getElementById('adRestLat').value) || null, lng: parseFloat(document.getElementById('adRestLng').value) || null, phone: document.getElementById('adRestPhone').value.trim(), email: document.getElementById('adRestEmail').value.trim(), cuisine: document.getElementById('adRestCuisine').value.trim() || 'Various', rating: parseFloat(document.getElementById('adRestRating').value) || 4.5, logo: document.getElementById('adRestLogo').value.trim(), menu, active: true, activeCategories: Object.keys(menu).filter(c => menu[c].length > 0), deliveryTime: '20 min', deliveryFee: '$2' };
+  adRestaurants[key] = data;
+  restaurants[key] = data;
+  adSaveData();
+  setRenderRest(); adRenderRestaurants(); adCloseRestForm();
+  adToast(adEditRestKey ? '"' + name + '" updated!' : '"' + name + '" added!');
+  if (supaConnected) {
+    const result = await supaSaveRestaurant(key, data);
+    if (result !== false) adToast('✅ Synced to Supabase');
+    else adToast('⚠️ Saved locally — Supabase sync failed');
+  }
+  adEditRestKey = null;
 }
 function adCollectMenu(cat) {
   const items = []; const forms = document.querySelectorAll('#ad' + cat.charAt(0).toUpperCase() + cat.slice(1) + 'Items .ad-menu-item');
@@ -5487,6 +5798,387 @@ async function adSubmitFleet() {
   else { fleetVehicle = { id: 'v-' + Date.now(), type, plateNumber: plate, model, driverName: name, driverPhone: phone, driverPin: pin, license, status, lat: 9.56, lng: 44.065 }; adVehicles.push(fleetVehicle); adToast('Fleet registered!'); }
   adSaveData(); adRenderSettingsFleetList(); adRenderFleet(); adCloseFleetForm();
   if (supaConnected && fleetVehicle) await supaSaveVehicle(fleetVehicle);
+}
+
+// ─── SETTINGS PAGE ───
+function setTab(tab, el) {
+  document.querySelectorAll('#setTabsBar .set-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.set-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('setPanel-' + tab).classList.add('active');
+}
+function setRenderRest() {
+  const el = document.getElementById('setRestaurantsBody'); if (!el) return;
+  const keys = Object.keys(adRestaurants);
+  if (!keys.length) { el.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px">No restaurants</td></tr>'; return; }
+  el.innerHTML = keys.map(k => {
+    const r = adRestaurants[k]; const active = r.active !== undefined ? r.active : true;
+    const icon = r.icon || 'fa-utensils';
+    const cuisine = r.cuisine || (icon === 'fa-utensils' ? 'Fast Food' : icon === 'fa-mug-hot' ? 'Coffee & Food' : icon === 'fa-fire' ? 'Grilled' : icon === 'fa-pizza-slice' ? 'Pizza' : 'Juice & Drinks');
+    return '<tr><td><strong>' + r.name + '</strong></td><td>' + cuisine + '</td><td><i class="fas fa-star" style="color:var(--warning);font-size:0.75rem"></i> ' + (r.rating || '4.5') + '</td><td>' + (r.orders || 0) + '</td><td><button class="set-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="setToggleRest(\'' + k + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td><td><button class="set-btn set-btn-danger set-btn-sm" onclick="setDeleteRest(\'' + k + '\')"><i class="fas fa-trash"></i></button></td></tr>';
+  }).join('');
+}
+function setToggleRest(k) { const r = adRestaurants[k]; if (!r) return; r.active = r.active !== undefined ? !r.active : false; adSaveData(); setRenderRest(); adRenderRestaurants(); adToast(r.name + ' is now ' + (r.active ? 'Active' : 'Inactive')); }
+function setDeleteRest(k) { if (!adRestaurants[k]) return; if (!confirm('Delete ' + adRestaurants[k].name + '?')) return; delete adRestaurants[k]; adSaveData(); setRenderRest(); adRenderRestaurants(); adToast('Restaurant deleted'); }
+function setRenderVehicles() {
+  const el = document.getElementById('setVehiclesBody'); if (!el) return;
+  if (!adVehicles.length) { el.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px">No vehicles</td></tr>'; return; }
+  el.innerHTML = adVehicles.map(v => {
+    const icon = v.type === 'bike' ? 'fa-motorcycle' : v.type === 'taxi' ? 'fa-car' : 'fa-bicycle';
+    const active = v.status === 'available' || v.status === 'delivering';
+    return '<tr><td><strong>' + (v.driverName || 'Unknown') + '</strong></td><td>' + (v.plateNumber || v.plate || 'N/A') + '</td><td>' + (v.driverPhone || '') + '</td><td><i class="fas ' + icon + '"></i> ' + (v.type || 'bike') + '</td><td><button class="set-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="setToggleVehicle(\'' + v.id + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td><td><button class="set-btn set-btn-secondary set-btn-sm" style="margin-right:4px" onclick="adToast(\'Vehicle details opened\')"><i class="fas fa-edit"></i></button><button class="set-btn set-btn-danger set-btn-sm" onclick="setDeleteVehicle(\'' + v.id + '\')"><i class="fas fa-trash"></i></button></td></tr>';
+  }).join('');
+}
+function setToggleVehicle(vid) { const v = adVehicles.find(x => x.id == vid); if (!v) return; v.status = v.status === 'available' ? 'unavailable' : 'available'; adSaveData(); setRenderVehicles(); adRenderFleet(); adToast(v.driverName + ' is now ' + v.status); }
+function setDeleteVehicle(vid) { if (!confirm('Delete this vehicle?')) return; adVehicles = adVehicles.filter(v => v.id != vid); adSaveData(); setRenderVehicles(); adRenderFleet(); adToast('Vehicle deleted'); }
+function setLoadDelivery() {
+  const d = JSON.parse(localStorage.getItem('gopoint_delivery_settings') || '{}');
+  document.getElementById('setCommissionRate').value = d.commission || 15;
+  document.getElementById('setDeliveryFee').value = d.fee || 2000;
+  document.getElementById('setFreeDeliveryThreshold').value = d.freeThreshold || 50000;
+  document.getElementById('setMinimumOrder').value = d.minOrder || 10000;
+  document.getElementById('setMaxRadius').value = d.maxRadius || 10;
+}
+function setSaveDelivery() {
+  const s = { commission: document.getElementById('setCommissionRate').value, fee: document.getElementById('setDeliveryFee').value, freeThreshold: document.getElementById('setFreeDeliveryThreshold').value, minOrder: document.getElementById('setMinimumOrder').value, maxRadius: document.getElementById('setMaxRadius').value };
+  localStorage.setItem('gopoint_delivery_settings', JSON.stringify(s));
+  adToast('Delivery settings saved!');
+}
+function setLoadPlatform() {
+  const sys = JSON.parse(localStorage.getItem('gopoint_system_settings') || '{}');
+  document.getElementById('setPlatformName').value = sys.businessName || 'Go!Point';
+  document.getElementById('setContactPhone').value = sys.businessPhone || '+252 61 XXX XXXX';
+  document.getElementById('setSupportEmail').value = sys.businessEmail || 'info@gopoint.com';
+  document.getElementById('setPlatformAddress').value = sys.businessAddress || 'Hargeisa, Somaliland';
+  document.getElementById('setWorkingHours').value = sys.workingHours || '10:00 AM - 11:00 PM';
+}
+function setSavePlatform() {
+  const s = { businessName: document.getElementById('setPlatformName').value.trim() || 'Go!Point', businessPhone: document.getElementById('setContactPhone').value.trim(), businessEmail: document.getElementById('setSupportEmail').value.trim(), businessAddress: document.getElementById('setPlatformAddress').value.trim(), workingHours: document.getElementById('setWorkingHours').value.trim() };
+  localStorage.setItem('gopoint_system_settings', JSON.stringify(s));
+  settings.system = s;
+  adSaveData();
+  adToast('Platform info updated!');
+}
+
+// ★ RESTAURANTS PAGE UPGRADE FUNCTIONS ★
+let restCurrentView = 'grid';
+let restMenuRestKey = null;
+let restEditingMenuItemIdx = null;
+let restMenuFilterCategory = 'All';
+
+function restIconToCuisine(icon) {
+  const map = { 'fa-utensils': 'Fast Food', 'fa-mug-hot': 'Coffee & Food', 'fa-fire': 'Grilled', 'fa-pizza-slice': 'Pizza', 'fa-glass-water': 'Juice & Drinks' };
+  return map[icon] || 'Various';
+}
+
+function restGetFilteredRestaurants() {
+  let keys = Object.keys(adRestaurants);
+  const search = (document.getElementById('restSearchInput')?.value || '').toLowerCase();
+  const status = document.getElementById('restFilterStatus')?.value || 'all';
+  const cuisine = document.getElementById('restFilterCuisine')?.value || 'all';
+  if (search) keys = keys.filter(k => {
+    const r = adRestaurants[k];
+    return (r.name || '').toLowerCase().includes(search) || (r.address || '').toLowerCase().includes(search);
+  });
+  if (status !== 'all') keys = keys.filter(k => {
+    const active = adRestaurants[k].active !== undefined ? adRestaurants[k].active : true;
+    return status === 'active' ? active : !active;
+  });
+  if (cuisine !== 'all') keys = keys.filter(k => {
+    const r = adRestaurants[k];
+    const cType = r.cuisine || restIconToCuisine(r.icon);
+    return cType === cuisine;
+  });
+  return keys;
+}
+
+function restPopulateCuisineFilter() {
+  const cuisines = new Set(Object.values(adRestaurants).map(r => r.cuisine || restIconToCuisine(r.icon)));
+  const el = document.getElementById('restFilterCuisine');
+  if (el) el.innerHTML = '<option value="all">All Cuisines</option>' + [...cuisines].map(c => '<option value="' + c + '">' + c + '</option>').join('');
+}
+
+function restUpdateStats() {
+  const keys = Object.keys(adRestaurants);
+  const total = keys.length;
+  const active = keys.filter(k => adRestaurants[k].active !== undefined ? adRestaurants[k].active : true).length;
+  const avgRating = total ? (keys.reduce((s, k) => s + (adRestaurants[k].rating || 4.5), 0) / total).toFixed(1) : '0';
+  const el = document.getElementById('restStatTotal'); if (el) el.textContent = total;
+  const el2 = document.getElementById('restStatActive'); if (el2) el2.textContent = active;
+  const el3 = document.getElementById('restStatOrders'); if (el3) el3.textContent = adOrders.length;
+  const el4 = document.getElementById('restStatAvgRating'); if (el4) el4.textContent = avgRating;
+}
+
+function restRenderRestaurants() {
+  const keys = restGetFilteredRestaurants();
+  const grid = document.getElementById('restRestaurantsGrid');
+  if (grid) {
+    grid.innerHTML = keys.map(k => {
+      const r = adRestaurants[k];
+      const active = r.active !== undefined ? r.active : true;
+      const icon = r.icon || 'fa-utensils';
+      const cuisine = r.cuisine || restIconToCuisine(icon);
+      const totalMenuItems = r.menu ? Object.values(r.menu).reduce((s, arr) => s + arr.length, 0) : 0;
+      return '<div class="rest-card">' +
+        '<div class="rest-card-img" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark))"><i class="fas ' + icon + '"></i></div>' +
+        '<div class="rest-card-body">' +
+        '<div class="rest-card-name">' + r.name + '</div>' +
+        '<div class="rest-card-meta">' +
+        '<span><i class="fas fa-star" style="color:#F59E0B"></i> ' + (r.rating || '4.5') + '</span>' +
+        '<span><i class="fas fa-utensils"></i> ' + totalMenuItems + ' items</span>' +
+        '</div>' +
+        '<div class="rest-card-info"><i class="fas fa-map-marker-alt"></i> ' + (r.address || 'N/A') + '</div>' +
+        '<div class="rest-card-info"><i class="fas fa-phone"></i> ' + (r.phone || 'N/A') + '</div>' +
+        '<div class="rest-card-info"><i class="fas fa-tag"></i> ' + cuisine + '</div>' +
+        '<div class="rest-card-actions">' +
+        '<button class="btn btn-secondary" style="padding:5px 10px;font-size:.72rem" onclick="restOpenMenuManager(\'' + k + '\')"><i class="fas fa-utensils"></i> Menu</button>' +
+        '<button class="btn btn-secondary" style="padding:5px 10px;font-size:.72rem" onclick="restEditRestaurant(\'' + k + '\')"><i class="fas fa-edit"></i></button>' +
+        '<button class="btn btn-danger" style="padding:5px 10px;font-size:.72rem" onclick="restDeleteRestaurant(\'' + k + '\')"><i class="fas fa-trash"></i></button>' +
+        '<button class="rest-toggle ' + (active ? 'on' : '') + '" onclick="restToggleStatus(\'' + k + '\')"></button>' +
+        '</div></div></div>';
+    }).join('');
+  }
+  const listBody = document.getElementById('restRestaurantsListBody');
+  if (listBody) {
+    listBody.innerHTML = keys.map(k => {
+      const r = adRestaurants[k];
+      const active = r.active !== undefined ? r.active : true;
+      const icon = r.icon || 'fa-utensils';
+      const cuisine = r.cuisine || restIconToCuisine(icon);
+      return '<tr>' +
+        '<td><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:8px;background:var(--primary-soft);display:flex;align-items:center;justify-content:center;color:var(--primary)"><i class="fas ' + icon + '"></i></div><strong>' + r.name + '</strong></div></td>' +
+        '<td>' + cuisine + '</td><td style="font-size:.8rem">' + (r.address || '-') + '</td><td style="font-size:.8rem">' + (r.phone || '-') + '</td>' +
+        '<td><i class="fas fa-star" style="color:#F59E0B;font-size:.75rem"></i> ' + (r.rating || '4.5') + '</td>' +
+        '<td><button class="rest-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="restToggleStatus(\'' + k + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td>' +
+        '<td><button class="btn btn-secondary" style="padding:5px 10px;font-size:.72rem" onclick="restOpenMenuManager(\'' + k + '\')"><i class="fas fa-utensils"></i></button> ' +
+        '<button class="btn btn-secondary" style="padding:5px 10px;font-size:.72rem" onclick="restEditRestaurant(\'' + k + '\')"><i class="fas fa-edit"></i></button> ' +
+        '<button class="btn btn-danger" style="padding:5px 10px;font-size:.72rem" onclick="restDeleteRestaurant(\'' + k + '\')"><i class="fas fa-trash"></i></button></td></tr>';
+    }).join('');
+  }
+  restUpdateStats();
+}
+
+function restSetView(v) {
+  restCurrentView = v;
+  document.getElementById('restViewGrid').classList.toggle('active', v === 'grid');
+  document.getElementById('restViewList').classList.toggle('active', v === 'list');
+  document.getElementById('restRestaurantsGrid').style.display = v === 'grid' ? 'grid' : 'none';
+  document.getElementById('restRestaurantsListWrap').style.display = v === 'list' ? 'block' : 'none';
+}
+
+function restToggleStatus(key) {
+  const r = adRestaurants[key]; if (!r) return;
+  r.active = r.active !== undefined ? !r.active : false;
+  adSaveData(); restRenderRestaurants();
+  restToast(r.name + ' is now ' + (r.active ? 'Active' : 'Inactive'));
+}
+
+function restAddRestaurant() {
+  const editKey = document.getElementById('restModal-addRestaurant').dataset.editKey;
+  const name = document.getElementById('restAddName').value.trim();
+  if (!name) { restToast('Please enter restaurant name'); return; }
+  const key = editKey || name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const icon = document.getElementById('restAddIcon').value;
+  const data = {
+    name, address: document.getElementById('restAddAddress').value.trim() || 'Hargeisa',
+    phone: document.getElementById('restAddPhone').value.trim(), email: document.getElementById('restAddEmail').value.trim(),
+    lat: parseFloat(document.getElementById('restAddLat').value) || null, lng: parseFloat(document.getElementById('restAddLng').value) || null,
+    cuisine: document.getElementById('restAddCuisine').value, rating: parseFloat(document.getElementById('restAddRating').value) || 4.5,
+    icon, active: adRestaurants[key] ? adRestaurants[key].active : true,
+    menu: adRestaurants[key] ? adRestaurants[key].menu : { coffee: [], food: [], dessert: [], juices: [], softdrinks: [] },
+    deliveryTime: '20 min', deliveryFee: '$2', activeCategories: []
+  };
+  adRestaurants[key] = data; restaurants[key] = data;
+  adSaveData(); restCloseModal('addRestaurant'); restPopulateCuisineFilter(); restRenderRestaurants();
+  adRenderRestaurants();
+  restToast(editKey ? name + ' updated!' : name + ' added!');
+  document.getElementById('restAddName').value = '';
+  document.getElementById('restAddAddress').value = '';
+  document.getElementById('restAddPhone').value = '';
+  document.getElementById('restAddEmail').value = '';
+  if (supaConnected) supaSaveRestaurant(key, data);
+}
+
+function restEditRestaurant(key) {
+  const r = adRestaurants[key]; if (!r) return;
+  document.getElementById('restModalTitle').textContent = 'Edit Restaurant';
+  document.getElementById('restAddName').value = r.name || '';
+  document.getElementById('restAddAddress').value = r.address || '';
+  document.getElementById('restAddPhone').value = r.phone || '';
+  document.getElementById('restAddEmail').value = r.email || '';
+  document.getElementById('restAddLat').value = r.lat || '';
+  document.getElementById('restAddLng').value = r.lng || '';
+  document.getElementById('restAddCuisine').value = r.cuisine || 'Various';
+  document.getElementById('restAddRating').value = r.rating || 4.5;
+  document.getElementById('restAddIcon').value = r.icon || 'fa-utensils';
+  document.getElementById('restModal-addRestaurant').dataset.editKey = key;
+  restOpenModal('addRestaurant');
+}
+
+function restDeleteRestaurant(key) {
+  const r = adRestaurants[key]; if (!r) return;
+  if (!confirm('Delete ' + r.name + '?')) return;
+  delete adRestaurants[key]; delete restaurants[key];
+  adSaveData(); restPopulateCuisineFilter(); restRenderRestaurants(); adRenderRestaurants();
+  restToast('Restaurant deleted');
+  if (supaConnected) supaDeleteRestaurant(key);
+}
+
+function restOpenMenuManager(key) {
+  restMenuRestKey = key; restEditingMenuItemIdx = null; restMenuFilterCategory = 'All';
+  const r = adRestaurants[key];
+  document.getElementById('restMenuManagerTitle').textContent = r.name + ' — Menu';
+  restRenderMenuCategoryTabs(); restRenderMenuItems(); restOpenModal('menuManager');
+}
+
+function restRenderMenuCategoryTabs() {
+  if (!restMenuRestKey) return;
+  const r = adRestaurants[restMenuRestKey];
+  const cats = ['All', ...Object.keys(r.menu || {}).filter(c => (r.menu[c] || []).length > 0)];
+  document.getElementById('restMenuCategoryTabs').innerHTML = cats.map(c =>
+    '<button class="rest-tab ' + (c === restMenuFilterCategory ? 'active' : '') + '" onclick="restFilterMenuCategory(\'' + c + '\',this)">' + c + '</button>'
+  ).join('');
+}
+
+function restFilterMenuCategory(cat, el) {
+  restMenuFilterCategory = cat;
+  document.querySelectorAll('#restMenuCategoryTabs .rest-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active'); restRenderMenuItems();
+}
+
+function restRenderMenuItems() {
+  if (!restMenuRestKey) return;
+  const r = adRestaurants[restMenuRestKey];
+  let items = [];
+  const menu = r.menu || {};
+  if (restMenuFilterCategory === 'All') {
+    for (const cat in menu) { (menu[cat] || []).forEach(m => items.push({ ...m, _cat: cat })); }
+  } else {
+    items = (menu[restMenuFilterCategory] || []).map(m => ({ ...m, _cat: restMenuFilterCategory }));
+  }
+  document.getElementById('restMenuItemsBody').innerHTML = items.length ? items.map(m => {
+    return '<tr>' +
+      '<td>' + (m.image ? '<img src="' + m.image + '" style="width:44px;height:44px;border-radius:8px;object-fit:cover">' : '<div style="width:44px;height:44px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--gray)"><i class="fas fa-image"></i></div>') + '</td>' +
+      '<td><strong>' + m.name + '</strong>' + (m.description ? '<br><small style="color:var(--gray)">' + m.description + '</small>' : '') + '</td>' +
+      '<td><span style="display:inline-flex;padding:2px 8px;border-radius:99px;font-size:.68rem;font-weight:700;background:var(--green-soft);color:#065f46">' + m._cat + '</span></td>' +
+      '<td><strong>$' + (m.price || 0).toFixed(2) + '</strong></td>' +
+      '<td><button class="rest-status-btn ' + (m.status !== false ? 'active' : 'inactive') + '" onclick="restToggleMenuItemStatus(\'' + m._cat + '\',' + (menu[m._cat] || []).indexOf(m) + ')">' + (m.status !== false ? 'Active' : 'Inactive') + '</button></td>' +
+      '<td><button class="btn btn-secondary" style="padding:5px 10px;font-size:.72rem" onclick="restEditMenuItem(\'' + m._cat + '\',' + (menu[m._cat] || []).indexOf(m) + ')"><i class="fas fa-edit"></i></button> ' +
+      '<button class="btn btn-danger" style="padding:5px 10px;font-size:.72rem" onclick="restDeleteMenuItem(\'' + m._cat + '\',' + (menu[m._cat] || []).indexOf(m) + ')"><i class="fas fa-trash"></i></button></td></tr>';
+  }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px">No items in this category</td></tr>';
+}
+
+function restToggleMenuItemStatus(cat, idx) {
+  const r = adRestaurants[restMenuRestKey];
+  if (r.menu[cat] && r.menu[cat][idx]) {
+    r.menu[cat][idx].status = r.menu[cat][idx].status !== false ? false : true;
+    adSaveData(); restRenderMenuItems();
+    restToast('Item ' + (r.menu[cat][idx].status !== false ? 'activated' : 'deactivated'));
+  }
+}
+
+function restPreviewMenuItemImage(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    document.getElementById('restMenuImgPreview').src = ev.target.result;
+    document.getElementById('restMenuImgPreview').style.display = 'block';
+    document.getElementById('restMenuImgPlaceholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function restOpenAddMenuItem() {
+  restEditingMenuItemIdx = null;
+  document.getElementById('restMenuItemModalTitle').textContent = 'Add Menu Item';
+  document.getElementById('restMenuItemName').value = '';
+  document.getElementById('restMenuItemPrice').value = '';
+  document.getElementById('restMenuItemDesc').value = '';
+  document.getElementById('restMenuImgPreview').style.display = 'none';
+  document.getElementById('restMenuImgPlaceholder').style.display = '';
+  document.getElementById('restMenuItemImgInput').value = '';
+  const r = adRestaurants[restMenuRestKey];
+  const cats = Object.keys(r.menu || {});
+  document.getElementById('restMenuItemCategory').innerHTML = cats.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+  restOpenModal('addMenuItem');
+}
+
+function restEditMenuItem(cat, idx) {
+  const r = adRestaurants[restMenuRestKey];
+  const item = r.menu[cat][idx]; if (!item) return;
+  restEditingMenuItemIdx = { cat, idx };
+  document.getElementById('restMenuItemModalTitle').textContent = 'Edit Menu Item';
+  document.getElementById('restMenuItemName').value = item.name || '';
+  document.getElementById('restMenuItemPrice').value = item.price || '';
+  document.getElementById('restMenuItemDesc').value = item.description || '';
+  document.getElementById('restMenuItemImgInput').value = '';
+  if (item.image) {
+    document.getElementById('restMenuImgPreview').src = item.image;
+    document.getElementById('restMenuImgPreview').style.display = 'block';
+    document.getElementById('restMenuImgPlaceholder').style.display = 'none';
+  } else {
+    document.getElementById('restMenuImgPreview').style.display = 'none';
+    document.getElementById('restMenuImgPlaceholder').style.display = '';
+  }
+  const cats = Object.keys(r.menu || {});
+  document.getElementById('restMenuItemCategory').innerHTML = cats.map(c => '<option value="' + c + '" ' + (c === cat ? 'selected' : '') + '>' + c + '</option>').join('');
+  restOpenModal('addMenuItem');
+}
+
+function restSaveMenuItem() {
+  const name = document.getElementById('restMenuItemName').value.trim();
+  const price = parseFloat(document.getElementById('restMenuItemPrice').value);
+  const cat = document.getElementById('restMenuItemCategory').value;
+  const desc = document.getElementById('restMenuItemDesc').value.trim();
+  const imgPreview = document.getElementById('restMenuImgPreview');
+  const newImage = imgPreview.style.display !== 'none' ? imgPreview.src : '';
+  if (!name || !price) { restToast('Please fill all fields'); return; }
+  const r = adRestaurants[restMenuRestKey];
+  if (!r.menu) r.menu = {};
+  if (!r.menu[cat]) r.menu[cat] = [];
+  if (restEditingMenuItemIdx) {
+    const item = r.menu[restEditingMenuItemIdx.cat][restEditingMenuItemIdx.idx];
+    item.name = name; item.price = price; item.description = desc;
+    if (newImage) item.image = newImage;
+    restToast('Item updated!');
+  } else {
+    r.menu[cat].push({ id: Date.now(), name, price, description: desc, image: newImage, status: true });
+    restToast('Item added!');
+  }
+  adSaveData(); restCloseModal('addMenuItem'); restRenderMenuCategoryTabs(); restRenderMenuItems();
+  restEditingMenuItemIdx = null;
+}
+
+function restDeleteMenuItem(cat, idx) {
+  const r = adRestaurants[restMenuRestKey];
+  if (!confirm('Delete ' + r.menu[cat][idx].name + '?')) return;
+  r.menu[cat].splice(idx, 1);
+  adSaveData(); restRenderMenuCategoryTabs(); restRenderMenuItems(); restToast('Item deleted');
+}
+
+function restOpenModal(id) { document.getElementById('restModal-' + id).classList.add('show'); }
+function restCloseModal(id) {
+  document.getElementById('restModal-' + id).classList.remove('show');
+  if (id === 'addRestaurant') {
+    document.getElementById('restModalTitle').textContent = 'Add Restaurant';
+    document.getElementById('restModal-addRestaurant').dataset.editKey = '';
+    document.getElementById('restAddName').value = '';
+    document.getElementById('restAddAddress').value = '';
+    document.getElementById('restAddPhone').value = '';
+    document.getElementById('restAddEmail').value = '';
+    document.getElementById('restAddLat').value = '';
+    document.getElementById('restAddLng').value = '';
+    document.getElementById('restAddRating').value = '4.5';
+  }
+}
+
+function restToast(msg) {
+  const c = document.getElementById('restToastContainer');
+  const t = document.createElement('div');
+  t.className = 'rest-toast-item';
+  t.innerHTML = '<i class="fas fa-check-circle" style="color:var(--success)"></i> ' + msg;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(10px)'; t.style.transition = 'all .3s ease'; setTimeout(() => t.remove(), 300); }, 2500);
 }
 
 function adLogout() {
