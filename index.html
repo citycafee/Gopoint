@@ -2610,9 +2610,10 @@ function fpRequestLocation() {
           showAppToast('⚠️ Location permission denied. Please allow location to use Go!Point.');
           if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
         } else if (err.code === err.POSITION_UNAVAILABLE) {
-          fpCheckGpsEnabled();
+          showAppToast('⚠️ Device GPS is turned off');
+          showGpsOverlay();
         } else {
-          showAppToast('⚠️ Location request timed out. Please try again.');
+          showAppToast('⚠️ Location request timed out. Please check your GPS and try again.');
           if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
         }
       },
