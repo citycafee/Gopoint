@@ -4432,16 +4432,17 @@ saveBtn.style.background = '';
 saveBtn.disabled = false;
 showAppToast('✅ Profile updated');
 setTimeout(() => {
-  const rows = document.querySelectorAll('.pf-info-row');
-  rows.forEach(row => { row.classList.remove('pf-row-saved'); });
-  const nameRow = document.getElementById('pfInfoName');
-  const phoneRow = document.getElementById('pfInfoPhone');
-  const emailRow = document.getElementById('pfInfoEmail');
-  const addrRow = document.getElementById('pfInfoAddress');
-  [nameRow, phoneRow, emailRow, addrRow].forEach(el => {
-    if (el && el.closest) el.closest('.pf-info-row')?.classList.add('pf-row-saved');
-  });
-  setTimeout(() => { rows.forEach(row => { row.classList.remove('pf-row-saved'); }); }, 1500);
+  const card = document.querySelector('.pf-info-card');
+  if (card) { card.style.transition = 'all .3s'; card.style.boxShadow = '0 0 0 2px #16a34a, 0 4px 14px rgba(22,163,74,0.15)'; }
+  const cells = document.querySelectorAll('.pf-info-cell');
+  cells.forEach(c => { c.style.transition = 'all .3s'; c.style.background = '#ecfdf5'; });
+  const locBar = document.querySelector('.pf-info-location-bar');
+  if (locBar) { locBar.style.transition = 'all .3s'; locBar.style.background = 'linear-gradient(135deg, #d1fae5, #ecfdf5)'; }
+  setTimeout(() => {
+    if (card) { card.style.boxShadow = ''; }
+    cells.forEach(c => { c.style.background = ''; });
+    if (locBar) { locBar.style.background = ''; }
+  }, 1500);
 }, 100);
 }, 800);
 }
