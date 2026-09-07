@@ -1416,17 +1416,52 @@ Facebook
 
     <!-- Tab 2: Scan QR -->
     <div class="fp-wa-tab-content" id="fpWaTabQr">
-      <div class="fp-wa-qr-wrap">
-        <img src="" alt="WhatsApp QR Code" class="fp-wa-qr-img" id="fpWaQrImg">
+      <div id="fpWaQrStep1">
+        <div class="fp-wa-qr-wrap">
+          <img src="" alt="WhatsApp QR Code" class="fp-wa-qr-img" id="fpWaQrImg">
+        </div>
+        <div class="fp-wa-qr-status waiting" id="fpWaQrStatus">
+          <i class="fas fa-circle-notch fa-spin"></i> Waiting for scan...
+        </div>
+        <p class="fp-wa-qr-hint">Open your phone camera, point it at the QR code, then tap the link to open WhatsApp and send the message.</p>
+        <button class="fp-wa-qr-btn" onclick="showQrVerifyForm()">
+          <i class="fas fa-check-circle"></i> I've Scanned It
+        </button>
+        <button class="fp-wa-qr-btn-ghost" onclick="switchWaTab('form')">← Back to form</button>
       </div>
-      <div class="fp-wa-qr-status waiting" id="fpWaQrStatus">
-        <i class="fas fa-circle-notch fa-spin"></i> Waiting for scan...
+      <div id="fpWaQrStep2" style="display:none;">
+        <div style="margin-bottom:16px; text-align:left;">
+          <label class="fp-wa-form-label"><i class="fas fa-phone" style="color:#25D366; margin-right:4px;"></i> Your WhatsApp Number</label>
+          <div class="fp-wa-phone-row">
+            <div class="fp-wa-phone-prefix">
+              <select id="fpWaQrCountry">
+                <option value="+252">🇸🇴 +252</option>
+                <option value="+254">🇰🇪 +254</option>
+                <option value="+256">🇺🇬 +256</option>
+                <option value="+255">🇹🇿 +255</option>
+                <option value="+251">🇪🇹 +251</option>
+              </select>
+            </div>
+            <input type="tel" class="fp-wa-form-input" id="fpWaQrPhone" placeholder="6X XXX XXXX" maxlength="12" style="border:none; border-radius:0; padding:13px 14px;">
+          </div>
+        </div>
+        <div style="margin-bottom:20px; text-align:left;">
+          <label class="fp-wa-form-label"><i class="fas fa-user" style="color:#25D366; margin-right:4px;"></i> Your Name (as on WhatsApp)</label>
+          <input type="text" class="fp-wa-form-input" id="fpWaQrName" placeholder="e.g. Ahmed Ali" maxlength="40">
+        </div>
+        <button class="fp-wa-qr-btn" onclick="submitQrVerify()">
+          <i class="fas fa-paper-plane"></i> Verify & Sign In
+        </button>
+        <button class="fp-wa-qr-btn-ghost" onclick="showQrScanStep()">← Back to QR</button>
       </div>
-      <p class="fp-wa-qr-hint">Open your phone camera, point it at the QR code, then tap the link to open WhatsApp and verify.</p>
-      <button class="fp-wa-qr-btn" onclick="verifyWhatsappScan()">
-        <i class="fas fa-check-circle"></i> I've Scanned It
-      </button>
-      <button class="fp-wa-qr-btn-ghost" onclick="switchWaTab('form')">← Back to form</button>
+      <div id="fpWaQrStep3" style="display:none;">
+        <div style="background:linear-gradient(135deg,#f0fdf4,#ecfdf5); border:2px solid #86efac; border-radius:16px; padding:24px; text-align:center;">
+          <div style="font-size:3rem; margin-bottom:8px;">✅</div>
+          <h3 style="color:#065f46; font-size:1.1rem; font-weight:800; margin-bottom:16px;">WhatsApp Verified!</h3>
+          <div id="fpWaQrResult" style="background:white; border-radius:12px; padding:16px; text-align:left; box-shadow:0 2px 8px rgba(0,0,0,0.06);"></div>
+          <p style="color:#065f46; font-size:12px; margin-top:16px; line-height:1.5;">Your WhatsApp account has been verified. Signing you in now...</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -4141,18 +4176,25 @@ function generateWaQrUrl(phone, text) {
   const waUrl = 'https://wa.me/' + businessPhone + '?text=' + encodeURIComponent(msg);
   return 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(waUrl);
 }
+function resetQrSteps() {
+  const s1 = document.getElementById('fpWaQrStep1');
+  const s2 = document.getElementById('fpWaQrStep2');
+  const s3 = document.getElementById('fpWaQrStep3');
+  if (s1) s1.style.display = 'block';
+  if (s2) s2.style.display = 'none';
+  if (s3) s3.style.display = 'none';
+}
 function openWhatsappQrLogin() {
   const modal = document.getElementById('fpWhatsappQrModal');
   if (!modal) return;
   switchWaTab('form');
-  const nameEl = document.getElementById('fpWaName');
-  const phoneEl = document.getElementById('fpWaPhone');
-  if (nameEl) nameEl.value = '';
-  if (phoneEl) phoneEl.value = '';
+  document.getElementById('fpWaName').value = '';
+  document.getElementById('fpWaPhone').value = '';
   const qrImg = document.getElementById('fpWaQrImg');
   if (qrImg) qrImg.src = generateWaQrUrl();
   const status = document.getElementById('fpWaQrStatus');
   if (status) { status.className = 'fp-wa-qr-status waiting'; status.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Waiting for scan...'; }
+  resetQrSteps();
   modal.classList.add('active');
 }
 function closeWhatsappQrLogin() {
@@ -4172,8 +4214,9 @@ function switchWaTab(tab) {
     tabs[1].classList.add('active');
     if (formContent) formContent.classList.remove('active');
     if (qrContent) qrContent.classList.add('active');
+    resetQrSteps();
     const qrImg = document.getElementById('fpWaQrImg');
-    if (qrImg && !qrImg.src) qrImg.src = generateWaQrUrl();
+    if (qrImg) qrImg.src = generateWaQrUrl();
   }
 }
 function submitWhatsappForm() {
@@ -4187,22 +4230,32 @@ function submitWhatsappForm() {
   closeWhatsappQrLogin();
   completeLogin(user);
 }
-function verifyWhatsappScan() {
-  const status = document.getElementById('fpWaQrStatus');
-  if (status) { status.className = 'fp-wa-qr-status verifying'; status.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifying...'; }
-  const businessPhone = '25261000000';
-  const verifyCode = 'GP-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-  const newQrSrc = generateWaQrUrl(businessPhone, 'Hi Go!point! I want to sign in. My verification code is: ' + verifyCode);
-  const qrImg = document.getElementById('fpWaQrImg');
-  if (qrImg) qrImg.src = newQrSrc;
+function showQrVerifyForm() {
+  document.getElementById('fpWaQrStep1').style.display = 'none';
+  document.getElementById('fpWaQrStep2').style.display = 'block';
+  document.getElementById('fpWaQrStep3').style.display = 'none';
+}
+function showQrScanStep() {
+  document.getElementById('fpWaQrStep1').style.display = 'block';
+  document.getElementById('fpWaQrStep2').style.display = 'none';
+  document.getElementById('fpWaQrStep3').style.display = 'none';
+}
+function submitQrVerify() {
+  const phone = document.getElementById('fpWaQrPhone').value.trim();
+  const name = document.getElementById('fpWaQrName').value.trim();
+  const country = document.getElementById('fpWaQrCountry').value;
+  if (!name) { showAppToast('⚠️ Please enter your name'); document.getElementById('fpWaQrName').focus(); return; }
+  if (!phone || phone.length < 6) { showAppToast('⚠️ Please enter a valid WhatsApp number'); document.getElementById('fpWaQrPhone').focus(); return; }
+  const fullPhone = country + phone;
+  document.getElementById('fpWaQrStep2').style.display = 'none';
+  document.getElementById('fpWaQrStep3').style.display = 'block';
+  const result = document.getElementById('fpWaQrResult');
+  result.innerHTML = '<div style="display:flex; align-items:center; gap:12px; padding:4px 0;"><div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#25D366,#128C7E); color:white; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; flex-shrink:0;">' + name.charAt(0).toUpperCase() + '</div><div><div style="font-size:11px; color:#888; font-weight:500;">WhatsApp Name</div><div style="font-size:15px; font-weight:700; color:#1a1a1a;">' + name + '</div></div></div><div style="border-top:1px solid #f1f5f9; margin:12px 0;"></div><div style="display:flex; align-items:center; gap:12px; padding:4px 0;"><div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#25D366,#128C7E); color:white; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fab fa-whatsapp"></i></div><div><div style="font-size:11px; color:#888; font-weight:500;">WhatsApp Number</div><div style="font-size:15px; font-weight:700; color:#1a1a1a;">' + fullPhone + '</div></div></div>';
   setTimeout(() => {
-    if (status) { status.className = 'fp-wa-qr-status success'; status.innerHTML = '<i class="fas fa-check-circle"></i> WhatsApp verified! Logging in...'; }
-    setTimeout(() => {
-      closeWhatsappQrLogin();
-      const user = { name: 'WhatsApp User', email: '', phone: businessPhone, provider: 'whatsapp' };
-      completeLogin(user);
-    }, 1500);
-  }, 2500);
+    const user = { name: name, email: '', phone: fullPhone, provider: 'whatsapp' };
+    closeWhatsappQrLogin();
+    completeLogin(user);
+  }, 3000);
 }
 
 function loginWithWhatsApp() {
