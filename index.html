@@ -2008,11 +2008,12 @@ Gmail
 <div class="ad-user"><span>👤 Admin</span><button onclick="adLogout()">Logout</button></div>
 </div>
 <div class="ad-content">
-<div class="ad-stats">
+<div class="ad-stats" id="adStatsBar">
 <div class="ad-stat"><h3>Today's Orders</h3><div class="value" id="adStatToday">0</div><div class="change">Current day total</div></div>
 <div class="ad-stat"><h3>This Month</h3><div class="value" id="adStatMonth">0</div><div class="change">Current month total</div></div>
 <div class="ad-stat"><h3>Revenue</h3><div class="value" id="adStatRevenue">$0</div><div class="change">Completed orders</div></div>
 <div class="ad-stat"><h3>Active Drivers</h3><div class="value" id="adStatActiveDrivers">0</div><div class="change" id="adStatTotalDrivers">0 total</div></div>
+<div class="ad-stat"><h3>Restaurants</h3><div class="value" id="adRestaurantCount">0</div><div class="change">Total active</div></div>
 <div class="ad-stat"><h3>All Time Orders</h3><div class="value" id="adStatAllOrders">0</div><div class="change">Since launch</div></div>
 </div>
 <div class="ad-section" id="adFleetSection">
@@ -5681,7 +5682,7 @@ function adSwitchTab(tab) {
   ['adFleetSection', 'adOrdersSection', 'adCompletedSection', 'adRestaurantsSection', 'adRestReportSection', 'adFleetReportSection', 'adSettingsSection'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   const titles = { dashboard: '📊 Dashboard', orders: '📦 Orders', fleet: '🛵 Fleet Management', restaurants: '🍽️ Restaurants', restaurantReport: '📈 Restaurant Report', fleetReport: '🚚 Fleet Report', settings: '⚙️ Platform Settings' };
   document.getElementById('adPageTitle').textContent = titles[tab] || 'Dashboard';
-  const statsBar = document.querySelector('.ad-stats');
+  const statsBar = document.getElementById('adStatsBar');
   if (statsBar) statsBar.style.display = tab === 'settings' ? 'none' : 'grid';
   if (tab === 'dashboard' || tab === 'orders' || tab === 'fleet' || tab === 'restaurants') {
     document.getElementById('adFleetSection').style.display = 'block';

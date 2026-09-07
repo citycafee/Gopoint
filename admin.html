@@ -383,6 +383,7 @@ transition: var(--transition);
 <div class="ad-stat"><h3>This Month</h3><div class="value" id="adStatMonth">0</div><div class="change">Current month total</div></div>
 <div class="ad-stat"><h3>Revenue</h3><div class="value" id="adStatRevenue">$0</div><div class="change">Completed orders</div></div>
 <div class="ad-stat"><h3>Active Drivers</h3><div class="value" id="adStatActiveDrivers">0</div><div class="change" id="adStatTotalDrivers">0 total</div></div>
+<div class="ad-stat"><h3>Restaurants</h3><div class="value" id="adRestaurantCount">0</div><div class="change">Total active</div></div>
 <div class="ad-stat"><h3>All Time Orders</h3><div class="value" id="adStatAllOrders">0</div><div class="change">Since launch</div></div>
 </div>
 <div class="ad-section" id="adFleetSection">
@@ -1438,7 +1439,7 @@ function setSavePlatform() {
   adSaveData();
   adToast('Platform info updated!');
 }
-function adLogout() { if (!confirm('Logout from Admin Dashboard?')) return; localStorage.removeItem('admin_auth'); document.getElementById('adminDashboard').classList.remove('active'); document.getElementById('adminDashboard').style.display = 'none'; document.getElementById('frontPageContainer').style.display = 'block'; window.scrollTo({ top: 0 }); }
+function adLogout() { if (!confirm('Logout from Admin Dashboard?')) return; localStorage.removeItem('admin_auth'); window.location.href = 'index.html'; }
 
 function adBackToHome() { document.getElementById('adminDashboard').classList.remove('active'); document.getElementById('adminDashboard').style.display = 'none'; window.location.href = 'index.html'; }
 
