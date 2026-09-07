@@ -2617,7 +2617,7 @@ function fpRequestLocation() {
           if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
         }
       },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
     );
   }, 300);
 }
