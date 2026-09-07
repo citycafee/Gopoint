@@ -4897,7 +4897,7 @@ const appNavbar = document.querySelector('.app-navbar');
 const appNavRight = document.querySelector('.app-nav-right');
 if (view === 'profile') { document.getElementById('appProfileView').classList.add('active'); renderProfileView(); if (appNavbar) appNavbar.style.display = ''; if (appNavRight) appNavRight.style.display = 'none'; }
 else { if (appNavbar) appNavbar.style.display = ''; if (appNavRight) appNavRight.style.display = ''; }
-if (view === 'home') { document.getElementById('appHomeView').classList.add('active'); document.getElementById('appMiniCartBar').classList.remove('visible'); appRenderRestaurantList(); if (appMap) setTimeout(() => appMap.invalidateSize(), 100); }
+if (view === 'home') { document.getElementById('appHomeView').classList.add('active'); document.getElementById('appMiniCartBar').classList.remove('visible'); refreshRestaurants().then(() => appRenderRestaurantList()); if (appMap) setTimeout(() => appMap.invalidateSize(), 100); }
 else if (view === 'orders') { document.getElementById('appOrdersView').classList.add('active'); renderOrdersView(); }
 else if (view === 'addresses') { document.getElementById('appAddressesView').classList.add('active'); renderAddressesView(); }
 document.querySelectorAll('.app-nav-right ul li').forEach(li => li.classList.remove('active-nav'));
@@ -5100,6 +5100,17 @@ localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles));
 localStorage.setItem('gopoint_orders', JSON.stringify(orders));
 localStorage.setItem('gopointSettings', JSON.stringify(settings));
 }
+
+async function refreshRestaurants() {
+  if (!supaConnected) return;
+  try {
+    const restData = await supaLoadRestaurants();
+    if (Object.keys(restData).length > 0) {
+      restaurants = restData;
+      saveLocalData();
+    }
+  } catch (e) { console.error('refreshRestaurants error:', e); }
+}
 async function addOrderToDB(orderData) { const id = 'ord-' + Date.now(); const fullOrder = { ...orderData, id, timestamp: new Date(), created_at: new Date().toISOString() }; orders.push(fullOrder); saveLocalData(); appUpdateTrackButtonVisibility(); if (supaConnected) { await supaSaveOrder(fullOrder); } return id; }
 
 async function updateOrderInDB(orderId, updates) { const idx = orders.findIndex(o => o.id === orderId); if (idx !== -1) { orders[idx] = { ...orders[idx], ...updates }; saveLocalData(); appUpdateTrackButtonVisibility(); } if (supaConnected) { await supaUpdateOrder(orderId, updates); } }
@@ -5187,7 +5198,8 @@ function appStartBannerCarousel() { if (appBannerInterval) clearInterval(appBann
 function appGoToSlide(index) { appCurrentSlide = index; const inner = document.getElementById('appBannerCarousel'); if (inner) inner.style.transform = `translateX(-${index * 100}%)`; document.querySelectorAll('.app-carousel-indicators button').forEach((b, i) => { b.classList.toggle('active', i === index); }); }
 
 function appOpenRestaurantMenu(key) { if (!restaurants[key]) return; currentRestaurant = key;
-const r = restaurants[key];
+refreshRestaurants().then(() => {
+const r = restaurants[key]; if (!r) return;
 const rImg = (r.menu.food && r.menu.food[0]) ? r.menu.food[0].image : (r.menu.coffee && r.menu.coffee[0]) ? r.menu.coffee[0].image : '';
 document.getElementById('appExplorerRestHeader').innerHTML = `<div class="app-explorer-rest-img" style="background-image:url('${rImg}')"></div><div class="app-explorer-rest-info"><h3>${r.name}</h3><div class="app-explorer-rest-meta"><span><i class="fas fa-utensils"></i> ${r.cuisine||''}</span><span><i class="fas fa-star" style="color:#f59e0b;"></i> ${r.rating||'4.5'}</span><span><i class="fas fa-clock"></i> ${r.deliveryTime||''}</span></div></div>`;
 const active = r.activeCategories || allCategories;
@@ -5197,8 +5209,10 @@ appRenderExplorerMenuItems();
 document.getElementById('appHomeView').style.display = 'none';
 document.getElementById('appExplorerContainer').classList.add('active');
 if (cartVisible) { cartVisible = false; document.getElementById('appCartWindow').classList.remove('visible'); }
-window.scrollTo({ top: 0 }); }
-function appBackToRestaurants() { document.getElementById('appExplorerContainer').classList.remove('active'); document.getElementById('appHomeView').style.display = 'block'; document.getElementById('appMiniCartBar').classList.remove('visible'); currentRestaurant = null; window.scrollTo({ top: 0 }); appRenderRestaurantList(); }
+window.scrollTo({ top: 0 });
+});
+}
+function appBackToRestaurants() { document.getElementById('appExplorerContainer').classList.remove('active'); document.getElementById('appHomeView').style.display = 'block'; document.getElementById('appMiniCartBar').classList.remove('visible'); currentRestaurant = null; window.scrollTo({ top: 0 }); refreshRestaurants().then(() => appRenderRestaurantList()); }
 
 function appRenderExplorerMenuItems() {
 if (!currentRestaurant || !restaurants[currentRestaurant]) return;
