@@ -2597,29 +2597,11 @@ function fpRequestLocation() {
         customerLocation = { lat, lng, area: 'Detecting...' };
         localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
         (async () => {
-          try {
-            if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
-              customerLocation.area = await resolveHargeisaLocation(lat, lng);
-            } else {
-              const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
-              const data = await res.json();
-              const a = data.address || {};
-              const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
-              const landmark = a.amenity || a.shop || a.tourism || '';
-              customerLocation.area = landmark ? `${landmark}, ${area}` : area;
-              customerLocation.fullAddress = data.display_name || '';
-            }
-            localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-            updateSearchPlaceholder();
-            showAppToast('📍 Location: ' + customerLocation.area);
-          } catch(e) {
-            if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
-              customerLocation.area = getHargeisaArea(lat, lng);
-            }
-            localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-            updateSearchPlaceholder();
-            showAppToast('📍 GPS captured');
-          }
+          const locData = await smartReverseGeocode(lat, lng);
+          customerLocation = { ...customerLocation, ...locData };
+          localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+          updateSearchPlaceholder();
+          showAppToast('📍 Location: ' + customerLocation.area);
           if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
         })();
       },
@@ -3913,6 +3895,28 @@ function getHargeisaArea(lat, lng) {
   return subArea + ', ' + closest.name + ', Hargeisa';
 }
 
+async function smartReverseGeocode(lat, lng) {
+  try {
+    if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
+      const area = await resolveHargeisaLocation(lat, lng);
+      return { district: 'Hargeisa', subArea: area.split(',')[0], area: area, fullAddress: area + ', Somaliland' };
+    }
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
+    const data = await res.json();
+    const addr = data.address || {};
+    const district = addr.state_district || addr.city_district || addr.county || addr.district || addr.city || 'Not specified';
+    const subArea = addr.suburb || addr.neighbourhood || addr.quarter || addr.town || addr.village || 'Not specified';
+    const area = subArea !== 'Not specified' ? `${subArea}, ${district}` : district;
+    return { district, subArea, area, fullAddress: data.display_name || '' };
+  } catch (e) {
+    if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
+      const area = getHargeisaArea(lat, lng);
+      return { district: 'Hargeisa', subArea: area.split(',')[0], area, fullAddress: area };
+    }
+    return { district: 'Unknown', subArea: 'Unknown', area: 'Detected Location', fullAddress: '' };
+  }
+}
+
 function resolveHargeisaLocation(lat, lng) {
   let minDist = Infinity, closest = hargeisaDistricts[0];
   for (const d of hargeisaDistricts) {
@@ -3953,20 +3957,8 @@ if (saved) {
     }
     if (customerLocation.lat && customerLocation.lng) {
       (async () => {
-        try {
-          if (customerLocation.lat >= 9.54 && customerLocation.lat <= 9.58 && customerLocation.lng >= 44.05 && customerLocation.lng <= 44.08) {
-            customerLocation.area = await resolveHargeisaLocation(customerLocation.lat, customerLocation.lng);
-          } else {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${customerLocation.lat}&lon=${customerLocation.lng}&addressdetails=1`);
-            const data = await res.json();
-            const a = data.address || {};
-            customerLocation.area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
-          }
-        } catch(e) {
-          if (customerLocation.lat >= 9.54 && customerLocation.lat <= 9.58 && customerLocation.lng >= 44.05 && customerLocation.lng <= 44.08) {
-            customerLocation.area = getHargeisaArea(customerLocation.lat, customerLocation.lng);
-          }
-        }
+        const locData = await smartReverseGeocode(customerLocation.lat, customerLocation.lng);
+        customerLocation = { ...customerLocation, ...locData };
         localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
         updateSearchPlaceholder();
         showAppToast('📍 Location: ' + customerLocation.area);
@@ -3974,37 +3966,6 @@ if (saved) {
       return;
     }
   } catch(e) {}
-}
-if (localStorage.getItem('gopoint_loc_permitted') === '1') {
-  if (!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(async (pos) => {
-    const lat = pos.coords.latitude, lng = pos.coords.longitude;
-    customerLocation = { lat, lng, area: 'Detecting...' };
-    try {
-      if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
-        customerLocation.area = await resolveHargeisaLocation(lat, lng);
-      } else {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
-        const data = await res.json();
-        const a = data.address || {};
-        const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
-        const landmark = a.amenity || a.shop || a.tourism || a.landmark || '';
-        customerLocation.area = landmark ? `${landmark}, ${area}` : area;
-        customerLocation.fullAddress = data.display_name || '';
-      }
-      localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-      updateSearchPlaceholder();
-      showAppToast('📍 Location: ' + customerLocation.area);
-    } catch (e) {
-      if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
-        customerLocation.area = getHargeisaArea(lat, lng);
-      }
-      localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-      updateSearchPlaceholder();
-      showAppToast('📍 GPS captured');
-    }
-  }, (err) => {}, { enableHighAccuracy: true, timeout: 15000 });
-  return;
 }
 fpShowLocationOverlay();
 }

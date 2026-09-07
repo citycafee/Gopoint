@@ -981,19 +981,49 @@ const wrap = document.getElementById('dpActiveMapWrap');
 if (wrap) wrap.style.display = 'none';
 }
 
-function dpToggleOnline() {
-if (dpAdminDeactivated) { dpToast('🔴 deactivated by admin - Contact admin to reactivate', 'error'); return; }
-dpOnline = !dpOnline;
-dpUpdateUI();
-if (dpOnline) {
-dpRefresh();
-dpCheckForIncomingCalls();
-dpToast('🟢 You are now Online', 'success');
-} else {
-dpStopRingtone();
-hideIncomingCall();
-dpToast('⚫ You are now Offline', 'info');
+function dpCheckGpsStatus() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      dpToast('⚠️ GPS not supported by browser', 'error');
+      resolve(false);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      () => resolve(true),
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          dpToast('⚠️ Please enable location permission in settings', 'error');
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          dpToast('⚠️ Please turn on your device GPS/Location', 'error');
+        } else {
+          dpToast('⚠️ Location unavailable: ' + err.message, 'error');
+        }
+        resolve(false);
+      },
+      { enableHighAccuracy: true, timeout: 5000 }
+    );
+  });
 }
+
+async function dpToggleOnline() {
+  if (dpAdminDeactivated) { dpToast('🔴 deactivated by admin - Contact admin to reactivate', 'error'); return; }
+
+  if (!dpOnline) {
+    const gpsOk = await dpCheckGpsStatus();
+    if (!gpsOk) return;
+  }
+
+  dpOnline = !dpOnline;
+  dpUpdateUI();
+  if (dpOnline) {
+    dpRefresh();
+    dpCheckForIncomingCalls();
+    dpToast('🟢 You are now Online', 'success');
+  } else {
+    dpStopRingtone();
+    hideIncomingCall();
+    dpToast('⚫ You are now Offline', 'info');
+  }
 }
 
 function dpResetDemo() { if(confirm('Reset all demo data and reload?')) { localStorage.clear(); location.reload(); } }
