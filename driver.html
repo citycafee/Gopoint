@@ -779,7 +779,7 @@ const defaultVehicles = [
 ];
 
 // ─── GLOBAL DRIVER PORTAL VARIABLES ───
-let dpDriver = null, dpOnline = true, dpAdminDeactivated = false, dpRinging = new Set(), dpRingCtx = null, dpRingOsc = null, dpRingGain = null, dpRingInt = null, dpCurrentTab = 'incoming', dpHistoryFilter = 'all', dpEarningsFilter = 'all', dpDateFrom = null, dpDateTo = null;
+let dpDriver = null, dpOnline = true, dpAdminDeactivated = false, dpRinging = new Set(), dpRingCtx = null, dpRingOsc = null, dpRingGain = null, dpRingInt = null, dpCurrentTab = 'incoming', dpHistoryFilter = 'all', dpEarningsFilter = 'all', dpDateFrom = null, dpDateTo = null, dpLocationWatchId = null;
 let dpActiveMap = null, dpActiveDriverMarker = null, dpCustomerMarker = null, dpPickupMarker = null, dpRouteLine = null, dpActiveMidLabel = null, dpActiveOrderId = null;
 let dpPickupToCustLabel = null;
 let dpCurrentCallOrderId = null;
@@ -1018,10 +1018,12 @@ async function dpToggleOnline() {
   if (dpOnline) {
     dpRefresh();
     dpCheckForIncomingCalls();
+    dpStartLocationTracking();
     dpToast('🟢 You are now Online', 'success');
   } else {
     dpStopRingtone();
     hideIncomingCall();
+    dpStopLocationTracking();
     dpToast('⚫ You are now Offline', 'info');
   }
 }
@@ -1430,6 +1432,29 @@ dpRingGain = null;
 }
 
 // ─── DRIVER MAP FUNCTIONS ───
+function dpStartLocationTracking() {
+  if (!navigator.geolocation || dpLocationWatchId !== null) return;
+  dpLocationWatchId = navigator.geolocation.watchPosition(
+    (p) => {
+      const la = p.coords.latitude, lo = p.coords.longitude;
+      if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la, lo]);
+      if (dpDriver) { dpDriver.lat = la; dpDriver.lng = lo; }
+      if (dpActiveMap && !dpActiveOrderId) {
+        dpActiveMap.panTo([la, lo]);
+      }
+    },
+    (err) => { console.warn('GPS Watch Error:', err); },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+}
+
+function dpStopLocationTracking() {
+  if (dpLocationWatchId !== null) {
+    navigator.geolocation.clearWatch(dpLocationWatchId);
+    dpLocationWatchId = null;
+  }
+}
+
 function dpClearRouteLayers(map) {
 const m = map || dpActiveMap;
 if (!m) return;
@@ -1450,14 +1475,16 @@ dpActiveMap = L.map('dpActiveMapBox', { zoomControl: true }).setView([la, lo], 1
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(dpActiveMap);
 const ico = L.divIcon({ html: `<div style="width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.3);font-size:14px"><i class="fas fa-motorcycle"></i></div>`, className: '', iconSize: [36, 36], iconAnchor: [18, 18] });
 dpActiveDriverMarker = L.marker([la, lo], { icon: ico }).addTo(dpActiveMap);
-if (navigator.geolocation) {
-navigator.geolocation.getCurrentPosition(p => {
-const la2 = p.coords.latitude, lo2 = p.coords.longitude;
-if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la2, lo2]);
-if (dpActiveMap) dpActiveMap.setView([la2, lo2], 15);
-if (dpDriver) { dpDriver.lat = la2; dpDriver.lng = lo2; }
-}, () => {}, { enableHighAccuracy: true, timeout: 10000 });
-}
+  if (dpOnline) {
+    dpStartLocationTracking();
+  } else if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(p => {
+      const la2 = p.coords.latitude, lo2 = p.coords.longitude;
+      if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la2, lo2]);
+      if (dpActiveMap) dpActiveMap.setView([la2, lo2], 15);
+      if (dpDriver) { dpDriver.lat = la2; dpDriver.lng = lo2; }
+    }, () => {}, { enableHighAccuracy: true, timeout: 10000 });
+  }
 }
 
 function dpShowCustomerOnMap(orderId, opts = {}) {
