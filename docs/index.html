@@ -315,6 +315,9 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-profile-view .pf-info-edit { background: none; border: none; color: #00A19B; font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 8px; transition: background .2s; }
 .app-profile-view .pf-info-edit:hover { background: #f0fdf9; }
 .app-profile-view .pf-info-edit:disabled { opacity: 0.5; cursor: not-allowed; }
+@keyframes pfRowSaved { 0% { background: transparent; } 30% { background: #ecfdf5; } 100% { background: transparent; } }
+.app-profile-view .pf-info-row.pf-row-saved { animation: pfRowSaved 1.2s ease; }
+.app-profile-view .pf-info-row.pf-row-saved .pf-info-value { color: #16a34a; font-weight: 700; }
 .app-profile-view .pf-order-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
 .app-profile-view .pf-order-item:last-child { border-bottom: none; }
 .app-profile-view .pf-order-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
@@ -4385,6 +4388,18 @@ saveBtn.textContent = 'Save Changes';
 saveBtn.style.background = '';
 saveBtn.disabled = false;
 showAppToast('✅ Profile updated');
+setTimeout(() => {
+  const rows = document.querySelectorAll('.pf-info-row');
+  rows.forEach(row => { row.classList.remove('pf-row-saved'); });
+  const nameRow = document.getElementById('pfInfoName');
+  const phoneRow = document.getElementById('pfInfoPhone');
+  const emailRow = document.getElementById('pfInfoEmail');
+  const addrRow = document.getElementById('pfInfoAddress');
+  [nameRow, phoneRow, emailRow, addrRow].forEach(el => {
+    if (el && el.closest) el.closest('.pf-info-row')?.classList.add('pf-row-saved');
+  });
+  setTimeout(() => { rows.forEach(row => { row.classList.remove('pf-row-saved'); }); }, 1500);
+}, 100);
 }, 800);
 }
 
