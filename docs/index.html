@@ -2865,7 +2865,24 @@ if (session?.user) {
 }
 
 const savedUser = localStorage.getItem('gopoint_user');
-if (savedUser) { try { currentUser = JSON.parse(savedUser); goToMarketplace(); } catch (e) { localStorage.removeItem('gopoint_user'); } }
+if (savedUser) {
+  try {
+    const parsed = JSON.parse(savedUser);
+    currentUser = parsed;
+    if (supaConnected && parsed.id) {
+      const { data: prof } = await sb.from('profiles').select('*').eq('id', parsed.id).single();
+      if (prof) {
+        currentUser.name = prof.full_name || parsed.name;
+        currentUser.phone = prof.phone || parsed.phone;
+        currentUser.email = prof.email || parsed.email;
+        currentUser.address = prof.address || parsed.address || '';
+        currentUser.created = prof.created_at;
+        localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
+      }
+    }
+    goToMarketplace();
+  } catch (e) { localStorage.removeItem('gopoint_user'); }
+}
 window.addEventListener('scroll', () => {
 const header = document.getElementById('fpHeader');
 if (header) { if (window.scrollY > 50) header.classList.add('scrolled'); else header.classList.remove('scrolled'); }
@@ -4180,7 +4197,7 @@ localStorage.setItem('gopoint_users', JSON.stringify(users));
 completeLogin({ name, email, phone: '', provider: 'email' });
 }
 
-function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
+async function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); if (supaConnected && user.id) { await sb.from('profiles').upsert({ id: user.id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '' }, { onConflict: 'id' }); } closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
 function goToMarketplace() { document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('fpDriverLoginPopup').classList.remove('active'); document.getElementById('fpAdminLoginPopup').classList.remove('active'); document.getElementById('fpLoginModal').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); updateSearchPlaceholder(); detectFrontLocation(); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
 
 async function logoutUser() {
