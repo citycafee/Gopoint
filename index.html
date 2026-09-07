@@ -45,6 +45,21 @@
 --text: #0f172a;
 --gray: #64748b;
 --light-gray-app: #e2e8f0;
+--yellow-soft: #FEF3C7;
+--yellow-dark: #B45309;
+--blue-soft: #E0E7FF;
+--purple: #8B5CF6;
+--purple-soft: #EDE9FE;
+--green: #10B981;
+--green-soft: #D1FAE5;
+--red: #EF4444;
+--red-soft: #FEE2E2;
+--blue: #6366F1;
+--primary-glow: rgba(255,107,0,.15);
+--primary-soft: #FFF7ED;
+--surface: #FFFFFF;
+--surface-2: #F1F5F9;
+--border: #E2E8F0;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -100,8 +115,8 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 
 /* ─── FRONT PAGE ─── */
 #frontPageContainer { position: relative; min-height: 100vh; background: var(--light-gray); }
-.fp-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.15); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); transition: var(--transition); }
-.fp-header.scrolled { background: rgba(0, 0, 0, 0.9); padding: 10px 30px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); }
+.fp-header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.97); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,.08); transition: var(--transition); }
+.fp-header.scrolled { background: rgba(15, 23, 42, 0.99); padding: 10px 30px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); }
 .fp-logo-text { font-size: 24px; font-weight: 900; color: var(--white); letter-spacing: -0.5px; }
 .fp-logo-text span { color: var(--theme); }
 .fp-nav ul { display: flex; list-style: none; gap: 8px; align-items: center; }
@@ -114,8 +129,8 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-mobile-menu a { color: var(--white); text-decoration: none; font-size: 24px; font-weight: 600; padding: 12px 30px; border-radius: var(--radius-md); cursor: pointer; }
 .fp-login-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
 .fp-login-modal.active { opacity: 1; visibility: visible; }
-.fp-login-card { background: var(--white); border-radius: 20px; width: 90%; max-width: 420px; padding: 32px 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); position: relative; overflow: hidden; max-height: 90vh; overflow-y: auto; }
-.fp-login-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--theme), var(--theme-dark)); }
+.fp-login-card { background: var(--white); border-radius: 14px; width: 90%; max-width: 420px; padding: 32px 24px; box-shadow: var(--shadow-lg); position: relative; overflow: hidden; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); }
+.fp-login-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); }
 .fp-google-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 10001; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
 .fp-google-modal.active { opacity: 1; visibility: visible; }
 .fp-google-modal-card { background: var(--white); border-radius: var(--radius-xl); width: 90%; max-width: 440px; padding: 28px; box-shadow: var(--shadow-lg); position: relative; overflow: hidden; max-height: 90vh; overflow-y: auto; }
@@ -133,7 +148,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-login-logo p { font-size: 14px; color: #888; margin-top: 4px; }
 #fpDriverLoginSection input:focus,
 #fpAdminLoginSection input:focus { border-color: var(--theme) !important; box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.12) !important; outline: none; }
-.fp-login-tabs { display: flex; gap: 6px; margin-bottom: 20px; background: #f1f5f9; padding: 4px; border-radius: 10px; }
+.fp-login-tabs { display: flex; gap: 6px; margin-bottom: 20px; background: var(--surface-2); padding: 4px; border-radius: 10px; }
 .fp-login-tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 0.9rem; transition: var(--transition); }
 .fp-login-tab.active { background: var(--white); color: var(--primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
 .fp-form-group { margin-bottom: 16px; }
@@ -245,19 +260,21 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 #appContainer.driver-active #appDeliveryForm,
 #appContainer.driver-active #appPaymentForm,
 #appContainer.driver-active #appTrackingModal { display: none !important; }
-.app-navbar { background: #fff; height: 70px; position: fixed; top: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06); display: flex; align-items: center; padding: 0 2rem; }
+.app-navbar { background: rgba(15, 23, 42, 0.97); height: 70px; position: fixed; top: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2); display: flex; align-items: center; padding: 0 2rem; backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,.08); }
 .app-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1400px; margin: 0 auto; }
 .app-nav-left { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
-.app-merchant-logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.3rem; color: var(--primary); }
-.app-search-box { display: flex; align-items: center; background: #f0f0f0; border-radius: 30px; padding: 6px 16px; min-width: 260px; gap: 10px; }
-.app-search-box input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.95rem; font-family: inherit; }
+.app-merchant-logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.3rem; color: var(--white); }
+.app-search-box { display: flex; align-items: center; background: rgba(255,255,255,.1); border-radius: 30px; padding: 6px 16px; min-width: 260px; gap: 10px; border: 1px solid rgba(255,255,255,.08); }
+.app-search-box input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.95rem; font-family: inherit; color: var(--white); }
+.app-search-box input::placeholder { color: rgba(255,255,255,.5); }
 .app-nav-right { display: flex; align-items: center; gap: 0.8rem; }
 .app-nav-right ul { display: flex; gap: 0.5rem; list-style: none; align-items: center; }
-.app-nav-right ul li { cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 30px; transition: 0.2s; font-weight: 500; font-size: 0.9rem; }
-.app-nav-right ul li:hover { background: rgba(34, 197, 94, 0.08); }
+.app-nav-right ul li { cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 30px; transition: 0.2s; font-weight: 500; font-size: 0.9rem; color: rgba(255,255,255,.7); }
+.app-nav-right ul li:hover { background: rgba(255,255,255,.1); color: #fff; }
 .app-nav-right ul li i { color: var(--primary); font-size: 1rem; }
-.user-avatar-btn { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 30px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white !important; cursor: pointer; border: none; font-weight: 600; font-size: 0.85rem; transition: var(--transition); }
-.user-avatar-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
+.app-nav-right ul li.active-nav { background: rgba(255,255,255,.1); color: #fff; }
+.user-avatar-btn { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 30px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white !important; cursor: pointer; border: none; font-weight: 600; font-size: 0.85rem; transition: var(--transition); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
+.user-avatar-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4); }
 .user-avatar-btn .avatar-circle { width: 30px; height: 30px; border-radius: 50%; background: white; color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
 .user-avatar-btn .user-name { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .user-dropdown { position: absolute; top: 60px; right: 20px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); min-width: 220px; padding: 8px; display: none; z-index: 100; }
@@ -273,7 +290,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-view { display: none; margin-top: 70px; padding: 1rem 2rem; max-width: 1400px; margin-left: auto; margin-right: auto; }
 .app-view.active { display: block; }
 .app-profile-view { min-height: 100vh; background: var(--bg); padding-bottom: 40px; margin: 0 -2rem; }
-.app-profile-view .pf-hero { background: linear-gradient(135deg, #F5C451 0%, #e6b33e 60%, #00A19B 100%); padding: 0 24px 60px; position: relative; }
+.app-profile-view .pf-hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 0 24px 60px; position: relative; }
 .app-profile-view .pf-hero-top { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; }
 .app-profile-view .pf-hero-top .pf-back-btn { background: rgba(255,255,255,0.25); backdrop-filter: blur(8px); border: none; color: #1a1a1a; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; }
 .app-profile-view .pf-hero-top .pf-back-btn:hover { background: rgba(255,255,255,0.45); }
@@ -296,7 +313,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-profile-view .pf-stat-card:hover { transform: translateY(-2px); }
 .app-profile-view .pf-stat-num { font-size: 26px; font-weight: 800; color: var(--primary); }
 .app-profile-view .pf-stat-lbl { font-size: 11px; color: #888; font-weight: 600; margin-top: 2px; }
-.app-profile-view .pf-section { background: #fff; border-radius: 20px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.app-profile-view .pf-section { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
 .app-profile-view .pf-section-title { font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
 .app-profile-view .pf-section-title i { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; flex-shrink: 0; }
 .app-profile-view .pf-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -354,10 +371,10 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-profile-view .pf-bottom-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
 .app-profile-view .pf-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all .2s; font-family: inherit; }
 .app-profile-view .pf-btn:active { transform: scale(0.97); }
-.app-profile-view .pf-btn-primary { background: linear-gradient(135deg, #00A19B, #008F8A); color: #fff; box-shadow: 0 4px 16px rgba(0,161,155,0.3); }
-.app-profile-view .pf-btn-primary:hover { box-shadow: 0 6px 24px rgba(0,161,155,0.4); }
-.app-profile-view .pf-btn-outline { background: #fff; color: #E63946; border: 2px solid #E63946; }
-.app-profile-view .pf-btn-outline:hover { background: #fef2f2; }
+.app-profile-view .pf-btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 4px 16px rgba(34,197,94,.3); }
+.app-profile-view .pf-btn-primary:hover { box-shadow: 0 6px 24px rgba(34,197,94,.4); }
+.app-profile-view .pf-btn-outline { background: var(--white); color: var(--red); border: 2px solid var(--red); border-radius: 10px; }
+.app-profile-view .pf-btn-outline:hover { background: var(--red-soft); }
 .app-profile-view .pf-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
 .app-profile-view .pf-modal-overlay.active { display: flex; }
 .app-profile-view .pf-modal-card { background: #fff; border-radius: 20px; padding: 28px 24px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; }
@@ -383,7 +400,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-address-card .address-actions button { padding: 4px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
 .btn-delete { background: #fee2e2; color: #ef4444; }
 .btn-add-address { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: 600; font-family: inherit; }
-.app-sticky-top { position: sticky; top: 70px; background: #fff; z-index: 100; padding: 0.8rem 0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); border-bottom: 1px solid #e5e7eb; }
+.app-sticky-top { position: sticky; top: 70px; background: rgba(255,255,255,.85); backdrop-filter: blur(16px) saturate(180%); z-index: 100; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
 .app-filter-triggers { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
 .app-cat-name { border-left: 4px solid var(--primary); padding-left: 12px; font-weight: 600; font-size: 1.1rem; }
 .app-banner { padding: 1rem 0; }
@@ -409,8 +426,10 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 #appMap { height: 380px; width: 100%; border-radius: 16px; z-index: 1; }
 .app-container { max-width: 1400px; margin: 0 auto; padding: 1.5rem 0; }
 .app-row-eq-height { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-.app-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); transition: 0.3s; border: 1px solid #e2e8f0; cursor: pointer; height: 100%; }
-.app-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12); border-color: var(--primary); }
+.app-card { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.04); transition: var(--transition); border: 1px solid var(--border); cursor: pointer; height: 100%; position: relative; }
+.app-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); opacity: 0; transition: var(--transition); }
+.app-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: transparent; }
+.app-card:hover::after { opacity: 1; }
 .app-card_inner { display: flex; flex-direction: column; padding: 16px; gap: 10px; height: 100%; }
 .app-card_image_view { width: 100%; height: 160px; object-fit: cover; border-radius: 12px; }
 .app-card_heading { font-size: 1.1rem; font-weight: 700; color: var(--text); }
@@ -424,7 +443,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-restaurant-distance { background: rgba(59, 130, 246, 0.15); color: #3b82f6; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
 .app-view-menu { color: var(--primary); font-weight: 600; font-size: 0.9rem; cursor: pointer; border: none; background: none; }
 .app-view-menu:hover { text-decoration: underline; }
-.app-footer-container { background: #0f172a; color: #ddd; padding: 3rem 0 1rem; margin-top: 3rem; }
+.app-footer-container { background: #0f0f0f; color: #ddd; padding: 3rem 0 1rem; margin-top: 3rem; border-top: 1px solid rgba(255,255,255,.08); }
 .app-footer-container .app-container { max-width: 1200px; }
 .app-top-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
 .app-column-row { margin: 6px 0; font-size: 0.9rem; }
@@ -481,30 +500,30 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
   #appExplorerMenuItems .menu-item .item-content .item-footer .item-price { font-size: 11px; }
   #appExplorerMenuItems .menu-item .item-content .item-footer .add-btn { padding: 4px 8px; font-size: 10px; }
 }
-.app-mini-cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 12px 20px; display: none !important; justify-content: space-between; align-items: center; z-index: 900; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15); cursor: pointer; }
+.app-mini-cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 12px 20px; display: none !important; justify-content: space-between; align-items: center; z-index: 900; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2); cursor: pointer; }
 .app-mini-cart-bar.visible { display: flex; }
 .app-mini-cart-info { display: flex; align-items: center; gap: 12px; }
 .app-mini-cart-count { background: rgba(255, 255, 255, 0.25); padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; }
 .app-mini-cart-total { font-size: 1.1rem; font-weight: 700; }
 .app-mini-cart-view { background: white; color: var(--primary); padding: 8px 20px; border-radius: 30px; font-weight: 700; font-size: 0.9rem; }
-.app-cart-window { position: fixed; bottom: 80px; right: 20px; width: 340px; max-height: 80vh; z-index: 1000; box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25); border-radius: 22px; overflow: hidden; display: none; background: white; }
+.app-cart-window { position: fixed; bottom: 80px; right: 20px; width: 340px; max-height: 80vh; z-index: 1000; box-shadow: var(--shadow-lg); border-radius: 16px; overflow: hidden; display: none; background: white; border: 1px solid var(--border); }
 .app-cart-window.visible { display: block; }
 .app-cart-content { max-height: 60vh; overflow-y: auto; }
 .app-modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; }
 .app-modal-overlay.hidden { display: none; }
-.app-modal-card { background: white; border-radius: 16px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; }
+.app-modal-card { background: white; border-radius: 14px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; box-shadow: var(--shadow-lg); border: 1px solid var(--border); }
 .app-modal-close { position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 24px; color: #777; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 .app-modal-close:hover { background: #f0f0f0; color: var(--primary); }
-.app-glovo-button { background: var(--primary); color: white; border-radius: 10px; padding: 12px 24px; font-weight: 600; border: none; cursor: pointer; font-family: inherit; font-size: 0.95rem; transition: var(--transition); }
-.app-glovo-button:hover { background: var(--primary-dark); }
-.app-glovo-input, .app-glovo-select { border: 2px solid #e5e7eb; border-radius: 10px; padding: 12px 16px; width: 100%; font-family: inherit; outline: none; transition: var(--transition); }
-.app-glovo-input:focus, .app-glovo-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2); }
+.app-glovo-button { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border-radius: 10px; padding: 12px 24px; font-weight: 600; border: none; cursor: pointer; font-family: inherit; font-size: 0.95rem; transition: var(--transition); box-shadow: 0 2px 8px rgba(16,185,129,.3); }
+.app-glovo-button:hover { background: linear-gradient(135deg, var(--primary-dark), #059669); box-shadow: 0 4px 12px rgba(16,185,129,.4); }
+.app-glovo-input, .app-glovo-select { border: 2px solid var(--border); border-radius: 8px; padding: 12px 16px; width: 100%; font-family: inherit; outline: none; transition: var(--transition); background: var(--white); }
+.app-glovo-input:focus, .app-glovo-select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(255,107,0,.15); }
 .app-step-indicator { display: flex; justify-content: space-between; margin-bottom: 2rem; }
 .app-step { flex: 1; text-align: center; padding: 0.5rem; position: relative; }
 .app-step:not(:last-child):after { content: ''; position: absolute; top: 50%; right: 0; transform: translateY(-50%); height: 2px; width: 100%; background-color: #ddd; z-index: 1; }
-.app-step.active .app-step-number { background: #f59e0b; color: white; }
-.app-step.completed .app-step-number { background: var(--primary); color: white; }
-.app-step-number { width: 40px; height: 40px; border-radius: 50%; background: #e5e7eb; color: #6B7280; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; position: relative; z-index: 2; font-weight: 600; }
+.app-step.active .app-step-number { background: linear-gradient(135deg, var(--theme), var(--theme-dark)); color: white; box-shadow: 0 2px 8px rgba(255,107,0,.3); }
+.app-step.completed .app-step-number { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; box-shadow: 0 2px 8px rgba(34,197,94,.3); }
+.app-step-number { width: 40px; height: 40px; border-radius: 50%; background: var(--surface-2); color: #6B7280; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; position: relative; z-index: 2; font-weight: 600; }
 .app-payment-option { border: 2px solid #e5e7eb; border-radius: 1rem; padding: 1.25rem 0.5rem; text-align: center; cursor: pointer; transition: all 0.3s; background: white; position: relative; }
 .app-payment-option:hover { border-color: var(--primary); transform: translateY(-3px); }
 .app-payment-option.selected { border-color: var(--primary); background: rgba(34, 197, 94, 0.08); }
@@ -512,12 +531,12 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-phone-input { display: flex; border: 2px solid #e5e7eb; border-radius: 0.75rem; overflow: hidden; background: white; }
 .app-phone-prefix { background: #f0fdf4; padding: 0.875rem 1rem; border-right: 2px solid #e5e7eb; font-weight: 600; color: #0f172a; display: flex; align-items: center; }
 .app-phone-number { flex: 1; border: none; padding: 0.875rem 1rem; font-size: 1rem; outline: none; background: transparent; text-align: center; font-weight: 500; font-family: inherit; }
-.app-delivery-method-btn { padding: 1.25rem; border: 2px solid #e5e7eb; border-radius: 1rem; cursor: pointer; transition: all 0.3s; background: white; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; }
-.app-delivery-method-btn:hover { border-color: var(--primary); transform: translateY(-3px); }
-.app-delivery-method-btn.selected { border-color: var(--primary); background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(22, 163, 74, 0.08)); }
+.app-delivery-method-btn { padding: 1.25rem; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: var(--transition); background: white; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; }
+.app-delivery-method-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.app-delivery-method-btn.selected { border-color: var(--primary); background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(22, 163, 74, 0.08)); box-shadow: 0 2px 8px rgba(34,197,94,.15); }
 .app-delivery-method-btn.selected::after { content: '✓'; position: absolute; top: 8px; right: 8px; background: var(--primary); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; }
-.app-detect-location-btn { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 12px 20px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; font-family: inherit; }
-.app-detect-location-btn:hover { transform: translateY(-2px); }
+.app-detect-location-btn { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 12px 20px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; font-family: inherit; box-shadow: 0 2px 8px rgba(59,130,246,.3); transition: var(--transition); }
+.app-detect-location-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,.4); }
 .app-location-status { margin-top: 8px; padding: 8px 12px; border-radius: 8px; font-size: 0.875rem; text-align: center; }
 .app-location-status.success { background: #d1fae5; color: #065f46; }
 .app-location-status.error { background: #fee2e2; color: #991b1b; }
@@ -723,14 +742,14 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .dp-b-sm { padding: 6px 12px; font-size: .78rem; border-radius: 8px; }
 .dp-b-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
 .dp-b-outline:hover { background: var(--primary); color: #fff; }
-.dp-scard { padding: clamp(14px, 3vw, 20px); border-radius: 16px; margin: clamp(12px, 3vw, 20px) 0; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); position: relative; overflow: hidden; }
+.dp-scard { padding: clamp(14px, 3vw, 20px); border-radius: 14px; margin: clamp(12px, 3vw, 20px) 0; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,.1); }
 .dp-scard::before { content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.1); border-radius: 50%; }
 .dp-scard.off { background: linear-gradient(135deg, #64748b, #475569); }
 .dp-scard h3 { font-size: clamp(.95rem, 2.8vw, 1.1rem); font-weight: 700; position: relative; }
 .dp-scard p { font-size: clamp(.75rem, 2vw, .85rem); opacity: .9; position: relative; }
 .dp-scard .dp-ico { font-size: clamp(1.8rem, 5vw, 2.5rem); position: relative; }
 .dp-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(8px, 2vw, 12px); margin-bottom: clamp(12px, 3vw, 20px); }
-.dp-stat { background: #1e293b; padding: clamp(10px, 2.5vw, 16px); border-radius: 12px; border: 1px solid #334155; text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.dp-stat { background: #1e293b; padding: clamp(10px, 2.5vw, 16px); border-radius: 14px; border: 1px solid #334155; text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .dp-stat h4 { font-size: clamp(.6rem, 1.8vw, .7rem); color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
 .dp-stat .v { font-size: clamp(1rem, 2.5vw, 1.25rem); font-weight: 700; color: var(--primary); }
 .dp-stat .sub { font-size: clamp(.6rem, 1.6vw, .7rem); color: #64748b; margin-top: 2px; }
@@ -873,7 +892,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .dp-call-btn-label { font-size: 0.9rem; color: #f8fafc; font-weight: 600; }
 
 /* ─── ADMIN DASHBOARD ─── */
-#adminDashboard { display: none; min-height: 100dvh; }
+#adminDashboard { display: none; min-height: 100dvh; padding-top: 0; }
 #adminDashboard.active { display: block; }
 .admin-login-overlay { display: none; position: fixed; inset: 0; z-index: 10001; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(12px) saturate(150%); align-items: center; justify-content: center; }
 .admin-login-overlay.active { display: flex; }
@@ -1743,21 +1762,24 @@ Gmail
 <!-- How It Works Section -->
 <section style="background:#f8fafc; padding:60px 20px;">
 <div style="max-width:1100px; margin:0 auto; text-align:center;">
-<h2 style="font-size:2rem; font-weight:800; color:#0f172a; margin-bottom:8px;">How It Works</h2>
+<h2 style="font-size:2rem; font-weight:800; color:#0f172a; margin-bottom:8px; letter-spacing:-0.03em;">How It Works</h2>
 <p style="color:#64748b; font-size:1rem; margin-bottom:40px;">Order your favorite food in 3 simple steps</p>
 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:24px;">
-<div style="background:white; border-radius:16px; padding:32px 24px; box-shadow:0 4px 20px rgba(0,0,0,0.06); text-align:center;">
-<div style="width:64px; height:64px; background:linear-gradient(135deg,#22c55e,#16a34a); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;"><i class="fas fa-store" style="font-size:1.5rem; color:white;"></i></div>
+<div style="background:white; border-radius:14px; padding:32px 24px; box-shadow:0 1px 2px rgba(0,0,0,.04); border:1px solid var(--border); text-align:center; transition:var(--transition); position:relative; overflow:hidden;">
+<div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#22c55e,#16a34a);"></div>
+<div style="width:64px; height:64px; background:linear-gradient(135deg,#22c55e,#16a34a); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; box-shadow:0 4px 12px rgba(34,197,94,.25);"><i class="fas fa-store" style="font-size:1.5rem; color:white;"></i></div>
 <h3 style="font-size:1.1rem; font-weight:700; color:#0f172a; margin-bottom:8px;">1. Browse Restaurants</h3>
 <p style="color:#64748b; font-size:0.9rem; line-height:1.6;">Explore local restaurants, view menus, and find your favorite dishes. Filter by cuisine, rating, or delivery time.</p>
 </div>
-<div style="background:white; border-radius:16px; padding:32px 24px; box-shadow:0 4px 20px rgba(0,0,0,0.06); text-align:center;">
-<div style="width:64px; height:64px; background:linear-gradient(135deg,#f59e0b,#d97706); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;"><i class="fas fa-shopping-cart" style="font-size:1.5rem; color:white;"></i></div>
+<div style="background:white; border-radius:14px; padding:32px 24px; box-shadow:0 1px 2px rgba(0,0,0,.04); border:1px solid var(--border); text-align:center; transition:var(--transition); position:relative; overflow:hidden;">
+<div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#f59e0b,#d97706);"></div>
+<div style="width:64px; height:64px; background:linear-gradient(135deg,#f59e0b,#d97706); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; box-shadow:0 4px 12px rgba(245,158,11,.25);"><i class="fas fa-shopping-cart" style="font-size:1.5rem; color:white;"></i></div>
 <h3 style="font-size:1.1rem; font-weight:700; color:#0f172a; margin-bottom:8px;">2. Place Your Order</h3>
 <p style="color:#64748b; font-size:0.9rem; line-height:1.6;">Add items to cart, choose delivery or pickup, select payment method (Telesom, E-Dahab, or Cash), and confirm your order.</p>
 </div>
-<div style="background:white; border-radius:16px; padding:32px 24px; box-shadow:0 4px 20px rgba(0,0,0,0.06); text-align:center;">
-<div style="width:64px; height:64px; background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;"><i class="fas fa-motorcycle" style="font-size:1.5rem; color:white;"></i></div>
+<div style="background:white; border-radius:14px; padding:32px 24px; box-shadow:0 1px 2px rgba(0,0,0,.04); border:1px solid var(--border); text-align:center; transition:var(--transition); position:relative; overflow:hidden;">
+<div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#3b82f6,#1d4ed8);"></div>
+<div style="width:64px; height:64px; background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; box-shadow:0 4px 12px rgba(59,130,246,.25);"><i class="fas fa-motorcycle" style="font-size:1.5rem; color:white;"></i></div>
 <h3 style="font-size:1.1rem; font-weight:700; color:#0f172a; margin-bottom:8px;">3. Fast Delivery</h3>
 <p style="color:#64748b; font-size:0.9rem; line-height:1.6;">A nearby rider picks up your order and delivers it fast. Track your delivery in real-time on the map.</p>
 </div>
@@ -1768,35 +1790,35 @@ Gmail
 <!-- Features Section -->
 <section style="background:white; padding:60px 20px;">
 <div style="max-width:1100px; margin:0 auto; text-align:center;">
-<h2 style="font-size:2rem; font-weight:800; color:#0f172a; margin-bottom:8px;">Why Choose Go!point?</h2>
+<h2 style="font-size:2rem; font-weight:800; color:#0f172a; margin-bottom:8px; letter-spacing:-0.03em;">Why Choose Go!point?</h2>
 <p style="color:#64748b; font-size:1rem; margin-bottom:40px;">The best delivery experience in Somaliland</p>
 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:20px;">
-<div style="text-align:center; padding:24px;">
+<div style="text-align:center; padding:24px; background:var(--light-gray); border-radius:14px; border:1px solid var(--border); transition:var(--transition);">
 <div style="font-size:2.5rem; margin-bottom:12px;">⚡</div>
 <h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Lightning Fast</h4>
 <p style="color:#64748b; font-size:0.85rem;">Average delivery in 15-25 minutes. Our riders are always nearby.</p>
 </div>
-<div style="text-align:center; padding:24px;">
+<div style="text-align:center; padding:24px; background:var(--light-gray); border-radius:14px; border:1px solid var(--border); transition:var(--transition);">
 <div style="font-size:2.5rem; margin-bottom:12px;">💰</div>
 <h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Multiple Payments</h4>
 <p style="color:#64748b; font-size:0.85rem;">Pay with Telesom, E-Dahab, or Cash on delivery. Your choice.</p>
 </div>
-<div style="text-align:center; padding:24px;">
+<div style="text-align:center; padding:24px; background:var(--light-gray); border-radius:14px; border:1px solid var(--border); transition:var(--transition);">
 <div style="font-size:2.5rem; margin-bottom:12px;">📍</div>
 <h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Live Tracking</h4>
 <p style="color:#64748b; font-size:0.85rem;">Track your order in real-time from restaurant to your doorstep.</p>
 </div>
-<div style="text-align:center; padding:24px;">
+<div style="text-align:center; padding:24px; background:var(--light-gray); border-radius:14px; border:1px solid var(--border); transition:var(--transition);">
 <div style="font-size:2.5rem; margin-bottom:12px;">🍽️</div>
 <h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Top Restaurants</h4>
 <p style="color:#64748b; font-size:0.85rem;">Order from the best local restaurants. Pizza, burgers, coffee & more.</p>
 </div>
-<div style="text-align:center; padding:24px;">
+<div style="text-align:center; padding:24px; background:var(--light-gray); border-radius:14px; border:1px solid var(--border); transition:var(--transition);">
 <div style="font-size:2.5rem; margin-bottom:12px;">🛵</div>
 <h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Motorcycle & Taxi</h4>
 <p style="color:#64748b; font-size:0.85rem;">Choose motorcycle for fast delivery or taxi for larger orders.</p>
 </div>
-<div style="text-align:center; padding:24px;">
+<div style="text-align:center; padding:24px; background:var(--light-gray); border-radius:14px; border:1px solid var(--border); transition:var(--transition);">
 <div style="font-size:2.5rem; margin-bottom:12px;">🔒</div>
 <h4 style="font-weight:700; color:#0f172a; margin-bottom:6px;">Secure & Reliable</h4>
 <p style="color:#64748b; font-size:0.85rem;">Your orders are handled with care. Rated riders only.</p>
@@ -1843,7 +1865,7 @@ Gmail
 <div class="fp-column"><h4>Legal</h4><a href="#">Terms of Service</a><a href="#">Privacy Policy</a><a href="#">Help Center</a></div>
 </div>
 </div>
-<div class="fp-copyright">© 2025 Go!point — ONE APP TO RULE THEM ALL</div>
+<div class="fp-copyright">© 2026 Go!point — ONE APP TO RULE THEM ALL</div>
 </footer>
 </div>
 
@@ -2427,9 +2449,9 @@ Gmail
 </div>
 <input type="hidden" id="appDeliveryMethod" required>
 </div>
-<div id="appAssignedDriverContainer" style="display:none; margin-top:12px; padding:12px; background:linear-gradient(to right, #f0fdf4, #ecfdf5); border-radius:12px; border:1px solid #bbf7d0;">
+<div id="appAssignedDriverContainer" style="display:none; margin-top:12px; padding:12px; background:var(--green-soft); border-radius:12px; border:1px solid rgba(34,197,94,.2);">
 <div style="display:flex; align-items:center; gap:10px;">
-<i class="fas fa-user-check" style="color:#22c55e; font-size:1.2rem;"></i>
+<i class="fas fa-user-check" style="color:var(--primary); font-size:1.2rem;"></i>
 <div>
 <div style="font-weight:600; color:#065f46; font-size:0.9rem;">Assigned Rider</div>
 <div id="appAssignedDriverName" style="font-weight:700; color:#0f172a; font-size:1rem;"></div>
@@ -2438,7 +2460,7 @@ Gmail
 </div>
 </div>
 <div style="display:flex; gap:10px;">
-<button type="button" onclick="backToPayment()" style="flex:1; background:#e5e7eb; color:#333; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;">Back</button>
+<button type="button" onclick="backToPayment()" style="flex:1; background:var(--surface-2); color:var(--text); padding:12px; border:1px solid var(--border); border-radius:10px; cursor:pointer; font-weight:600; font-family:inherit; transition:var(--transition);">Back</button>
 <button type="submit" class="app-glovo-button" style="flex:1;"><i class="fas fa-lock"></i> Place Order</button>
 </div>
 </form>
@@ -2504,25 +2526,25 @@ Gmail
 <!-- Tracking Modal -->
 <div id="appTrackingModal" class="app-modal-overlay hidden">
 <div class="app-modal-card" style="max-width:900px;">
-<div style="padding:16px; background:linear-gradient(to right, #2563eb, #1e40af); color:white; border-radius:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+<div style="padding:16px; background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:white; border-radius:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
 <div><h3 style="font-size:1.2rem; font-weight:700;"><i class="fas fa-map-marked-alt" style="margin-right:8px;"></i>Live Order Tracking</h3><p style="font-size:0.85rem; opacity:0.9;" id="appTrackingOrderId">Order #------</p></div>
 <button onclick="closeTrackingModal()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:1.2rem;">×</button>
 </div>
 <div id="appTrackingMap" style="height:400px; width:100%; border-radius:12px; margin-bottom:16px;"></div>
 <div class="app-tracking-timeline" id="appTrackingTimeline" style="margin-bottom:16px;"></div>
 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;">
-<div style="background:#f0fdf4; padding:12px; border-radius:10px; border:1px solid #bbf7d0;"><h4 style="font-weight:700; color:#065f46; margin-bottom:6px;"><i class="fas fa-store" style="margin-right:6px;"></i>Restaurant</h4><p id="appTrackRestName" style="font-size:0.9rem; font-weight:600;">-</p><p id="appTrackRestDistance" style="font-size:0.8rem; color:#065f46; margin-top:4px;"><i class="fas fa-map-marker-alt"></i> <span id="appTrackRestDistanceValue">-</span></p></div>
-<div style="background:#eff6ff; padding:12px; border-radius:10px; border:1px solid #bfdbfe;"><h4 style="font-weight:700; color:#1e40af; margin-bottom:6px;"><i class="fas fa-motorcycle" style="margin-right:6px;"></i>Driver</h4><p id="appTrackDriverName" style="font-size:0.9rem; font-weight:600;">-</p><p id="appTrackDriverPhone" style="font-size:0.8rem; color:#666;">-</p></div>
-<div style="background:#fffbeb; padding:12px; border-radius:10px; border:1px solid #fde68a;"><h4 style="font-weight:700; color:#92400e; margin-bottom:6px;"><i class="fas fa-home" style="margin-right:6px;"></i>Delivering To</h4><p id="appTrackCustomerName" style="font-size:0.9rem; font-weight:600;">-</p><p id="appTrackCustomerDistance" style="font-size:0.8rem; color:#92400e; margin-top:4px;"><i class="fas fa-map-marker-alt"></i> <span id="appTrackCustomerDistanceValue">-</span></p></div>
+<div style="background:var(--green-soft); padding:12px; border-radius:10px; border:1px solid rgba(34,197,94,.2);"><h4 style="font-weight:700; color:#065f46; margin-bottom:6px;"><i class="fas fa-store" style="margin-right:6px;"></i>Restaurant</h4><p id="appTrackRestName" style="font-size:0.9rem; font-weight:600;">-</p><p id="appTrackRestDistance" style="font-size:0.8rem; color:#065f46; margin-top:4px;"><i class="fas fa-map-marker-alt"></i> <span id="appTrackRestDistanceValue">-</span></p></div>
+<div style="background:var(--blue-soft); padding:12px; border-radius:10px; border:1px solid rgba(99,102,241,.2);"><h4 style="font-weight:700; color:#1e40af; margin-bottom:6px;"><i class="fas fa-motorcycle" style="margin-right:6px;"></i>Driver</h4><p id="appTrackDriverName" style="font-size:0.9rem; font-weight:600;">-</p><p id="appTrackDriverPhone" style="font-size:0.8rem; color:var(--gray);">-</p></div>
+<div style="background:var(--yellow-soft); padding:12px; border-radius:10px; border:1px solid rgba(245,158,11,.2);"><h4 style="font-weight:700; color:var(--yellow-dark); margin-bottom:6px;"><i class="fas fa-home" style="margin-right:6px;"></i>Delivering To</h4><p id="appTrackCustomerName" style="font-size:0.9rem; font-weight:600;">-</p><p id="appTrackCustomerDistance" style="font-size:0.8rem; color:var(--yellow-dark); margin-top:4px;"><i class="fas fa-map-marker-alt"></i> <span id="appTrackCustomerDistanceValue">-</span></p></div>
 </div>
-<div style="background:#e0e7ff; padding:12px; border-radius:10px; border:1px solid #c7d2fe; margin-bottom:16px;">
-<h4 style="font-weight:700; color:#4338ca; margin-bottom:6px;"><i class="fas fa-route" style="margin-right:6px;"></i>Distance (Restaurant → Customer)</h4>
-<p id="appTrackRestaurantToCustomerDistance" style="font-size:1.1rem; font-weight:700; color:#4338ca;">-</p>
+<div style="background:var(--purple-soft); padding:12px; border-radius:10px; border:1px solid rgba(139,92,246,.2); margin-bottom:16px;">
+<h4 style="font-weight:700; color:var(--purple); margin-bottom:6px;"><i class="fas fa-route" style="margin-right:6px;"></i>Distance (Restaurant → Customer)</h4>
+<p id="appTrackRestaurantToCustomerDistance" style="font-size:1.1rem; font-weight:700; color:var(--purple);">-</p>
 </div>
 <div style="display:flex; gap:10px; flex-wrap:wrap;">
-<button onclick="callDriver()" style="flex:1; min-width:120px; background:var(--primary); color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;"><i class="fas fa-phone"></i> Call Driver</button>
-<button onclick="whatsappDriver()" style="flex:1; min-width:120px; background:#25D366; color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-<button onclick="refreshTracking()" style="flex:1; min-width:120px; background:#3b82f6; color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600;"><i class="fas fa-sync-alt"></i> Refresh</button>
+<button onclick="callDriver()" style="flex:1; min-width:120px; background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600; box-shadow:0 2px 8px rgba(34,197,94,.3);"><i class="fas fa-phone"></i> Call Driver</button>
+<button onclick="whatsappDriver()" style="flex:1; min-width:120px; background:linear-gradient(135deg, #25D366, #128C7E); color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600; box-shadow:0 2px 8px rgba(37,211,102,.3);"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+<button onclick="refreshTracking()" style="flex:1; min-width:120px; background:linear-gradient(135deg, #3b82f6, #1d4ed8); color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:600; box-shadow:0 2px 8px rgba(59,130,246,.3);"><i class="fas fa-sync-alt"></i> Refresh</button>
 </div>
 </div>
 </div>
@@ -3051,20 +3073,21 @@ async function handleGoogleUser(u) {
     email: u.email || '',
     phone: u.user_metadata?.phone || '',
     provider: u.provider || 'google',
-    id: u.id
+    id: u.id,
+    created: u.created_at
   };
   currentUser = googleUser;
   localStorage.setItem('gopoint_user', JSON.stringify(googleUser));
   localStorage.setItem('gopoint_loc_permitted', '1');
   if (supaConnected && u.id) {
-    await sb.from('profiles').upsert({ id: u.id, full_name: googleUser.name, phone: googleUser.phone, email: googleUser.email }, { onConflict: 'id' });
+    await sb.from('profiles').upsert({ id: u.id, full_name: googleUser.name, phone: googleUser.phone, email: googleUser.email, registered_at: u.created_at }, { onConflict: 'id' });
     const { data: prof } = await sb.from('profiles').select('*').eq('id', u.id).single();
     if (prof) {
       currentUser.name = prof.full_name || googleUser.name;
       currentUser.phone = prof.phone || googleUser.phone;
       currentUser.email = prof.email || googleUser.email;
       currentUser.address = prof.address || '';
-      currentUser.created = prof.created_at;
+      currentUser.created = prof.registered_at || prof.created_at || u.created_at;
       localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
     }
   }
@@ -3103,7 +3126,7 @@ sb.auth.onAuthStateChange((event, session) => {
           currentUser.phone = prof.phone || parsed.phone;
           currentUser.email = prof.email || parsed.email;
           currentUser.address = prof.address || parsed.address || '';
-          currentUser.created = prof.created_at;
+          currentUser.created = prof.registered_at || prof.created_at || parsed.created;
           localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
         }
       }
@@ -4494,7 +4517,7 @@ localStorage.setItem('gopoint_users', JSON.stringify(users));
 completeLogin({ name, email, phone: '', provider: 'email' });
 }
 
-async function completeLogin(user) { currentUser = user; localStorage.setItem('gopoint_user', JSON.stringify(user)); if (supaConnected && user.id) { await sb.from('profiles').upsert({ id: user.id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '' }, { onConflict: 'id' }); } closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
+async function completeLogin(user) { currentUser = user; if (!user.created && !user.registeredAt) { const existing = localStorage.getItem('gopoint_user'); const parsed = existing ? JSON.parse(existing) : null; user.created = parsed?.created || new Date().toISOString(); } localStorage.setItem('gopoint_user', JSON.stringify(user)); if (supaConnected && user.id) { await sb.from('profiles').upsert({ id: user.id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '', registered_at: user.created }, { onConflict: 'id' }); } closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
 function goToMarketplace() { document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('fpDriverLoginPopup').classList.remove('active'); document.getElementById('fpAdminLoginPopup').classList.remove('active'); document.getElementById('fpLoginModal').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); updateSearchPlaceholder(); detectFrontLocation(); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
 
 async function logoutUser() {
