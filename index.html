@@ -1062,35 +1062,102 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .fp-wa-qr-modal.active { display: flex; }
 .fp-wa-qr-card {
-  background: #fff; border-radius: 24px; padding: 32px;
+  background: #fff; border-radius: 24px; padding: 32px 28px;
   width: 100%; max-width: 400px; text-align: center;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  max-height: 90vh; overflow-y: auto; position: relative;
 }
-.fp-wa-qr-card h2 { color: #1a1a1a; font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
-.fp-wa-qr-card p { color: #64748b; font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5; }
+.fp-wa-qr-close {
+  position: absolute; top: 16px; right: 16px;
+  background: #f1f5f9; border: none; width: 34px; height: 34px;
+  border-radius: 50%; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: #555; transition: all 0.2s;
+}
+.fp-wa-qr-close:hover { background: #e2e8f0; color: #1a1a1a; }
+.fp-wa-qr-card h2 { color: #1a1a1a; font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+.fp-wa-qr-card > p.wa-subtitle { color: #64748b; font-size: 0.88rem; margin-bottom: 20px; line-height: 1.5; }
+/* ─── TAB BAR ─── */
+.fp-wa-tabs {
+  display: flex; background: #f1f5f9; border-radius: 12px;
+  padding: 4px; margin-bottom: 24px; gap: 4px;
+}
+.fp-wa-tab {
+  flex: 1; padding: 10px 8px; border: none; border-radius: 10px;
+  font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  transition: all 0.25s; background: transparent; color: #64748b;
+  font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.fp-wa-tab.active {
+  background: #fff; color: #25D366; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.fp-wa-tab:hover:not(.active) { color: #334155; }
+/* ─── TAB CONTENT ─── */
+.fp-wa-tab-content { display: none; }
+.fp-wa-tab-content.active { display: block; }
+/* ─── FORM TAB ─── */
+.fp-wa-form-group { margin-bottom: 16px; text-align: left; }
+.fp-wa-form-label { display: block; font-size: 12px; font-weight: 600; color: #555; margin-bottom: 6px; }
+.fp-wa-phone-row {
+  display: flex; border: 2px solid #e5e7eb; border-radius: 12px;
+  overflow: hidden; background: white; transition: all 0.2s;
+}
+.fp-wa-phone-row:focus-within { border-color: #25D366; box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.12); }
+.fp-wa-phone-prefix {
+  display: flex; align-items: center; gap: 2px; padding: 13px 10px;
+  border-right: 1px solid #e5e7eb; background: #fafafa;
+  font-size: 13px; font-weight: 600; color: #333; min-width: 88px;
+}
+.fp-wa-phone-prefix select {
+  border: none; background: transparent; font-size: 12px; font-weight: 600;
+  color: #333; outline: none; cursor: pointer; font-family: inherit;
+  appearance: none; -webkit-appearance: none;
+  padding-right: 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0 center;
+}
+.fp-wa-form-input {
+  width: 100%; border: 2px solid #e5e7eb; border-radius: 12px;
+  padding: 13px 14px; font-size: 15px; font-family: inherit;
+  outline: none; transition: all 0.2s; background: white; color: #1a1a1a;
+}
+.fp-wa-form-input:focus { border-color: #25D366; box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.12); }
+.fp-wa-form-input::placeholder { color: #bbb; }
+.fp-wa-form-btn {
+  width: 100%; padding: 14px; background: #25D366;
+  color: #fff; border: none; border-radius: 12px;
+  font-size: 1rem; font-weight: 700; cursor: pointer;
+  transition: all 0.2s; margin-top: 8px;
+  font-family: inherit;
+}
+.fp-wa-form-btn:hover { background: #1ebe5d; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); }
+/* ─── QR TAB ─── */
 .fp-wa-qr-wrap {
   background: #f8fafc; border: 8px solid #fff; border-radius: 20px;
-  padding: 10px; display: inline-block; margin-bottom: 24px;
+  padding: 10px; display: inline-block; margin-bottom: 20px;
   box-shadow: 0 0 0 1px #e2e8f0;
 }
-.fp-wa-qr-img { width: 220px; height: 220px; display: block; }
+.fp-wa-qr-img { width: 200px; height: 200px; display: block; }
 .fp-wa-qr-status {
-  margin-bottom: 20px; font-weight: 600; font-size: 0.9rem;
+  margin-bottom: 16px; font-weight: 600; font-size: 0.88rem;
   display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .fp-wa-qr-status.waiting { color: #64748b; }
 .fp-wa-qr-status.verifying { color: #3b82f6; }
 .fp-wa-qr-status.success { color: #22c55e; }
+.fp-wa-qr-hint { font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px; line-height: 1.5; }
 .fp-wa-qr-btn {
-  width: 100%; padding: 14px; background: #25D366;
+  width: 100%; padding: 13px; background: #25D366;
   color: #fff; border: none; border-radius: 12px;
-  font-size: 1rem; font-weight: 700; cursor: pointer;
-  transition: all 0.2s; margin-bottom: 12px;
+  font-size: 0.95rem; font-weight: 700; cursor: pointer;
+  transition: all 0.2s; margin-bottom: 10px;
+  font-family: inherit;
 }
 .fp-wa-qr-btn:hover { background: #1ebe5d; transform: translateY(-1px); }
 .fp-wa-qr-btn-ghost {
   background: transparent; color: #64748b;
-  border: none; font-size: 0.9rem; cursor: pointer; font-weight: 500;
+  border: none; font-size: 0.88rem; cursor: pointer; font-weight: 500;
+  font-family: inherit;
 }
 .fp-wa-qr-btn-ghost:hover { color: #1a1a1a; }
 
@@ -1308,23 +1375,59 @@ Facebook
 </div>
 </div>
 
-<!-- ─── WHATSAPP QR LOGIN MODAL ─── -->
+<!-- ─── WHATSAPP LOGIN MODAL ─── -->
 <div class="fp-wa-qr-modal" id="fpWhatsappQrModal">
   <div class="fp-wa-qr-card">
-    <div style="font-size:3rem; margin-bottom:12px;">📱</div>
-    <h2>WhatsApp Login</h2>
-    <p>Scan the QR code below with your WhatsApp app to instantly verify your number and sign in.</p>
+    <button class="fp-wa-qr-close" onclick="closeWhatsappQrLogin()">×</button>
+    <div style="font-size:2.5rem; margin-bottom:8px;">💬</div>
+    <h2>Sign in with WhatsApp</h2>
+    <p class="wa-subtitle">Choose how you'd like to continue</p>
 
-    <div class="fp-wa-qr-wrap">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://wa.me/25261000000?text=Verify%20my%20GoPoint%20account" alt="WhatsApp QR Code" class="fp-wa-qr-img" id="fpWaQrImg">
+    <div class="fp-wa-tabs">
+      <button class="fp-wa-tab active" onclick="switchWaTab('form')"><i class="fas fa-pen-to-square" style="font-size:12px;"></i> Enter Details</button>
+      <button class="fp-wa-tab" onclick="switchWaTab('qr')"><i class="fas fa-qrcode" style="font-size:12px;"></i> Scan QR</button>
     </div>
 
-    <div class="fp-wa-qr-status waiting" id="fpWaQrStatus">
-      <i class="fas fa-circle-notch fa-spin"></i> Waiting for scan...
+    <!-- Tab 1: Enter Details -->
+    <div class="fp-wa-tab-content active" id="fpWaTabForm">
+      <div class="fp-wa-form-group">
+        <label class="fp-wa-form-label">WhatsApp Number</label>
+        <div class="fp-wa-phone-row">
+          <div class="fp-wa-phone-prefix">
+            <select id="fpWaCountry">
+              <option value="+252">🇸🇴 +252</option>
+              <option value="+254">🇰🇪 +254</option>
+              <option value="+256">🇺🇬 +256</option>
+              <option value="+255">🇹🇿 +255</option>
+              <option value="+251">🇪🇹 +251</option>
+            </select>
+          </div>
+          <input type="tel" class="fp-wa-form-input" id="fpWaPhone" placeholder="6X XXX XXXX" maxlength="12" style="border:none; border-radius:0; padding:13px 14px;">
+        </div>
+      </div>
+      <div class="fp-wa-form-group">
+        <label class="fp-wa-form-label">Your Name</label>
+        <input type="text" class="fp-wa-form-input" id="fpWaName" placeholder="e.g. Ahmed Ali" maxlength="40">
+      </div>
+      <button class="fp-wa-form-btn" onclick="submitWhatsappForm()">
+        <i class="fab fa-whatsapp"></i> Continue with WhatsApp
+      </button>
     </div>
 
-    <button class="fp-wa-qr-btn" onclick="verifyWhatsappScan()">Verify Now</button>
-    <button class="fp-wa-qr-btn-ghost" onclick="closeWhatsappQrLogin()">Cancel</button>
+    <!-- Tab 2: Scan QR -->
+    <div class="fp-wa-tab-content" id="fpWaTabQr">
+      <div class="fp-wa-qr-wrap">
+        <img src="" alt="WhatsApp QR Code" class="fp-wa-qr-img" id="fpWaQrImg">
+      </div>
+      <div class="fp-wa-qr-status waiting" id="fpWaQrStatus">
+        <i class="fas fa-circle-notch fa-spin"></i> Waiting for scan...
+      </div>
+      <p class="fp-wa-qr-hint">Open your phone camera, point it at the QR code, then tap the link to open WhatsApp and verify.</p>
+      <button class="fp-wa-qr-btn" onclick="verifyWhatsappScan()">
+        <i class="fas fa-check-circle"></i> I've Scanned It
+      </button>
+      <button class="fp-wa-qr-btn-ghost" onclick="switchWaTab('form')">← Back to form</button>
+    </div>
   </div>
 </div>
 
@@ -4035,10 +4138,11 @@ fpShowLocationOverlay();
 function openWhatsappQrLogin() {
   const modal = document.getElementById('fpWhatsappQrModal');
   if (!modal) return;
-  const businessPhone = '25261000000';
-  const qrData = 'https://wa.me/' + businessPhone + '?text=' + encodeURIComponent('Hi Go!point, I want to sign in to my account.');
-  const qrImg = document.getElementById('fpWaQrImg');
-  if (qrImg) qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(qrData);
+  switchWaTab('form');
+  const nameEl = document.getElementById('fpWaName');
+  const phoneEl = document.getElementById('fpWaPhone');
+  if (nameEl) nameEl.value = '';
+  if (phoneEl) phoneEl.value = '';
   const status = document.getElementById('fpWaQrStatus');
   if (status) { status.className = 'fp-wa-qr-status waiting'; status.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Waiting for scan...'; }
   modal.classList.add('active');
@@ -4046,6 +4150,36 @@ function openWhatsappQrLogin() {
 function closeWhatsappQrLogin() {
   const modal = document.getElementById('fpWhatsappQrModal');
   if (modal) modal.classList.remove('active');
+}
+function switchWaTab(tab) {
+  const tabs = document.querySelectorAll('#fpWhatsappQrModal .fp-wa-tab');
+  const formContent = document.getElementById('fpWaTabForm');
+  const qrContent = document.getElementById('fpWaTabQr');
+  tabs.forEach(t => t.classList.remove('active'));
+  if (tab === 'form') {
+    tabs[0].classList.add('active');
+    if (formContent) formContent.classList.add('active');
+    if (qrContent) qrContent.classList.remove('active');
+  } else {
+    tabs[1].classList.add('active');
+    if (formContent) formContent.classList.remove('active');
+    if (qrContent) qrContent.classList.add('active');
+    const businessPhone = '25261000000';
+    const qrData = 'https://wa.me/' + businessPhone + '?text=' + encodeURIComponent('Hi Go!point, I want to sign in to my account.');
+    const qrImg = document.getElementById('fpWaQrImg');
+    if (qrImg) qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(qrData);
+  }
+}
+function submitWhatsappForm() {
+  const phone = document.getElementById('fpWaPhone').value.trim();
+  const name = document.getElementById('fpWaName').value.trim();
+  const country = document.getElementById('fpWaCountry').value;
+  if (!name) { showAppToast('⚠️ Please enter your name'); document.getElementById('fpWaName').focus(); return; }
+  if (!phone || phone.length < 6) { showAppToast('⚠️ Please enter a valid WhatsApp number'); document.getElementById('fpWaPhone').focus(); return; }
+  const fullPhone = country + phone;
+  const user = { name: name, email: '', phone: fullPhone, provider: 'whatsapp' };
+  closeWhatsappQrLogin();
+  completeLogin(user);
 }
 function verifyWhatsappScan() {
   const status = document.getElementById('fpWaQrStatus');
