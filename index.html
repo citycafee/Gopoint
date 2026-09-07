@@ -3022,6 +3022,18 @@ async function handleGoogleUser(u) {
   currentUser = googleUser;
   localStorage.setItem('gopoint_user', JSON.stringify(googleUser));
   localStorage.setItem('gopoint_loc_permitted', '1');
+  if (supaConnected && u.id) {
+    await sb.from('profiles').upsert({ id: u.id, full_name: googleUser.name, phone: googleUser.phone, email: googleUser.email }, { onConflict: 'id' });
+    const { data: prof } = await sb.from('profiles').select('*').eq('id', u.id).single();
+    if (prof) {
+      currentUser.name = prof.full_name || googleUser.name;
+      currentUser.phone = prof.phone || googleUser.phone;
+      currentUser.email = prof.email || googleUser.email;
+      currentUser.address = prof.address || '';
+      currentUser.created = prof.created_at;
+      localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
+    }
+  }
   setTimeout(() => goToMarketplace(), 300);
 }
 
@@ -4611,7 +4623,7 @@ currentUser.phone = phone || currentUser.phone;
 currentUser.email = email || currentUser.email;
 currentUser.address = address;
 localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
-if (supaConnected && currentUser.id) { await sb.from('profiles').upsert({ id: currentUser.id, full_name: name, phone: phone || '' }); }
+if (supaConnected && currentUser.id) { await sb.from('profiles').upsert({ id: currentUser.id, full_name: name, phone: phone || '', email: email || '', address: address || '' }, { onConflict: 'id' }); }
 updateUserUI();
 showAppToast('✅ Profile updated');
 closeProfileEditModal();
