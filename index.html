@@ -314,6 +314,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-profile-view .pf-info-value { font-size: 15px; font-weight: 600; color: #1a1a1a; }
 .app-profile-view .pf-info-edit { background: none; border: none; color: #00A19B; font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 8px; transition: background .2s; }
 .app-profile-view .pf-info-edit:hover { background: #f0fdf9; }
+.app-profile-view .pf-info-edit:disabled { opacity: 0.5; cursor: not-allowed; }
 .app-profile-view .pf-order-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
 .app-profile-view .pf-order-item:last-child { border-bottom: none; }
 .app-profile-view .pf-order-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
@@ -2299,6 +2300,7 @@ Gmail
 <div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-phone"></i></div><div class="pf-info-text"><div class="pf-info-label">Phone Number</div><div class="pf-info-value" id="pfInfoPhone">+252 61 XXX XXXX</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
 <div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-envelope"></i></div><div class="pf-info-text"><div class="pf-info-label">Email Address</div><div class="pf-info-value" id="pfInfoEmail">Not set</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
 <div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-map-marker-alt"></i></div><div class="pf-info-text"><div class="pf-info-label">Default Address</div><div class="pf-info-value" id="pfInfoAddress">Not set</div></div></div><button class="pf-info-edit" onclick="openProfileEditModal()">Edit</button></div>
+<div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#ecfdf5;color:#16a34a;"><i class="fas fa-crosshairs"></i></div><div class="pf-info-text"><div class="pf-info-label">Current Location</div><div class="pf-info-value" id="pfInfoLocation">Detecting...</div></div></div><button class="pf-info-edit" onclick="pfDetectLocation()" id="pfLocationDetectBtn">Detect</button></div>
 <div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f1f5f9;color:#64748b;"><i class="fas fa-shield-alt"></i></div><div class="pf-info-text"><div class="pf-info-label">Login Method</div><div class="pf-info-value" id="pfInfoProvider">Phone + OTP</div></div></div></div>
 <div class="pf-info-row"><div class="pf-info-left"><div class="pf-info-icon" style="background:#f0fdf9;color:#16a34a;"><i class="fas fa-calendar-alt"></i></div><div class="pf-info-text"><div class="pf-info-label">Member Since</div><div class="pf-info-value" id="pfInfoSince">-</div></div></div></div>
 </div>
@@ -4503,6 +4505,7 @@ document.getElementById('pfInfoPhone').textContent = phone;
 document.getElementById('pfInfoEmail').textContent = email;
 document.getElementById('pfInfoAddress').textContent = currentUser.address || 'Not set';
 document.getElementById('pfInfoProvider').textContent = provider;
+document.getElementById('pfInfoLocation').textContent = (customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...') ? customerLocation.area : 'Not detected';
 const created = currentUser.created || currentUser.registeredAt;
 document.getElementById('pfInfoSince').textContent = created ? new Date(created).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) : '-';
 // Recent Orders
@@ -4553,6 +4556,48 @@ document.getElementById('pfEditModal').classList.add('active');
 
 function closeProfileEditModal() {
 document.getElementById('pfEditModal').classList.remove('active');
+}
+
+function pfDetectLocation() {
+const btn = document.getElementById('pfLocationDetectBtn');
+const el = document.getElementById('pfInfoLocation');
+if (!navigator.geolocation) { showAppToast('⚠️ Geolocation not supported'); return; }
+btn.textContent = '...';
+btn.disabled = true;
+el.textContent = 'Detecting...';
+navigator.geolocation.getCurrentPosition(async (pos) => {
+const lat = pos.coords.latitude, lng = pos.coords.longitude;
+customerLocation = { lat, lng, area: 'Detecting...' };
+try {
+  if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
+    customerLocation.area = await resolveHargeisaLocation(lat, lng);
+  } else {
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
+    const data = await res.json();
+    const a = data.address || {};
+    const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
+    const landmark = a.amenity || a.shop || a.tourism || '';
+    customerLocation.area = landmark ? `${landmark}, ${area}` : area;
+  }
+} catch(e) {
+  if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
+    customerLocation.area = getHargeisaArea(lat, lng);
+  } else {
+    customerLocation.area = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  }
+}
+localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+el.textContent = customerLocation.area;
+btn.textContent = 'Detect';
+btn.disabled = false;
+showAppToast('📍 Location: ' + customerLocation.area);
+if (appMap) { appMap.setView([lat, lng], 14); appUpdateCustomerMarker(); }
+}, (err) => {
+el.textContent = 'Permission denied';
+btn.textContent = 'Detect';
+btn.disabled = false;
+showAppToast('⚠️ Location permission denied');
+}, { enableHighAccuracy: true, timeout: 10000 });
 }
 
 async function saveProfileFromModal() {
