@@ -1676,6 +1676,7 @@ function restToggleMenuItemStatus(cat, idx) {
     r.menu[cat][idx].status = r.menu[cat][idx].status !== false ? false : true;
     adSaveData(); restRenderMenuItems();
     restToast('Item ' + (r.menu[cat][idx].status !== false ? 'activated' : 'deactivated'));
+    if (supaConnected) supaSaveRestaurant(restMenuRestKey, r);
   }
 }
 
@@ -1749,6 +1750,7 @@ function restSaveMenuItem() {
   }
   adSaveData(); restCloseModal('addMenuItem'); restRenderMenuCategoryTabs(); restRenderMenuItems();
   restEditingMenuItemIdx = null;
+  if (supaConnected) supaSaveRestaurant(restMenuRestKey, r);
 }
 
 function restDeleteMenuItem(cat, idx) {
@@ -1756,6 +1758,7 @@ function restDeleteMenuItem(cat, idx) {
   if (!confirm('Delete ' + r.menu[cat][idx].name + '?')) return;
   r.menu[cat].splice(idx, 1);
   adSaveData(); restRenderMenuCategoryTabs(); restRenderMenuItems(); restToast('Item deleted');
+  if (supaConnected) supaSaveRestaurant(restMenuRestKey, r);
 }
 
 // Modal helpers
