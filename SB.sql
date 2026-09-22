@@ -177,10 +177,55 @@ CREATE POLICY "Settings: anyone insert"   ON settings    FOR INSERT WITH CHECK (
 CREATE POLICY "Settings: anyone update"   ON settings    FOR UPDATE USING (true);
 
 -- ═══════════════════════════════════════════════
--- ENABLE REALTIME
+-- ENABLE REALTIME (all public tables, now + future)
 -- ═══════════════════════════════════════════════
-ALTER PUBLICATION supabase_realtime ADD TABLE orders;
-ALTER PUBLICATION supabase_realtime ADD TABLE vehicles;
+
+-- Add every existing public table to supabase_realtime (idempotent)
+DO $$
+DECLARE
+  t text;
+BEGIN
+  FOR t IN SELECT tablename FROM pg_tables WHERE schemaname = 'public'
+  LOOP
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_publication_tables
+      WHERE pubname = 'supabase_realtime'
+        AND schemaname = 'public'
+        AND tablename = t
+    ) THEN
+      EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE public.%I', t);
+    END IF;
+  END LOOP;
+END $$;
+
+-- Auto-add any table created later (no manual ALTER PUBLICATION ever again)
+CREATE OR REPLACE FUNCTION public.auto_add_table_to_realtime()
+RETURNS event_trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  obj record;
+BEGIN
+  FOR obj IN
+    SELECT * FROM pg_event_trigger_ddl_commands()
+    WHERE command_tag = 'CREATE TABLE'
+      AND object_type = 'table'
+  LOOP
+    BEGIN
+      EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE %s', obj.object_identity);
+    EXCEPTION
+      WHEN duplicate_object THEN NULL;
+      WHEN undefined_object THEN NULL;
+    END;
+  END LOOP;
+END;
+$$;
+
+DROP EVENT TRIGGER IF EXISTS trg_auto_realtime_tables;
+CREATE EVENT TRIGGER trg_auto_realtime_tables
+ON ddl_command_end
+WHEN TAG IN ('CREATE TABLE')
+EXECUTE FUNCTION public.auto_add_table_to_realtime();
 
 -- ═══════════════════════════════════════════════
 -- SEED DATA
