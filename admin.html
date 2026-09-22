@@ -1004,6 +1004,14 @@ function supaSubscribeToOrders(callback) {
     .subscribe();
 }
 
+function supaSubscribeToVehicles(callback) {
+  return sb.channel('vehicles-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, payload => {
+      if (callback) callback(payload);
+    })
+    .subscribe();
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // ★ HYBRID LOAD: Supabase first, localStorage fallback ★
 // ═══════════════════════════════════════════════════════════════════
@@ -1475,7 +1483,7 @@ function setRenderVehicles() {
     return '<tr><td><strong>' + (v.driverName || 'Unknown') + '</strong></td><td>' + (v.plateNumber || v.plate || 'N/A') + '</td><td>' + (v.driverPhone || '') + '</td><td><i class="fas ' + icon + '"></i> ' + (v.type || 'bike') + '</td><td><button class="set-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="setToggleVehicle(\'' + v.id + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td><td><button class="set-btn set-btn-secondary set-btn-sm" style="margin-right:4px" onclick="adToast(\'Vehicle details opened\')"><i class="fas fa-edit"></i></button><button class="set-btn set-btn-danger set-btn-sm" onclick="setDeleteVehicle(\'' + v.id + '\')"><i class="fas fa-trash"></i></button></td></tr>';
   }).join('');
 }
-function setToggleVehicle(vid) { const v = adVehicles.find(x => x.id == vid); if (!v) return; v.status = v.status === 'available' ? 'unavailable' : 'available'; adSaveData(); setRenderVehicles(); adRenderFleet(); adToast(v.driverName + ' is now ' + v.status); }
+async function setToggleVehicle(vid) { const v = adVehicles.find(x => x.id == vid); if (!v) return; v.status = v.status === 'available' ? 'unavailable' : 'available'; adSaveData(); setRenderVehicles(); adRenderFleet(); adToast(v.driverName + ' is now ' + v.status); if (supaConnected) await supaSaveVehicle(v); }
 function setDeleteVehicle(vid) { if (!confirm('Delete this vehicle?')) return; adVehicles = adVehicles.filter(v => v.id != vid); adSaveData(); setRenderVehicles(); adRenderFleet(); adToast('Vehicle deleted'); }
 function setLoadDelivery() {
   const d = JSON.parse(localStorage.getItem('gopoint_delivery_settings') || '{}');

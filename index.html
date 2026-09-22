@@ -3127,6 +3127,14 @@ function supaSubscribeToOrders(callback) {
     .subscribe();
 }
 
+function supaSubscribeToVehicles(callback) {
+  return sb.channel('vehicles-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, payload => {
+      if (callback) callback(payload);
+    })
+    .subscribe();
+}
+
 // ─── HYBRID LOAD: Supabase first, localStorage fallback ───
 let supaConnected = false;
 
@@ -3709,8 +3717,20 @@ setTimeout(() => dpShowCustomerOnMap(activeOrder.id, { useActiveMap: true }), 40
 // ─── DRIVER PORTAL FUNCTIONS ───
 function dpLoadData() { /* Data already loaded */ }
 
-function dpSyncVehicleStatus() {
+async function dpSyncVehicleStatus() {
   if (!dpDriver) return;
+  if (supaConnected) {
+    const { data } = await sb.from('vehicles').select('*').eq('id', dpDriver.id).single();
+    if (data) {
+      dpAdminDeactivated = data.status === 'unavailable';
+      dpDriver.status = data.status;
+      dpDriver.lat = data.lat;
+      dpDriver.lng = data.lng;
+      const vi = vehicles.find(v => v.id === dpDriver.id);
+      if (vi) { vi.status = data.status; vi.lat = data.lat; vi.lng = data.lng; }
+      return;
+    }
+  }
   try {
     const saved = JSON.parse(localStorage.getItem('gopoint_vehicles'));
     if (saved) {
@@ -5127,7 +5147,28 @@ setTimeout(() => {
 }, 800);
 }
 
-async function initApp() { loadFromLocalStorage(); await initSupabaseData(); appInitMap(); appStartBannerCarousel(); setupAppEventListeners(); appRenderRestaurantList(); supaSubscribeToOrders((payload) => { loadFromLocalStorage(); if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); } }); }
+async function initApp() {
+loadFromLocalStorage();
+await initSupabaseData();
+appInitMap();
+appStartBannerCarousel();
+setupAppEventListeners();
+appRenderRestaurantList();
+supaSubscribeToOrders((payload) => { loadFromLocalStorage(); if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); } });
+supaSubscribeToVehicles(async (payload) => {
+loadFromLocalStorage();
+if (dpDriver) {
+const wasDeactivated = dpAdminDeactivated;
+await dpSyncVehicleStatus();
+dpRefresh();
+dpUpdateUI();
+dpCheckForIncomingCalls();
+if (!wasDeactivated && dpAdminDeactivated) {
+dpToast('🔴 deactivated by admin - Contact admin', 'error');
+}
+}
+});
+}
 
 function setupAppEventListeners() {
 document.getElementById('appHomeSearchInput')?.addEventListener('input', appRenderRestaurantList);
@@ -5684,10 +5725,11 @@ function adRenderFleet() {
   }).join('');
 }
 
-function adToggleVehicle(vid, checked) {
+async function adToggleVehicle(vid, checked) {
   const v = adVehicles.find(x => x.id == vid); if (!v) return;
   v.status = checked ? 'available' : 'unavailable';
   adSaveData(); adRenderAll(); adToast(v.driverName + ' is now ' + v.status);
+  if (supaConnected) await supaSaveVehicle(v);
 }
 
 function adRenderActiveOrders() {
@@ -5983,7 +6025,7 @@ function setRenderVehicles() {
     return '<tr><td><strong>' + (v.driverName || 'Unknown') + '</strong></td><td>' + (v.plateNumber || v.plate || 'N/A') + '</td><td>' + (v.driverPhone || '') + '</td><td><i class="fas ' + icon + '"></i> ' + (v.type || 'bike') + '</td><td><button class="set-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="setToggleVehicle(\'' + v.id + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td><td><button class="set-btn set-btn-secondary set-btn-sm" style="margin-right:4px" onclick="adToast(\'Vehicle details opened\')"><i class="fas fa-edit"></i></button><button class="set-btn set-btn-danger set-btn-sm" onclick="setDeleteVehicle(\'' + v.id + '\')"><i class="fas fa-trash"></i></button></td></tr>';
   }).join('');
 }
-function setToggleVehicle(vid) { const v = adVehicles.find(x => x.id == vid); if (!v) return; v.status = v.status === 'available' ? 'unavailable' : 'available'; adSaveData(); setRenderVehicles(); adRenderFleet(); adToast(v.driverName + ' is now ' + v.status); }
+async function setToggleVehicle(vid) { const v = adVehicles.find(x => x.id == vid); if (!v) return; v.status = v.status === 'available' ? 'unavailable' : 'available'; adSaveData(); setRenderVehicles(); adRenderFleet(); adToast(v.driverName + ' is now ' + v.status); if (supaConnected) await supaSaveVehicle(v); }
 function setDeleteVehicle(vid) { if (!confirm('Delete this vehicle?')) return; adVehicles = adVehicles.filter(v => v.id != vid); adSaveData(); setRenderVehicles(); adRenderFleet(); adToast('Vehicle deleted'); }
 function setLoadDelivery() {
   const d = JSON.parse(localStorage.getItem('gopoint_delivery_settings') || '{}');

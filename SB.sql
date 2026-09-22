@@ -180,6 +180,7 @@ CREATE POLICY "Settings: anyone update"   ON settings    FOR UPDATE USING (true)
 -- ENABLE REALTIME
 -- ═══════════════════════════════════════════════
 ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+ALTER PUBLICATION supabase_realtime ADD TABLE vehicles;
 
 -- ═══════════════════════════════════════════════
 -- SEED DATA

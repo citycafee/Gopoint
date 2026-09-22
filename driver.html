@@ -686,6 +686,14 @@ function supaSubscribeToOrders(callback) {
     .subscribe();
 }
 
+function supaSubscribeToVehicles(callback) {
+  return sb.channel('vehicles-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, payload => {
+      if (callback) callback(payload);
+    })
+    .subscribe();
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // ★ HYBRID LOAD: Supabase first, localStorage fallback ★
 // ═══════════════════════════════════════════════════════════════════
@@ -871,6 +879,19 @@ setTimeout(() => dpShowCustomerOnMap(activeOrder.id, { useActiveMap: true }), 40
 supaSubscribeToOrders((payload) => {
 loadFromLocalStorage();
 if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); }
+});
+supaSubscribeToVehicles(async (payload) => {
+loadFromLocalStorage();
+if (dpDriver) {
+const wasDeactivated = dpAdminDeactivated;
+await dpSyncVehicleStatus();
+dpRefresh();
+dpUpdateUI();
+dpCheckForIncomingCalls();
+if (!wasDeactivated && dpAdminDeactivated) {
+dpToast('🔴 deactivated by admin - Contact admin', 'error');
+}
+}
 });
 }
 
@@ -1639,6 +1660,19 @@ if (savedDriver) {
       supaSubscribeToOrders((payload) => {
         loadFromLocalStorage();
         if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); }
+      });
+      supaSubscribeToVehicles(async (payload) => {
+        loadFromLocalStorage();
+        if (dpDriver) {
+          const wasDeactivated = dpAdminDeactivated;
+          await dpSyncVehicleStatus();
+          dpRefresh();
+          dpUpdateUI();
+          dpCheckForIncomingCalls();
+          if (!wasDeactivated && dpAdminDeactivated) {
+            dpToast('🔴 deactivated by admin - Contact admin', 'error');
+          }
+        }
       });
     }
   } catch (e) { localStorage.removeItem('dpDriver'); }
