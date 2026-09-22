@@ -5479,16 +5479,28 @@ document.getElementById('appTrackingModal').classList.remove('hidden');
 document.getElementById('appTrackingOrderId').textContent = `Order #${String(order.id).slice(-6)}`;
 const rest = restaurants[order.restaurant] || {};
 document.getElementById('appTrackRestName').textContent = rest.name || 'Unknown';
-document.getElementById('appTrackDriverName').textContent = order.vehicle?.driverName || 'Pending Driver';
-document.getElementById('appTrackDriverPhone').textContent = order.vehicle?.driverPhone || '-';
+const vehSnap = appGetTrackedVehicle(order);
+document.getElementById('appTrackDriverName').textContent = vehSnap?.driverName || 'Pending Driver';
+document.getElementById('appTrackDriverPhone').textContent = vehSnap?.driverPhone || '-';
 document.getElementById('appTrackCustomerName').textContent = order.customer?.name || '';
 if (rest.lat && rest.lng && order.coordinates?.lat && order.coordinates?.lng) {
 const restToCustomerDist = appCalculateDistance(rest.lat, rest.lng, order.coordinates.lat, order.coordinates.lng).toFixed(1);
 document.getElementById('appTrackRestaurantToCustomerDistance').textContent = `${restToCustomerDist} km`;
 }
 appRenderTrackingTimeline(order);
+if (supaConnected) {
+Promise.all([supaLoadOrders(), supaLoadVehicles()]).then(([ordData, vehData]) => {
+if (ordData.length > 0) { orders = ordData; }
+if (vehData.length > 0) { vehicles = vehData; }
+saveLocalData();
+const fresh = orders.find(o => o.id == currentTrackedOrder) || order;
+setTimeout(() => appInitTrackingMap(fresh), 250);
+appStartDriverSimulation(fresh);
+});
+} else {
 setTimeout(() => appInitTrackingMap(order), 250);
 appStartDriverSimulation(order);
+}
 if (trackingPollInterval) clearInterval(trackingPollInterval);
 trackingPollInterval = setInterval(async () => { await refreshTracking(); }, 10000);
 }
@@ -5505,8 +5517,16 @@ return `<div class="app-timeline-item ${cls}"><div style="display:flex;align-ite
 }).join('');
 }
 
+function appGetTrackedVehicle(order) {
+const live = order.vehicleId ? vehicles.find(v => v.id === order.vehicleId) : null;
+if (live && live.lat != null && live.lng != null && ['available','delivering'].includes(live.status)) {
+return { id: live.id, driverName: live.driverName, driverPhone: live.driverPhone, plateNumber: live.plateNumber, type: live.type, lat: live.lat, lng: live.lng, status: live.status, live: true };
+}
+return order.vehicle || null;
+}
+
 function appInitTrackingMap(order) {
-if (trackingMap) { trackingMap.remove(); trackingMap = null; }
+if (trackingMap) { trackingMap.remove(); trackingMap = null; driverMarker = null; }
 const rest = restaurants[order.restaurant] || {}, restLat = rest.lat || 9.56, restLng = rest.lng || 44.065;
 const custLat = order.coordinates?.lat || 9.56, custLng = order.coordinates?.lng || 44.065;
 trackingMap = L.map('appTrackingMap').setView([(restLat + custLat) / 2, (restLng + custLng) / 2], 13);
@@ -5515,31 +5535,52 @@ const restIcon = L.divIcon({ html: '<div class="app-custom-marker" style="backgr
 const custIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#f59e0b;width:40px;height:40px;"><i class="fas fa-home"></i></div>', className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
 L.marker([restLat, restLng], { icon: restIcon }).addTo(trackingMap).bindPopup(`<b>🍽️ ${rest.name || 'Restaurant'}</b>`);
 L.marker([custLat, custLng], { icon: custIcon }).addTo(trackingMap).bindPopup(`<b>🏠 Delivery Address</b>`);
-const vehLat = order.vehicle?.lat || restLat, vehLng = order.vehicle?.lng || restLng;
-if (order.vehicle && ['out_for_delivery', 'ready', 'preparing'].includes(order.status)) {
+const veh = appGetTrackedVehicle(order);
+const vehLat = veh?.lat || restLat, vehLng = veh?.lng || restLng;
+const activeStatuses = ['preparing', 'ready', 'out_for_delivery'];
+if (veh && activeStatuses.includes(order.status) && (veh.live || veh.lat != null)) {
 const vehIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#3b82f6;width:44px;height:44px;"><i class="fas fa-motorcycle"></i></div>', className: '', iconSize: [44, 44], iconAnchor: [22, 22] });
-driverMarker = L.marker([vehLat, vehLng], { icon: vehIcon }).addTo(trackingMap).bindPopup(`<b>🛵 ${order.vehicle.driverName}</b>`);
+driverMarker = L.marker([vehLat, vehLng], { icon: vehIcon }).addTo(trackingMap).bindPopup(`<b>🛵 ${veh.driverName || 'Driver'}</b>`);
 }
-const routeCoords = order.vehicle && ['out_for_delivery'].includes(order.status) ? [[restLat, restLng], [vehLat, vehLng], [custLat, custLng]] : [[restLat, restLng], [custLat, custLng]];
+const routeCoords = veh && order.status === 'out_for_delivery' ? [[restLat, restLng], [vehLat, vehLng], [custLat, custLng]] : [[restLat, restLng], [custLat, custLng]];
 L.polyline(routeCoords, { color: '#3b82f6', weight: 4, opacity: 0.7, dashArray: '10, 10' }).addTo(trackingMap);
 trackingMap.fitBounds(L.latLngBounds(routeCoords), { padding: [60, 60] });
 }
 
 function appStartDriverSimulation(order) {
-if (driverSimulationInterval) clearInterval(driverSimulationInterval);
-if (!order.vehicle || order.status !== 'out_for_delivery' || !driverMarker) return;
+if (driverSimulationInterval) { clearInterval(driverSimulationInterval); driverSimulationInterval = null; }
+const veh = appGetTrackedVehicle(order);
+if (!veh?.live || order.status !== 'out_for_delivery' || !driverMarker) return;
 const rest = restaurants[order.restaurant] || {}, targetLat = order.coordinates?.lat || 9.56, targetLng = order.coordinates?.lng || 44.065;
-let curLat = order.vehicle.lat || rest.lat || 9.56, curLng = order.vehicle.lng || rest.lng || 44.065;
+let curLat = veh.lat || rest.lat || 9.56, curLng = veh.lng || rest.lng || 44.065;
 driverSimulationInterval = setInterval(() => {
 curLat += (targetLat - curLat) * 0.08;
 curLng += (targetLng - curLng) * 0.08;
 driverMarker.setLatLng([curLat, curLng]);
-if (order.vehicle) { order.vehicle.lat = curLat; order.vehicle.lng = curLng; }
-if (appCalculateDistance(curLat, curLng, targetLat, targetLng) < 0.05) clearInterval(driverSimulationInterval);
+if (appCalculateDistance(curLat, curLng, targetLat, targetLng) < 0.05) { clearInterval(driverSimulationInterval); driverSimulationInterval = null; }
 }, 2000);
 }
 
-async function refreshTracking() { if (!currentTrackedOrder) return; if (supaConnected) { const ordData = await supaLoadOrders(); if (ordData.length > 0) { orders = ordData; saveLocalData(); } } const o = orders.find(o => o.id == currentTrackedOrder); if (o) { if (o.status === 'completed') { closeTrackingModal(); showAppToast('🎉 Order delivered!'); return; } document.getElementById('appTrackDriverName').textContent = o.vehicle?.driverName || 'Pending Driver'; document.getElementById('appTrackDriverPhone').textContent = o.vehicle?.driverPhone || '-'; appRenderTrackingTimeline(o); appInitTrackingMap(o); appStartDriverSimulation(o); } }
+async function refreshTracking() {
+if (!currentTrackedOrder) return;
+if (supaConnected) {
+const [ordData, vehData] = await Promise.all([supaLoadOrders(), supaLoadVehicles()]);
+if (ordData.length > 0) { orders = ordData; }
+if (vehData.length > 0) { vehicles = vehData; }
+saveLocalData();
+} else {
+try { const sv = JSON.parse(localStorage.getItem('gopoint_vehicles') || '[]'); if (sv.length > 0) vehicles = sv; } catch(_) {}
+}
+const o = orders.find(o => o.id == currentTrackedOrder);
+if (o) {
+if (o.status === 'completed') { closeTrackingModal(); showAppToast('🎉 Order delivered!'); return; }
+document.getElementById('appTrackDriverName').textContent = o.vehicle?.driverName || 'Pending Driver';
+document.getElementById('appTrackDriverPhone').textContent = o.vehicle?.driverPhone || '-';
+appRenderTrackingTimeline(o);
+appInitTrackingMap(o);
+appStartDriverSimulation(o);
+}
+}
 function closeTrackingModal() { document.getElementById('appTrackingModal').classList.add('hidden'); if (trackingMap) { trackingMap.remove(); trackingMap = null; } if (driverSimulationInterval) { clearInterval(driverSimulationInterval); driverSimulationInterval = null; } if (trackingPollInterval) { clearInterval(trackingPollInterval); trackingPollInterval = null; } }
 function callDriver() { if (!currentTrackedOrder) return; const o = orders.find(o => o.id == currentTrackedOrder); if (o?.vehicle?.driverPhone) window.open(`tel:${o.vehicle.driverPhone}`); else showAppToast('⚠️ No driver phone'); }
 function whatsappDriver() { if (!currentTrackedOrder) return; const o = orders.find(o => o.id == currentTrackedOrder); if (!o?.vehicle?.driverPhone) { showAppToast('⚠️ No driver phone'); return; } let ph = o.vehicle.driverPhone.replace(/\D/g, ''); if (!ph.startsWith('252')) ph = '252' + ph; const msg = `Hi ${o.vehicle.driverName}, I'm tracking my order #${String(o.id).slice(-6)}.`; window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`, '_blank'); }

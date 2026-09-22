@@ -1432,13 +1432,27 @@ dpRingGain = null;
 }
 
 // ─── DRIVER MAP FUNCTIONS ───
+let dpLocPersistTimer = null;
+function dpPersistDriverLocation(la, lo) {
+  if (dpDriver) { dpDriver.lat = la; dpDriver.lng = lo; }
+  const vi = vehicles.find(v => v.id === dpDriver?.id);
+  if (vi) { vi.lat = la; vi.lng = lo; }
+  try { localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles)); } catch(_) {}
+  if (dpLocPersistTimer) return;
+  dpLocPersistTimer = setTimeout(() => {
+    dpLocPersistTimer = null;
+    if (dpDriver && supaConnected) {
+      sb.from('vehicles').update({ lat: dpDriver.lat, lng: dpDriver.lng }).eq('id', dpDriver.id).then(() => {}).catch(() => {});
+    }
+  }, 10000);
+}
 function dpStartLocationTracking() {
   if (!navigator.geolocation || dpLocationWatchId !== null) return;
   dpLocationWatchId = navigator.geolocation.watchPosition(
     (p) => {
       const la = p.coords.latitude, lo = p.coords.longitude;
       if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la, lo]);
-      if (dpDriver) { dpDriver.lat = la; dpDriver.lng = lo; }
+      dpPersistDriverLocation(la, lo);
       if (dpActiveMap && !dpActiveOrderId) {
         dpActiveMap.panTo([la, lo]);
       }
@@ -1482,7 +1496,7 @@ dpActiveDriverMarker = L.marker([la, lo], { icon: ico }).addTo(dpActiveMap);
       const la2 = p.coords.latitude, lo2 = p.coords.longitude;
       if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la2, lo2]);
       if (dpActiveMap) dpActiveMap.setView([la2, lo2], 15);
-      if (dpDriver) { dpDriver.lat = la2; dpDriver.lng = lo2; }
+      dpPersistDriverLocation(la2, lo2);
     }, () => {}, { enableHighAccuracy: true, timeout: 10000 });
   }
 }
