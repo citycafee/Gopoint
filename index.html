@@ -1335,7 +1335,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 </div>
 <i class="fas fa-location-crosshairs fp-loc-permicon" aria-hidden="true"></i>
 </div>
-<div class="fp-loc-body" id="fpLocBody">While using the app</div>
+<div class="fp-loc-body" id="fpLocBody">Allow location access so we can process your delivery, find nearby restaurants, and help riders reach you faster.</div>
 <div class="fp-loc-detected" id="fpLocDetected" style="display:none;">
 <i class="fas fa-map-marker-alt"></i>
 <div class="fp-loc-detected-text">
@@ -1347,6 +1347,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <div class="fp-loc-feature"><i class="fas fa-store"></i> Find nearby restaurants &amp; stores</div>
 <div class="fp-loc-feature"><i class="fas fa-clock"></i> Show accurate delivery times</div>
 <div class="fp-loc-feature"><i class="fas fa-motorcycle"></i> Help riders reach you faster</div>
+<div class="fp-loc-feature"><i class="fas fa-shipping-fast"></i> Required for delivery orders</div>
 </div>
 <div class="fp-loc-divider"></div>
 <div class="fp-loc-actions">
@@ -3167,16 +3168,20 @@ toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
 function fpShowLocationOverlay() {
   const originEl = document.getElementById('fpLocOrigin');
   if (originEl) originEl.textContent = 'Go!point wants to';
-  if (localStorage.getItem('gopoint_loc_permitted') === '1') {
-    if (!customerLocation) detectFrontLocation();
+  const saved = localStorage.getItem('gopoint_customer_location');
+  let hasValidArea = false;
+  if (saved) {
+    try { const loc = JSON.parse(saved); hasValidArea = loc.area && loc.area !== 'Detecting...'; } catch(e) {}
+  }
+  if (localStorage.getItem('gopoint_loc_permitted') === '1' && hasValidArea) {
     if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
     return;
   }
+  if (!hasValidArea && customerLocation) detectFrontLocation();
   const overlay = document.getElementById('fpLocationOverlay');
   if (!overlay) return;
   const detectedEl = document.getElementById('fpLocDetected');
   const detectedAddr = document.getElementById('fpLocDetectedAddress');
-  const saved = localStorage.getItem('gopoint_customer_location');
   if (saved && detectedEl && detectedAddr) {
     try {
       const loc = JSON.parse(saved);
@@ -3186,7 +3191,10 @@ function fpShowLocationOverlay() {
       }
     } catch(e) {}
   }
-  // Show immediately when user-initiated (after Get Started or Guest), otherwise wait
+  const actionsEl = overlay.querySelector('.fp-loc-actions');
+  if (actionsEl) actionsEl.style.display = 'flex';
+  const bodyEl = overlay.querySelector('.fp-loc-body');
+  if (bodyEl) bodyEl.textContent = 'Allow location access so we can process your delivery, find nearby restaurants, and help riders reach you faster.';
   const delay = (window._fpLoginFlowPending || window._guestFlow) ? 0 : 800;
   setTimeout(() => overlay.classList.add('active'), delay);
 }
@@ -3202,15 +3210,15 @@ function fpRequestLocation() {
     if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
     return;
   }
-  localStorage.setItem('gopoint_loc_permitted', '1');
   if (overlay) {
     overlay.querySelector('.fp-loc-actions').style.display = 'none';
-    overlay.querySelector('.fp-loc-body').textContent = 'Detecting your location...';
+    overlay.querySelector('.fp-loc-body').textContent = 'Detecting your location for delivery...';
   }
   setTimeout(() => {
     if (overlay) overlay.classList.remove('active');
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        localStorage.setItem('gopoint_loc_permitted', '1');
         localStorage.removeItem('gopoint_loc_skipped');
         const lat = pos.coords.latitude, lng = pos.coords.longitude;
         customerLocation = { lat, lng, area: 'Detecting...' };
@@ -3242,7 +3250,11 @@ function fpRequestLocation() {
 }
 
 function fpSkipLocation() {
-  showAppToast('⚠️ Location access is required to use Go!Point');
+  const overlay = document.getElementById('fpLocationOverlay');
+  if (overlay) overlay.classList.remove('active');
+  localStorage.setItem('gopoint_loc_skipped', '1');
+  localStorage.removeItem('gopoint_loc_permitted');
+  showAppToast('⚠️ Location access is required for delivery. You can enable it anytime in browser settings.');
   if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
 }
 
