@@ -274,7 +274,9 @@ transition: var(--transition);
 .rest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .rest-card{background:var(--white);border-radius:var(--radius-md);border:1px solid var(--border-light);overflow:hidden;transition:var(--transition)}
 .rest-card:hover{box-shadow:var(--shadow-md)}
-.rest-card .rest-card-img{height:130px;display:flex;align-items:center;justify-content:center;color:white;font-size:2.2rem}
+.rest-card .rest-card-img{height:130px;display:flex;align-items:center;justify-content:center;color:white;font-size:2.2rem;position:relative;overflow:hidden}
+.rest-card .rest-card-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rest-card .rest-card-img i{position:relative;z-index:1}
 .rest-card .rest-card-body{padding:16px}
 .rest-card .rest-card-name{font-weight:700;font-size:1rem;margin-bottom:4px}
 .rest-card .rest-card-meta{font-size:.78rem;color:var(--gray);display:flex;gap:12px;margin-bottom:8px}
@@ -477,7 +479,7 @@ transition: var(--transition);
 </div>
 <div class="set-panel" id="setPanel-restaurants">
 <div class="set-card set-fade-in">
-<div class="set-card-header"><h3><i class="fas fa-store" style="color:var(--theme);margin-right:8px"></i> Manage Restaurants</h3></div>
+<div class="set-card-header"><h3><i class="fas fa-store" style="color:var(--theme);margin-right:8px"></i> Manage Restaurants</h3><button class="set-btn set-btn-primary set-btn-sm" onclick="adShowRestForm()"><i class="fas fa-plus"></i> New Restaurant</button></div>
 <div class="set-card-body" style="padding:0">
 <div class="set-table-wrap">
 <table class="set-table">
@@ -512,7 +514,7 @@ transition: var(--transition);
 </div>
 <div class="set-panel" id="setPanel-vehicles">
 <div class="set-card set-fade-in">
-<div class="set-card-header"><h3><i class="fas fa-motorcycle" style="color:var(--theme);margin-right:8px"></i> Manage Vehicles</h3></div>
+<div class="set-card-header"><h3><i class="fas fa-motorcycle" style="color:var(--theme);margin-right:8px"></i> Manage Vehicles</h3><button class="set-btn set-btn-primary set-btn-sm" onclick="adShowFleetForm()"><i class="fas fa-plus"></i> New Vehicle</button></div>
 <div class="set-card-body" style="padding:0">
 <div class="set-table-wrap">
 <table class="set-table">
@@ -644,7 +646,16 @@ transition: var(--transition);
 <div class="ad-form-group"><label>Cuisine</label><input type="text" class="ad-form-control" id="adRestCuisine"></div>
 <div class="ad-form-group"><label>Rating</label><input type="number" class="ad-form-control" id="adRestRating" step="0.1" min="0" max="5"></div>
 </div>
-<div class="ad-form-group"><label>Logo URL</label><input type="url" class="ad-form-control" id="adRestLogo"></div>
+<div class="ad-form-group"><label>Restaurant Image</label>
+<div style="display:flex;gap:12px;align-items:flex-start">
+<div class="rest-menu-img-upload" style="width:90px;height:90px" onclick="document.getElementById('adRestImgInput').click()"><img id="adRestImgPreview" alt=""><i class="fas fa-camera" id="adRestImgPlaceholder" style="color:var(--gray);font-size:1.2rem"></i></div>
+<div style="flex:1;min-width:0">
+<input type="file" id="adRestImgInput" accept="image/*" style="display:none" onchange="adPreviewRestImage(event)">
+<input type="url" class="ad-form-control" id="adRestLogo" placeholder="Or paste image URL" oninput="if(this.value.trim())adClearRestImageFile()" style="margin-bottom:8px">
+<button type="button" class="ad-btn ad-btn-outline" style="font-size:.75rem;padding:6px 12px" onclick="document.getElementById('adRestImgInput').click()"><i class="fas fa-upload"></i> Upload Image</button>
+</div>
+</div>
+</div>
 <h3 style="font-size:1rem;font-weight:700;margin:20px 0 14px;">Menu Items</h3>
 <div class="ad-tabs">
 <button type="button" class="ad-tab-btn active" onclick="adMenuTab('food')">Food</button>
@@ -709,6 +720,16 @@ transition: var(--transition);
 <div class="rest-form-group"><label>Longitude</label><input type="number" id="restAddLng" step="any" placeholder="e.g., 44.0650"></div>
 <div class="rest-form-group"><label>Cuisine Type</label><select id="restAddCuisine"><option>Fast Food</option><option>Grilled Chicken</option><option>Shawarma</option><option>Pizza</option><option>Coffee & Food</option><option>Grilled</option><option>Juice & Drinks</option><option>Mediterranean</option><option>Italian</option><option>Cafe</option><option>Various</option></select></div>
 <div class="rest-form-group"><label>Rating</label><input type="number" id="restAddRating" step="0.1" min="0" max="5" value="4.5"></div>
+<div class="rest-form-group"><label>Restaurant Image</label>
+<div style="display:flex;gap:12px;align-items:flex-start">
+<div class="rest-menu-img-upload" style="width:90px;height:90px" onclick="document.getElementById('restAddImgInput').click()"><img id="restAddImgPreview" alt=""><i class="fas fa-camera" id="restAddImgPlaceholder" style="color:var(--gray);font-size:1.2rem"></i></div>
+<div style="flex:1;min-width:0">
+<input type="file" id="restAddImgInput" accept="image/*" style="display:none" onchange="restPreviewRestImage(event)">
+<input type="url" id="restAddImageUrl" placeholder="Or paste image URL" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;outline:none" oninput="if(this.value.trim())restClearRestImageFile()">
+<button type="button" class="btn btn-secondary" style="margin-top:8px;padding:6px 12px;font-size:.75rem" onclick="document.getElementById('restAddImgInput').click()"><i class="fas fa-upload"></i> Upload Image</button>
+</div>
+</div>
+</div>
 <div class="rest-form-group"><label>Icon</label><select id="restAddIcon"><option value="fa-utensils">Restaurant</option><option value="fa-mug-hot">Coffee</option><option value="fa-fire">Grilled</option><option value="fa-pizza-slice">Pizza</option><option value="fa-glass-water">Juice</option></select></div>
 </div>
 <div class="rest-modal-footer"><button class="btn btn-secondary" onclick="restCloseModal('addRestaurant')">Cancel</button><button class="btn btn-primary" onclick="restAddRestaurant()"><i class="fas fa-plus"></i> Add</button></div>
@@ -1263,7 +1284,7 @@ function adSwitchTab(tab) {
   const titles = { dashboard: '📊 Dashboard', orders: '📦 Orders', fleet: '🛵 Fleet Management', restaurants: '🍽️ Restaurants', restaurantReport: '📈 Restaurant Report', fleetReport: '🚚 Fleet Report', settings: '⚙️ Platform Settings' };
   document.getElementById('adPageTitle').textContent = titles[tab] || 'Dashboard';
   const statsBar = document.getElementById('adStatsBar');
-  if (statsBar) statsBar.style.display = tab === 'settings' ? 'none' : 'grid';
+  if (statsBar) statsBar.style.display = tab === 'dashboard' ? 'grid' : 'none';
   if (tab === 'dashboard' || tab === 'orders' || tab === 'fleet' || tab === 'restaurants') {
     document.getElementById('adFleetSection').style.display = 'block';
     document.getElementById('adOrdersSection').style.display = 'block';
@@ -1293,8 +1314,50 @@ function adRenderSettingsRestList() {
   el.innerHTML = keys.map(k => { const r = adRestaurants[k]; return '<div class="ad-fleet-card"><div class="ad-fleet-info"><div class="ad-fleet-avatar" style="font-size:1.2rem;">🍽️</div><div class="ad-fleet-details"><h4>' + r.name + '</h4><p>' + (r.address || 'No address') + '</p><p>' + (r.phone || 'No phone') + '</p></div></div><div class="ad-fleet-status"><button class="ad-btn ad-btn-edit" onclick="adEditRest(\'' + k + '\')"><i class="fas fa-edit"></i></button><button class="ad-btn ad-btn-delete" onclick="adDeleteRest(\'' + k + '\')"><i class="fas fa-trash"></i></button></div></div>'; }).join('');
 }
 
-function adShowRestForm() { adEditRestKey = null; document.getElementById('adRestFormTitle').textContent = 'Add New Restaurant'; document.getElementById('adRestForm').reset(); ['food', 'dessert', 'juices', 'softdrinks', 'coffee'].forEach(c => { const el = document.getElementById('ad' + c.charAt(0).toUpperCase() + c.slice(1) + 'Items'); if (el) el.innerHTML = ''; }); adAddMenuItem('food'); document.getElementById('adRestFormModal').classList.add('active'); }
-function adCloseRestForm() { document.getElementById('adRestFormModal').classList.remove('active'); }
+let adRestImageBase64 = '';
+function adPreviewRestImage(e) {
+  const file = e.target.files[0]; if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { adToast('Image too large (max 2MB)'); return; }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    adRestImageBase64 = ev.target.result;
+    const p = document.getElementById('adRestImgPreview'); p.src = adRestImageBase64; p.style.display = 'block';
+    document.getElementById('adRestImgPlaceholder').style.display = 'none';
+    document.getElementById('adRestLogo').value = '';
+  };
+  reader.readAsDataURL(file);
+}
+function adClearRestImageFile() {
+  adRestImageBase64 = '';
+  const p = document.getElementById('adRestImgPreview'); if (p) { p.style.display = 'none'; p.removeAttribute('src'); }
+  const ph = document.getElementById('adRestImgPlaceholder'); if (ph) ph.style.display = '';
+  const inp = document.getElementById('adRestImgInput'); if (inp) inp.value = '';
+}
+function adResetRestImage() {
+  adClearRestImageFile();
+  const logo = document.getElementById('adRestLogo'); if (logo) logo.value = '';
+}
+function adSetRestImage(src) {
+  adClearRestImageFile();
+  const logo = document.getElementById('adRestLogo');
+  if (!src) { if (logo) logo.value = ''; return; }
+  if (src.startsWith('data:')) {
+    adRestImageBase64 = src;
+    const p = document.getElementById('adRestImgPreview'); p.src = src; p.style.display = 'block';
+    document.getElementById('adRestImgPlaceholder').style.display = 'none';
+    if (logo) logo.value = '';
+  } else {
+    if (logo) logo.value = src;
+    const p = document.getElementById('adRestImgPreview'); p.src = src; p.style.display = 'block';
+    document.getElementById('adRestImgPlaceholder').style.display = 'none';
+  }
+}
+function adGetRestImage() {
+  const url = (document.getElementById('adRestLogo')?.value || '').trim();
+  return adRestImageBase64 || url;
+}
+function adShowRestForm() { adEditRestKey = null; document.getElementById('adRestFormTitle').textContent = 'Add New Restaurant'; document.getElementById('adRestForm').reset(); adResetRestImage(); ['food', 'dessert', 'juices', 'softdrinks', 'coffee'].forEach(c => { const el = document.getElementById('ad' + c.charAt(0).toUpperCase() + c.slice(1) + 'Items'); if (el) el.innerHTML = ''; }); adAddMenuItem('food'); document.getElementById('adRestFormModal').classList.add('active'); }
+function adCloseRestForm() { document.getElementById('adRestFormModal').classList.remove('active'); adResetRestImage(); }
 function adEditRest(key) {
   if (!adRestaurants[key]) return; adEditRestKey = key; const r = adRestaurants[key];
   document.getElementById('adRestFormTitle').textContent = 'Edit Restaurant';
@@ -1302,7 +1365,7 @@ function adEditRest(key) {
   document.getElementById('adRestLat').value = r.lat || ''; document.getElementById('adRestLng').value = r.lng || '';
   document.getElementById('adRestPhone').value = r.phone || ''; document.getElementById('adRestEmail').value = r.email || '';
   document.getElementById('adRestCuisine').value = r.cuisine || ''; document.getElementById('adRestRating').value = r.rating || '';
-  document.getElementById('adRestLogo').value = r.logo || '';
+  adSetRestImage(r.logo || r.image || '');
   ['food', 'dessert', 'juices', 'softdrinks', 'coffee'].forEach(c => { const el = document.getElementById('ad' + c.charAt(0).toUpperCase() + c.slice(1) + 'Items'); if (el) el.innerHTML = ''; });
   if (r.menu) { for (const cat in r.menu) { const el = document.getElementById('ad' + cat.charAt(0).toUpperCase() + cat.slice(1) + 'Items'); if (el) { r.menu[cat].forEach(item => { const div = document.createElement('div'); div.className = 'ad-menu-item'; div.innerHTML = '<button type="button" class="remove-btn" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button><div class="ad-form-row"><div class="ad-form-group"><label>Item Name *</label><input type="text" class="ad-form-control" name="admin-' + cat + '-name" value="' + item.name + '" required></div><div class="ad-form-group"><label>Price *</label><input type="number" class="ad-form-control" name="admin-' + cat + '-price" value="' + item.price + '" step="0.01" min="0" required></div></div><div class="ad-form-group"><label>Description</label><input type="text" class="ad-form-control" name="admin-' + cat + '-description" value="' + (item.description || '') + '"></div><div class="ad-form-group"><label>Image URL</label><input type="url" class="ad-form-control" name="admin-' + cat + '-image" value="' + (item.image || '') + '"></div>'; el.appendChild(div); }); } } }
   document.getElementById('adRestFormModal').classList.add('active');
@@ -1313,7 +1376,8 @@ async function adSubmitRest() {
   const key = adEditRestKey || name.toLowerCase().replace(/[^a-z0-9]/g, '');
   const menu = { coffee: adCollectMenu('coffee'), food: adCollectMenu('food'), dessert: adCollectMenu('dessert'), juices: adCollectMenu('juices'), softdrinks: adCollectMenu('softdrinks') };
   if (!Object.values(menu).some(c => c.length > 0)) { adToast('Add at least one menu item'); return; }
-  const data = { name, address: document.getElementById('adRestAddress').value.trim(), lat: parseFloat(document.getElementById('adRestLat').value) || null, lng: parseFloat(document.getElementById('adRestLng').value) || null, phone: document.getElementById('adRestPhone').value.trim(), email: document.getElementById('adRestEmail').value.trim(), cuisine: document.getElementById('adRestCuisine').value.trim() || 'Various', rating: parseFloat(document.getElementById('adRestRating').value) || 4.5, logo: document.getElementById('adRestLogo').value.trim(), menu, active: true, activeCategories: Object.keys(menu).filter(c => menu[c].length > 0), deliveryTime: '20 min', deliveryFee: '$2' };
+  const restImage = adGetRestImage();
+  const data = { name, address: document.getElementById('adRestAddress').value.trim(), lat: parseFloat(document.getElementById('adRestLat').value) || null, lng: parseFloat(document.getElementById('adRestLng').value) || null, phone: document.getElementById('adRestPhone').value.trim(), email: document.getElementById('adRestEmail').value.trim(), cuisine: document.getElementById('adRestCuisine').value.trim() || 'Various', rating: parseFloat(document.getElementById('adRestRating').value) || 4.5, logo: restImage, image: restImage, menu, active: true, activeCategories: Object.keys(menu).filter(c => menu[c].length > 0), deliveryTime: '20 min', deliveryFee: '$2' };
   adRestaurants[key] = data;
   restaurants[key] = data;
   adSaveData();
@@ -1395,7 +1459,9 @@ function setRenderRest() {
     const r = adRestaurants[k]; const active = r.active !== undefined ? r.active : true;
     const icon = r.icon || 'fa-utensils';
     const cuisine = r.cuisine || (icon === 'fa-utensils' ? 'Fast Food' : icon === 'fa-mug-hot' ? 'Coffee & Food' : icon === 'fa-fire' ? 'Grilled' : icon === 'fa-pizza-slice' ? 'Pizza' : 'Juice & Drinks');
-    return '<tr><td><strong>' + r.name + '</strong></td><td>' + cuisine + '</td><td><i class="fas fa-star" style="color:var(--warning);font-size:0.75rem"></i> ' + (r.rating || '4.5') + '</td><td>' + (r.orders || 0) + '</td><td><button class="set-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="setToggleRest(\'' + k + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td><td><button class="set-btn set-btn-danger set-btn-sm" onclick="setDeleteRest(\'' + k + '\')"><i class="fas fa-trash"></i></button></td></tr>';
+    const rImg = r.image || r.logo || '';
+    const thumb = rImg ? '<img src="' + rImg + '" alt="" style="width:32px;height:32px;border-radius:6px;object-fit:cover;margin-right:8px;vertical-align:middle" onerror="this.style.display=\'none\'">' : '';
+    return '<tr><td>' + thumb + '<strong>' + r.name + '</strong></td><td>' + cuisine + '</td><td><i class="fas fa-star" style="color:var(--warning);font-size:0.75rem"></i> ' + (r.rating || '4.5') + '</td><td>' + (r.orders || 0) + '</td><td><button class="set-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="setToggleRest(\'' + k + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td><td><button class="set-btn set-btn-danger set-btn-sm" onclick="setDeleteRest(\'' + k + '\')"><i class="fas fa-trash"></i></button></td></tr>';
   }).join('');
 }
 function setToggleRest(k) { const r = adRestaurants[k]; if (!r) return; r.active = r.active !== undefined ? !r.active : false; adSaveData(); setRenderRest(); adRenderRestaurants(); adToast(r.name + ' is now ' + (r.active ? 'Active' : 'Inactive')); }
@@ -1519,8 +1585,10 @@ function restRenderRestaurants() {
       const icon = r.icon || 'fa-utensils';
       const cuisine = r.cuisine || restIconToCuisine(icon);
       const totalMenuItems = r.menu ? Object.values(r.menu).reduce((s, arr) => s + arr.length, 0) : 0;
+      const rImg = r.image || r.logo || '';
+      const imgHtml = rImg ? '<img src="' + rImg + '" alt="' + r.name + '" onerror="this.remove()">' : '';
       return '<div class="rest-card">' +
-        '<div class="rest-card-img" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark))"><i class="fas ' + icon + '"></i></div>' +
+        '<div class="rest-card-img" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark))">' + imgHtml + '<i class="fas ' + icon + '"></i></div>' +
         '<div class="rest-card-body">' +
         '<div class="rest-card-name">' + r.name + '</div>' +
         '<div class="rest-card-meta">' +
@@ -1546,8 +1614,10 @@ function restRenderRestaurants() {
       const active = r.active !== undefined ? r.active : true;
       const icon = r.icon || 'fa-utensils';
       const cuisine = r.cuisine || restIconToCuisine(icon);
+      const rImg = r.image || r.logo || '';
+      const thumb = rImg ? '<img src="' + rImg + '" alt="" style="width:36px;height:36px;border-radius:8px;object-fit:cover" onerror="this.style.display=\'none\'">' : '<div style="width:36px;height:36px;border-radius:8px;background:var(--primary-soft);display:flex;align-items:center;justify-content:center;color:var(--primary)"><i class="fas ' + icon + '"></i></div>';
       return '<tr>' +
-        '<td><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:8px;background:var(--primary-soft);display:flex;align-items:center;justify-content:center;color:var(--primary)"><i class="fas ' + icon + '"></i></div><strong>' + r.name + '</strong></div></td>' +
+        '<td><div style="display:flex;align-items:center;gap:10px">' + thumb + '<strong>' + r.name + '</strong></div></td>' +
         '<td>' + cuisine + '</td><td style="font-size:.8rem">' + (r.address || '-') + '</td><td style="font-size:.8rem">' + (r.phone || '-') + '</td>' +
         '<td><i class="fas fa-star" style="color:#F59E0B;font-size:.75rem"></i> ' + (r.rating || '4.5') + '</td>' +
         '<td><button class="rest-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="restToggleStatus(\'' + k + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td>' +
@@ -1575,24 +1645,67 @@ function restToggleStatus(key) {
   if (supaConnected) supaSaveRestaurant(key, r);
 }
 
+let restImageBase64 = '';
+function restPreviewRestImage(e) {
+  const file = e.target.files[0]; if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { restToast('Image too large (max 2MB)'); return; }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    restImageBase64 = ev.target.result;
+    const p = document.getElementById('restAddImgPreview'); p.src = restImageBase64; p.style.display = 'block';
+    document.getElementById('restAddImgPlaceholder').style.display = 'none';
+    document.getElementById('restAddImageUrl').value = '';
+  };
+  reader.readAsDataURL(file);
+}
+function restClearRestImageFile() {
+  restImageBase64 = '';
+  const p = document.getElementById('restAddImgPreview'); if (p) { p.style.display = 'none'; p.removeAttribute('src'); }
+  const ph = document.getElementById('restAddImgPlaceholder'); if (ph) ph.style.display = '';
+  const inp = document.getElementById('restAddImgInput'); if (inp) inp.value = '';
+}
+function restResetRestImage() {
+  restClearRestImageFile();
+  const url = document.getElementById('restAddImageUrl'); if (url) url.value = '';
+}
+function restSetRestImage(src) {
+  restClearRestImageFile();
+  const url = document.getElementById('restAddImageUrl');
+  if (!src) { if (url) url.value = ''; return; }
+  if (src.startsWith('data:')) {
+    restImageBase64 = src;
+    const p = document.getElementById('restAddImgPreview'); p.src = src; p.style.display = 'block';
+    document.getElementById('restAddImgPlaceholder').style.display = 'none';
+    if (url) url.value = '';
+  } else {
+    if (url) url.value = src;
+    const p = document.getElementById('restAddImgPreview'); p.src = src; p.style.display = 'block';
+    document.getElementById('restAddImgPlaceholder').style.display = 'none';
+  }
+}
+function restGetRestImage() {
+  const url = (document.getElementById('restAddImageUrl')?.value || '').trim();
+  return restImageBase64 || url;
+}
 function restAddRestaurant() {
   const editKey = document.getElementById('restModal-addRestaurant').dataset.editKey;
   const name = document.getElementById('restAddName').value.trim();
   if (!name) { restToast('Please enter restaurant name'); return; }
   const key = editKey || name.toLowerCase().replace(/[^a-z0-9]/g, '');
   const icon = document.getElementById('restAddIcon').value;
+  const restImage = restGetRestImage();
   const data = {
     name, address: document.getElementById('restAddAddress').value.trim() || 'Hargeisa',
     phone: document.getElementById('restAddPhone').value.trim(), email: document.getElementById('restAddEmail').value.trim(),
     lat: parseFloat(document.getElementById('restAddLat').value) || null, lng: parseFloat(document.getElementById('restAddLng').value) || null,
     cuisine: document.getElementById('restAddCuisine').value, rating: parseFloat(document.getElementById('restAddRating').value) || 4.5,
-    icon, active: adRestaurants[key] ? adRestaurants[key].active : true,
+    icon, logo: restImage, image: restImage, active: adRestaurants[key] ? adRestaurants[key].active : true,
     menu: adRestaurants[key] ? adRestaurants[key].menu : { coffee: [], food: [], dessert: [], juices: [], softdrinks: [] },
     deliveryTime: '20 min', deliveryFee: '$2', activeCategories: []
   };
   adRestaurants[key] = data; restaurants[key] = data;
   adSaveData(); restCloseModal('addRestaurant'); restPopulateCuisineFilter(); restRenderRestaurants();
-  adRenderRestaurants();
+  adRenderRestaurants(); setRenderRest();
   restToast(editKey ? name + ' updated!' : name + ' added!');
   document.getElementById('restAddName').value = '';
   document.getElementById('restAddAddress').value = '';
@@ -1613,6 +1726,7 @@ function restEditRestaurant(key) {
   document.getElementById('restAddCuisine').value = r.cuisine || 'Various';
   document.getElementById('restAddRating').value = r.rating || 4.5;
   document.getElementById('restAddIcon').value = r.icon || 'fa-utensils';
+  restSetRestImage(r.logo || r.image || '');
   document.getElementById('restModal-addRestaurant').dataset.editKey = key;
   restOpenModal('addRestaurant');
 }
@@ -1777,6 +1891,7 @@ function restCloseModal(id) {
     document.getElementById('restAddLat').value = '';
     document.getElementById('restAddLng').value = '';
     document.getElementById('restAddRating').value = '4.5';
+    restResetRestImage();
   }
 }
 
