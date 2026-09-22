@@ -2503,6 +2503,7 @@ Gmail
 <i class="fas fa-toggle-on"></i> <span id="dpLblOnline">Online</span>
 </button>
 <button id="dpRefreshBtn" class="dp-b dp-b-gray dp-b-sm" onclick="dpRefreshFromSupa()"><i class="fas fa-rotate-right"></i> Refresh</button>
+<button class="dp-b dp-b-blue dp-b-sm" onclick="dpManualRefreshLocation()"><i class="fas fa-location-crosshairs"></i> Refresh Location</button>
 </div>
 </div>
 <div class="dp-scard" id="dpStatusCard">
@@ -4234,13 +4235,31 @@ dpLocationWatchId = navigator.geolocation.watchPosition(
 (err) => { dpHandleLocationError(err); },
 { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
 );
-// Sync location to Supabase every 10 seconds
+// Sync location to Supabase every 5 seconds
 if (dpLocationUpdateInterval) clearInterval(dpLocationUpdateInterval);
 dpLocationUpdateInterval = setInterval(() => {
 if (dpDriver && dpDriver.lat && dpDriver.lng && supaConnected) {
 sb.from('vehicles').update({ lat: dpDriver.lat, lng: dpDriver.lng }).eq('id', dpDriver.id).then(() => {}).catch(() => {});
 }
-}, 10000);
+}, 5000);
+}
+function dpManualRefreshLocation() {
+if (!navigator.geolocation) { dpToast('⚠️ GPS not supported', 'error'); return; }
+dpToast('📍 Refreshing location...', 'info');
+navigator.geolocation.getCurrentPosition(
+(pos) => {
+dpUpdateDriverPosition(pos.coords.latitude, pos.coords.longitude);
+if (dpDriver && supaConnected) {
+sb.from('vehicles').update({ lat: dpDriver.lat, lng: dpDriver.lng }).eq('id', dpDriver.id)
+.then(() => dpToast('✅ Location updated', 'success'))
+.catch(() => dpToast('⚠️ Sync failed', 'error'));
+} else {
+dpToast('✅ Location updated', 'success');
+}
+},
+(err) => dpHandleLocationError(err),
+{ enableHighAccuracy: true, timeout: 10000 }
+);
 }
 
 function dpUpdateDriverPosition(lat, lng) {
@@ -5502,7 +5521,7 @@ setTimeout(() => appInitTrackingMap(order), 250);
 appStartDriverSimulation(order);
 }
 if (trackingPollInterval) clearInterval(trackingPollInterval);
-trackingPollInterval = setInterval(async () => { await refreshTracking(); }, 10000);
+trackingPollInterval = setInterval(async () => { await refreshTracking(); }, 5000);
 }
 
 function appRenderTrackingTimeline(order) {
@@ -5519,10 +5538,10 @@ return `<div class="app-timeline-item ${cls}"><div style="display:flex;align-ite
 
 function appGetTrackedVehicle(order) {
 const live = order.vehicleId ? vehicles.find(v => v.id === order.vehicleId) : null;
-if (live && live.lat != null && live.lng != null && ['available','delivering'].includes(live.status)) {
+if (live && live.lat != null && live.lng != null && live.status === 'delivering') {
 return { id: live.id, driverName: live.driverName, driverPhone: live.driverPhone, plateNumber: live.plateNumber, type: live.type, lat: live.lat, lng: live.lng, status: live.status, live: true };
 }
-return order.vehicle || null;
+return null;
 }
 
 function appInitTrackingMap(order) {
@@ -5538,7 +5557,7 @@ L.marker([custLat, custLng], { icon: custIcon }).addTo(trackingMap).bindPopup(`<
 const veh = appGetTrackedVehicle(order);
 const vehLat = veh?.lat || restLat, vehLng = veh?.lng || restLng;
 const activeStatuses = ['preparing', 'ready', 'out_for_delivery'];
-if (veh && activeStatuses.includes(order.status) && (veh.live || veh.lat != null)) {
+if (veh && veh.live && activeStatuses.includes(order.status)) {
 const vehIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#3b82f6;width:44px;height:44px;"><i class="fas fa-motorcycle"></i></div>', className: '', iconSize: [44, 44], iconAnchor: [22, 22] });
 driverMarker = L.marker([vehLat, vehLng], { icon: vehIcon }).addTo(trackingMap).bindPopup(`<b>🛵 ${veh.driverName || 'Driver'}</b>`);
 }
@@ -5574,8 +5593,9 @@ try { const sv = JSON.parse(localStorage.getItem('gopoint_vehicles') || '[]'); i
 const o = orders.find(o => o.id == currentTrackedOrder);
 if (o) {
 if (o.status === 'completed') { closeTrackingModal(); showAppToast('🎉 Order delivered!'); return; }
-document.getElementById('appTrackDriverName').textContent = o.vehicle?.driverName || 'Pending Driver';
-document.getElementById('appTrackDriverPhone').textContent = o.vehicle?.driverPhone || '-';
+const vehNow = appGetTrackedVehicle(o);
+document.getElementById('appTrackDriverName').textContent = vehNow?.driverName || 'Pending Driver';
+document.getElementById('appTrackDriverPhone').textContent = vehNow?.driverPhone || '-';
 appRenderTrackingTimeline(o);
 appInitTrackingMap(o);
 appStartDriverSimulation(o);
