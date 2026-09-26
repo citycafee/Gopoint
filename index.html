@@ -2777,6 +2777,10 @@ Gmail
 <div style="padding:1rem; max-width:1400px; margin:0 auto;">
 <button onclick="appBackToRestaurants()" style="display:flex; align-items:center; gap:8px; background:white; border:1px solid #e5e7eb; padding:8px 16px; border-radius:30px; cursor:pointer; font-weight:600; color:var(--primary); margin-bottom:1rem;"><i class="fas fa-arrow-left"></i> Back</button>
 <div id="appExplorerRestHeader" class="app-explorer-rest-card"></div>
+<div id="appRestMapWrap" style="display:none; background:white; border-radius:16px; padding:10px; box-shadow:0 2px 10px rgba(0,0,0,.06); margin-bottom:14px;">
+<div id="appRestMap" style="height:240px; width:100%; border-radius:12px; overflow:hidden; background:#e2e8f0;"></div>
+<div id="appRestMapCaption" style="margin-top:8px; padding:0 4px; font-size:.85rem; color:#64748b; display:flex; align-items:center; gap:8px;"></div>
+</div>
 <div id="appExplorerCatTabs" class="app-explorer-cat-tabs"></div>
 <div id="appExplorerMenuItems"></div>
 </div>
@@ -3392,7 +3396,7 @@ function formatPrice(usd) {
   if (mode === 'both') return '$' + usd.toFixed(2) + ' (SLSH ' + slsh.toLocaleString() + ')';
   return '$' + usd.toFixed(2);
 }
-let appMap = null, appMarkers = [], appCustomerMarker = null, appCurrentSlide = 0, appBannerInterval = null, appCurrentCategory = 'All';
+let appMap = null, appMarkers = [], appCustomerMarker = null, appRestMap = null, appCurrentSlide = 0, appBannerInterval = null, appCurrentCategory = 'All';
 let profileMiniMapInstance = null;
 
 // ─── GLOBAL DRIVER PORTAL VARIABLES ───
@@ -5337,9 +5341,34 @@ document.getElementById('appHomeView').style.display = 'none';
 document.getElementById('appExplorerContainer').classList.add('active');
 if (cartVisible) { cartVisible = false; document.getElementById('appCartWindow').classList.remove('visible'); }
 window.scrollTo({ top: 0 });
+setTimeout(appInitRestaurantMap, 150);
 });
 }
 function appBackToRestaurants() { document.getElementById('appExplorerContainer').classList.remove('active'); document.getElementById('appHomeView').style.display = 'block'; document.getElementById('appMiniCartBar').classList.remove('visible'); currentRestaurant = null; window.scrollTo({ top: 0 }); refreshRestaurants().then(() => appRenderRestaurantList()); }
+
+// Restaurant page map — shows the customer's location (detected at Get Started) next to the restaurant.
+function appInitRestaurantMap() {
+const wrap = document.getElementById('appRestMapWrap');
+if (!wrap) return;
+const cap = document.getElementById('appRestMapCaption');
+const r = currentRestaurant ? restaurants[currentRestaurant] : null;
+if (!r || typeof customerLocation === 'undefined' || !customerLocation || !customerLocation.lat || !customerLocation.lng) { wrap.style.display = 'none'; return; }
+wrap.style.display = 'block';
+const rLat = r.lat || 9.56, rLng = r.lng || 44.065;
+if (!appRestMap) {
+  appRestMap = L.map('appRestMap', { scrollWheelZoom: false });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(appRestMap);
+}
+appRestMap.eachLayer((layer) => { if (layer instanceof L.Marker) appRestMap.removeLayer(layer); });
+const custIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#3b82f6;width:40px;height:40px;"><i class="fas fa-user"></i></div>', className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
+L.marker([customerLocation.lat, customerLocation.lng], { icon: custIcon }).addTo(appRestMap).bindPopup('<b>📍 Your Location</b><br>' + (customerLocation.area || 'Detected'));
+L.marker([rLat, rLng]).addTo(appRestMap).bindPopup('<b>' + (r.name || 'Restaurant') + '</b>');
+const bounds = L.latLngBounds([[customerLocation.lat, customerLocation.lng], [rLat, rLng]]).pad(0.3);
+appRestMap.invalidateSize();
+appRestMap.fitBounds(bounds, { maxZoom: 16 });
+const dist = appCalculateDistance(customerLocation.lat, customerLocation.lng, rLat, rLng).toFixed(1);
+if (cap) cap.innerHTML = '<i class="fas fa-location-arrow" style="color:#3b82f6;"></i> 📍 ' + (customerLocation.area || 'Your location') + '<span style="margin-left:auto; background:#dbeafe; color:#1e40af; padding:3px 10px; border-radius:20px; font-weight:700; white-space:nowrap;">' + dist + ' km from here</span>';
+}
 
 function appRenderExplorerMenuItems() {
 if (!currentRestaurant || !restaurants[currentRestaurant]) return;
