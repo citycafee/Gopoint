@@ -1058,6 +1058,8 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .fp-loc-title { font-size: 15px; font-weight: 600; color: #202124; line-height: 1.35; }
 .fp-loc-body { padding: 4px 16px 10px 68px; font-size: 13px; color: #5f6368; line-height: 1.5; }
 .fp-loc-body strong { color: #202124; }
+.fp-loc-reset-hint { margin-top: 10px; padding: 8px 10px; background: #fff8e1; border: 1px solid #fde68a; border-radius: 8px; font-size: 12px; color: #92400e; line-height: 1.55; text-align: left; }
+.fp-loc-reset-hint strong { color: #78350f; }
 .fp-loc-features { padding: 0 16px 12px 68px; display: flex; flex-direction: column; gap: 8px; }
 .fp-loc-feature { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #3c4043; line-height: 1.3; }
 .fp-loc-feature i { width: 28px; height: 28px; border-radius: 8px; background: #f1f3f4; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #5f6368; flex-shrink: 0; }
@@ -3189,13 +3191,21 @@ function fpHasAllowedLocation() {
 }
 
 // Keeps the prompt open with an explanation — the app stays locked until location is allowed.
-function fpShowLocationError(msg) {
+function fpShowLocationError(msg, hint) {
   const overlay = document.getElementById('fpLocationOverlay');
   if (!overlay) return;
   const actionsEl = overlay.querySelector('.fp-loc-actions');
   if (actionsEl) actionsEl.style.display = 'flex';
   const bodyEl = overlay.querySelector('.fp-loc-body');
-  if (bodyEl && msg) bodyEl.textContent = msg;
+  if (bodyEl && msg) {
+    bodyEl.textContent = msg;
+    if (hint) {
+      const hintEl = document.createElement('div');
+      hintEl.className = 'fp-loc-reset-hint';
+      hintEl.innerHTML = hint;
+      bodyEl.appendChild(hintEl);
+    }
+  }
   const detectedEl = document.getElementById('fpLocDetected');
   if (detectedEl) detectedEl.style.display = 'none';
   overlay.classList.add('active');
@@ -3287,7 +3297,10 @@ function fpRequestLocation() {
       localStorage.setItem('gopoint_loc_skipped', '1');
       if (err.code === err.PERMISSION_DENIED) {
         showAppToast('⚠️ Location access is required. Please allow location to use Go!point.');
-        fpShowLocationError('Location access is blocked. Go!point needs your location for delivery — tap Allow, or enable location for this site in your browser settings.');
+        fpShowLocationError(
+          'Location access is blocked. Go!point needs your location for delivery — tap Allow to try again.',
+          '<strong>Already blocked this site before?</strong> The browser stops asking and denies it silently. Tap the <strong>🔒 or ⚙ icon</strong> next to the address bar → <strong>Site settings → Location → Allow</strong>, then reload this page. (iPhone: Settings → Safari → Location → Allow.)'
+        );
       } else if (err.code === err.POSITION_UNAVAILABLE) {
         showAppToast('⚠️ Device GPS is turned off');
         fpShowLocationError('Your GPS is turned off. Please enable Location/GPS, then tap Allow to continue.');
@@ -3369,6 +3382,18 @@ const dLat = ((lat2 - lat1) * Math.PI) / 180;
 const dLng = ((lng2 - lng1) * Math.PI) / 180;
 const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
 return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// The delivery point is the position captured when "Get Started" was pressed (the customer's home).
+// Old orders saved with the placeholder coordinate (9.56, 44.065) are corrected from that saved location.
+function appResolveDeliveryCoords(order) {
+const c = order && order.coordinates;
+const isPlaceholder = !c || c.lat == null || c.lng == null || (Math.abs(c.lat - 9.56) < 1e-6 && Math.abs(c.lng - 44.065) < 1e-6);
+if (!isPlaceholder) return { lat: c.lat, lng: c.lng };
+let loc = (typeof customerLocation !== 'undefined' && customerLocation && customerLocation.lat && customerLocation.lng) ? customerLocation : null;
+if (!loc) { try { const s = localStorage.getItem('gopoint_customer_location'); if (s) loc = JSON.parse(s); } catch(e) {} }
+if (loc && loc.lat && loc.lng) return { lat: loc.lat, lng: loc.lng };
+return { lat: 9.56, lng: 44.065 };
 }
 
 function appGetClosestVehicleOfType(type, lat, lng) {
@@ -5467,6 +5492,7 @@ const applyLocation = async (loc, source) => {
     loc = { ...loc, ...locData };
   }
   customerLocation = loc;
+  detectedCoordinates = { lat: loc.lat, lng: loc.lng };
   localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
   if (areaInput) areaInput.value = customerLocation.area;
   setStatus('success', '📍 ' + customerLocation.area + (source === 'saved' ? '  •  same as Get Started' : ''));
@@ -5598,7 +5624,13 @@ const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
 const assignedVehicle = vehicle ? { id: vehicle.id, driverName: vehicle.driverName, driverPhone: vehicle.driverPhone, plateNumber: vehicle.plateNumber, type: vehicle.type } : null;
 const orderData = {
 type: 'delivery', customer: deliveryInfo, payment: paymentInfo, items: [...cart], total, status: 'pending',
-coordinates: detectedCoordinates || { lat: 9.56, lng: 44.065 }, restaurant: currentRestaurant,
+// Delivery destination = where Get Started detected the customer (their home), never the city-centre placeholder.
+coordinates: (detectedCoordinates && detectedCoordinates.lat && detectedCoordinates.lng)
+  ? { lat: detectedCoordinates.lat, lng: detectedCoordinates.lng }
+  : ((customerLocation && customerLocation.lat && customerLocation.lng)
+      ? { lat: customerLocation.lat, lng: customerLocation.lng }
+      : { lat: 9.56, lng: 44.065 }),
+restaurant: currentRestaurant,
 vehicle: assignedVehicle, vehicleId: deliveryInfo.vehicleId || null,
 statusHistory: [{ status: 'pending', time: new Date().toISOString() }],
 created_at: new Date().toISOString()
@@ -5635,9 +5667,10 @@ const vehSnap = appGetTrackedVehicle(order);
 document.getElementById('appTrackDriverName').textContent = vehSnap?.driverName || 'Pending Driver';
 document.getElementById('appTrackDriverPhone').textContent = vehSnap?.driverPhone || '-';
 document.getElementById('appTrackCustomerName').textContent = order.customer?.name || '';
-if (rest.lat && rest.lng && order.coordinates?.lat && order.coordinates?.lng) {
-const restToCustomerDist = appCalculateDistance(rest.lat, rest.lng, order.coordinates.lat, order.coordinates.lng).toFixed(1);
-document.getElementById('appTrackRestaurantToCustomerDistance').textContent = `${restToCustomerDist} km`;
+if (rest.lat && rest.lng) {
+ const dest = appResolveDeliveryCoords(order);
+ const restToCustomerDist = appCalculateDistance(rest.lat, rest.lng, dest.lat, dest.lng).toFixed(1);
+ document.getElementById('appTrackRestaurantToCustomerDistance').textContent = `${restToCustomerDist} km`;
 }
 appRenderTrackingTimeline(order);
 if (supaConnected) {
@@ -5680,7 +5713,8 @@ return null;
 function appInitTrackingMap(order) {
 if (trackingMap) { trackingMap.remove(); trackingMap = null; driverMarker = null; }
 const rest = restaurants[order.restaurant] || {}, restLat = rest.lat || 9.56, restLng = rest.lng || 44.065;
-const custLat = order.coordinates?.lat || 9.56, custLng = order.coordinates?.lng || 44.065;
+const dest = appResolveDeliveryCoords(order);
+const custLat = dest.lat, custLng = dest.lng;
 trackingMap = L.map('appTrackingMap').setView([(restLat + custLat) / 2, (restLng + custLng) / 2], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(trackingMap);
 const restIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#22c55e;width:40px;height:40px;"><i class="fas fa-store"></i></div>', className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
@@ -5703,7 +5737,8 @@ function appStartDriverSimulation(order) {
 if (driverSimulationInterval) { clearInterval(driverSimulationInterval); driverSimulationInterval = null; }
 const veh = appGetTrackedVehicle(order);
 if (!veh?.live || order.status !== 'out_for_delivery' || !driverMarker) return;
-const rest = restaurants[order.restaurant] || {}, targetLat = order.coordinates?.lat || 9.56, targetLng = order.coordinates?.lng || 44.065;
+const rest = restaurants[order.restaurant] || {};
+const dest = appResolveDeliveryCoords(order), targetLat = dest.lat, targetLng = dest.lng;
 let curLat = veh.lat || rest.lat || 9.56, curLng = veh.lng || rest.lng || 44.065;
 driverSimulationInterval = setInterval(() => {
 curLat += (targetLat - curLat) * 0.08;
