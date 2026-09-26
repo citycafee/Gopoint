@@ -3176,6 +3176,27 @@ toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 // ─── LOCATION PERMISSION NOTIFICATION ───
+// Access is only allowed when the browser permission was granted AND we have a resolved area.
+function fpHasAllowedLocation() {
+  if (localStorage.getItem('gopoint_loc_permitted') !== '1') return false;
+  const saved = localStorage.getItem('gopoint_customer_location');
+  if (!saved) return false;
+  try { const loc = JSON.parse(saved); return !!(loc && loc.area && loc.area !== 'Detecting...'); } catch(e) { return false; }
+}
+
+// Keeps the prompt open with an explanation — the app stays locked until location is allowed.
+function fpShowLocationError(msg) {
+  const overlay = document.getElementById('fpLocationOverlay');
+  if (!overlay) return;
+  const actionsEl = overlay.querySelector('.fp-loc-actions');
+  if (actionsEl) actionsEl.style.display = 'flex';
+  const bodyEl = overlay.querySelector('.fp-loc-body');
+  if (bodyEl && msg) bodyEl.textContent = msg;
+  const detectedEl = document.getElementById('fpLocDetected');
+  if (detectedEl) detectedEl.style.display = 'none';
+  overlay.classList.add('active');
+}
+
 function fpShowLocationOverlay() {
   const originEl = document.getElementById('fpLocOrigin');
   if (originEl) originEl.textContent = 'Go!point wants to';
@@ -3184,7 +3205,7 @@ function fpShowLocationOverlay() {
   if (saved) {
     try { const loc = JSON.parse(saved); hasValidArea = loc.area && loc.area !== 'Detecting...'; } catch(e) {}
   }
-  if (localStorage.getItem('gopoint_loc_permitted') === '1' && hasValidArea) {
+  if (fpHasAllowedLocation()) {
     if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
     return;
   }
@@ -3216,9 +3237,7 @@ function fpRequestLocation() {
   const detectedAddr = document.getElementById('fpLocDetectedAddress');
   if (!navigator.geolocation) {
     showAppToast('⚠️ Geolocation is not supported by your browser');
-    fpCheckGpsEnabled();
-    if (overlay) overlay.classList.remove('active');
-    if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
+    fpShowLocationError('Your browser does not support location access. Go!point needs your location to continue.');
     return;
   }
   if (overlay) {
@@ -3244,15 +3263,19 @@ function fpRequestLocation() {
         })();
       },
       (err) => {
+        // Location not allowed → the application stays locked (no login, no guest entry).
+        localStorage.removeItem('gopoint_loc_permitted');
+        localStorage.setItem('gopoint_loc_skipped', '1');
         if (err.code === err.PERMISSION_DENIED) {
-          showAppToast('⚠️ Location permission denied. Please allow location to use Go!Point.');
-          if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
+          showAppToast('⚠️ Location access is required. Please allow location to use Go!point.');
+          fpShowLocationError('Location access is blocked. Go!point needs your location for delivery — tap Allow, or enable location for this site in your browser settings.');
         } else if (err.code === err.POSITION_UNAVAILABLE) {
           showAppToast('⚠️ Device GPS is turned off');
+          fpShowLocationError('Your GPS is turned off. Please enable Location/GPS, then tap Allow to continue.');
           showGpsOverlay();
         } else {
           showAppToast('⚠️ Location request timed out. Please check your GPS and try again.');
-          if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
+          fpShowLocationError('Location request timed out. Please check your GPS and tap Allow to try again.');
         }
       },
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
@@ -3261,15 +3284,20 @@ function fpRequestLocation() {
 }
 
 function fpSkipLocation() {
-  const overlay = document.getElementById('fpLocationOverlay');
-  if (overlay) overlay.classList.remove('active');
+  // Blocking location = no access to the application.
   localStorage.setItem('gopoint_loc_skipped', '1');
   localStorage.removeItem('gopoint_loc_permitted');
-  showAppToast('⚠️ Location access is required for delivery. You can enable it anytime in browser settings.');
-  if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
+  showAppToast('⚠️ Location access is required to use Go!point.');
+  fpShowLocationError('Location access is required to use Go!point — delivery, nearby stores and riders all need your location. Tap Allow to continue.');
 }
 
 function fpChainNotifOrLogin() {
+  // Hard gate: without an allowed location the app never opens.
+  if (!fpHasAllowedLocation()) {
+    window._fpLoginFlowPending = false;
+    fpShowLocationOverlay();
+    return;
+  }
   window._fpLoginFlowPending = false;
   if (window._guestFlow) { window._guestFlow = false; goToMarketplace(); return; }
   document.getElementById('fpLoginModal').classList.add('active');
@@ -4399,12 +4427,7 @@ e._t = setTimeout(() => { e.classList.remove('show'); }, 3000);
 // ─── FRONT PAGE LOGIN FUNCTIONS ───
 function openFrontLogin() {
   window._fpLoginFlowPending = true;
-  const saved = localStorage.getItem('gopoint_customer_location');
-  let hasValidArea = false;
-  if (saved) {
-    try { const loc = JSON.parse(saved); hasValidArea = loc.area && loc.area !== 'Detecting...'; } catch(e) {}
-  }
-  if (localStorage.getItem('gopoint_loc_permitted') === '1' && hasValidArea) {
+  if (fpHasAllowedLocation()) {
     fpChainNotifOrLogin();
   } else {
     fpShowLocationOverlay();
@@ -4933,7 +4956,16 @@ completeLogin({ name, email, phone: '', provider: 'email' });
 }
 
 async function completeLogin(user) { currentUser = user; if (!user.created && !user.registeredAt) { const existing = localStorage.getItem('gopoint_user'); const parsed = existing ? JSON.parse(existing) : null; user.created = parsed?.created || new Date().toISOString(); } localStorage.setItem('gopoint_user', JSON.stringify(user)); if (supaConnected && user.id) { await sb.from('profiles').upsert({ id: user.id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '', registered_at: user.created }, { onConflict: 'id' }); } closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
-function goToMarketplace() { document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('fpDriverLoginPopup').classList.remove('active'); document.getElementById('fpAdminLoginPopup').classList.remove('active'); document.getElementById('fpLoginModal').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); updateSearchPlaceholder(); detectFrontLocation(); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
+function goToMarketplace() {
+  // The application is locked until the customer allows location access.
+  if (!fpHasAllowedLocation()) {
+    window._fpLoginFlowPending = false;
+    window._guestFlow = false;
+    fpShowLocationOverlay();
+    showAppToast('⚠️ Location access is required to use Go!point.');
+    return;
+  }
+  document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('fpDriverLoginPopup').classList.remove('active'); document.getElementById('fpAdminLoginPopup').classList.remove('active'); document.getElementById('fpLoginModal').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); updateSearchPlaceholder(); detectFrontLocation(); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
 
 async function logoutUser() {
 if (!confirm('Are you sure you want to logout?')) return;
@@ -5382,33 +5414,47 @@ document.getElementById('appMiniCartTotal').textContent = total.toFixed(2);
 function toggleCart() { cartVisible = !cartVisible; document.getElementById('appCartWindow').classList.toggle('visible', cartVisible); }
 
 async function detectAppLocation() {
-const input = document.getElementById('appHomeSearchInput');
+const statusBox = document.getElementById('appLocationStatusBox');
+const areaInput = document.getElementById('appDetectedLocation');
+const setStatus = (cls, text) => { if (statusBox) { statusBox.className = 'app-location-status ' + cls; statusBox.textContent = text; statusBox.style.display = 'block'; } };
+const applyLocation = async (loc, source) => {
+  if (!loc.area || loc.area === 'Detecting...') {
+    const locData = await smartReverseGeocode(loc.lat, loc.lng);
+    loc = { ...loc, ...locData };
+  }
+  customerLocation = loc;
+  localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
+  if (areaInput) areaInput.value = customerLocation.area;
+  setStatus('success', '📍 ' + customerLocation.area + (source === 'saved' ? '  •  same as Get Started' : ''));
+  updateSearchPlaceholder();
+  showAppToast('📍 Location: ' + customerLocation.area);
+  if (appMap && customerLocation.lat && customerLocation.lng) { appMap.setView([customerLocation.lat, customerLocation.lng], 14); appUpdateCustomerMarker(); }
+  return customerLocation;
+};
+
+// 1) Reuse the exact location captured when "Get Started" was pressed — both must match.
+const saved = localStorage.getItem('gopoint_customer_location');
+if (saved) {
+  try {
+    const loc = JSON.parse(saved);
+    if (loc && loc.lat && loc.lng) {
+      setStatus('loading', '📍 Using the location from Get Started...');
+      return await applyLocation(loc, 'saved');
+    }
+  } catch(e) {}
+}
+
+// 2) Nothing detected yet — run the same detection as the Get Started prompt.
+if (!navigator.geolocation) { showAppToast('⚠️ Geolocation not supported'); setStatus('error', '⚠️ Location is not supported by this browser'); return; }
+setStatus('loading', '📍 Detecting your location...');
 showAppToast('📍 Detecting your location...');
-if (!navigator.geolocation) { showAppToast('⚠️ Geolocation not supported'); return; }
 navigator.geolocation.getCurrentPosition(async (pos) => {
 const lat = pos.coords.latitude, lng = pos.coords.longitude;
-customerLocation = { lat, lng, area: 'Detecting...' };
-try {
-  if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
-    customerLocation.area = await resolveHargeisaLocation(lat, lng);
-  } else {
-    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
-    const data = await res.json();
-    const a = data.address || {};
-    const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
-    const landmark = a.amenity || a.shop || a.tourism || '';
-    customerLocation.area = landmark ? `${landmark}, ${area}` : area;
-  }
-} catch(e) {
-  if (lat >= 9.54 && lat <= 9.58 && lng >= 44.05 && lng <= 44.08) {
-    customerLocation.area = getHargeisaArea(lat, lng);
-  }
-}
-localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
-updateSearchPlaceholder();
-showAppToast('📍 Location: ' + customerLocation.area);
-if (appMap) { appMap.setView([lat, lng], 14); appUpdateCustomerMarker(); }
+localStorage.setItem('gopoint_loc_permitted', '1');
+localStorage.removeItem('gopoint_loc_skipped');
+await applyLocation({ lat, lng, area: 'Detecting...' }, 'fresh');
 }, (err) => {
+setStatus('error', '⚠️ Location permission denied — allow location to use delivery');
 showAppToast('⚠️ Location permission denied');
 }, { enableHighAccuracy: true, timeout: 10000 });
 }
