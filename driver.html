@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#FF6B00" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-title" content="Go!point Driver" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Go!point Driver" />
+<link rel="manifest" href="manifest.json" />
 <title>Go!point — Driver Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
@@ -377,7 +384,6 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <div class="dp-hdr-btns">
 <button class="dp-b dp-b-purple dp-b-sm" onclick="openAdminLoginFromDriver()"><i class="fas fa-shield-halved"></i> Admin</button>
 <button class="dp-b dp-b-blue dp-b-sm" onclick="dpSimulateOrder()"><i class="fas fa-plus"></i> Simulate Order</button>
-<button class="dp-b dp-b-blue dp-b-sm" onclick="dpManualRefreshLocation()"><i class="fas fa-location-crosshairs"></i> Refresh Location</button>
 <button class="dp-b" id="dpBtnToggle" onclick="dpToggleOnline()">
 <i class="fas fa-toggle-on"></i> <span id="dpLblOnline">Online</span>
 </button>
@@ -1052,8 +1058,15 @@ async function dpToggleOnline() {
 
 function dpResetDemo() { if(confirm('Reset all demo data and reload?')) { localStorage.clear(); location.reload(); } }
 
+// True while the driver holds an accepted order that has not been Delivered yet.
+function dpHasActiveDelivery() {
+if (!dpDriver) return false;
+return orders.some(o => ['preparing', 'ready', 'out_for_delivery'].includes(o.status) && o.vehicle && (o.vehicle.id === dpDriver.id || o.vehicle.driverName === dpDriver.driverName));
+}
+
 function dpCheckForIncomingCalls() {
     if (!dpOnline || dpAdminDeactivated) return;
+    if (dpHasActiveDelivery()) { if (dpCurrentCallOrderId) hideIncomingCall(); return; }
     const myPending = orders.filter(o => o.status === 'pending' && (!o.vehicle || o.vehicle.id === dpDriver?.id));
     if (myPending.length > 0 && !dpCurrentCallOrderId) {
         showIncomingCall(myPending[0].id);
@@ -1170,7 +1183,7 @@ document.getElementById('dpSDist').textContent = dist.toFixed(1) + ' km';
 }
 
 function dpUpdateTabCounts() {
-const pending = orders.filter(o => o.status === 'pending' && (!o.vehicle || o.vehicle.id === dpDriver?.id)).length;
+const pending = dpHasActiveDelivery() ? 0 : orders.filter(o => o.status === 'pending' && (!o.vehicle || o.vehicle.id === dpDriver?.id)).length;
 const active = orders.filter(o => ['preparing', 'ready', 'out_for_delivery'].includes(o.status) && o.vehicle && o.vehicle.driverName === dpDriver?.driverName).length;
 const history = orders.filter(o => o.status === 'completed' && o.vehicle && o.vehicle.driverName === dpDriver?.driverName).length;
 document.getElementById('dpCntNew').textContent = pending;
@@ -1194,8 +1207,9 @@ return { orders: filtered, gross, fee, net, count: filtered.length };
 
 function dpRenderIncoming() {
 if (!dpDriver || dpAdminDeactivated) return;
-const p = orders.filter(o => o.status === 'pending' && o.id !== dpCurrentCallOrderId && (!o.vehicle || o.vehicle.id === dpDriver.id));
 const c = document.getElementById('dpListIncoming');
+if (dpHasActiveDelivery()) { c.innerHTML = `<div class="dp-empty"><i class="fas fa-truck"></i><p>Delivery in progress</p><p class="sub">New orders are paused until you mark this order as Delivered</p></div>`; return; }
+const p = orders.filter(o => o.status === 'pending' && o.id !== dpCurrentCallOrderId && (!o.vehicle || o.vehicle.id === dpDriver.id));
 if (!p.length) { c.innerHTML = `<div class="dp-empty"><i class="fas fa-inbox"></i><p>No other incoming orders</p><p class="sub">New orders will appear here</p></div>`; return; }
 c.innerHTML = p.map(o => {
 const r = restaurants[o.restaurant] || { name: 'Unknown' };
@@ -1229,6 +1243,7 @@ ${isNew ? '<div class="dp-ring-tag"><i class="fas fa-bell"></i> NEW ORDER</div>'
 function dpCalcEarnings(order) { const total = order.total || 0; const appFee = total * DP_CONFIG.commissionRate; return { total, appFee, driverEarn: total - appFee }; }
 
 async function dpAccept(id) {
+if (dpHasActiveDelivery()) { dpToast('⛔ Finish your current delivery before accepting another order', 'error'); hideIncomingCall(); return; }
 const i = orders.findIndex(x => x.id === id);
 if (i === -1) return;
 const o = orders[i];
@@ -1476,25 +1491,6 @@ function dpPersistDriverLocation(la, lo, force) {
     push();
   }, 5000);
 }
-function dpManualRefreshLocation() {
-  if (!navigator.geolocation) { dpToast('⚠️ GPS not supported', 'error'); return; }
-  dpToast('📍 Refreshing location...', 'info');
-  navigator.geolocation.getCurrentPosition(
-    (p) => {
-      const la = p.coords.latitude, lo = p.coords.longitude;
-      if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la, lo]);
-      if (dpActiveMap) dpActiveMap.setView([la, lo], 15);
-      dpPersistDriverLocation(la, lo, true);
-      dpToast('✅ Location updated', 'success');
-    },
-    (err) => {
-      if (err.code === err.PERMISSION_DENIED) dpToast('⚠️ Location permission denied', 'error');
-      else if (err.code === err.POSITION_UNAVAILABLE) dpToast('⚠️ GPS is OFF', 'error');
-      else dpToast('⚠️ Location request timed out', 'error');
-    },
-    { enableHighAccuracy: true, timeout: 10000 }
-  );
-}
 function dpStartLocationTracking() {
   if (!navigator.geolocation || dpLocationWatchId !== null) return;
   dpLocationWatchId = navigator.geolocation.watchPosition(
@@ -1704,6 +1700,32 @@ dpLogout = function() {
 localStorage.removeItem('dpDriver');
 _origDpLogout();
 };
+</script>
+<script>
+/* ── Mobile: hide the browser URL bar and fit the app to the full screen ── */
+(function () {
+  var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  var standalone = false;
+  try { standalone = window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: minimal-ui)').matches || navigator.standalone === true; } catch (e) {}
+  function collapseUrlBar() {
+    if (!isMobile || standalone) return;
+    try { if (window.scrollY === 0) window.scrollTo(0, 1); else window.scrollBy(0, 1); } catch (e) {}
+  }
+  window.addEventListener('load', function () { setTimeout(collapseUrlBar, 400); });
+  window.addEventListener('pageshow', function () { setTimeout(collapseUrlBar, 400); });
+  window.addEventListener('orientationchange', function () { setTimeout(collapseUrlBar, 500); });
+  if (isMobile && !standalone) {
+    var requested = false;
+    window.addEventListener('click', function () {
+      if (requested) return;
+      requested = true;
+      var el = document.documentElement;
+      var req = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (!req) return;
+      try { var p = req.call(el); if (p && typeof p.catch === 'function') p.catch(function () {}); } catch (e) {}
+    }, { once: true });
+  }
+})();
 </script>
 </body>
 </html>

@@ -874,3 +874,12 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .ad-report-summary { grid-template-columns: repeat(2, 1fr); }
 }
 
+
+/* ─── MOBILE: fill the whole screen (dynamic viewport, safe areas) ─── */
+html { height: 100%; }
+body { overscroll-behavior-y: none; }
+.fp-hero-bg, .app-profile-view, .app-explorer, .fp-mobile-menu { min-height: 100dvh; }
+.fp-mobile-menu { height: 100dvh; }
+.settings-container { max-height: 100dvh; }
+.app-mini-cart-bar { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+

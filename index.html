@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#FF6B00" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-title" content="Go!point" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Go!point" />
@@ -60,6 +62,19 @@
 --surface: #FFFFFF;
 --surface-2: #F1F5F9;
 --border: #E2E8F0;
+--border-light: #E2E8F0;
+--text-sec: #64748b;
+--shadow-xs: 0 1px 2px rgba(0,0,0,.05);
+--radius-full: 9999px;
+--danger: #EF4444;
+--danger-dark: #DC2626;
+--danger-bg: #FEF2F2;
+--success: #16a34a;
+--success-bg: #DCFCE7;
+--info: #2563EB;
+--info-bg: #EFF6FF;
+--warning: #F59E0B;
+--warning-bg: #FFFBEB;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -1325,6 +1340,14 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 @media(max-width:1024px){.rest-stats-grid{grid-template-columns:repeat(2,1fr)}.rest-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:768px){.rest-stats-grid,.rest-grid{grid-template-columns:1fr}.rest-filter-bar{flex-direction:column;align-items:stretch}.rest-search-box{min-width:auto}}
 
+/* ─── MOBILE: fill the whole screen (dynamic viewport, safe areas) ─── */
+html { height: 100%; }
+body { overscroll-behavior-y: none; }
+#frontPageContainer, .fp-hero-bg, .app-profile-view, .app-explorer { min-height: 100dvh; }
+.fp-mobile-menu { height: 100dvh; }
+.settings-container { max-height: 100dvh; }
+.app-mini-cart-bar { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+
 </style>
 </head>
 <body>
@@ -2005,6 +2028,7 @@ Gmail
 <a onclick="adSwitchTab('restaurants')"><span>🍽️</span> Restaurants</a>
 <a onclick="adSwitchTab('restaurantReport')"><span>📈</span> Restaurant Report</a>
 <a onclick="adSwitchTab('fleetReport')"><span>🚚</span> Fleet Report</a>
+<a onclick="adSwitchTab('users')"><span>👥</span> Users</a>
 <a onclick="adSwitchTab('settings')"><span>⚙️</span> Settings</a>
 <a onclick="adLogout()"><span>🚪</span> Logout</a>
 </nav>
@@ -2074,6 +2098,18 @@ Gmail
 <div class="ad-section" id="adFleetReportSection" style="display:none;">
 <div class="ad-section-header"><h2><i class="fas fa-truck"></i> Daily Fleet Report</h2><span class="ad-badge" id="adFleetReportDate">Today</span></div>
 <div class="ad-section-body"><div class="ad-report-summary" id="adFleetReportSummary"></div><div id="adFleetReportTable"></div></div>
+</div>
+<!-- USERS SECTION -->
+<div class="ad-section" id="adUsersSection" style="display:none;">
+<div class="ad-section-header"><h2><i class="fas fa-users"></i> All Users</h2><span class="ad-badge" id="adUsersCount">0</span></div>
+<div class="ad-section-body">
+<div class="rest-search-box" style="margin-bottom:14px"><i class="fas fa-search"></i><input type="text" id="adUsersSearch" placeholder="Search by name, phone, or email..." oninput="adRenderUsers()"></div>
+<table class="ad-table" style="width:100%">
+<thead><tr><th>User</th><th>Phone</th><th>Email / Gmail</th><th>Sign-in</th><th>Orders</th><th>Joined</th><th>Actions</th></tr></thead>
+<tbody id="adUsersBody"><tr><td colspan="7" class="ad-empty">Loading users…</td></tr></tbody>
+</table>
+<p style="margin-top:12px;font-size:.78rem;color:var(--gray);"><i class="fas fa-shield-halved"></i> Password resets are sent to the user's WhatsApp number, or to their Gmail address when no phone is available.</p>
+</div>
 </div>
 <div id="adSettingsSection" style="display:none">
 <div class="set-wrap">
@@ -2329,16 +2365,45 @@ Gmail
 </div>
 <h3 style="font-size:1rem;font-weight:700;margin:20px 0 14px;">Vehicle Information</h3>
 <div class="ad-form-row">
-<div class="ad-form-group"><label>Type *</label><select class="ad-form-control" id="adFleetType" required><option value="bike">Matorbike</option><option value="taxi">Taxi</option></select></div>
+<div class="ad-form-group"><label>Type *</label><select class="ad-form-control" id="adFleetType" required><option value="bike">Matorbike</option><option value="taxi">Taxi</option><option value="scooter">Scooter</option></select></div>
 <div class="ad-form-group"><label>Plate Number *</label><input type="text" class="ad-form-control" id="adFleetPlate" required></div>
 <div class="ad-form-group"><label>Model</label><input type="text" class="ad-form-control" id="adFleetModel"></div>
-<div class="ad-form-group"><label>Status *</label><select class="ad-form-control" id="adFleetStatus" required><option value="available">Available</option><option value="unavailable">Unavailable</option></select></div>
+<div class="ad-form-group"><label>Status *</label><select class="ad-form-control" id="adFleetStatus" required><option value="available">Available</option><option value="delivering">Delivering</option><option value="unavailable">Unavailable</option></select></div>
 </div>
 </form>
 <div class="ad-form-footer">
 <button onclick="adCloseFleetForm()" class="ad-btn ad-btn-outline">Cancel</button>
-<button onclick="adSubmitFleet()" class="ad-btn ad-btn-green">Register Fleet</button>
+<button id="adFleetSubmitBtn" onclick="adSubmitFleet()" class="ad-btn ad-btn-green">Register Fleet</button>
 </div>
+</div>
+</div>
+</div>
+
+<!-- USER PASSWORD RESET MODAL -->
+<div class="ad-modal" id="adUserResetModal">
+<div class="ad-modal-box" style="max-width:460px">
+<div class="ad-modal-header"><h2><i class="fas fa-key" style="color:var(--warning);margin-right:8px"></i> Password Reset</h2><button onclick="adCloseUserReset()"><i class="fas fa-times"></i></button></div>
+<div class="ad-modal-body">
+<div style="text-align:center;margin-bottom:16px">
+<div id="adResetAvatar" style="width:64px;height:64px;border-radius:50%;background:var(--theme);color:#fff;font-size:1.5rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 10px">U</div>
+<h3 id="adResetUserName" style="font-size:1.05rem">—</h3>
+<p id="adResetUserMeta" style="font-size:.85rem;color:var(--gray);margin-top:4px">—</p>
+</div>
+<div style="background:var(--bg);border:1px solid var(--border-light);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+<div style="font-size:.78rem;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">New temporary password</div>
+<div style="display:flex;gap:8px;align-items:center">
+<code id="adResetTempPw" style="flex:1;font-size:1rem;font-weight:700;background:#fff;border:1px dashed var(--border);border-radius:8px;padding:8px 10px;word-break:break-all">—</code>
+<button class="ad-btn ad-btn-edit" style="padding:8px 10px" title="Copy" onclick="adCopyResetPw()"><i class="fas fa-copy"></i></button>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<button class="ad-btn ad-btn-green" id="adResetWaBtn" onclick="adSendUserReset('whatsapp')"><i class="fab fa-whatsapp"></i> Send reset to WhatsApp</button>
+<button class="ad-btn ad-btn-edit" id="adResetMailBtn" onclick="adSendUserReset('gmail')"><i class="fas fa-envelope"></i> Send reset to Gmail</button>
+</div>
+<p id="adResetHint" style="font-size:.78rem;color:var(--gray);margin-top:10px;line-height:1.5"></p>
+</div>
+<div class="ad-form-footer">
+<button onclick="adCloseUserReset()" class="ad-btn ad-btn-outline">Close</button>
 </div>
 </div>
 </div>
@@ -2779,10 +2844,6 @@ Gmail
 <div style="padding:1rem; max-width:1400px; margin:0 auto;">
 <button onclick="appBackToRestaurants()" style="display:flex; align-items:center; gap:8px; background:white; border:1px solid #e5e7eb; padding:8px 16px; border-radius:30px; cursor:pointer; font-weight:600; color:var(--primary); margin-bottom:1rem;"><i class="fas fa-arrow-left"></i> Back</button>
 <div id="appExplorerRestHeader" class="app-explorer-rest-card"></div>
-<div id="appRestMapWrap" style="display:none; background:white; border-radius:16px; padding:10px; box-shadow:0 2px 10px rgba(0,0,0,.06); margin-bottom:14px;">
-<div id="appRestMap" style="height:240px; width:100%; border-radius:12px; overflow:hidden; background:#e2e8f0;"></div>
-<div id="appRestMapCaption" style="margin-top:8px; padding:0 4px; font-size:.85rem; color:#64748b; display:flex; align-items:center; gap:8px;"></div>
-</div>
 <div id="appExplorerCatTabs" class="app-explorer-cat-tabs"></div>
 <div id="appExplorerMenuItems"></div>
 </div>
@@ -3435,7 +3496,7 @@ function formatPrice(usd) {
   if (mode === 'both') return '$' + usd.toFixed(2) + ' (SLSH ' + slsh.toLocaleString() + ')';
   return '$' + usd.toFixed(2);
 }
-let appMap = null, appMarkers = [], appCustomerMarker = null, appRestMap = null, appCurrentSlide = 0, appBannerInterval = null, appCurrentCategory = 'All';
+let appMap = null, appMarkers = [], appCustomerMarker = null, appCurrentSlide = 0, appBannerInterval = null, appCurrentCategory = 'All';
 let profileMiniMapInstance = null;
 
 // ─── GLOBAL DRIVER PORTAL VARIABLES ───
@@ -4978,6 +5039,7 @@ async function completeGoogleProfile() {
 
   currentUser = completedUser;
   localStorage.setItem('gopoint_user', JSON.stringify(completedUser));
+  syncUserRecord(completedUser);
   closeGoogleProfileModal();
   showAppToast('✅ Profile complete! Welcome, ' + name + '!');
   setTimeout(() => goToMarketplace(), 500);
@@ -4999,7 +5061,21 @@ localStorage.setItem('gopoint_users', JSON.stringify(users));
 completeLogin({ name, email, phone: '', provider: 'email' });
 }
 
-async function completeLogin(user) { currentUser = user; if (!user.created && !user.registeredAt) { const existing = localStorage.getItem('gopoint_user'); const parsed = existing ? JSON.parse(existing) : null; user.created = parsed?.created || new Date().toISOString(); } localStorage.setItem('gopoint_user', JSON.stringify(user)); if (supaConnected && user.id) { await sb.from('profiles').upsert({ id: user.id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '', registered_at: user.created }, { onConflict: 'id' }); } closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
+function syncUserRecord(user) {
+  if (!user) return;
+  const id = String(user.phone || user.email || '').toLowerCase();
+  if (!id) return;
+  let localPw = '';
+  try {
+    const reg = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+    const k = Object.keys(reg).find(kk => kk.toLowerCase() === id) || (user.email && Object.keys(reg).find(kk => reg[kk].email === user.email)) || (user.phone && Object.keys(reg).find(kk => reg[kk].phone === user.phone));
+    if (k && reg[k].password) localPw = reg[k].password;
+  } catch (_) {}
+  const rec = { id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', provider: user.provider || '', password: user.password || localPw || '' };
+  if (supaConnected) { sb.from('app_users').upsert(rec, { onConflict: 'id' }).then(() => {}).catch(() => {}); }
+}
+
+async function completeLogin(user) { currentUser = user; if (!user.created && !user.registeredAt) { const existing = localStorage.getItem('gopoint_user'); const parsed = existing ? JSON.parse(existing) : null; user.created = parsed?.created || new Date().toISOString(); } localStorage.setItem('gopoint_user', JSON.stringify(user)); syncUserRecord(user); if (supaConnected && user.id) { await sb.from('profiles').upsert({ id: user.id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '', registered_at: user.created }, { onConflict: 'id' }); } closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
 function goToMarketplace() {
   // The application is locked until the customer allows location access.
   if (!fpHasAllowedLocation()) {
@@ -5381,34 +5457,9 @@ document.getElementById('appHomeView').style.display = 'none';
 document.getElementById('appExplorerContainer').classList.add('active');
 if (cartVisible) { cartVisible = false; document.getElementById('appCartWindow').classList.remove('visible'); }
 window.scrollTo({ top: 0 });
-setTimeout(appInitRestaurantMap, 150);
 });
 }
 function appBackToRestaurants() { document.getElementById('appExplorerContainer').classList.remove('active'); document.getElementById('appHomeView').style.display = 'block'; document.getElementById('appMiniCartBar').classList.remove('visible'); currentRestaurant = null; window.scrollTo({ top: 0 }); refreshRestaurants().then(() => appRenderRestaurantList()); }
-
-// Restaurant page map — shows the customer's location (detected at Get Started) next to the restaurant.
-function appInitRestaurantMap() {
-const wrap = document.getElementById('appRestMapWrap');
-if (!wrap) return;
-const cap = document.getElementById('appRestMapCaption');
-const r = currentRestaurant ? restaurants[currentRestaurant] : null;
-if (!r || typeof customerLocation === 'undefined' || !customerLocation || !customerLocation.lat || !customerLocation.lng) { wrap.style.display = 'none'; return; }
-wrap.style.display = 'block';
-const rLat = r.lat || 9.56, rLng = r.lng || 44.065;
-if (!appRestMap) {
-  appRestMap = L.map('appRestMap', { scrollWheelZoom: false });
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(appRestMap);
-}
-appRestMap.eachLayer((layer) => { if (layer instanceof L.Marker) appRestMap.removeLayer(layer); });
-const custIcon = L.divIcon({ html: '<div class="app-custom-marker" style="background:#3b82f6;width:40px;height:40px;"><i class="fas fa-user"></i></div>', className: '', iconSize: [40, 40], iconAnchor: [20, 20] });
-L.marker([customerLocation.lat, customerLocation.lng], { icon: custIcon }).addTo(appRestMap).bindPopup('<b>📍 Your Location</b><br>' + (customerLocation.area || 'Detected'));
-L.marker([rLat, rLng]).addTo(appRestMap).bindPopup('<b>' + (r.name || 'Restaurant') + '</b>');
-const bounds = L.latLngBounds([[customerLocation.lat, customerLocation.lng], [rLat, rLng]]).pad(0.3);
-appRestMap.invalidateSize();
-appRestMap.fitBounds(bounds, { maxZoom: 16 });
-const dist = appCalculateDistance(customerLocation.lat, customerLocation.lng, rLat, rLng).toFixed(1);
-if (cap) cap.innerHTML = '<i class="fas fa-location-arrow" style="color:#3b82f6;"></i> 📍 ' + (customerLocation.area || 'Your location') + '<span style="margin-left:auto; background:#dbeafe; color:#1e40af; padding:3px 10px; border-radius:20px; font-weight:700; white-space:nowrap;">' + dist + ' km from here</span>';
-}
 
 function appRenderExplorerMenuItems() {
 if (!currentRestaurant || !restaurants[currentRestaurant]) return;
@@ -5956,8 +6007,8 @@ function adSwitchTab(tab) {
   adCurrentTab = tab;
   document.querySelectorAll('.ad-sidebar-nav a').forEach(a => a.classList.remove('active'));
   const navLink = document.querySelector('.ad-sidebar-nav a[onclick*="' + tab + '"]'); if (navLink) navLink.classList.add('active');
-  ['adFleetSection', 'adOrdersSection', 'adCompletedSection', 'adRestaurantsSection', 'adRestReportSection', 'adFleetReportSection', 'adSettingsSection'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-  const titles = { dashboard: '📊 Dashboard', orders: '📦 Orders', fleet: '🛵 Fleet Management', restaurants: '🍽️ Restaurants', restaurantReport: '📈 Restaurant Report', fleetReport: '🚚 Fleet Report', settings: '⚙️ Platform Settings' };
+  ['adFleetSection', 'adOrdersSection', 'adCompletedSection', 'adRestaurantsSection', 'adRestReportSection', 'adFleetReportSection', 'adSettingsSection', 'adUsersSection'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  const titles = { dashboard: '📊 Dashboard', orders: '📦 Orders', fleet: '🛵 Fleet Management', restaurants: '🍽️ Restaurants', restaurantReport: '📈 Restaurant Report', fleetReport: '🚚 Fleet Report', users: '👥 Users', settings: '⚙️ Platform Settings' };
   document.getElementById('adPageTitle').textContent = titles[tab] || 'Dashboard';
   const statsBar = document.getElementById('adStatsBar');
   if (statsBar) statsBar.style.display = tab === 'dashboard' ? 'grid' : 'none';
@@ -5974,6 +6025,7 @@ function adSwitchTab(tab) {
     adRenderAll();
   } else if (tab === 'restaurantReport') { document.getElementById('adRestReportSection').style.display = 'block'; adRenderRestReport(); }
   else if (tab === 'fleetReport') { document.getElementById('adFleetReportSection').style.display = 'block'; adRenderFleetReport(); }
+  else if (tab === 'users') { document.getElementById('adUsersSection').style.display = 'block'; adRenderUsers(); adLoadUsers(); }
   else if (tab === 'settings') {
     document.getElementById('adSettingsSection').style.display = 'block';
     setLoadDelivery();
@@ -6099,11 +6151,12 @@ function adRenderSettingsFleetList() {
   }).join('');
 }
 
-function adShowFleetForm() { adEditFleetId = null; document.getElementById('adFleetFormTitle').textContent = 'Register Fleet'; document.getElementById('adFleetForm').reset(); document.getElementById('adFleetStatus').value = 'available'; document.getElementById('adFleetFormModal').classList.add('active'); }
-function adCloseFleetForm() { document.getElementById('adFleetFormModal').classList.remove('active'); }
+function adShowFleetForm() { adEditFleetId = null; document.getElementById('adFleetFormTitle').textContent = 'Register Fleet'; const sb = document.getElementById('adFleetSubmitBtn'); if (sb) sb.textContent = 'Register Fleet'; document.getElementById('adFleetForm').reset(); document.getElementById('adFleetStatus').value = 'available'; document.getElementById('adFleetFormModal').classList.add('active'); }
+function adCloseFleetForm() { document.getElementById('adFleetFormModal').classList.remove('active'); adEditFleetId = null; }
 function adEditFleet(vid) {
-  const v = adVehicles.find(x => x.id == vid); if (!v) return; adEditFleetId = vid;
+  const v = adVehicles.find(x => x.id == vid); if (!v) { adToast('Vehicle not found'); return; } adEditFleetId = vid;
   document.getElementById('adFleetFormTitle').textContent = 'Edit Fleet';
+  const sb = document.getElementById('adFleetSubmitBtn'); if (sb) sb.textContent = 'Save Changes';
   document.getElementById('adFleetName').value = v.driverName || ''; document.getElementById('adFleetPhone').value = v.driverPhone || '';
   document.getElementById('adFleetLicense').value = v.license || ''; document.getElementById('adFleetPin').value = v.driverPin || '';
   document.getElementById('adFleetType').value = v.type || 'bike'; document.getElementById('adFleetPlate').value = v.plateNumber || v.plate || '';
@@ -6138,22 +6191,172 @@ function setRenderRest() {
     const cuisine = r.cuisine || (icon === 'fa-utensils' ? 'Fast Food' : icon === 'fa-mug-hot' ? 'Coffee & Food' : icon === 'fa-fire' ? 'Grilled' : icon === 'fa-pizza-slice' ? 'Pizza' : 'Juice & Drinks');
     const rImg = r.image || r.logo || '';
     const thumb = rImg ? '<img src="' + rImg + '" alt="" style="width:32px;height:32px;border-radius:6px;object-fit:cover;margin-right:8px;vertical-align:middle" onerror="this.style.display=\'none\'">' : '';
-    return '<tr><td>' + thumb + '<strong>' + r.name + '</strong></td><td>' + cuisine + '</td><td><i class="fas fa-star" style="color:var(--warning);font-size:0.75rem"></i> ' + (r.rating || '4.5') + '</td><td>' + (r.orders || 0) + '</td><td><button class="set-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="setToggleRest(\'' + k + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td><td><button class="set-btn set-btn-danger set-btn-sm" onclick="setDeleteRest(\'' + k + '\')"><i class="fas fa-trash"></i></button></td></tr>';
+    return '<tr><td>' + thumb + '<strong>' + r.name + '</strong></td><td>' + cuisine + '</td><td><i class="fas fa-star" style="color:var(--warning);font-size:0.75rem"></i> ' + (r.rating || '4.5') + '</td><td>' + (r.orders || 0) + '</td><td><button class="set-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="setToggleRest(\'' + k + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td><td><button class="set-btn set-btn-secondary set-btn-sm" style="margin-right:4px" onclick="adEditRest(\'' + k + '\')"><i class="fas fa-edit"></i></button><button class="set-btn set-btn-danger set-btn-sm" onclick="setDeleteRest(\'' + k + '\')"><i class="fas fa-trash"></i></button></td></tr>';
   }).join('');
 }
 function setToggleRest(k) { const r = adRestaurants[k]; if (!r) return; r.active = r.active !== undefined ? !r.active : false; adSaveData(); setRenderRest(); adRenderRestaurants(); adToast(r.name + ' is now ' + (r.active ? 'Active' : 'Inactive')); }
-function setDeleteRest(k) { if (!adRestaurants[k]) return; if (!confirm('Delete ' + adRestaurants[k].name + '?')) return; delete adRestaurants[k]; adSaveData(); setRenderRest(); adRenderRestaurants(); adToast('Restaurant deleted'); }
+function setDeleteRest(k) { if (!adRestaurants[k]) return; adDeleteRest(k); }
 function setRenderVehicles() {
   const el = document.getElementById('setVehiclesBody'); if (!el) return;
   if (!adVehicles.length) { el.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px">No vehicles</td></tr>'; return; }
   el.innerHTML = adVehicles.map(v => {
     const icon = v.type === 'bike' ? 'fa-motorcycle' : v.type === 'taxi' ? 'fa-car' : 'fa-bicycle';
     const active = v.status === 'available' || v.status === 'delivering';
-    return '<tr><td><strong>' + (v.driverName || 'Unknown') + '</strong></td><td>' + (v.plateNumber || v.plate || 'N/A') + '</td><td>' + (v.driverPhone || '') + '</td><td><i class="fas ' + icon + '"></i> ' + (v.type || 'bike') + '</td><td><button class="set-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="setToggleVehicle(\'' + v.id + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td><td><button class="set-btn set-btn-secondary set-btn-sm" style="margin-right:4px" onclick="adToast(\'Vehicle details opened\')"><i class="fas fa-edit"></i></button><button class="set-btn set-btn-danger set-btn-sm" onclick="setDeleteVehicle(\'' + v.id + '\')"><i class="fas fa-trash"></i></button></td></tr>';
+    return '<tr><td><strong>' + (v.driverName || 'Unknown') + '</strong></td><td>' + (v.plateNumber || v.plate || 'N/A') + '</td><td>' + (v.driverPhone || '') + '</td><td><i class="fas ' + icon + '"></i> ' + (v.type || 'bike') + '</td><td><button class="set-status-btn ' + (active ? 'active' : 'inactive') + '" onclick="setToggleVehicle(\'' + v.id + '\')">' + (active ? 'Active' : 'Inactive') + '</button></td><td><button class="set-btn set-btn-secondary set-btn-sm" style="margin-right:4px" onclick="adEditFleet(\'' + v.id + '\')"><i class="fas fa-edit"></i></button><button class="set-btn set-btn-danger set-btn-sm" onclick="setDeleteVehicle(\'' + v.id + '\')"><i class="fas fa-trash"></i></button></td></tr>';
   }).join('');
 }
 async function setToggleVehicle(vid) { const v = adVehicles.find(x => x.id == vid); if (!v) return; v.status = v.status === 'available' ? 'unavailable' : 'available'; adSaveData(); setRenderVehicles(); adRenderFleet(); adToast(v.driverName + ' is now ' + v.status); if (supaConnected) await supaSaveVehicle(v); }
 function setDeleteVehicle(vid) { if (!confirm('Delete this vehicle?')) return; adVehicles = adVehicles.filter(v => v.id != vid); adSaveData(); setRenderVehicles(); adRenderFleet(); adToast('Vehicle deleted'); }
+
+// ─── USERS DATABASE ───
+let adUsersList = [], adResetUserKey = null, adResetTempPw = '';
+
+function adLocalUsers() {
+  const out = {};
+  try {
+    const reg = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+    Object.keys(reg).forEach(k => { const u = reg[k] || {}; out[String(k).toLowerCase()] = { ...u, _key: k }; });
+    const goog = JSON.parse(localStorage.getItem('gopoint_google_profiles') || '{}');
+    Object.keys(goog).forEach(k => { const g = goog[k] || {}; const key = k || g.email; if (!key) return; const kk = String(key).toLowerCase(); out[kk] = { ...out[kk], ...g, provider: (g.provider || 'gmail'), _key: key, password: (out[kk] && out[kk].password) || '' }; });
+    const cur = JSON.parse(localStorage.getItem('gopoint_user') || 'null');
+    if (cur && (cur.phone || cur.email)) { const kk = String(cur.phone || cur.email).toLowerCase(); if (!out[kk]) out[kk] = { ...cur, _key: cur.phone || cur.email }; }
+  } catch (_) {}
+  return Object.values(out);
+}
+
+async function adLoadRemoteUsers() {
+  if (!supaConnected) return [];
+  try {
+    const { data, error } = await sb.from('app_users').select('*');
+    if (error || !data) return [];
+    return data.map(r => ({ name: r.full_name || '', phone: r.phone || '', email: r.email || '', provider: r.provider || '', password: r.password || '', created: r.created_at, _key: r.id }));
+  } catch (_) { return []; }
+}
+
+async function adLoadUsers() {
+  const merged = {};
+  (await adLoadRemoteUsers()).forEach(u => { if (u._key) merged[String(u._key).toLowerCase()] = u; });
+  adLocalUsers().forEach(u => {
+    const k = String(u._key || u.phone || u.email || '').toLowerCase(); if (!k) return;
+    const prev = merged[k] || {};
+    merged[k] = { ...prev, ...u, name: u.name || prev.name || '', phone: u.phone || prev.phone || '', email: u.email || prev.email || '', password: u.password || prev.password || '', provider: u.provider || prev.provider || '', created: prev.created || u.created || u.registeredAt || null, _key: u._key || prev._key || k };
+  });
+  adUsersList = Object.values(merged);
+  adRenderUsers();
+}
+
+function adUserProvider(u) {
+  const p = (u.provider || '').toLowerCase();
+  if (p.includes('google') || p.includes('gmail')) return { label: 'Gmail', icon: 'fab fa-google', color: '#DB4437' };
+  if (p.includes('whatsapp')) return { label: 'WhatsApp', icon: 'fab fa-whatsapp', color: '#25D366' };
+  if (p.includes('email') || p.includes('username')) return { label: 'Email', icon: 'fas fa-envelope', color: '#2563EB' };
+  if (p.includes('phone')) return { label: 'Phone', icon: 'fas fa-phone', color: '#16a34a' };
+  if (u.email && !u.phone) return { label: 'Gmail', icon: 'fab fa-google', color: '#DB4437' };
+  if (u.phone && !u.email) return { label: 'WhatsApp', icon: 'fab fa-whatsapp', color: '#25D366' };
+  return { label: 'Email', icon: 'fas fa-envelope', color: '#2563EB' };
+}
+
+function adUserOrders(u) {
+  const up = (u.phone || '').replace(/\D/g, '');
+  return adOrders.filter(o => {
+    const op = ((o.customer && o.customer.phone) || '').replace(/\D/g, '');
+    if (up && op && up.slice(-9) === op.slice(-9)) return true;
+    if (u.email && o.customer && o.customer.email && String(o.customer.email).toLowerCase() === String(u.email).toLowerCase()) return true;
+    return false;
+  }).length;
+}
+
+function adRenderUsers() {
+  const el = document.getElementById('adUsersBody'); if (!el) return;
+  const term = (document.getElementById('adUsersSearch')?.value || '').toLowerCase().trim();
+  const list = adUsersList.filter(u => !term || (u.name || '').toLowerCase().includes(term) || (u.phone || '').toLowerCase().includes(term) || (u.email || '').toLowerCase().includes(term));
+  const badge = document.getElementById('adUsersCount'); if (badge) badge.textContent = adUsersList.length;
+  if (!list.length) { el.innerHTML = '<tr><td colspan="7" class="ad-empty">' + (adUsersList.length ? 'No users match your search' : 'No users yet — users appear here after they sign in') + '</td></tr>'; return; }
+  el.innerHTML = list.map(u => {
+    const key = String(u._key || u.phone || u.email);
+    const prov = adUserProvider(u);
+    const initials = (u.name || 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+    let joined = '—';
+    try { if (u.created) { const d = new Date(u.created); if (!isNaN(d)) joined = d.toLocaleDateString(); } } catch (_) {}
+    const esc = key.replace(/'/g, "\\'");
+    return '<tr>' +
+      '<td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:var(--theme);color:#fff;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center">' + initials + '</div><div><strong>' + (u.name || 'Customer') + '</strong>' + (u.username ? '<br><span style="font-size:.75rem;color:var(--gray)">@' + u.username + '</span>' : '') + '</div></div></td>' +
+      '<td>' + (u.phone ? '<i class="fas fa-phone" style="color:var(--gray);margin-right:5px"></i>' + u.phone : '<span style="color:var(--gray)">—</span>') + '</td>' +
+      '<td>' + (u.email ? '<i class="fas fa-envelope" style="color:var(--gray);margin-right:5px"></i>' + u.email : '<span style="color:var(--gray)">—</span>') + '</td>' +
+      '<td><span style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:' + prov.color + '"><i class="' + prov.icon + '"></i>' + prov.label + '</span></td>' +
+      '<td>' + adUserOrders(u) + '</td>' +
+      '<td>' + joined + '</td>' +
+      '<td><button class="ad-btn ad-btn-edit" style="padding:6px 9px" title="Password reset" onclick="adOpenUserReset(\'' + esc + '\')"><i class="fas fa-key"></i></button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function adCloseUserReset() { document.getElementById('adUserResetModal').classList.remove('active'); adResetUserKey = null; }
+
+function adGenTempPassword() {
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz', digits = '23456789', sym = '!@#$%&*';
+  let pw = letters[Math.floor(Math.random() * 4)] + digits[Math.floor(Math.random() * digits.length)] + sym[Math.floor(Math.random() * sym.length)];
+  const all = letters + digits + sym;
+  while (pw.length < 10) pw += all[Math.floor(Math.random() * all.length)];
+  return pw.split('').sort(() => Math.random() - 0.5).join('');
+}
+
+function adCopyResetPw() {
+  const t = adResetTempPw; if (!t) return;
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => adToast('Copied to clipboard'));
+  else { const i = document.createElement('textarea'); i.value = t; document.body.appendChild(i); i.select(); document.execCommand('copy'); i.remove(); adToast('Copied to clipboard'); }
+}
+
+function adOpenUserReset(key) {
+  const u = adUsersList.find(x => String(x._key || x.phone || x.email) === String(key)); if (!u) { adToast('User not found'); return; }
+  adResetUserKey = u._key || u.phone || u.email;
+  adResetTempPw = adGenTempPassword();
+  document.getElementById('adResetAvatar').textContent = (u.name || 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  document.getElementById('adResetUserName').textContent = u.name || 'Customer';
+  document.getElementById('adResetUserMeta').textContent = [u.phone, u.email].filter(Boolean).join(' • ') || 'No contact saved';
+  document.getElementById('adResetTempPw').textContent = adResetTempPw;
+  const wa = document.getElementById('adResetWaBtn'), ml = document.getElementById('adResetMailBtn');
+  wa.disabled = !u.phone; ml.disabled = !u.email;
+  wa.style.opacity = u.phone ? '1' : '.5'; ml.style.opacity = u.email ? '1' : '.5';
+  document.getElementById('adResetHint').innerHTML = !u.phone && !u.email
+    ? '⚠️ This user has no WhatsApp number or Gmail address saved — add one to their profile to send a reset.'
+    : (!u.phone ? 'ℹ️ No WhatsApp number — the reset will be sent to their Gmail.<br>' : '') + (!u.email ? 'ℹ️ No Gmail address — the reset will be sent to their WhatsApp number.<br>' : '') + 'The new password takes effect immediately and is shown to the user in the message.';
+  document.getElementById('adUserResetModal').classList.add('active');
+}
+
+function adPersistResetPassword(u, pw) {
+  const key = String(u._key || u.phone || u.email || '').toLowerCase();
+  try {
+    const reg = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+    const k = Object.keys(reg).find(kk => kk.toLowerCase() === key) ||
+      Object.keys(reg).find(kk => (u.phone && reg[kk].phone === u.phone) || (u.email && reg[kk].email === u.email));
+    const target = k || key;
+    reg[target] = { ...(reg[target] || {}), name: u.name || (reg[target] && reg[target].name) || '', phone: u.phone || (reg[target] && reg[target].phone) || '', email: u.email || (reg[target] && reg[target].email) || '', username: (reg[target] && reg[target].username) || (u.email ? u.email.split('@')[0] : '') || '', password: pw, provider: u.provider || (reg[target] && reg[target].provider) || '' };
+    localStorage.setItem('gopoint_users', JSON.stringify(reg));
+  } catch (_) {}
+  if (supaConnected) {
+    sb.from('app_users').upsert({ id: key, full_name: u.name || '', phone: u.phone || '', email: u.email || '', provider: u.provider || '', password: pw }, { onConflict: 'id' }).then(() => {}).catch(() => {});
+  }
+}
+
+async function adSendUserReset(via) {
+  const u = adUsersList.find(x => String(x._key || x.phone || x.email) === String(adResetUserKey)); if (!u || !adResetTempPw) return;
+  if (via === 'whatsapp' && !u.phone) { adToast('No WhatsApp number saved for this user'); return; }
+  if (via === 'gmail' && !u.email) { adToast('No Gmail address saved for this user'); return; }
+  adPersistResetPassword(u, adResetTempPw);
+  const msg = '🔐 Go!Point Password Reset\n\nHi ' + (u.name || 'there') + ',\n\nA new temporary password for your Go!Point account has been generated:\n\n🔑 ' + adResetTempPw + '\n\nUse it to sign in, then change it from your profile.\n\nIf you did not request this, please ignore this message.';
+  if (via === 'whatsapp') {
+    let d = String(u.phone).replace(/\D/g, '');
+    if (!d.startsWith('252')) d = '252' + d.replace(/^0/, '');
+    window.open('https://wa.me/' + d + '?text=' + encodeURIComponent(msg), '_blank');
+    adToast('✅ WhatsApp reset sent to ' + u.phone);
+  } else {
+    window.location.href = 'mailto:' + u.email + '?subject=' + encodeURIComponent('Go!Point password reset') + '&body=' + encodeURIComponent(msg);
+    adToast('✅ Gmail reset prepared for ' + u.email);
+  }
+  adCloseUserReset();
+  adRenderUsers();
+}
 function setLoadDelivery() {
   const d = JSON.parse(localStorage.getItem('gopoint_delivery_settings') || '{}');
   document.getElementById('setCommissionRate').value = d.commission || 15;
@@ -6619,6 +6822,32 @@ async function showAdminDashboard() {
   adSwitchTab('dashboard');
   window.scrollTo({ top: 0 });
 }
+</script>
+<script>
+/* ── Mobile: hide the browser URL bar and fit the app to the full screen ── */
+(function () {
+  var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  var standalone = false;
+  try { standalone = window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: minimal-ui)').matches || navigator.standalone === true; } catch (e) {}
+  function collapseUrlBar() {
+    if (!isMobile || standalone) return;
+    try { if (window.scrollY === 0) window.scrollTo(0, 1); else window.scrollBy(0, 1); } catch (e) {}
+  }
+  window.addEventListener('load', function () { setTimeout(collapseUrlBar, 400); });
+  window.addEventListener('pageshow', function () { setTimeout(collapseUrlBar, 400); });
+  window.addEventListener('orientationchange', function () { setTimeout(collapseUrlBar, 500); });
+  if (isMobile && !standalone) {
+    var requested = false;
+    window.addEventListener('click', function () {
+      if (requested) return;
+      requested = true;
+      var el = document.documentElement;
+      var req = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (!req) return;
+      try { var p = req.call(el); if (p && typeof p.catch === 'function') p.catch(function () {}); } catch (e) {}
+    }, { once: true });
+  }
+})();
 </script>
 </body>
 </html>
