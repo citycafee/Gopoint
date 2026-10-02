@@ -2,6 +2,7 @@
   "name": "Go!point - Food Delivery",
   "short_name": "Go!point",
   "description": "Fast food delivery at the speed of now",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

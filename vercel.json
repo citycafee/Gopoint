@@ -6,7 +6,9 @@
     { "src": "driver.html", "use": "@vercel/static" },
     { "src": "styles.css", "use": "@vercel/static" },
     { "src": "rider.jpg", "use": "@vercel/static" },
-    { "src": "manifest.json", "use": "@vercel/static" }
+    { "src": "manifest.json", "use": "@vercel/static" },
+    { "src": "icon-192.png", "use": "@vercel/static" },
+    { "src": "icon-512.png", "use": "@vercel/static" }
   ],
   "headers": [
     {
