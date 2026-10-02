@@ -4447,6 +4447,19 @@ if (dpLocationWatchId != null) { navigator.geolocation.clearWatch(dpLocationWatc
 if (dpLocationUpdateInterval) { clearInterval(dpLocationUpdateInterval); dpLocationUpdateInterval = null; }
 }
 
+async function dpFetchRoadRoute(pts) {
+if (!pts || pts.length < 2) return null;
+const coordStr = pts.map(p => p[1].toFixed(6) + ',' + p[0].toFixed(6)).join(';');
+try {
+const res = await fetch('https://router.project-osrm.org/route/v1/driving/' + coordStr + '?overview=full&geometries=geojson&alternatives=false&steps=false');
+if (!res.ok) return null;
+const j = await res.json();
+const r = j && j.routes && j.routes[0];
+if (!r || !r.geometry || !r.geometry.coordinates || r.geometry.coordinates.length < 2) return null;
+return { latlngs: r.geometry.coordinates.map(c => [c[1], c[0]]), distance: typeof r.distance === 'number' ? r.distance : null };
+} catch (e) { return null; }
+}
+
 function dpShowCustomerOnMap(orderId, opts = {}) {
 const useActiveMap = opts.useActiveMap !== false;
 const o = orders.find(x => x.id === orderId);
@@ -4484,6 +4497,15 @@ if (pickupLat != null && pickupLng != null) linePts.push([pickupLat, pickupLng])
 linePts.push([custLat, custLng]);
 if (linePts.length >= 2) {
 dpRouteLine = L.polyline(linePts, { color: '#0ea5e9', weight: 5, opacity: 0.85, dashArray: '10, 8', lineCap: 'round' }).addTo(map);
+dpFetchRoadRoute(linePts).then(road => {
+if (!road || !road.latlngs || road.latlngs.length < 2) return;
+if (dpActiveOrderId !== orderId || !dpActiveMap) return;
+const m = dpActiveMap;
+if (dpRouteLine) { m.removeLayer(dpRouteLine); dpRouteLine = null; }
+dpRouteLine = L.polyline(road.latlngs, { color: '#0ea5e9', weight: 6, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(m);
+try { m.fitBounds(dpRouteLine.getBounds(), { padding: [60, 60], maxZoom: 15 }); } catch (e) {}
+if (road.distance != null) dpToast(`🛣️ Main-road route: ${(road.distance / 1000).toFixed(1)} km`, 'success');
+});
 }
 let distToCust = null, distToPickup = null, distPickupToCust = null;
 if (driverLat != null && driverLng != null) {
