@@ -1074,6 +1074,14 @@ function supaSubscribeToVehicles(callback) {
     .subscribe();
 }
 
+function supaSubscribeToUsers(callback) {
+  return sb.channel('app-users-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'app_users' }, payload => {
+      if (callback) callback(payload);
+    })
+    .subscribe();
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // ★ HYBRID LOAD: Supabase first, localStorage fallback ★
 // ═══════════════════════════════════════════════════════════════════
@@ -2132,6 +2140,11 @@ function restToast(msg) {
 window.addEventListener('DOMContentLoaded', async () => {
   loadFromLocalStorage();
   await initSupabaseData();
+
+  // Live-refresh the Users (All Users) list whenever someone signs in or edits their profile
+  if (supaConnected) {
+    try { supaSubscribeToUsers(() => { if (adCurrentTab === 'users') adLoadUsers(); }); } catch (_) {}
+  }
 
   // Auto-login: check if admin is already logged in
   const adminAuth = localStorage.getItem('admin_auth');

@@ -33,3 +33,14 @@ CREATE POLICY "Users: anyone delete" ON app_users FOR DELETE USING (true);
 -- Realtime: SB.sql installs an event trigger that auto-adds any
 -- newly created public table to supabase_realtime, so no extra step
 -- is needed if SB.sql has been run before this file.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'app_users'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE app_users;
+  END IF;
+END $$;

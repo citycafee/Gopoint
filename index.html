@@ -3608,6 +3608,7 @@ async function handleGoogleUser(u) {
       localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
     }
   }
+  syncUserRecord(currentUser);
   setTimeout(() => goToMarketplace(), 300);
 }
 
@@ -5297,6 +5298,7 @@ currentUser.email = email || currentUser.email;
 currentUser.address = address;
 localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
 if (supaConnected && currentUser.id) { await sb.from('profiles').upsert({ id: currentUser.id, full_name: name, phone: phone || '', email: email || '', address: address || '' }, { onConflict: 'id' }); }
+syncUserRecord(currentUser);
 saveBtn.textContent = '✓ Saved';
 saveBtn.style.background = '#16a34a';
 setTimeout(() => {
