@@ -1074,14 +1074,6 @@ function supaSubscribeToVehicles(callback) {
     .subscribe();
 }
 
-function supaSubscribeToUsers(callback) {
-  return sb.channel('app-users-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'app_users' }, payload => {
-      if (callback) callback(payload);
-    })
-    .subscribe();
-}
-
 // ═══════════════════════════════════════════════════════════════════
 // ★ HYBRID LOAD: Supabase first, localStorage fallback ★
 // ═══════════════════════════════════════════════════════════════════
@@ -1576,11 +1568,19 @@ function adLocalUsers() {
 
 async function adLoadRemoteUsers() {
   if (!supaConnected) return [];
+  const out = [];
   try {
     const { data, error } = await sb.from('app_users').select('*');
-    if (error || !data) return [];
-    return data.map(r => ({ name: r.full_name || '', phone: r.phone || '', email: r.email || '', provider: r.provider || '', password: r.password || '', created: r.created_at, _key: r.id }));
-  } catch (_) { return []; }
+    if (!error && data) data.forEach(r => out.push({ name: r.full_name || '', phone: r.phone || '', email: r.email || '', provider: r.provider || '', password: r.password || '', created: r.created_at, _key: r.id }));
+  } catch (_) {}
+  try {
+    const { data, error } = await sb.from('settings').select('*').like('key', 'usr:%');
+    if (!error && data) data.forEach(r => {
+      const v = r.value || {};
+      out.push({ name: v.name || '', phone: v.phone || '', email: v.email || '', provider: v.provider || '', password: v.password || '', created: v.created || r.updated_at, _key: String(r.key).slice(4) });
+    });
+  } catch (_) {}
+  return out;
 }
 
 async function adLoadUsers() {
@@ -1686,6 +1686,13 @@ function adPersistResetPassword(u, pw) {
   } catch (_) {}
   if (supaConnected) {
     sb.from('app_users').upsert({ id: key, full_name: u.name || '', phone: u.phone || '', email: u.email || '', provider: u.provider || '', password: pw }, { onConflict: 'id' }).then(() => {}).catch(() => {});
+    const uVal = { name: u.name || '', phone: u.phone || '', email: u.email || '', provider: u.provider || '', password: pw, created: u.created || null };
+    const uKey = 'usr:' + key;
+    sb.from('settings').select('key').eq('key', uKey)
+      .then(({ data }) => (data && data.length
+        ? sb.from('settings').update({ value: uVal, updated_at: new Date().toISOString() }).eq('key', uKey)
+        : sb.from('settings').insert({ key: uKey, value: uVal, updated_at: new Date().toISOString() })))
+      .then(() => {}).catch(() => {});
   }
 }
 
@@ -2141,9 +2148,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   loadFromLocalStorage();
   await initSupabaseData();
 
-  // Live-refresh the Users (All Users) list whenever someone signs in or edits their profile
+  // Auto-refresh the Users (All Users) list while that tab is open, so new
+  // sign-ins and profile edits appear without a manual reload
   if (supaConnected) {
-    try { supaSubscribeToUsers(() => { if (adCurrentTab === 'users') adLoadUsers(); }); } catch (_) {}
+    setInterval(() => { if (adCurrentTab === 'users' && typeof adLoadUsers === 'function') adLoadUsers(); }, 15000);
   }
 
   // Auto-login: check if admin is already logged in

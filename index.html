@@ -5095,7 +5095,16 @@ function syncUserRecord(user) {
     if (k && reg[k].password) localPw = reg[k].password;
   } catch (_) {}
   const rec = { id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', provider: user.provider || '', password: user.password || localPw || '' };
-  if (supaConnected) { sb.from('app_users').upsert(rec, { onConflict: 'id' }).then(() => {}).catch(() => {}); }
+  if (supaConnected) {
+    sb.from('app_users').upsert(rec, { onConflict: 'id' }).then(() => {}).catch(() => {});
+    const uVal = { name: rec.full_name, phone: rec.phone, email: rec.email, provider: rec.provider, password: rec.password, created: user.created || user.registeredAt || new Date().toISOString() };
+    const uKey = 'usr:' + id;
+    sb.from('settings').select('key').eq('key', uKey)
+      .then(({ data }) => (data && data.length
+        ? sb.from('settings').update({ value: uVal, updated_at: new Date().toISOString() }).eq('key', uKey)
+        : sb.from('settings').insert({ key: uKey, value: uVal, updated_at: new Date().toISOString() })))
+      .then(() => {}).catch(() => {});
+  }
 }
 
 async function completeLogin(user) { currentUser = user; if (!user.created && !user.registeredAt) { const existing = localStorage.getItem('gopoint_user'); const parsed = existing ? JSON.parse(existing) : null; user.created = parsed?.created || new Date().toISOString(); } localStorage.setItem('gopoint_user', JSON.stringify(user)); syncUserRecord(user); if (supaConnected && user.id) { await sb.from('profiles').upsert({ id: user.id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '', registered_at: user.created }, { onConflict: 'id' }); } closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
@@ -6250,11 +6259,19 @@ function adLocalUsers() {
 
 async function adLoadRemoteUsers() {
   if (!supaConnected) return [];
+  const out = [];
   try {
     const { data, error } = await sb.from('app_users').select('*');
-    if (error || !data) return [];
-    return data.map(r => ({ name: r.full_name || '', phone: r.phone || '', email: r.email || '', provider: r.provider || '', password: r.password || '', created: r.created_at, _key: r.id }));
-  } catch (_) { return []; }
+    if (!error && data) data.forEach(r => out.push({ name: r.full_name || '', phone: r.phone || '', email: r.email || '', provider: r.provider || '', password: r.password || '', created: r.created_at, _key: r.id }));
+  } catch (_) {}
+  try {
+    const { data, error } = await sb.from('settings').select('*').like('key', 'usr:%');
+    if (!error && data) data.forEach(r => {
+      const v = r.value || {};
+      out.push({ name: v.name || '', phone: v.phone || '', email: v.email || '', provider: v.provider || '', password: v.password || '', created: v.created || r.updated_at, _key: String(r.key).slice(4) });
+    });
+  } catch (_) {}
+  return out;
 }
 
 async function adLoadUsers() {
@@ -6360,6 +6377,13 @@ function adPersistResetPassword(u, pw) {
   } catch (_) {}
   if (supaConnected) {
     sb.from('app_users').upsert({ id: key, full_name: u.name || '', phone: u.phone || '', email: u.email || '', provider: u.provider || '', password: pw }, { onConflict: 'id' }).then(() => {}).catch(() => {});
+    const uVal = { name: u.name || '', phone: u.phone || '', email: u.email || '', provider: u.provider || '', password: pw, created: u.created || null };
+    const uKey = 'usr:' + key;
+    sb.from('settings').select('key').eq('key', uKey)
+      .then(({ data }) => (data && data.length
+        ? sb.from('settings').update({ value: uVal, updated_at: new Date().toISOString() }).eq('key', uKey)
+        : sb.from('settings').insert({ key: uKey, value: uVal, updated_at: new Date().toISOString() })))
+      .then(() => {}).catch(() => {});
   }
 }
 
