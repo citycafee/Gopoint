@@ -8,7 +8,8 @@
     { "src": "rider.jpg", "use": "@vercel/static" },
     { "src": "manifest.json", "use": "@vercel/static" },
     { "src": "icon-192.png", "use": "@vercel/static" },
-    { "src": "icon-512.png", "use": "@vercel/static" }
+    { "src": "icon-512.png", "use": "@vercel/static" },
+    { "src": "sw.js", "use": "@vercel/static" }
   ],
   "headers": [
     {

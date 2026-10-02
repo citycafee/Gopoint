@@ -2184,5 +2184,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 })();
 </script>
+<script>
+/* PWA: network-first service worker so the installed app always picks up updates */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  });
+}
+</script>
 </body>
 </html>
