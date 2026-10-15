@@ -4735,8 +4735,11 @@ const u = document.getElementById('fpAdminUsername').value.trim();
 const p = document.getElementById('fpAdminPassword').value.trim();
 if (!u || !p) { showAppToast('⚠️ Please enter username and password'); return; }
 if (u === 'admin' && p === 'admin123') {
+// Mark admin as logged in, then go to the dedicated Admin Dashboard (/admin)
+localStorage.setItem('admin_auth', 'true');
 closeFrontLogin();
-showAdminDashboard();
+const isLocal = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+window.location.href = isLocal ? 'admin.html' : '/admin';
 } else {
 showAppToast('⚠️ Invalid admin credentials');
 }

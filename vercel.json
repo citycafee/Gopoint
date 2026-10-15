@@ -11,6 +11,10 @@
     { "src": "icon-512.png", "use": "@vercel/static" },
     { "src": "sw.js", "use": "@vercel/static" }
   ],
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/driver", "destination": "/driver.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
