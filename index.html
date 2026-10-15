@@ -4929,7 +4929,47 @@ else if (/^\d{6,12}$/.test(p)) p = '+252' + p;
 return p;
 }
 
-function loginWithPhone() {
+function appMatchUser(u, q, qPhone) {
+const key = String(u._key || u.key || '').toLowerCase();
+const uname = String(u.username || '').toLowerCase();
+const email = String(u.email || '').toLowerCase();
+const emailPrefix = email ? email.split('@')[0] : '';
+const phone = u.phone ? appNormalizePhone(u.phone) : '';
+return key === q || (uname && uname === q) || (email && email === q) || (emailPrefix && emailPrefix === q) || (phone && qPhone && phone === qPhone);
+}
+
+// Look up an account in the cloud (Supabase) — accounts registered on other
+// devices live there, and local storage can be wiped by reset buttons.
+async function appFindRemoteUser(id) {
+if (!supaConnected) return null;
+const q = id.toLowerCase();
+const qPhone = appNormalizePhone(id);
+const rows = [];
+try {
+const { data, error } = await sb.from('app_users').select('*');
+if (!error && data) data.forEach(r => rows.push({ _key: r.id, name: r.full_name || '', phone: r.phone || '', email: r.email || '', provider: r.provider || '', password: r.password || '', created: r.created_at }));
+} catch (_) {}
+try {
+const { data, error } = await sb.from('settings').select('*').like('key', 'usr:%');
+if (!error && data) data.forEach(r => {
+const v = r.value || {};
+rows.push({ _key: String(r.key).slice(4), name: v.name || '', phone: v.phone || '', email: v.email || '', provider: v.provider || '', password: v.password || '', created: v.created || r.updated_at });
+});
+} catch (_) {}
+return rows.find(u => appMatchUser(u, q, qPhone)) || null;
+}
+
+function appCacheUserLocally(user) {
+try {
+const reg = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+const key = String(user._key || user.email || user.phone || '').toLowerCase();
+if (!key) return;
+reg[key] = { name: user.name || '', username: user.email ? user.email.split('@')[0] : (user.username || ''), email: user.email || '', phone: user.phone || '', password: user.password || '', provider: user.provider || '' };
+localStorage.setItem('gopoint_users', JSON.stringify(reg));
+} catch (_) {}
+}
+
+async function loginWithPhone() {
 const id = document.getElementById('fpCustomerPhone').value.trim();
 const password = document.getElementById('fpCustomerPassword').value;
 if (!id) { showAppToast('⚠️ Please enter your username or phone number'); document.getElementById('fpCustomerPhone').focus(); return; }
@@ -4937,22 +4977,39 @@ if (!password) { showAppToast('⚠️ Please enter your password'); document.get
 const users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
 const q = id.toLowerCase();
 const qPhone = appNormalizePhone(id);
-let key = null;
+let localKey = null;
 for (const k in users) {
 const u = users[k] || {};
-if (k.toLowerCase() === q || (u.username && u.username.toLowerCase() === q) || (u.email && u.email.toLowerCase() === q)) { key = k; break; }
-if (u.phone && qPhone && appNormalizePhone(u.phone) === qPhone) { key = k; break; }
+if (k.toLowerCase() === q || (u.username && u.username.toLowerCase() === q) || (u.email && u.email.toLowerCase() === q) || (u.email && u.email.split('@')[0].toLowerCase() === q)) { localKey = k; break; }
+if (u.phone && qPhone && appNormalizePhone(u.phone) === qPhone) { localKey = k; break; }
 }
-if (!key) { showAppToast('⚠️ No account found. Please sign up first.'); showRegisterStep(); return; }
-const user = users[key];
-if (user.password && user.password !== password) { showAppToast('⚠️ Incorrect password'); document.getElementById('fpCustomerPassword').value = ''; return; }
-if (!user.password) {
-// Legacy account (created before passwords) — set the password on first sign-in
-user.password = password;
-users[key] = user;
+const localUser = localKey ? users[localKey] : null;
+
+// Fast path: local account with matching password
+if (localUser && localUser.password && localUser.password === password) { completeLogin(localUser); return; }
+
+// Check the cloud — the account may be registered on another device
+const remoteUser = await appFindRemoteUser(id);
+if (remoteUser && remoteUser.password && remoteUser.password === password) {
+appCacheUserLocally(remoteUser);
+completeLogin({ name: remoteUser.name || 'Customer', username: remoteUser.email ? remoteUser.email.split('@')[0] : (remoteUser.username || ''), email: remoteUser.email || '', phone: remoteUser.phone || '', password: remoteUser.password, provider: remoteUser.provider || '', created: remoteUser.created });
+return;
+}
+
+// Legacy local account with no password yet — adopt the entered password
+if (localUser && !localUser.password && !remoteUser) {
+localUser.password = password;
+users[localKey] = localUser;
 localStorage.setItem('gopoint_users', JSON.stringify(users));
+completeLogin(localUser);
+return;
 }
-completeLogin(user);
+
+if (!localUser && !remoteUser) { showAppToast('⚠️ No account found. Please sign up first.'); showRegisterStep(); return; }
+if (remoteUser && !remoteUser.password) { showAppToast('⚠️ This account signs in with Gmail — tap the Gmail button'); return; }
+showAppToast('⚠️ Incorrect password');
+document.getElementById('fpCustomerPassword').value = '';
+document.getElementById('fpCustomerPassword').focus();
 }
 
 function togglePasswordVisibility(inputId, btn) {
