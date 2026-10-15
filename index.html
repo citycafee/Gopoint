@@ -1474,7 +1474,6 @@ Facebook
 
 <div class="fp-fpl-footer-links">
 <a onclick="fplOpenDriverLogin()"><i class="fas fa-motorcycle"></i> Sign in as Driver</a>
-<a onclick="fplOpenAdminLogin()"><i class="fas fa-shield-halved"></i> Sign in as Admin</a>
 <a onclick="fplBrowseMarketplace()"><i class="fas fa-store"></i> Browse as Guest</a>
 </div>
 
@@ -1516,7 +1515,6 @@ Facebook
 
 <div class="fp-fpl-footer-links" style="border-top: 1px solid #f0f0f0; padding-top: 14px;">
 <a onclick="closeDriverLoginPopup(); openFullpageLogin();"><i class="fas fa-arrow-left"></i> Back to Customer Login</a>
-<a onclick="closeDriverLoginPopup(); fplOpenAdminLogin();"><i class="fas fa-shield-halved"></i> Sign in as Admin</a>
 </div>
 </div>
 </div>
@@ -1669,7 +1667,6 @@ Facebook
 <div class="fp-mobile-menu" id="fpMobileMenu">
 <a onclick="openFrontLogin(); toggleFpMobileMenu();"><i class="fas fa-user"></i> Login</a>
 <a onclick="goToMarketplace(); toggleFpMobileMenu();"><i class="fas fa-store"></i> Marketplace</a>
-<a onclick="openAdminLogin(); toggleFpMobileMenu();"><i class="fas fa-shield-halved"></i> Admin</a>
 <a><i class="fas fa-globe"></i> English</a>
 </div>
 
@@ -1742,10 +1739,9 @@ Gmail
 <a onclick="showRegisterStep()" style="font-size:13px; color:var(--theme); cursor:pointer; font-weight:700;">Sign Up Here</a>
 </div>
 
-<!-- Driver & Admin Links -->
+<!-- Driver & Guest Links -->
 <div style="display:flex; justify-content:center; gap:20px; padding-top:12px; border-top:1px solid #f0f0f0;">
 <a onclick="switchLoginTab('driver')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-motorcycle"></i> Driver</a>
-<a onclick="switchLoginTab('admin')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-shield-halved"></i> Admin</a>
 <a onclick="closeFullpageLogin(); document.getElementById('fpLoginModal').classList.remove('active'); window._guestFlow = true; fpShowLocationOverlay();" style="font-size:13px; color:var(--theme); cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-store"></i> Guest</a>
 </div>
 
@@ -1816,7 +1812,6 @@ Gmail
 
 <div style="display:flex; justify-content:center; gap:16px; margin-top:20px; padding-top:16px; border-top:1px solid #f0f0f0;">
 <a onclick="switchLoginTab('customer')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-arrow-left"></i> Customer Login</a>
-<a onclick="switchLoginTab('admin')" style="font-size:13px; color:#666; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-shield-halved"></i> Admin</a>
 </div>
 
 </div>
@@ -2559,7 +2554,6 @@ Gmail
 <p id="dpWelcomeMsg"></p>
 </div>
 <div class="dp-hdr-btns">
-<button class="dp-b dp-b-purple dp-b-sm" onclick="openAdminLoginFromDriver()"><i class="fas fa-shield-halved"></i> Admin</button>
 <button class="dp-b dp-b-blue dp-b-sm" onclick="dpSimulateOrder()"><i class="fas fa-plus"></i> Simulate Order</button>
 <select id="dpRingtoneSelect" onchange="dpSetRingtone(this.value)" style="background:#1e293b;color:#f1f5f9;border:1px solid #475569;border-radius:8px;padding:6px 8px;font-size:.8rem;cursor:pointer;">
 <option value="0">🔔 Classic</option>
