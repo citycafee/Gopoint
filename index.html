@@ -5037,7 +5037,7 @@ completeLogin(localUser);
 return;
 }
 
-if (!localUser) { showAppToast('⚠️ No account found. Please sign up first.'); showRegisterStep(); return; }
+if (!localUser) { showAppToast('⚠️ No account found. Check your username/phone or tap "Sign Up Here" to create one.'); return; }
 showAppToast('⚠️ Incorrect password');
 document.getElementById('fpCustomerPassword').value = '';
 document.getElementById('fpCustomerPassword').focus();
