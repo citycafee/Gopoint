@@ -1699,7 +1699,7 @@ Facebook
 </div>
 
 <!-- Sign In Button -->
-<button class="fp-btn fp-btn-whatsapp" onclick="loginWithPhone()" style="border-radius:30px; padding:15px; font-size:16px; font-weight:700; width:100%; box-shadow:0 4px 15px rgba(34,197,94,0.3); margin-bottom:8px;">
+<button class="fp-btn fp-btn-whatsapp" id="fpCustomerSignInBtn" onclick="loginWithPhone()" style="border-radius:30px; padding:15px; font-size:16px; font-weight:700; width:100%; box-shadow:0 4px 15px rgba(34,197,94,0.3); margin-bottom:8px;">
 <i class="fas fa-sign-in-alt"></i> Sign In
 </button>
 
@@ -4969,11 +4969,31 @@ localStorage.setItem('gopoint_users', JSON.stringify(reg));
 } catch (_) {}
 }
 
+function appSetSignInLoading(on) {
+const btn = document.getElementById('fpCustomerSignInBtn');
+if (!btn) return;
+btn.disabled = on;
+btn.style.opacity = on ? '0.75' : '';
+btn.style.cursor = on ? 'wait' : '';
+btn.innerHTML = on
+? '<i class="fas fa-spinner fa-spin"></i> Checking database…'
+: '<i class="fas fa-sign-in-alt"></i> Sign In';
+}
+
 async function loginWithPhone() {
 const id = document.getElementById('fpCustomerPhone').value.trim();
 const password = document.getElementById('fpCustomerPassword').value;
 if (!id) { showAppToast('⚠️ Please enter your username or phone number'); document.getElementById('fpCustomerPhone').focus(); return; }
 if (!password) { showAppToast('⚠️ Please enter your password'); document.getElementById('fpCustomerPassword').focus(); return; }
+
+appSetSignInLoading(true);
+let remoteUser = null;
+try {
+// 1) The DATABASE (Supabase) is the authority for sign-in
+remoteUser = await appFindRemoteUser(id);
+} catch (_) { remoteUser = null; }
+
+// 2) Also look at the local cache (for offline fallback)
 const users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
 const q = id.toLowerCase();
 const qPhone = appNormalizePhone(id);
@@ -4984,29 +5004,40 @@ if (k.toLowerCase() === q || (u.username && u.username.toLowerCase() === q) || (
 if (u.phone && qPhone && appNormalizePhone(u.phone) === qPhone) { localKey = k; break; }
 }
 const localUser = localKey ? users[localKey] : null;
+appSetSignInLoading(false);
 
-// Fast path: local account with matching password
-if (localUser && localUser.password && localUser.password === password) { completeLogin(localUser); return; }
-
-// Check the cloud — the account may be registered on another device
-const remoteUser = await appFindRemoteUser(id);
-if (remoteUser && remoteUser.password && remoteUser.password === password) {
+// 3) Verified against the database — sign in and go to the restaurants page
+if (remoteUser) {
+if (!remoteUser.password) { showAppToast('⚠️ This account signs in with Gmail — tap the Gmail button'); return; }
+if (remoteUser.password !== password) {
+showAppToast('⚠️ Incorrect password');
+document.getElementById('fpCustomerPassword').value = '';
+document.getElementById('fpCustomerPassword').focus();
+return;
+}
 appCacheUserLocally(remoteUser);
 completeLogin({ name: remoteUser.name || 'Customer', username: remoteUser.email ? remoteUser.email.split('@')[0] : (remoteUser.username || ''), email: remoteUser.email || '', phone: remoteUser.phone || '', password: remoteUser.password, provider: remoteUser.provider || '', created: remoteUser.created });
 return;
 }
 
+// 4) Not in the database — fall back to a local account on this device
+if (localUser && localUser.password && localUser.password === password) {
+// Register this account into the database so it works everywhere from now on
+syncUserRecord(localUser);
+completeLogin(localUser);
+return;
+}
 // Legacy local account with no password yet — adopt the entered password
-if (localUser && !localUser.password && !remoteUser) {
+if (localUser && !localUser.password) {
 localUser.password = password;
 users[localKey] = localUser;
 localStorage.setItem('gopoint_users', JSON.stringify(users));
+syncUserRecord(localUser);
 completeLogin(localUser);
 return;
 }
 
-if (!localUser && !remoteUser) { showAppToast('⚠️ No account found. Please sign up first.'); showRegisterStep(); return; }
-if (remoteUser && !remoteUser.password) { showAppToast('⚠️ This account signs in with Gmail — tap the Gmail button'); return; }
+if (!localUser) { showAppToast('⚠️ No account found. Please sign up first.'); showRegisterStep(); return; }
 showAppToast('⚠️ Incorrect password');
 document.getElementById('fpCustomerPassword').value = '';
 document.getElementById('fpCustomerPassword').focus();
