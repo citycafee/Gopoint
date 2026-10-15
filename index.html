@@ -1683,21 +1683,10 @@ Facebook
 <div id="fpCustomerLoginSection">
 <div id="fpLoginStep" style="display:block;">
 
-<!-- Phone Number -->
+<!-- Username or Phone -->
 <div style="margin-bottom:16px;">
-<label class="fp-form-label"><i class="fas fa-phone" style="color:var(--theme); margin-right:6px;"></i> Phone</label>
-<div class="fp-phone-row">
-<div class="fp-phone-prefix">
-<select id="fpPhonePrefix">
-<option value="+252">🇸🇴 +252</option>
-<option value="+254">🇰🇪 +254</option>
-<option value="+256">🇺🇬 +256</option>
-<option value="+255">🇹🇿 +255</option>
-<option value="+251">🇪🇹 +251</option>
-</select>
-</div>
-<input type="tel" class="fp-phone-field" id="fpCustomerPhone" placeholder="6X XXX XXXX" maxlength="12">
-</div>
+<label class="fp-form-label"><i class="fas fa-user" style="color:var(--theme); margin-right:6px;"></i> Username or Phone</label>
+<input type="text" class="fp-phone-input" id="fpCustomerPhone" placeholder="Enter your username or phone" autocomplete="off" style="border:2px solid #e5e7eb; border-radius:14px; padding:14px; font-size:15px; width:100%; transition:all 0.2s ease;">
 </div>
 
 <!-- Password -->
@@ -1759,7 +1748,8 @@ Gmail
 
 <div id="fpRegisterSection" style="display:none;">
 <p style="text-align:center; margin-bottom:16px; color:#555; font-size:14px;">Create your account to continue</p>
-<div class="fp-form-group"><label class="fp-form-label">Full Name *</label><input type="text" class="fp-phone-input" id="fpRegisterName" placeholder="Enter your full name" required></div>
+<div class="fp-form-group"><label class="fp-form-label">Name *</label><input type="text" class="fp-phone-input" id="fpRegisterName" placeholder="Enter your name" required></div>
+<div class="fp-form-group"><label class="fp-form-label">Phone Number *</label><input type="tel" class="fp-phone-input" id="fpRegisterPhone" placeholder="Enter your phone" required></div>
 <div class="fp-form-group"><label class="fp-form-label">Email Address *</label><input type="email" class="fp-phone-input" id="fpRegisterEmail" placeholder="Enter your email" required></div>
 <div class="fp-form-group">
 <label class="fp-form-label">Password *</label>
@@ -3553,12 +3543,7 @@ googlePhone.addEventListener('input', function(e) {
 e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
 });
 }
-const customerPhone = document.getElementById('fpCustomerPhone');
-if (customerPhone) {
-customerPhone.addEventListener('input', function(e) {
-e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
-});
-}
+// fpCustomerPhone now accepts a username or phone, so no digits-only filter.
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -3570,6 +3555,18 @@ if (e.key !== 'Enter') return;
 if (document.getElementById('fpDriverLoginPopup')?.classList.contains('active')) { e.preventDefault(); driverPopupLogin(); }
 if (document.getElementById('fpAdminLoginPopup')?.classList.contains('active')) { e.preventDefault(); adminPopupLogin(); }
 if (document.getElementById('fpFullpageLogin')?.classList.contains('active')) { e.preventDefault(); fplContinueWithPhone(); }
+// Customer sign-in: Enter in username/phone or password submits the form
+const loginModal = document.getElementById('fpLoginModal');
+if (loginModal && loginModal.classList.contains('active') && document.getElementById('fpLoginStep')?.style.display !== 'none'
+&& document.getElementById('fpCustomerLoginSection')?.style.display !== 'none'
+&& (document.activeElement === document.getElementById('fpCustomerPhone') || document.activeElement === document.getElementById('fpCustomerPassword'))) {
+e.preventDefault(); loginWithPhone();
+}
+// Customer sign-up: Enter submits when focus is in any register field
+if (loginModal && loginModal.classList.contains('active') && document.getElementById('fpRegisterSection')?.style.display === 'block'
+&& document.getElementById('fpRegisterSection').contains(document.activeElement)) {
+e.preventDefault(); registerUser();
+}
 });
 
 const savedLocation = localStorage.getItem('gopoint_customer_location');
@@ -4577,10 +4574,11 @@ document.getElementById('fpFplPhone').focus();
 return;
 }
 const fullPhone = country + phone;
-document.getElementById('fpCustomerPhone').value = phone;
-document.getElementById('fpPhonePrefix').value = country;
+document.getElementById('fpCustomerPhone').value = fullPhone;
+document.getElementById('fpCustomerPassword').value = '';
 closeFullpageLogin();
-loginWithPhone();
+openFrontLoginModal();
+setTimeout(() => { document.getElementById('fpCustomerPassword').focus(); }, 350);
 }
 
 function fplOpenDriverLogin() {
@@ -4923,32 +4921,38 @@ function submitQrVerify() {
   }, 3000);
 }
 
-function loginWithWhatsApp() {
-const phone = document.getElementById('fpCustomerPhone').value.trim();
-const prefix = document.getElementById('fpPhonePrefix').value;
-if (!phone || phone.length < 6) { showAppToast('⚠️ Please enter your phone number'); return; }
-const fullPhone = prefix + phone;
-const whatsappMsg = encodeURIComponent('Hi Go!point, I want to sign up for delivery service.');
-window.open('https://wa.me/' + fullPhone.replace('+', '') + '?text=' + whatsappMsg, '_blank');
-const user = { name: 'WhatsApp User', email: '', phone: fullPhone, provider: 'whatsapp' };
-completeLogin(user);
+// Normalize a phone input to full form (bare local numbers get +252 default)
+function appNormalizePhone(v) {
+let p = (v || '').replace(/[\s\-()]/g, '');
+if (/^0\d+$/.test(p)) p = '+252' + p.slice(1);
+else if (/^\d{6,12}$/.test(p)) p = '+252' + p;
+return p;
 }
 
 function loginWithPhone() {
-const phone = document.getElementById('fpCustomerPhone').value.trim();
-const prefix = document.getElementById('fpPhonePrefix').value;
-if (!phone || phone.length < 6) { showAppToast('⚠️ Please enter a valid phone number'); return; }
-const fullPhone = prefix + phone;
+const id = document.getElementById('fpCustomerPhone').value.trim();
+const password = document.getElementById('fpCustomerPassword').value;
+if (!id) { showAppToast('⚠️ Please enter your username or phone number'); document.getElementById('fpCustomerPhone').focus(); return; }
+if (!password) { showAppToast('⚠️ Please enter your password'); document.getElementById('fpCustomerPassword').focus(); return; }
 const users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
-const key = fullPhone;
-if (users[key]) {
-completeLogin(users[key]);
-} else {
-const user = { name: 'Customer', email: '', phone: fullPhone, provider: 'phone' };
+const q = id.toLowerCase();
+const qPhone = appNormalizePhone(id);
+let key = null;
+for (const k in users) {
+const u = users[k] || {};
+if (k.toLowerCase() === q || (u.username && u.username.toLowerCase() === q) || (u.email && u.email.toLowerCase() === q)) { key = k; break; }
+if (u.phone && qPhone && appNormalizePhone(u.phone) === qPhone) { key = k; break; }
+}
+if (!key) { showAppToast('⚠️ No account found. Please sign up first.'); showRegisterStep(); return; }
+const user = users[key];
+if (user.password && user.password !== password) { showAppToast('⚠️ Incorrect password'); document.getElementById('fpCustomerPassword').value = ''; return; }
+if (!user.password) {
+// Legacy account (created before passwords) — set the password on first sign-in
+user.password = password;
 users[key] = user;
 localStorage.setItem('gopoint_users', JSON.stringify(users));
-completeLogin(user);
 }
+completeLogin(user);
 }
 
 function togglePasswordVisibility(inputId, btn) {
@@ -4973,6 +4977,7 @@ function showRegisterStep() {
 document.getElementById('fpLoginStep').style.display = 'none';
 document.getElementById('fpEmailLoginStep').style.display = 'none';
 document.getElementById('fpRegisterSection').style.display = 'block';
+setTimeout(() => { document.getElementById('fpRegisterName').focus(); }, 100);
 }
 
 function showLoginStep() {
@@ -5066,8 +5071,9 @@ async function completeGoogleProfile() {
 }
 
 function registerUser() {
-const name = document.getElementById('fpRegisterName').value.trim(), email = document.getElementById('fpRegisterEmail').value.trim(), password = document.getElementById('fpRegisterPassword').value, confirm = document.getElementById('fpRegisterConfirm').value, agreed = document.getElementById('fpTermsCheck').checked;
-if (!name) { showAppToast('⚠️ Please enter your full name'); return; }
+const name = document.getElementById('fpRegisterName').value.trim(), phone = document.getElementById('fpRegisterPhone').value.trim(), email = document.getElementById('fpRegisterEmail').value.trim(), password = document.getElementById('fpRegisterPassword').value, confirm = document.getElementById('fpRegisterConfirm').value, agreed = document.getElementById('fpTermsCheck').checked;
+if (!name) { showAppToast('⚠️ Please enter your name'); return; }
+if (!phone || phone.replace(/\D/g, '').length < 6) { showAppToast('⚠️ Please enter a valid phone number'); return; }
 if (!email || !email.includes('@')) { showAppToast('⚠️ Please enter a valid email address'); return; }
 if (password.length < 8) { showAppToast('⚠️ Password must be at least 8 characters'); return; }
 if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) { showAppToast('⚠️ Password must include letters and numbers'); return; }
@@ -5076,9 +5082,13 @@ if (!agreed) { showAppToast('⚠️ Please agree to the Terms of Service'); retu
 const users = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
 const key = email.toLowerCase();
 if (users[key]) { showAppToast('⚠️ An account with this email already exists'); return; }
-users[key] = { name, username: email.split('@')[0], email, password, phone: '' };
+const fullPhone = appNormalizePhone(phone);
+const phoneTaken = Object.keys(users).some(k => users[k] && users[k].phone && appNormalizePhone(users[k].phone) === fullPhone);
+if (phoneTaken) { showAppToast('⚠️ An account with this phone number already exists'); return; }
+const uname = email.split('@')[0];
+users[key] = { name, username: uname, email, password, phone: fullPhone };
 localStorage.setItem('gopoint_users', JSON.stringify(users));
-completeLogin({ name, email, phone: '', provider: 'email' });
+completeLogin({ name, username: uname, email, phone: fullPhone, password, provider: 'email' });
 }
 
 function syncUserRecord(user) {
