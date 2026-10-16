@@ -306,106 +306,153 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-view { display: none; margin-top: 70px; padding: 1rem 2rem; max-width: 1400px; margin-left: auto; margin-right: auto; }
 .app-view.active { display: block; }
 .app-profile-view { min-height: 100vh; background: var(--bg); padding-bottom: 40px; margin: 0 -2rem; }
-.app-profile-view .pf-hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 0 24px 60px; position: relative; }
-.app-profile-view .pf-hero-top { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; }
-.app-profile-view .pf-hero-top .pf-back-btn { background: rgba(255,255,255,0.25); backdrop-filter: blur(8px); border: none; color: #1a1a1a; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; }
-.app-profile-view .pf-hero-top .pf-back-btn:hover { background: rgba(255,255,255,0.45); }
-.app-profile-view .pf-hero-actions { display: flex; gap: 10px; }
-.app-profile-view .pf-hero-actions button { background: rgba(255,255,255,0.25); backdrop-filter: blur(8px); border: none; color: #1a1a1a; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; }
-.app-profile-view .pf-hero-actions button:hover { background: rgba(255,255,255,0.45); }
-.app-profile-view .pf-hero-top .pf-hero-title { color: #1a1a1a; font-size: 22px; font-weight: 800; }
-.app-profile-view .pf-avatar-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 8px; }
-.app-profile-view .pf-avatar-main { position: relative; }
-.app-profile-view .pf-avatar-ring { width: 110px; height: 110px; border-radius: 50%; background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; position: relative; }
-.app-profile-view .pf-avatar-ring::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.5); }
-.app-profile-view .pf-avatar-letter { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #00A19B, #22c55e); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 800; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
-.app-profile-view .pf-avatar-badge { position: absolute; bottom: 0; right: 0; width: 26px; height: 26px; background: #F5C451; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; border: 3px solid #fff; }
-.app-profile-view .pf-user-name { color: #1a1a1a; font-size: 28px; font-weight: 800; }
-.app-profile-view .pf-user-phone { color: rgba(26,26,26,0.7); font-size: 14px; font-weight: 500; }
-.app-profile-view .pf-member-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.3); backdrop-filter: blur(6px); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #1a1a1a; margin-top: 4px; }
-.app-profile-view .pf-content { max-width: 640px; margin: -40px auto 40px; padding: 0 16px; position: relative; z-index: 2; }
-.app-profile-view .pf-stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-.app-profile-view .pf-stat-card { background: #fff; border-radius: 16px; padding: 18px 12px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform .15s; }
-.app-profile-view .pf-stat-card:hover { transform: translateY(-2px); }
-.app-profile-view .pf-stat-num { font-size: 26px; font-weight: 800; color: var(--primary); }
-.app-profile-view .pf-stat-lbl { font-size: 11px; color: #888; font-weight: 600; margin-top: 2px; }
-.app-profile-view .pf-section { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
-.app-profile-view .pf-section-title { font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
-.app-profile-view .pf-section-title i { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; flex-shrink: 0; }
-.app-profile-view .pf-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.app-profile-view .pf-action-card { display: flex; align-items: center; gap: 14px; padding: 16px; background: #f8fafc; border-radius: 14px; cursor: pointer; transition: all .2s; border: 2px solid transparent; text-decoration: none; color: #1a1a1a; }
-.app-profile-view .pf-action-card:hover { border-color: #00A19B; background: #f0fdf9; transform: translateY(-2px); }
-.app-profile-view .pf-a-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-.app-profile-view .pf-a-label { font-size: 14px; font-weight: 700; }
-.app-profile-view .pf-a-desc { font-size: 11px; color: #888; }
-.app-profile-view .pf-info-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
-.app-profile-view .pf-info-row:last-child { border-bottom: none; }
-.app-profile-view .pf-info-left { display: flex; align-items: center; gap: 14px; }
-.app-profile-view .pf-info-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-.app-profile-view .pf-info-text { flex: 1; }
-.app-profile-view .pf-info-label { font-size: 12px; color: #888; font-weight: 500; }
-.app-profile-view .pf-info-value { font-size: 15px; font-weight: 600; color: #1a1a1a; }
-.app-profile-view .pf-info-edit { background: none; border: none; color: #00A19B; font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 8px; transition: background .2s; }
-.app-profile-view .pf-info-edit:hover { background: #f0fdf9; }
-.app-profile-view .pf-info-edit:disabled { opacity: 0.5; cursor: not-allowed; }
+/* ─── Hero ─── */
+.pf-hero { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 55%, #0f766e 100%); padding: 0 24px 66px; position: relative; overflow: hidden; }
+.pf-hero::before, .pf-hero::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.14); pointer-events: none; }
+.pf-hero::before { width: 230px; height: 230px; top: -105px; right: -70px; }
+.pf-hero::after { width: 150px; height: 150px; bottom: -60px; left: -45px; background: rgba(255,255,255,.08); }
+.pf-hero-top { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; position: relative; z-index: 1; }
+.pf-hero-top .pf-back-btn { background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.35); color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; backdrop-filter: blur(8px); }
+.pf-hero-top .pf-back-btn:hover { background: rgba(255,255,255,.42); }
+.pf-hero-actions { display: flex; gap: 10px; }
+.pf-hero-actions button { background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.35); color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; backdrop-filter: blur(8px); }
+.pf-hero-actions button:hover { background: rgba(255,255,255,.42); }
+.pf-hero-top .pf-hero-title { color: #fff; font-size: 19px; font-weight: 800; letter-spacing: .01em; text-shadow: 0 1px 3px rgba(0,0,0,.14); }
+.pf-avatar-section { display: flex; flex-direction: column; align-items: center; gap: 7px; margin-top: 4px; position: relative; z-index: 1; }
+.pf-avatar-main { position: relative; }
+.pf-avatar-ring { width: 110px; height: 110px; border-radius: 50%; background: rgba(255,255,255,.26); display: flex; align-items: center; justify-content: center; position: relative; }
+.pf-avatar-ring::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 2px dashed rgba(255,255,255,.6); }
+.pf-avatar-letter { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #ffffff, #e7fff3); color: var(--primary-dark); display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 800; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+.pf-avatar-edit { position: absolute; right: -3px; bottom: 3px; width: 32px; height: 32px; border-radius: 50%; background: var(--text); color: #fff; border: 3px solid #fff; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform .2s; z-index: 2; }
+.pf-avatar-edit:hover { transform: scale(1.12); }
+.pf-user-name { color: #fff; font-size: 27px; font-weight: 800; text-shadow: 0 1px 3px rgba(0,0,0,.16); }
+.pf-user-phone { color: rgba(255,255,255,.88); font-size: 14px; font-weight: 500; }
+.pf-badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 3px; }
+.pf-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px; border-radius: 20px; font-size: 11.5px; font-weight: 700; backdrop-filter: blur(6px); box-shadow: 0 2px 8px rgba(0,0,0,.14); }
+.pf-badge-provider { background: rgba(255,255,255,.94); color: var(--primary-dark); }
+.pf-badge-tier { background: linear-gradient(135deg, #F5C451, #E19B12); color: #4a3200; }
+/* ─── Content ─── */
+.pf-content { max-width: 640px; margin: -40px auto 40px; padding: 0 16px; position: relative; z-index: 2; }
+/* Profile completion */
+.pf-complete-card { display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 16px; padding: 14px 16px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,.07); }
+.pf-complete-card.pf-complete-done { border-left-color: #16a34a; }
+.pf-complete-ring { position: relative; width: 54px; height: 54px; flex-shrink: 0; }
+.pf-ring-svg { width: 54px; height: 54px; transform: rotate(-90deg); display: block; }
+.pf-ring-bg { fill: none; stroke: #edf2f7; stroke-width: 3.6; }
+.pf-ring-fill { fill: none; stroke: var(--primary); stroke-width: 3.6; stroke-linecap: round; transition: stroke-dasharray .7s cubic-bezier(.4,0,.2,1); }
+.pf-complete-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 800; color: var(--primary-dark); }
+.pf-complete-text { flex: 1; min-width: 0; }
+.pf-complete-title { font-size: 14.5px; font-weight: 800; color: var(--text); }
+.pf-complete-sub { font-size: 12px; color: var(--text-sec); margin-top: 3px; line-height: 1.4; }
+.pf-complete-btn { flex-shrink: 0; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; border: none; border-radius: 11px; padding: 10px 15px; font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform .15s; }
+.pf-complete-btn:hover { transform: translateY(-1px); }
+.pf-complete-btn:disabled { opacity: .55; cursor: default; transform: none; }
+/* Stats */
+.pf-stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+.pf-stat-card { background: #fff; border-radius: 16px; padding: 16px 10px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,.06); border: 1px solid var(--border); transition: transform .15s; }
+.pf-stat-card:hover { transform: translateY(-2px); }
+.pf-stat-num { font-size: 24px; font-weight: 800; color: var(--primary-dark); letter-spacing: -.02em; }
+.pf-stat-lbl { font-size: 10.5px; color: var(--text-sec); font-weight: 700; margin-top: 3px; text-transform: uppercase; letter-spacing: .5px; }
+/* Sections */
+.pf-section { background: #fff; border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.pf-sec-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.pf-section-title { font-size: 15px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; margin-bottom: 0; }
+.pf-section-title i { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; flex-shrink: 0; }
+.pf-section-title > i > i { font-size: 13.5px; }
+.pf-section-link { margin-left: auto; background: none; border: none; color: var(--primary-dark); font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 9px; transition: background .2s; white-space: nowrap; }
+.pf-section-link:hover { background: #eefaf4; }
+/* Quick actions */
+.pf-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pf-action-card { display: flex; align-items: center; gap: 13px; padding: 15px; background: #f8fafc; border-radius: 14px; cursor: pointer; transition: all .2s; border: 2px solid transparent; text-decoration: none; color: var(--text); }
+.pf-action-card:hover { border-color: var(--primary); background: #f0fdf9; transform: translateY(-2px); }
+.pf-a-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.pf-a-label { font-size: 14px; font-weight: 700; }
+.pf-a-desc { font-size: 11px; color: var(--text-sec); }
+/* Detail rows */
+.pf-info-list { display: flex; flex-direction: column; }
+.pf-info-row { display: flex; align-items: center; gap: 12px; padding: 13px 2px; border-bottom: 1px solid #f1f5f9; }
+.pf-info-row:last-child { border-bottom: none; }
+.pf-info-left { display: flex; align-items: center; gap: 13px; flex: 1; min-width: 0; }
+.pf-info-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.pf-info-text { flex: 1; min-width: 0; }
+.pf-info-label { font-size: 11px; color: var(--text-sec); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.pf-info-value { font-size: 15px; font-weight: 600; color: var(--text); margin-top: 2px; word-break: break-word; }
+.pf-info-value.pf-val-empty { color: #9aa5b1; font-weight: 500; font-style: italic; }
+.pf-info-edit { background: #f1f5f9; border: none; color: var(--primary-dark); font-size: 12.5px; font-weight: 700; cursor: pointer; padding: 7px 14px; border-radius: 20px; transition: background .2s; flex-shrink: 0; font-family: inherit; }
+.pf-info-edit:hover { background: #dcf7ea; }
 @keyframes pfRowSaved { 0% { background: transparent; } 30% { background: #ecfdf5; } 100% { background: transparent; } }
-.app-profile-view .pf-info-row.pf-row-saved { animation: pfRowSaved 1.2s ease; }
-.app-profile-view .pf-info-row.pf-row-saved .pf-info-value { color: #16a34a; font-weight: 700; }
-.pf-info-card { background: #fff; border-radius: 16px; padding: 18px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; transition: all .2s; }
-.pf-info-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); transform: translateY(-1px); }
-.pf-info-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; }
-.pf-info-card-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-.pf-info-card-title { font-size: 16px; font-weight: 700; color: #1a1a1a; }
-.pf-info-card-sub { font-size: 12px; color: #888; margin-top: 1px; }
-.pf-info-card-badge { margin-left: auto; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-.pf-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.pf-info-cell { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: #f8fafc; transition: background .2s; }
-.pf-info-cell:hover { background: #f1f5f9; }
-.pf-info-cell-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
-.pf-info-cell-label { font-size: 11px; color: #999; font-weight: 500; }
-.pf-info-cell-value { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-top: 1px; word-break: break-word; }
-.pf-info-location-bar { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: linear-gradient(135deg, #ecfdf5, #f0fdf9); border-radius: 14px; border: 1px solid #bbf7d0; margin-top: 12px; }
-.pf-info-location-bar .pf-info-cell-icon { background: #dcfce7; color: #16a34a; }
-.pf-info-location-bar .pf-info-cell-value { color: #16a34a; }
-.pf-location-detect-btn { margin-left: auto; padding: 8px 16px; border-radius: 10px; border: none; background: #16a34a; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; white-space: nowrap; }
+.pf-info-row.pf-row-saved { animation: pfRowSaved 1.4s ease; border-radius: 8px; }
+.pf-info-row.pf-row-saved .pf-info-value { color: #16a34a; font-weight: 700; }
+/* Location bar */
+.pf-info-location-bar { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: linear-gradient(135deg, #ecfdf5, #f0fdf9); border-radius: 14px; border: 1px solid #bbf7d0; margin-top: 14px; }
+.pf-info-cell-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; background: #dcfce7; color: #16a34a; }
+.pf-info-cell-label { font-size: 11px; color: #16a34a; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+.pf-info-cell-value { font-size: 13px; font-weight: 600; color: #16a34a; margin-top: 1px; word-break: break-word; }
+.pf-location-detect-btn { margin-left: auto; padding: 8px 15px; border-radius: 10px; border: none; background: #16a34a; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; white-space: nowrap; font-family: inherit; }
 .pf-location-detect-btn:hover { background: #15803d; transform: scale(1.03); }
-.pf-location-detect-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.app-profile-view .pf-order-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
-.app-profile-view .pf-order-item:last-child { border-bottom: none; }
-.app-profile-view .pf-order-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-.app-profile-view .pf-order-details { flex: 1; min-width: 0; }
-.app-profile-view .pf-order-id { font-size: 14px; font-weight: 700; }
-.app-profile-view .pf-order-meta { font-size: 12px; color: #888; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.app-profile-view .pf-order-status { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-.app-profile-view .pf-order-price { font-size: 15px; font-weight: 700; color: #1a1a1a; white-space: nowrap; }
-.app-profile-view .pf-status-delivered { background: #dcfce7; color: #16a34a; }
-.app-profile-view .pf-status-active { background: #fef3c7; color: #d97706; }
-.app-profile-view .pf-status-cancelled { background: #fee2e2; color: #dc2626; }
-.app-profile-view .pf-empty { text-align: center; padding: 30px 20px; color: #aaa; }
-.app-profile-view .pf-empty i { font-size: 40px; margin-bottom: 12px; display: block; }
-.app-profile-view .pf-empty p { font-size: 14px; }
-.app-profile-view .pf-bottom-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-.app-profile-view .pf-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all .2s; font-family: inherit; }
-.app-profile-view .pf-btn:active { transform: scale(0.97); }
-.app-profile-view .pf-btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 4px 16px rgba(34,197,94,.3); }
-.app-profile-view .pf-btn-primary:hover { box-shadow: 0 6px 24px rgba(34,197,94,.4); }
-.app-profile-view .pf-btn-outline { background: var(--white); color: var(--red); border: 2px solid var(--red); border-radius: 10px; }
-.app-profile-view .pf-btn-outline:hover { background: var(--red-soft); }
-.app-profile-view .pf-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-.app-profile-view .pf-modal-overlay.active { display: flex; }
-.app-profile-view .pf-modal-card { background: #fff; border-radius: 20px; padding: 28px 24px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; }
-.app-profile-view .pf-modal-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #00A19B, #22c55e); border-radius: 20px 20px 0 0; }
-.app-profile-view .pf-modal-close { position: absolute; top: 16px; right: 16px; background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #555; }
-.app-profile-view .pf-modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; color: #1a1a1a; }
-.app-profile-view .pf-form-group { margin-bottom: 16px; }
-.app-profile-view .pf-form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
-.app-profile-view .pf-form-group input { width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; font-weight: 500; font-family: inherit; outline: none; transition: border-color .2s; }
-.app-profile-view .pf-form-group input:focus { border-color: #00A19B; }
-.app-profile-view .pf-modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-.app-profile-view .pf-modal-actions button { flex: 1; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .2s; }
-.app-profile-view .pf-modal-cancel { background: #f1f5f9; color: #555; }
-.app-profile-view .pf-modal-save { background: linear-gradient(135deg, #00A19B, #008F8A); color: #fff; box-shadow: 0 4px 16px rgba(0,161,155,0.3); }
-.app-profile-view .pf-modal-save:disabled { opacity: 0.7; cursor: not-allowed; }
+.pf-location-detect-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+/* Settings rows */
+.pf-row-badge { background: var(--primary); color: #fff; font-size: 11px; font-weight: 800; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; }
+.pf-switch { width: 46px; height: 26px; border-radius: 20px; background: #d8dee7; position: relative; transition: background .25s; flex-shrink: 0; cursor: pointer; border: none; padding: 0; margin-left: auto; }
+.pf-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .25s; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.pf-switch.on { background: var(--primary); }
+.pf-switch.on::after { transform: translateX(20px); }
+.pf-row-state { font-size: 12.5px; font-weight: 700; color: var(--text-sec); margin-left: auto; flex-shrink: 0; }
+.pf-row-chev { color: #cbd5e1; font-size: 13px; flex-shrink: 0; margin-left: auto; }
+.pf-row-chev + .pf-info-icon { margin-left: 0; }
+/* Orders */
+.pf-order-item { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid #f1f5f9; }
+.pf-order-item:last-child { border-bottom: none; }
+.pf-order-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.pf-order-details { flex: 1; min-width: 0; }
+.pf-order-id { font-size: 14px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.pf-order-rest { font-size: 10.5px; font-weight: 700; color: var(--text-sec); background: #f1f5f9; padding: 2px 8px; border-radius: 10px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-order-meta { font-size: 12px; color: var(--text-sec); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-order-side { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+.pf-order-status { padding: 4px 11px; border-radius: 20px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+.pf-order-price { font-size: 15px; font-weight: 800; color: var(--text); }
+.pf-order-act { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: #fff; color: var(--primary-dark); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; flex-shrink: 0; }
+.pf-order-act:hover { background: #eefaf4; border-color: var(--primary); transform: rotate(-45deg); }
+.pf-status-delivered { background: #dcfce7; color: #16a34a; }
+.pf-status-active { background: #fef3c7; color: #d97706; }
+.pf-status-cancelled { background: #fee2e2; color: #dc2626; }
+.pf-empty { text-align: center; padding: 26px 16px; color: #9aa5b1; }
+.pf-empty i { font-size: 38px; margin-bottom: 10px; display: block; color: #cbd5e1; }
+.pf-empty p { font-size: 14px; margin-bottom: 15px; line-height: 1.5; }
+.pf-empty-btn { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; border: none; padding: 11px 22px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 14px rgba(34,197,94,.3); transition: transform .15s; }
+.pf-empty-btn:hover { transform: translateY(-1px); }
+/* Bottom actions */
+.pf-bottom-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
+.pf-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all .2s; font-family: inherit; }
+.pf-btn:active { transform: scale(.97); }
+.pf-btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 4px 16px rgba(34,197,94,.3); }
+.pf-btn-primary:hover { box-shadow: 0 6px 22px rgba(34,197,94,.4); }
+.pf-btn-outline { background: #fff; color: var(--red); border: 2px solid #fecaca; border-radius: 14px; }
+.pf-btn-outline:hover { background: #fef2f2; border-color: var(--red); }
+.pf-version { text-align: center; font-size: 11.5px; color: #9aa5b1; margin-top: 16px; }
+/* Modals */
+.pf-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.5); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+.pf-modal-overlay.active { display: flex; }
+.pf-modal-card { background: #fff; border-radius: 20px; padding: 28px 24px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,.25); position: relative; max-height: 90vh; overflow-y: auto; }
+.pf-modal-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #00A19B, #22c55e); border-radius: 20px 20px 0 0; }
+.pf-modal-card.pf-modal-danger::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+.pf-modal-close { position: absolute; top: 16px; right: 16px; background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #555; }
+.pf-modal-close:hover { background: #e2e8f0; }
+.pf-modal-title { font-size: 20px; font-weight: 800; margin-bottom: 6px; color: var(--text); }
+.pf-modal-sub { font-size: 13px; color: var(--text-sec); margin-bottom: 18px; line-height: 1.5; }
+.pf-modal-icon { width: 64px; height: 64px; border-radius: 50%; background: #fff1f2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 4px auto 14px; }
+.pf-form-group { margin-bottom: 15px; }
+.pf-form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+.pf-form-group input { width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; font-weight: 500; font-family: inherit; outline: none; transition: border-color .2s; box-sizing: border-box; }
+.pf-form-group input:focus { border-color: #00A19B; }
+.pf-modal-error { display: none; background: #fef2f2; color: #dc2626; font-size: 12.5px; font-weight: 600; padding: 10px 12px; border-radius: 10px; margin-bottom: 4px; }
+.pf-modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.pf-modal-actions button { flex: 1; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .2s; }
+.pf-modal-cancel { background: #f1f5f9; color: #555; }
+.pf-modal-cancel:hover { background: #e2e8f0; }
+.pf-modal-save { background: linear-gradient(135deg, #00A19B, #008F8A); color: #fff; box-shadow: 0 4px 16px rgba(0,161,155,.3); }
+.pf-modal-save.pf-save-danger { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 16px rgba(239,68,68,.3); }
+.pf-modal-save:disabled { opacity: .7; cursor: not-allowed; }
 .app-orders-list, .app-addresses-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
 .app-order-card, .app-address-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); border: 1px solid #e5e7eb; }
 .app-order-card .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -486,12 +533,14 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 #appExplorerMenuItems .menu-item .item-content .item-footer .item-price { font-size: 13px; font-weight: 700; color: #7CB342; }
 #appExplorerMenuItems .menu-item .item-content .item-footer .add-btn { background: var(--primary); color: white; border: none; border-radius: 10px; padding: 6px 16px; font-weight: 700; font-size: 13px; cursor: pointer; transition: background 0.2s, transform 0.1s; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
 #appExplorerMenuItems .menu-item .item-content .item-footer .add-btn:hover { background: var(--primary-dark); transform: scale(1.02); }
-.app-explorer-rest-card { display:flex; align-items:center; gap:16px; background:white; border-radius:16px; padding:14px 18px; box-shadow:0 2px 10px rgba(0,0,0,0.06); margin-bottom:14px; }
-.app-explorer-rest-img { width:64px; height:64px; border-radius:12px; background-size:cover; background-position:center; background-color:#f0f0f0; flex-shrink:0; }
-.app-explorer-rest-info { flex:1; min-width:0; }
-.app-explorer-rest-info h3 { margin:0 0 2px; font-size:1.1rem; font-weight:800; color:#1a1a1a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.app-explorer-rest-meta { display:flex; gap:10px; font-size:0.8rem; color:#888; flex-wrap:wrap; }
-.app-explorer-rest-meta span { display:flex; align-items:center; gap:4px; }
+.app-explorer-hero { position:relative; width:100%; height:clamp(230px, 38vw, 380px); background-color:#e5e7eb; background-size:cover; background-position:center; overflow:hidden; }
+.app-explorer-hero::before { content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,.05) 38%, rgba(0,0,0,.62) 78%, rgba(0,0,0,.82) 100%); }
+.app-explorer-hero-info { position:absolute; left:0; right:0; bottom:0; z-index:1; padding:18px clamp(12px, 3vw, 30px) 22px; }
+.app-explorer-hero-info h2 { margin:0 0 4px; font-size:clamp(1.4rem, 4vw, 2.1rem); font-weight:800; color:#fff; letter-spacing:-.01em; text-shadow:0 2px 10px rgba(0,0,0,.45); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.app-explorer-hero-meta { display:flex; gap:14px; font-size:0.85rem; color:rgba(255,255,255,.95); flex-wrap:wrap; margin-bottom:6px; text-shadow:0 1px 6px rgba(0,0,0,.45); }
+.app-explorer-hero-meta span { display:flex; align-items:center; gap:5px; }
+.app-explorer-hero-addr { display:flex; align-items:flex-start; gap:7px; font-size:0.82rem; color:rgba(255,255,255,.88); line-height:1.45; text-shadow:0 1px 6px rgba(0,0,0,.45); max-width:640px; }
+.app-explorer-hero-addr i { margin-top:3px; flex-shrink:0; }
 .app-explorer-cat-tabs { display:flex; gap:8px; overflow-x:auto; padding:4px 0 14px; scrollbar-width:none; }
 .app-explorer-cat-tabs::-webkit-scrollbar { display:none; }
 .app-explorer-cat-tab { padding:7px 18px; border-radius:20px; border:2px solid #e5e7eb; background:white; font-weight:600; font-size:0.85rem; cursor:pointer; white-space:nowrap; transition:all 0.2s; color:#555; }
@@ -2720,81 +2769,162 @@ Gmail
 <div class="pf-hero">
 <div class="pf-hero-top">
 <button class="pf-back-btn" onclick="navigateToView('home')"><i class="fas fa-arrow-left"></i></button>
-<div class="pf-hero-title">Go!point</div>
-<div class="pf-hero-actions"></div>
+<div class="pf-hero-title">My Profile</div>
+<div class="pf-hero-actions">
+<button onclick="openProfileEditModal()" title="Edit profile"><i class="fas fa-pen"></i></button>
+</div>
 </div>
 <div class="pf-avatar-section">
 <div class="pf-avatar-main">
 <div class="pf-avatar-ring">
 <div class="pf-avatar-letter" id="pfProfileAvatar">U</div>
 </div>
-<div class="pf-avatar-badge"><i class="fas fa-check"></i></div>
+<button class="pf-avatar-edit" onclick="openProfileEditModal()" title="Edit profile"><i class="fas fa-camera"></i></button>
 </div>
 <div class="pf-user-name" id="pfProfileName">User</div>
 <div class="pf-user-phone" id="pfProfilePhone">+252 61 XXX XXXX</div>
-<div class="pf-member-badge"><i class="fas fa-crown"></i> Member</div>
+<div class="pf-badges">
+<span class="pf-badge pf-badge-provider" id="pfProviderBadge"><i class="fas fa-shield-alt"></i> Password</span>
+<span class="pf-badge pf-badge-tier" id="pfTierBadge"><i class="fas fa-seedling"></i> New Member</span>
+</div>
 </div>
 </div>
 <!-- Main Content -->
 <div class="pf-content">
+<!-- Profile completion -->
+<div class="pf-complete-card" id="pfCompleteCard">
+<div class="pf-complete-ring">
+<svg class="pf-ring-svg" viewBox="0 0 36 36">
+<path class="pf-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+<path class="pf-ring-fill" id="pfRingFill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+</svg>
+<span class="pf-complete-pct" id="pfCompletePct">0%</span>
+</div>
+<div class="pf-complete-text">
+<div class="pf-complete-title" id="pfCompleteTitle">Complete your profile</div>
+<div class="pf-complete-sub" id="pfCompleteSub">Add your details to personalise your orders</div>
+</div>
+<button class="pf-complete-btn" id="pfCompleteBtn" onclick="openProfileEditModal()">Complete</button>
+</div>
 <!-- Stats -->
 <div class="pf-stats-row">
-<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatOrders">0</div><div class="pf-stat-lbl">Total Orders</div></div>
-<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatSpent">$0</div><div class="pf-stat-lbl">Total Spent</div></div>
-<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatSaved">$0</div><div class="pf-stat-lbl">Saved</div></div>
+<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatOrders">0</div><div class="pf-stat-lbl">Orders</div></div>
+<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatSpent">$0</div><div class="pf-stat-lbl">Spent</div></div>
+<div class="pf-stat-card"><div class="pf-stat-num" id="pfStatPlaces">0</div><div class="pf-stat-lbl">Restaurants</div></div>
 </div>
 <!-- Quick Actions -->
 <div class="pf-section">
+<div class="pf-sec-head">
 <div class="pf-section-title"><i style="background:linear-gradient(135deg,#00A19B,#22c55e);"><i class="fas fa-bolt"></i></i> Quick Actions</div>
+</div>
 <div class="pf-actions-grid">
 <div class="pf-action-card" onclick="navigateToView('home')"><div class="pf-a-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-utensils"></i></div><div><div class="pf-a-label">Order Food</div><div class="pf-a-desc">Browse restaurants</div></div></div>
-<div class="pf-action-card" onclick="navigateToView('orders')"><div class="pf-a-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-receipt"></i></div><div><div class="pf-a-label">My Orders</div><div class="pf-a-desc">Track & reorder</div></div></div>
-<div class="pf-action-card" onclick="openProfileEditModal()"><div class="pf-a-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-pen"></i></div><div><div class="pf-a-label">Edit Profile</div><div class="pf-a-desc">Update your info</div></div></div>
-<div class="pf-action-card" onclick="showAppToast('Help coming soon!')"><div class="pf-a-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-headset"></i></div><div><div class="pf-a-label">Get Help</div><div class="pf-a-desc">Contact support</div></div></div>
+<div class="pf-action-card" onclick="navigateToView('orders')"><div class="pf-a-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-receipt"></i></div><div><div class="pf-a-label">My Orders</div><div class="pf-a-desc">Track &amp; reorder</div></div></div>
+<div class="pf-action-card" onclick="navigateToView('addresses')"><div class="pf-a-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-map-marker-alt"></i></div><div><div class="pf-a-label">Saved Addresses</div><div class="pf-a-desc" id="pfQuickAddr">Manage places</div></div></div>
+<div class="pf-action-card" onclick="pfOpenSupport()"><div class="pf-a-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-headset"></i></div><div><div class="pf-a-label">Help &amp; Support</div><div class="pf-a-desc">Chat with us</div></div></div>
 </div>
 </div>
-<!-- Personal Info -->
+<!-- Personal Details -->
 <div class="pf-section">
-<div class="pf-section-title"><i style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fas fa-user-circle"></i></i> Personal Information</div>
-<!-- Account Card -->
-<div class="pf-info-card">
-<div class="pf-info-card-top">
-<div class="pf-info-card-icon" style="background:linear-gradient(135deg,#00A19B,#22c55e);color:#fff;font-size:20px;font-weight:800;" id="pfInfoCardAvatar">U</div>
-<div><div class="pf-info-card-title" id="pfInfoCardName">User</div><div class="pf-info-card-sub" id="pfInfoCardPhone">+252 61 XXX XXXX</div></div>
-<div class="pf-info-card-badge" style="background:#dcfce7;color:#16a34a;" id="pfInfoCardProvider"><i class="fas fa-shield-alt" style="margin-right:4px;font-size:10px;"></i>Google</div>
+<div class="pf-sec-head">
+<div class="pf-section-title"><i style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fas fa-user-circle"></i></i> Personal Details</div>
+<button class="pf-section-link" onclick="openProfileEditModal()">Edit all <i class="fas fa-chevron-right"></i></button>
 </div>
-<div class="pf-info-grid">
-<div class="pf-info-cell"><div class="pf-info-cell-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-envelope"></i></div><div><div class="pf-info-cell-label">Email</div><div class="pf-info-cell-value" id="pfInfoEmail">Not set</div></div></div>
-<div class="pf-info-cell"><div class="pf-info-cell-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-phone"></i></div><div><div class="pf-info-cell-label">Phone</div><div class="pf-info-cell-value" id="pfInfoPhone">Not set</div></div></div>
-<div class="pf-info-cell"><div class="pf-info-cell-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-map-marker-alt"></i></div><div><div class="pf-info-cell-label">Address</div><div class="pf-info-cell-value" id="pfInfoAddress">Not set</div></div></div>
-<div class="pf-info-cell"><div class="pf-info-cell-icon" style="background:#f0fdf9;color:#16a34a;"><i class="fas fa-calendar-alt"></i></div><div><div class="pf-info-cell-label">Member Since</div><div class="pf-info-cell-value" id="pfInfoSince">-</div></div></div>
+<div class="pf-info-list">
+<div class="pf-info-row">
+<div class="pf-info-left">
+<div class="pf-info-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-user"></i></div>
+<div class="pf-info-text"><div class="pf-info-label">Full Name</div><div class="pf-info-value" id="pfInfoName">Not set</div></div>
+</div>
+<button class="pf-info-edit" onclick="pfEditField('pfEditName')">Edit</button>
+</div>
+<div class="pf-info-row">
+<div class="pf-info-left">
+<div class="pf-info-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-phone"></i></div>
+<div class="pf-info-text"><div class="pf-info-label">Phone Number</div><div class="pf-info-value" id="pfInfoPhone">Not set</div></div>
+</div>
+<button class="pf-info-edit" onclick="pfEditField('pfEditPhone')">Edit</button>
+</div>
+<div class="pf-info-row">
+<div class="pf-info-left">
+<div class="pf-info-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-envelope"></i></div>
+<div class="pf-info-text"><div class="pf-info-label">Email Address</div><div class="pf-info-value" id="pfInfoEmail">Not set</div></div>
+</div>
+<button class="pf-info-edit" onclick="pfEditField('pfEditEmail')">Edit</button>
+</div>
+<div class="pf-info-row">
+<div class="pf-info-left">
+<div class="pf-info-icon" style="background:#fce7f3;color:#db2777;"><i class="fas fa-map-marker-alt"></i></div>
+<div class="pf-info-text"><div class="pf-info-label">Default Address</div><div class="pf-info-value" id="pfInfoAddress">Not set</div></div>
+</div>
+<button class="pf-info-edit" onclick="pfEditField('pfEditAddress')">Edit</button>
+</div>
+<div class="pf-info-row">
+<div class="pf-info-left">
+<div class="pf-info-icon" style="background:#f0fdf9;color:#16a34a;"><i class="fas fa-calendar-alt"></i></div>
+<div class="pf-info-text"><div class="pf-info-label">Member Since</div><div class="pf-info-value" id="pfInfoSince">-</div></div>
+</div>
+</div>
 </div>
 <!-- Current Location Bar -->
 <div class="pf-info-location-bar">
 <div class="pf-info-cell-icon"><i class="fas fa-crosshairs"></i></div>
-<div style="flex:1;"><div class="pf-info-cell-label" style="color:#16a34a;">Current Location</div><div class="pf-info-cell-value" id="pfInfoLocation" style="font-size:13px;">Detecting...</div></div>
+<div style="flex:1; min-width:0;"><div class="pf-info-cell-label">Current Location</div><div class="pf-info-cell-value" id="pfInfoLocation">Detecting...</div></div>
 <button class="pf-location-detect-btn" onclick="pfDetectLocation()" id="pfLocationDetectBtn"><i class="fas fa-location-crosshairs" style="margin-right:4px;"></i>Detect</button>
+</div>
+</div>
+<!-- Settings -->
+<div class="pf-section">
+<div class="pf-sec-head">
+<div class="pf-section-title"><i style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);"><i class="fas fa-sliders-h"></i></i> Settings</div>
+</div>
+<div class="pf-info-list">
+<div class="pf-info-row" onclick="pfOpenChangePassword()" style="cursor:pointer;">
+<div class="pf-info-left">
+<div class="pf-info-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-lock"></i></div>
+<div class="pf-info-text"><div class="pf-info-label">Security</div><div class="pf-info-value">Change Password</div></div>
+</div>
+<i class="fas fa-chevron-right pf-row-chev"></i>
+</div>
+<div class="pf-info-row">
+<div class="pf-info-left">
+<div class="pf-info-icon" style="background:#fee2e2;color:#dc2626;"><i class="fas fa-bell"></i></div>
+<div class="pf-info-text"><div class="pf-info-label">Notifications</div><div class="pf-info-value" id="pfNotifState">Order updates</div></div>
+</div>
+<button class="pf-switch" id="pfNotifSwitch" onclick="event.stopPropagation(); pfToggleNotif();" aria-label="Toggle notifications"></button>
+</div>
+<div class="pf-info-row" onclick="pfOpenSupport()" style="cursor:pointer;">
+<div class="pf-info-left">
+<div class="pf-info-icon" style="background:#dcfce7;color:#16a34a;"><i class="fab fa-whatsapp"></i></div>
+<div class="pf-info-text"><div class="pf-info-label">Support</div><div class="pf-info-value">Chat on WhatsApp</div></div>
+</div>
+<i class="fas fa-chevron-right pf-row-chev"></i>
 </div>
 </div>
 </div>
 <!-- Recent Orders -->
 <div class="pf-section">
+<div class="pf-sec-head">
 <div class="pf-section-title"><i style="background:linear-gradient(135deg,#f59e0b,#d97706);"><i class="fas fa-clock"></i></i> Recent Orders</div>
+<button class="pf-section-link" onclick="navigateToView('orders')">View all <i class="fas fa-chevron-right"></i></button>
+</div>
 <div id="pfRecentOrders">
-<div class="pf-empty"><i class="fas fa-receipt"></i><p>No orders yet. Start ordering!</p></div>
+<div class="pf-empty"><i class="fas fa-receipt"></i><p>No orders yet. Start ordering!</p><button class="pf-empty-btn" onclick="navigateToView('home')">Browse Restaurants</button></div>
 </div>
 </div>
 <!-- Bottom Actions -->
 <div class="pf-bottom-actions">
 <button class="pf-btn pf-btn-primary" onclick="navigateToView('home')"><i class="fas fa-shopping-bag"></i> Order Now</button>
-<button class="pf-btn pf-btn-outline" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+<button class="pf-btn pf-btn-outline" onclick="pfConfirmLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
 </div>
+<div class="pf-version">Go!point v1.0 &bull; Hargeisa, Somaliland</div>
 </div>
 <!-- Edit Profile Modal -->
 <div class="pf-modal-overlay" id="pfEditModal">
 <div class="pf-modal-card">
 <button class="pf-modal-close" onclick="closeProfileEditModal()">×</button>
 <div class="pf-modal-title">Personal Information</div>
+<div class="pf-modal-sub">Keep your details up to date so deliveries arrive smoothly.</div>
 <div class="pf-form-group"><label>Full Name</label><input type="text" id="pfEditName" placeholder="Your name"></div>
 <div class="pf-form-group"><label>Phone Number</label><input type="tel" id="pfEditPhone" placeholder="+252 61 XXX XXXX"></div>
 <div class="pf-form-group"><label>Email Address</label><input type="email" id="pfEditEmail" placeholder="your@email.com"></div>
@@ -2802,6 +2932,62 @@ Gmail
 <div class="pf-modal-actions">
 <button class="pf-modal-cancel" onclick="closeProfileEditModal()">Cancel</button>
 <button class="pf-modal-save" onclick="saveProfileFromModal()">Save Changes</button>
+</div>
+</div>
+</div>
+<!-- Change Password Modal -->
+<div class="pf-modal-overlay" id="pfPasswordModal">
+<div class="pf-modal-card">
+<button class="pf-modal-close" onclick="pfCloseChangePassword()">×</button>
+<div class="pf-modal-title">Change Password</div>
+<div class="pf-modal-sub">Confirm your current password, then choose a new one.</div>
+<div class="pf-form-group"><label>Current Password</label><input type="password" id="pfCurPassword" placeholder="Enter current password"></div>
+<div class="pf-form-group"><label>New Password</label><input type="password" id="pfNewPassword" placeholder="At least 6 characters"></div>
+<div class="pf-form-group"><label>Confirm New Password</label><input type="password" id="pfConfPassword" placeholder="Repeat new password"></div>
+<div class="pf-modal-error" id="pfPwError"></div>
+<div class="pf-modal-actions">
+<button class="pf-modal-cancel" onclick="pfCloseChangePassword()">Cancel</button>
+<button class="pf-modal-save" id="pfPwSaveBtn" onclick="pfChangePassword()">Update Password</button>
+</div>
+</div>
+</div>
+<!-- Support Modal -->
+<div class="pf-modal-overlay" id="pfSupportModal">
+<div class="pf-modal-card">
+<button class="pf-modal-close" onclick="pfCloseSupport()">×</button>
+<div class="pf-modal-title">Help &amp; Support</div>
+<div class="pf-modal-sub">Our team is ready to help with orders, payments or your account.</div>
+<div class="pf-info-list" style="margin-bottom:6px;">
+<div class="pf-info-row" id="pfWaBtn" onclick="pfWaSupport()" style="cursor:pointer;">
+<div class="pf-info-left">
+<div class="pf-info-icon" style="background:#dcfce7;color:#16a34a;"><i class="fab fa-whatsapp"></i></div>
+<div class="pf-info-text"><div class="pf-info-label">WhatsApp</div><div class="pf-info-value">Chat with us now</div></div>
+</div>
+<i class="fas fa-chevron-right pf-row-chev"></i>
+</div>
+<div class="pf-info-row" onclick="document.getElementById('pfMailBtn').click()" style="cursor:pointer;">
+<div class="pf-info-left">
+<div class="pf-info-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-envelope"></i></div>
+<div class="pf-info-text"><div class="pf-info-label">Email</div><div class="pf-info-value">Send us a message</div></div>
+</div>
+<i class="fas fa-chevron-right pf-row-chev"></i>
+</div>
+</div>
+<a id="pfMailBtn" style="display:none;"></a>
+<div class="pf-modal-actions">
+<button class="pf-modal-cancel" onclick="pfCloseSupport()">Close</button>
+</div>
+</div>
+</div>
+<!-- Logout Confirm Modal -->
+<div class="pf-modal-overlay" id="pfLogoutModal">
+<div class="pf-modal-card pf-modal-danger">
+<div class="pf-modal-icon"><i class="fas fa-sign-out-alt"></i></div>
+<div class="pf-modal-title" style="text-align:center;">Sign out?</div>
+<div class="pf-modal-sub" style="text-align:center; margin-bottom:6px;">You'll need to sign in again to view your orders and saved addresses.</div>
+<div class="pf-modal-actions">
+<button class="pf-modal-cancel" onclick="pfCancelLogout()">Cancel</button>
+<button class="pf-modal-save pf-save-danger" onclick="pfDoLogout()">Sign Out</button>
 </div>
 </div>
 </div>
@@ -2825,9 +3011,8 @@ Gmail
 
 <!-- Explorer Menu View -->
 <div id="appExplorerContainer" class="app-explorer">
+<div id="appExplorerRestHeader" class="app-explorer-hero"></div>
 <div style="padding:1rem; max-width:1400px; margin:0 auto;">
-<button onclick="appBackToRestaurants()" style="display:flex; align-items:center; gap:8px; background:white; border:1px solid #e5e7eb; padding:8px 16px; border-radius:30px; cursor:pointer; font-weight:600; color:var(--primary); margin-bottom:1rem;"><i class="fas fa-arrow-left"></i> Back</button>
-<div id="appExplorerRestHeader" class="app-explorer-rest-card"></div>
 <div id="appExplorerCatTabs" class="app-explorer-cat-tabs"></div>
 <div id="appExplorerMenuItems"></div>
 </div>
@@ -5214,10 +5399,11 @@ function goToMarketplace() {
   }
   document.getElementById('fpFullpageLogin').classList.remove('active'); document.getElementById('fpDriverLoginPopup').classList.remove('active'); document.getElementById('fpAdminLoginPopup').classList.remove('active'); document.getElementById('fpLoginModal').classList.remove('active'); document.getElementById('frontPageContainer').style.display = 'none'; document.getElementById('appContainer').classList.add('active'); window.scrollTo({ top: 0 }); document.body.style.overflow = ''; updateUserUI(); navigateToView('home'); updateSearchPlaceholder(); detectFrontLocation(); setTimeout(() => { if (typeof appMap !== 'undefined' && appMap) appMap.invalidateSize(); if (typeof appRenderRestaurantList === 'function') appRenderRestaurantList(); }, 200); }
 
-async function logoutUser() {
-if (!confirm('Are you sure you want to logout?')) return;
-await sb.auth.signOut();
+async function logoutUser(skipConfirm) {
+if (!skipConfirm) { pfConfirmLogout(); return; }
+try { await sb.auth.signOut(); } catch (_) {}
 currentUser = null;
+pfKnownStatuses = {};
 localStorage.removeItem('gopoint_user');
 document.getElementById('appContainer').classList.remove('active');
 document.getElementById('frontPageContainer').style.display = 'block';
@@ -5250,7 +5436,7 @@ const appNavbar = document.querySelector('.app-navbar');
 const appNavRight = document.querySelector('.app-nav-right');
 if (view === 'profile') { document.getElementById('appProfileView').classList.add('active'); renderProfileView(); if (appNavbar) appNavbar.style.display = ''; if (appNavRight) appNavRight.style.display = 'none'; }
 else { if (appNavbar) appNavbar.style.display = ''; if (appNavRight) appNavRight.style.display = ''; }
-if (view === 'home') { document.getElementById('appHomeView').classList.add('active'); document.getElementById('appMiniCartBar').classList.remove('visible'); refreshRestaurants().then(() => appRenderRestaurantList()); if (appMap) setTimeout(() => appMap.invalidateSize(), 100); }
+if (view === 'home') { const hv = document.getElementById('appHomeView'); hv.style.display = 'block'; hv.classList.add('active'); document.getElementById('appMiniCartBar').classList.remove('visible'); refreshRestaurants().then(() => appRenderRestaurantList()); if (appMap) setTimeout(() => appMap.invalidateSize(), 100); }
 else if (view === 'orders') { document.getElementById('appOrdersView').classList.add('active'); renderOrdersView(); }
 else if (view === 'addresses') { document.getElementById('appAddressesView').classList.add('active'); renderAddressesView(); }
 document.querySelectorAll('.app-nav-right ul li').forEach(li => li.classList.remove('active-nav'));
@@ -5260,54 +5446,304 @@ document.getElementById('appUserDropdown')?.classList.remove('active');
 if (cartVisible) toggleCart();
 }
 
+function pfUserOrders() {
+if (!currentUser) return [];
+const nm = (currentUser.name || '').trim().toLowerCase();
+const em = (currentUser.email || '').trim().toLowerCase();
+const ph = currentUser.phone ? appNormalizePhone(currentUser.phone) : '';
+return orders.filter(o => {
+const c = o.customer || {};
+const cp = c.phone ? appNormalizePhone(c.phone) : '';
+if (ph && cp && ph === cp) return true;
+if (em && c.email && em === c.email.trim().toLowerCase()) return true;
+if (nm && c.name && nm === c.name.trim().toLowerCase()) return true;
+return false;
+});
+}
+
+function pfNotifPref() { try { return localStorage.getItem('gopoint_notif') !== '0'; } catch (_) { return true; } }
+
+function pfNotify(title, body) {
+if (!pfNotifPref()) return;
+showAppToast('🔔 ' + title);
+try {
+if (typeof Notification !== 'undefined' && Notification.permission === 'granted') new Notification(title, { body: body || '' });
+} catch (_) {}
+}
+
+function pfToggleNotif() {
+const on = !pfNotifPref();
+try { localStorage.setItem('gopoint_notif', on ? '1' : '0'); } catch (_) {}
+if (on && typeof Notification !== 'undefined' && Notification.permission === 'default') {
+try { Notification.requestPermission().then(() => pfRenderNotif()).catch(() => {}); } catch (_) {}
+}
+pfRenderNotif();
+showAppToast(on ? '🔔 Order notifications on' : '🔕 Order notifications off');
+}
+
+function pfRenderNotif() {
+const sw = document.getElementById('pfNotifSwitch'), st = document.getElementById('pfNotifState');
+const on = pfNotifPref();
+if (sw) sw.classList.toggle('on', on);
+if (st) st.textContent = on ? 'Order updates on' : 'Order updates off';
+}
+
+function pfTier(count) {
+if (count >= 15) return { label: 'Gold Member', icon: 'fa-crown' };
+if (count >= 5) return { label: 'Silver Member', icon: 'fa-medal' };
+if (count >= 1) return { label: 'Bronze Member', icon: 'fa-award' };
+return { label: 'New Member', icon: 'fa-seedling' };
+}
+
+function pfCalcCompletion() {
+const checks = [
+!!(currentUser.name || '').trim(),
+!!(currentUser.phone || '').trim(),
+!!(currentUser.email || '').trim(),
+!!(currentUser.address || '').trim(),
+!!(customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...')
+];
+const done = checks.filter(Boolean).length;
+return Math.round(done / checks.length * 100);
+}
+
+function pfRenderCompletion() {
+const pct = pfCalcCompletion();
+const ring = document.getElementById('pfRingFill'), pctEl = document.getElementById('pfCompletePct');
+const title = document.getElementById('pfCompleteTitle'), sub = document.getElementById('pfCompleteSub');
+const btn = document.getElementById('pfCompleteBtn');
+if (!ring) return;
+ring.setAttribute('stroke-dasharray', pct + ', 100');
+pctEl.textContent = pct + '%';
+if (pct >= 100) {
+title.textContent = 'Profile complete!';
+sub.textContent = 'Everything is set up. Thanks for keeping it fresh.';
+btn.textContent = 'Done';
+btn.disabled = true;
+btn.onclick = null;
+} else {
+const missing = [];
+if (!(currentUser.name || '').trim()) missing.push('name');
+if (!(currentUser.phone || '').trim()) missing.push('phone');
+if (!(currentUser.email || '').trim()) missing.push('email');
+if (!(currentUser.address || '').trim()) missing.push('address');
+title.textContent = 'Complete your profile';
+sub.textContent = 'Add your ' + missing.slice(0, 3).join(', ') + (missing.length > 3 ? ' and more' : '') + ' to finish.';
+btn.textContent = 'Complete';
+btn.disabled = false;
+btn.onclick = () => openProfileEditModal();
+}
+}
+
+function pfEditField(id) { openProfileEditModal(id); }
+
+let pfKnownStatuses = {};
+function pfCheckOrderUpdates() {
+if (!currentUser) return;
+pfUserOrders().forEach(o => {
+const key = String(o.id);
+const cur = o.status || 'pending';
+if (!(key in pfKnownStatuses)) { pfKnownStatuses[key] = cur; return; }
+if (pfKnownStatuses[key] !== cur) {
+pfKnownStatuses[key] = cur;
+pfNotify('Order #' + key.slice(-6) + ' ' + cur.replace('_', ' '),
+'Your order status is now "' + cur.replace('_', ' ') + '".');
+if (document.getElementById('appProfileView').classList.contains('active')) renderProfileView();
+}
+});
+}
+
+function pfSupportContact() {
+const sys = (typeof settings !== 'undefined' && settings && settings.system) || {};
+const raw = String(sys.businessPhone || '');
+const digits = raw.replace(/\D/g, '');
+const valid = digits.length >= 9 && raw.indexOf('X') === -1;
+return { phone: valid ? (digits.startsWith('252') ? digits : '252' + digits) : '', email: sys.businessEmail || 'info@gopoint.com' };
+}
+
+function pfOpenSupport() {
+const c = pfSupportContact();
+const wa = document.getElementById('pfWaBtn');
+if (wa) wa.style.display = c.phone ? '' : 'none';
+const em = document.getElementById('pfMailBtn');
+if (em) em.href = 'mailto:' + c.email + '?subject=' + encodeURIComponent('Go!point support request');
+document.getElementById('pfSupportModal').classList.add('active');
+}
+
+function pfCloseSupport() { document.getElementById('pfSupportModal').classList.remove('active'); }
+
+function pfWaSupport() {
+const c = pfSupportContact();
+if (!c.phone) { showAppToast('⚠️ WhatsApp support is not configured'); return; }
+const msg = 'Hi Go!point support, I need help with my account (' + (currentUser ? currentUser.name || currentUser.phone || '' : '') + ').';
+window.open('https://wa.me/' + c.phone + '?text=' + encodeURIComponent(msg), '_blank');
+pfCloseSupport();
+}
+
+function pfOpenChangePassword() {
+if (!currentUser) { showAppToast('⚠️ Please sign in first'); return; }
+['pfCurPassword', 'pfNewPassword', 'pfConfPassword'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+pfShowPwError('');
+document.getElementById('pfPasswordModal').classList.add('active');
+setTimeout(() => { const el = document.getElementById('pfCurPassword'); if (el) el.focus(); }, 120);
+}
+
+function pfCloseChangePassword() { document.getElementById('pfPasswordModal').classList.remove('active'); }
+
+function pfShowPwError(msg) {
+const el = document.getElementById('pfPwError');
+if (!el) return;
+el.textContent = msg || '';
+el.style.display = msg ? 'block' : 'none';
+}
+
+async function pfChangePassword() {
+const cur = document.getElementById('pfCurPassword').value;
+const nw = document.getElementById('pfNewPassword').value;
+const cf = document.getElementById('pfConfPassword').value;
+if (!cur || !nw || !cf) { pfShowPwError('Please fill in all three fields.'); return; }
+if (nw.length < 6) { pfShowPwError('New password must be at least 6 characters.'); return; }
+if (nw !== cf) { pfShowPwError('New passwords do not match.'); return; }
+
+const btn = document.getElementById('pfPwSaveBtn');
+btn.disabled = true; btn.textContent = 'Verifying…';
+
+// Resolve the stored password: local registry first, then the cloud.
+let stored = '';
+try {
+const reg = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+const k = Object.keys(reg).find(kk => (currentUser.email && reg[kk].email === currentUser.email)
+|| (currentUser.phone && reg[kk].phone && appNormalizePhone(reg[kk].phone) === appNormalizePhone(currentUser.phone))
+|| kk === String(currentUser.phone || currentUser.email || '').toLowerCase());
+if (k && reg[k].password) stored = reg[k].password;
+} catch (_) {}
+if (!stored) stored = currentUser.password || '';
+if (!stored && supaConnected) {
+try { const r = await appFindRemoteUser(currentUser.email || currentUser.phone); if (r && r.password) stored = r.password; } catch (_) {}
+}
+
+if (!stored) {
+btn.disabled = false; btn.textContent = 'Update Password';
+pfShowPwError('This account signs in with Google, so it has no password to change.');
+return;
+}
+if (stored !== cur) {
+btn.disabled = false; btn.textContent = 'Update Password';
+pfShowPwError('Your current password is incorrect.');
+return;
+}
+
+btn.textContent = 'Saving…';
+currentUser.password = nw;
+localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
+try {
+const reg = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+const k = Object.keys(reg).find(kk => (currentUser.email && reg[kk].email === currentUser.email)
+|| (currentUser.phone && reg[kk].phone && appNormalizePhone(reg[kk].phone) === appNormalizePhone(currentUser.phone))
+|| kk === String(currentUser.phone || currentUser.email || '').toLowerCase());
+if (k) reg[k].password = nw;
+else if (currentUser.email || currentUser.phone) reg[String(currentUser.phone || currentUser.email).toLowerCase()] = { name: currentUser.name || '', username: currentUser.email ? currentUser.email.split('@')[0] : '', email: currentUser.email || '', phone: currentUser.phone || '', password: nw, provider: currentUser.provider || '' };
+localStorage.setItem('gopoint_users', JSON.stringify(reg));
+} catch (_) {}
+syncUserRecord(currentUser);
+
+btn.textContent = '✓ Updated';
+setTimeout(() => { pfCloseChangePassword(); btn.disabled = false; btn.textContent = 'Update Password'; showAppToast('🔒 Password changed successfully'); }, 700);
+}
+
+function pfConfirmLogout() { document.getElementById('pfLogoutModal').classList.add('active'); }
+function pfCancelLogout() { document.getElementById('pfLogoutModal').classList.remove('active'); }
+async function pfDoLogout() { pfCancelLogout(); await logoutUser(true); }
+
+function pfSavedAddressCount() {
+try { return JSON.parse(localStorage.getItem('gopoint_addresses') || '[]').length; } catch (_) { return 0; }
+}
+
+function pfReorder(orderId) {
+const o = orders.find(x => x.id == orderId);
+if (!o || !o.items || !o.items.length) { showAppToast('⚠️ This order has no items to reorder'); return; }
+o.items.forEach(it => {
+const ex = cart.find(c => c.id === it.id);
+if (ex) ex.quantity += (it.quantity || 1);
+else cart.push({ ...it, quantity: it.quantity || 1 });
+});
+if (o.restaurant && restaurants[o.restaurant]) currentRestaurant = o.restaurant;
+appUpdateCart();
+updateExplorerCartBadges();
+navigateToView('home');
+if (!cartVisible) toggleCart();
+showAppToast('🛒 ' + o.items.length + ' item(s) added to your cart');
+}
+
 function renderProfileView() {
 if (!currentUser) return;
-const name = currentUser.name || 'User';
-const phone = currentUser.phone || 'Not set';
-const email = currentUser.email || 'Not set';
-const provider = currentUser.provider === 'google' ? 'Google' : currentUser.provider === 'whatsapp' ? 'WhatsApp' : 'Phone + OTP';
-const providerColor = currentUser.provider === 'google' ? '#dcfce7,#16a34a' : currentUser.provider === 'whatsapp' ? '#dcfce7,#16a34a' : '#f1f5f9,#64748b';
-document.getElementById('pfProfileAvatar').textContent = name.charAt(0).toUpperCase();
+const name = (currentUser.name || 'User').trim() || 'User';
+const phone = currentUser.phone || '';
+const email = currentUser.email || '';
+const initial = name.charAt(0).toUpperCase();
+document.getElementById('pfProfileAvatar').textContent = initial;
 document.getElementById('pfProfileName').textContent = name;
-document.getElementById('pfProfilePhone').textContent = phone;
-const userOrders = orders.filter(o => o.customer?.phone === currentUser.phone || o.customer?.name === currentUser.name);
+document.getElementById('pfProfilePhone').textContent = email || phone || 'No contact details yet';
+
+// Provider + tier badges
+const prov = currentUser.provider === 'google' ? 'Google' : currentUser.provider === 'whatsapp' ? 'WhatsApp' : 'Password';
+document.getElementById('pfProviderBadge').innerHTML = '<i class="fas fa-shield-alt"></i> ' + prov;
+const userOrders = pfUserOrders();
+const tier = pfTier(userOrders.length);
+document.getElementById('pfTierBadge').innerHTML = '<i class="fas ' + tier.icon + '"></i> ' + tier.label;
+
+// Stats — all derived from real order history
 const totalSpent = userOrders.reduce((s, o) => s + (o.total || 0), 0);
+const places = new Set(userOrders.map(o => o.restaurant).filter(Boolean)).size;
 document.getElementById('pfStatOrders').textContent = userOrders.length;
 document.getElementById('pfStatSpent').textContent = '$' + totalSpent.toFixed(2);
-document.getElementById('pfStatSaved').textContent = '$' + (totalSpent * 0.05).toFixed(2);
-// Card
-const cardAvatar = document.getElementById('pfInfoCardAvatar');
-if (cardAvatar) cardAvatar.textContent = name.charAt(0).toUpperCase();
-const cardName = document.getElementById('pfInfoCardName');
-if (cardName) cardName.textContent = name;
-const cardPhone = document.getElementById('pfInfoCardPhone');
-if (cardPhone) cardPhone.textContent = phone;
-const cardProvider = document.getElementById('pfInfoCardProvider');
-if (cardProvider) {
-  const pc = providerColor.split(',');
-  cardProvider.textContent = provider;
-  cardProvider.style.background = pc[0];
-  cardProvider.style.color = pc[1];
-}
-document.getElementById('pfInfoPhone').textContent = phone;
-document.getElementById('pfInfoEmail').textContent = email;
-document.getElementById('pfInfoAddress').textContent = currentUser.address || 'Not set';
-document.getElementById('pfInfoLocation').textContent = (customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...') ? customerLocation.area : 'Not detected';
+document.getElementById('pfStatPlaces').textContent = places;
+
+// Completion meter
+pfRenderCompletion();
+
+// Personal details
+const setVal = (id, v, fallback) => {
+const el = document.getElementById(id);
+if (!el) return;
+const s = (v || '').trim();
+el.textContent = s || fallback;
+el.classList.toggle('pf-val-empty', !s);
+};
+setVal('pfInfoName', currentUser.name, 'Not set');
+setVal('pfInfoPhone', phone, 'Not set');
+setVal('pfInfoEmail', email, 'Not set');
+setVal('pfInfoAddress', currentUser.address, 'Not set');
 const created = currentUser.created || currentUser.registeredAt;
-document.getElementById('pfInfoSince').textContent = created ? new Date(created).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) : '-';
-// Recent Orders
+document.getElementById('pfInfoSince').textContent = created ? new Date(created).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '-';
+document.getElementById('pfInfoLocation').textContent = (customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...') ? customerLocation.area : 'Not detected';
+
+// Quick action count + notification switch
+const ac = document.getElementById('pfQuickAddr');
+if (ac) { const n = pfSavedAddressCount(); ac.textContent = n ? n + ' saved place' + (n === 1 ? '' : 's') : 'Manage places'; }
+pfRenderNotif();
+
+// Recent orders
 const container = document.getElementById('pfRecentOrders');
-const recent = userOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
-if (!recent.length) { container.innerHTML = '<div class="pf-empty"><i class="fas fa-receipt"></i><p>No orders yet. Start ordering!</p></div>'; return; }
+if (!container) return;
+const recent = userOrders.slice().sort((a, b) => new Date(b.timestamp || b.created_at || 0) - new Date(a.timestamp || a.created_at || 0)).slice(0, 5);
+if (!recent.length) {
+container.innerHTML = '<div class="pf-empty"><i class="fas fa-receipt"></i><p>No orders yet. Start ordering!</p><button class="pf-empty-btn" onclick="navigateToView(\'home\')">Browse Restaurants</button></div>';
+return;
+}
 container.innerHTML = recent.map(o => {
 const st = o.status || 'pending';
-let sc = 'pf-status-active', sl = st.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-if (st === 'delivered') { sc = 'pf-status-delivered'; sl = 'Delivered'; }
+let sc = 'pf-status-active', sl = String(st).replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+if (st === 'delivered' || st === 'completed') { sc = 'pf-status-delivered'; sl = 'Delivered'; }
 if (st === 'cancelled') { sc = 'pf-status-cancelled'; sl = 'Cancelled'; }
-const date = new Date(o.timestamp).toLocaleDateString('en-US', { month:'short', day:'numeric' });
-const time = new Date(o.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
-const items = o.items?.map(i => i.name).join(', ') || 'Order';
-return `<div class="pf-order-item"><div class="pf-order-icon" style="background:${st==='delivered'?'#dcfce7':'#fef3c7'};color:${st==='delivered'?'#16a34a':'#d97706'};"><i class="fas fa-${st==='delivered'?'check-circle':'clock'}"></i></div><div class="pf-order-details"><div class="pf-order-id">#${String(o.id).slice(-6)}</div><div class="pf-order-meta">${date} at ${time} &bull; ${items}</div></div><span class="pf-order-status ${sc}">${sl}</span><div class="pf-order-price">$${(o.total||0).toFixed(2)}</div></div>`;
+const when = o.timestamp || o.created_at;
+const date = when ? new Date(when).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+const time = when ? new Date(when).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '';
+const rname = (restaurants[o.restaurant] || {}).name || '';
+const items = (o.items || []).map(i => i.name).join(', ') || 'Order';
+const canReorder = ['delivered', 'completed'].includes(st) && (o.items || []).length;
+const meta = [date && (date + ' at ' + time), rname].filter(Boolean).join(' • ') || items;
+return `<div class="pf-order-item"><div class="pf-order-icon" style="background:${sc === 'pf-status-delivered' ? '#dcfce7' : sc === 'pf-status-cancelled' ? '#fee2e2' : '#fef3c7'};color:${sc === 'pf-status-delivered' ? '#16a34a' : sc === 'pf-status-cancelled' ? '#dc2626' : '#d97706'};"><i class="fas fa-${sc === 'pf-status-delivered' ? 'check-circle' : sc === 'pf-status-cancelled' ? 'times-circle' : 'clock'}"></i></div><div class="pf-order-details"><div class="pf-order-id">#${String(o.id).slice(-6)}${rname ? `<span class="pf-order-rest">${rname}</span>` : ''}</div><div class="pf-order-meta">${meta}</div></div><div class="pf-order-side"><span class="pf-order-status ${sc}">${sl}</span><div class="pf-order-price">$${(o.total || 0).toFixed(2)}</div></div>${canReorder ? `<button class="pf-order-act" title="Reorder" onclick="pfReorder('${o.id}')"><i class="fas fa-redo"></i></button>` : ''}</div>`;
 }).join('');
 }
 
@@ -5332,13 +5768,14 @@ container.innerHTML = addresses.map((addr, idx) => `<div class="app-address-card
 function addNewAddress() { const area = prompt('Enter area name:'); if (!area) return; const address = prompt('Enter full address:'); if (!address) return; const label = prompt('Enter a label (e.g., Home, Work):') || 'Address'; const addresses = JSON.parse(localStorage.getItem('gopoint_addresses') || '[]'); addresses.push({ label, area, address }); localStorage.setItem('gopoint_addresses', JSON.stringify(addresses)); renderAddressesView(); showAppToast('✅ Address saved'); }
 function deleteAddress(index) { if (!confirm('Delete this address?')) return; const addresses = JSON.parse(localStorage.getItem('gopoint_addresses') || '[]'); addresses.splice(index, 1); localStorage.setItem('gopoint_addresses', JSON.stringify(addresses)); renderAddressesView(); showAppToast('🗑️ Address deleted'); }
 
-function openProfileEditModal() {
+function openProfileEditModal(focusId) {
 if (!currentUser) return;
 document.getElementById('pfEditName').value = currentUser.name || '';
 document.getElementById('pfEditPhone').value = currentUser.phone || '';
 document.getElementById('pfEditEmail').value = currentUser.email || '';
 document.getElementById('pfEditAddress').value = currentUser.address || '';
 document.getElementById('pfEditModal').classList.add('active');
+if (focusId) setTimeout(() => { const el = document.getElementById(focusId); if (el) { el.focus(); if (el.select) el.select(); } }, 120);
 }
 
 function closeProfileEditModal() {
@@ -5393,7 +5830,7 @@ const phone = document.getElementById('pfEditPhone').value.trim();
 const email = document.getElementById('pfEditEmail').value.trim();
 const address = document.getElementById('pfEditAddress').value.trim();
 if (!name) { showAppToast('⚠️ Name required'); return; }
-const saveBtn = document.querySelector('.pf-modal-save');
+const saveBtn = document.querySelector('#pfEditModal .pf-modal-save');
 saveBtn.textContent = 'Saving...';
 saveBtn.disabled = true;
 currentUser.name = name;
@@ -5414,17 +5851,8 @@ saveBtn.style.background = '';
 saveBtn.disabled = false;
 showAppToast('✅ Profile updated');
 setTimeout(() => {
-  const card = document.querySelector('.pf-info-card');
-  if (card) { card.style.transition = 'all .3s'; card.style.boxShadow = '0 0 0 2px #16a34a, 0 4px 14px rgba(22,163,74,0.15)'; }
-  const cells = document.querySelectorAll('.pf-info-cell');
-  cells.forEach(c => { c.style.transition = 'all .3s'; c.style.background = '#ecfdf5'; });
-  const locBar = document.querySelector('.pf-info-location-bar');
-  if (locBar) { locBar.style.transition = 'all .3s'; locBar.style.background = 'linear-gradient(135deg, #d1fae5, #ecfdf5)'; }
-  setTimeout(() => {
-    if (card) { card.style.boxShadow = ''; }
-    cells.forEach(c => { c.style.background = ''; });
-    if (locBar) { locBar.style.background = ''; }
-  }, 1500);
+      const rows = document.querySelectorAll('.pf-info-row');
+      rows.forEach(r => { r.classList.remove('pf-row-saved'); void r.offsetWidth; r.classList.add('pf-row-saved'); setTimeout(() => r.classList.remove('pf-row-saved'), 1600); });
 }, 100);
 }, 800);
 }
@@ -5436,7 +5864,7 @@ appInitMap();
 appStartBannerCarousel();
 setupAppEventListeners();
 appRenderRestaurantList();
-supaSubscribeToOrders((payload) => { loadFromLocalStorage(); if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); } });
+supaSubscribeToOrders((payload) => { loadFromLocalStorage(); if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); } if (currentUser) pfCheckOrderUpdates(); });
 supaSubscribeToVehicles(async (payload) => {
 loadFromLocalStorage();
 if (dpDriver) {
@@ -5536,13 +5964,10 @@ const keys = Object.keys(filtered), displayKeys = keys.slice(0, 6);
 displayKeys.forEach((key, i) => {
 const r = filtered[key], img = r.image || r.logo || restaurantImages[i % restaurantImages.length];
 const distance = customerLocation ? appCalculateDistance(customerLocation.lat, customerLocation.lng, r.lat, r.lng).toFixed(1) : null;
-const menu = r.menu || {};
-const cats = Object.keys(menu).filter(c => menu[c] && menu[c].length > 0);
-const catCounts = cats.map(c => `${c} ${menu[c].length}`).join(' • ');
 const card = document.createElement('div');
 card.className = 'app-card';
 card.setAttribute('data-key', key);
-card.innerHTML = `<div class="app-card_inner"><img src="${img}" alt="${r.name}" class="app-card_image_view" loading="lazy" /><div><div class="app-card_heading">${r.name}</div><div class="app-card_description">${r.cuisine || 'Restaurant'} • ${r.address || ''}</div><div class="app-restaurant-meta"><div class="app-restaurant-rating"><i class="fa fa-star"></i> ${r.rating || '4.5'}</div><div class="app-restaurant-delivery-info"><span class="app-restaurant-delivery-time"><i class="fa fa-clock"></i> ${r.deliveryTime || '20 min'}</span>${distance ? `<span class="app-restaurant-distance"><i class="fa fa-location-arrow"></i> ${distance} km</span>` : ''}</div></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">${cats.map(c => `<span style="background:#f0fdf4;color:#065f46;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:600;">${categoryLabels[c] || c} ${menu[c].length}</span>`).join('')}</div></div></div>`;
+card.innerHTML = `<div class="app-card_inner"><img src="${img}" alt="${r.name}" class="app-card_image_view" loading="lazy" /><div><div class="app-card_heading">${r.name}</div><div class="app-card_description">${r.cuisine || 'Restaurant'} • ${r.address || ''}</div><div class="app-restaurant-meta"><div class="app-restaurant-rating"><i class="fa fa-star"></i> ${r.rating || '4.5'}</div><div class="app-restaurant-delivery-info"><span class="app-restaurant-delivery-time"><i class="fa fa-clock"></i> ${r.deliveryTime || '20 min'}</span>${distance ? `<span class="app-restaurant-distance"><i class="fa fa-location-arrow"></i> ${distance} km</span>` : ''}</div></div></div></div>`;
 card.addEventListener('click', () => appOpenRestaurantMenu(key));
 listContainer.appendChild(card);
 });
@@ -5575,8 +6000,11 @@ function appGoToSlide(index) { appCurrentSlide = index; const inner = document.g
 function appOpenRestaurantMenu(key) { if (!restaurants[key]) return; currentRestaurant = key;
 refreshRestaurants().then(() => {
 const r = restaurants[key]; if (!r) return;
-const rImg = (r.menu.food && r.menu.food[0]) ? r.menu.food[0].image : (r.menu.coffee && r.menu.coffee[0]) ? r.menu.coffee[0].image : '';
-document.getElementById('appExplorerRestHeader').innerHTML = `<div class="app-explorer-rest-img" style="background-image:url('${rImg}')"></div><div class="app-explorer-rest-info"><h3>${r.name}</h3><div class="app-explorer-rest-meta"><span><i class="fas fa-utensils"></i> ${r.cuisine||''}</span><span><i class="fas fa-star" style="color:#f59e0b;"></i> ${r.rating||'4.5'}</span><span><i class="fas fa-clock"></i> ${r.deliveryTime||''}</span></div></div>`;
+const rImg = r.image || r.logo || (r.menu.food && r.menu.food[0] && r.menu.food[0].image) || (r.menu.coffee && r.menu.coffee[0] && r.menu.coffee[0].image) || restaurantImages[0];
+const heroEl = document.getElementById('appExplorerRestHeader');
+heroEl.style.backgroundImage = rImg ? `url('${rImg}')` : '';
+const heroAddr = r.address ? `<div class="app-explorer-hero-addr"><i class="fas fa-map-marker-alt"></i><span>${r.address}</span></div>` : '';
+heroEl.innerHTML = `<div class="app-explorer-hero-info"><h2>${r.name}</h2><div class="app-explorer-hero-meta"><span><i class="fas fa-utensils"></i> ${r.cuisine||'Restaurant'}</span><span><i class="fas fa-star" style="color:#f59e0b;"></i> ${r.rating||'4.5'}</span><span><i class="fas fa-clock"></i> ${r.deliveryTime||'20 min'}</span></div>${heroAddr}</div>`;
 const active = r.activeCategories || allCategories;
 appExplorerCurrentCategory = active.includes('food') ? 'food' : active[0] || 'food';
 document.getElementById('appExplorerCatTabs').innerHTML = active.map(c => `<div class="app-explorer-cat-tab${c===appExplorerCurrentCategory?' active':''}" data-cat="${c}" onclick="appSelectExplorerCategory('${c}')">${categoryLabels[c] || c}</div>`).join('');
@@ -5587,8 +6015,6 @@ if (cartVisible) { cartVisible = false; document.getElementById('appCartWindow')
 window.scrollTo({ top: 0 });
 });
 }
-function appBackToRestaurants() { document.getElementById('appExplorerContainer').classList.remove('active'); document.getElementById('appHomeView').style.display = 'block'; document.getElementById('appMiniCartBar').classList.remove('visible'); currentRestaurant = null; window.scrollTo({ top: 0 }); refreshRestaurants().then(() => appRenderRestaurantList()); }
-
 function appRenderExplorerMenuItems() {
 if (!currentRestaurant || !restaurants[currentRestaurant]) return;
 const menu = restaurants[currentRestaurant].menu, div = document.getElementById('appExplorerMenuItems');
