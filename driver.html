@@ -1552,6 +1552,18 @@ return { latlngs: r.geometry.coordinates.map(c => [c[1], c[0]]), distance: typeo
 } catch (e) { return null; }
 }
 
+// Location line in the format: {name} location ({lat} Longitude {lng}) {address}
+function dpRestLocationText(r) {
+    if (!r) return '';
+    const lat = (r.lat !== undefined && r.lat !== null && r.lat !== '') ? Number(r.lat) : null;
+    const lng = (r.lng !== undefined && r.lng !== null && r.lng !== '') ? Number(r.lng) : null;
+    const hasCoords = lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng);
+    const parts = [`${r.name || 'Restaurant'} location`];
+    if (hasCoords) parts.push(`(${lat} Longitude ${lng})`);
+    if (r.address) parts.push(r.address);
+    return parts.join(' ');
+}
+
 function dpShowCustomerOnMap(orderId, opts = {}) {
 const useActiveMap = opts.useActiveMap !== false;
 const o = orders.find(x => x.id === orderId);
@@ -1579,7 +1591,7 @@ const cl = document.getElementById('dpLegendCustomer');
 if (cl) cl.style.display = 'inline-flex';
 if (pickupLat != null && pickupLng != null) {
 const pkIco = L.divIcon({ html: `<div style="width:34px;height:34px;border-radius:50%;background:#8b5cf6;color:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.35);font-size:14px"><i class="fas fa-store"></i></div>`, className: '', iconSize: [34, 34], iconAnchor: [17, 17] });
-dpPickupMarker = L.marker([pickupLat, pickupLng], { icon: pkIco }).addTo(map).bindPopup(`<b>🏪 ${rest.name || 'Restaurant'}</b>`);
+dpPickupMarker = L.marker([pickupLat, pickupLng], { icon: pkIco }).addTo(map).bindPopup(`<b>🏪 ${rest.name || 'Restaurant'}</b><br>${dpRestLocationText(rest)}`);
 const pl = document.getElementById('dpLegendPickup');
 if (pl) pl.style.display = 'inline-flex';
 }

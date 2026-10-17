@@ -497,6 +497,9 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-card_image_view { width: 100%; height: 160px; object-fit: cover; border-radius: 12px; }
 .app-card_heading { font-size: 1.1rem; font-weight: 700; color: var(--text); }
 .app-card_description { font-size: 0.9rem; color: var(--gray); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.app-card_location { display: flex; align-items: flex-start; gap: 5px; font-size: 0.78rem; color: #64748b; line-height: 1.4; margin-top: 3px; }
+.app-card_location i { margin-top: 2px; flex-shrink: 0; color: var(--primary); font-size: 0.7rem; }
+.app-card_location span { min-width: 0; overflow-wrap: anywhere; }
 .app-bottom-div { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
 .app-restaurant-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 .app-restaurant-rating { display: flex; align-items: center; gap: 4px; font-size: 0.8rem; color: var(--gray); }
@@ -660,6 +663,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-card_image_view { height: 120px; border-radius: 14px 14px 0 0; }
 .app-card_heading { font-size: 0.9rem; font-weight: 700; line-height: 1.2; margin-bottom: 2px; }
 .app-card_description { font-size: 0.72rem; color: #888; line-height: 1.3; }
+.app-card_location { font-size: 0.68rem; color: #8a94a6; line-height: 1.35; }
 .app-restaurant-meta { gap: 4px; }
 .app-restaurant-rating { font-size: 0.7rem; }
 .app-restaurant-delivery-time { font-size: 0.68rem; }
@@ -727,6 +731,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
 .app-card_heading { font-size: 0.85rem; }
 .app-card_description { font-size: 0.7rem; }
+.app-card_location { font-size: 0.65rem; }
 .app-restaurant-meta { flex-direction: row; align-items: center; gap: 6px; }
 .app-restaurant-delivery-info { flex-direction: row; gap: 6px; }
 /* Bottom navbar compact */
@@ -4666,7 +4671,7 @@ const cl = document.getElementById('dpLegendCustomer');
 if (cl) cl.style.display = 'inline-flex';
 if (pickupLat != null && pickupLng != null) {
 const pkIco = L.divIcon({ html: `<div style="width:34px;height:34px;border-radius:50%;background:#8b5cf6;color:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.35);font-size:14px"><i class="fas fa-store"></i></div>`, className: '', iconSize: [34, 34], iconAnchor: [17, 17] });
-dpPickupMarker = L.marker([pickupLat, pickupLng], { icon: pkIco }).addTo(map).bindPopup(`<b>🏪 ${rest.name || 'Restaurant'}</b>`);
+dpPickupMarker = L.marker([pickupLat, pickupLng], { icon: pkIco }).addTo(map).bindPopup(`<b>🏪 ${rest.name || 'Restaurant'}</b><br>${appRestLocationText(rest)}`);
 const pl = document.getElementById('dpLegendPickup');
 if (pl) pl.style.display = 'inline-flex';
 }
@@ -5932,7 +5937,7 @@ appMarkers = [];
 Object.keys(restaurantsToShow).forEach((key) => {
 const r = restaurantsToShow[key], lat = r.lat || 9.56, lng = r.lng || 44.065;
 const distance = customerLocation ? appCalculateDistance(customerLocation.lat, customerLocation.lng, lat, lng).toFixed(1) : null;
-const popupContent = `<div style="min-width:200px;"><h4 style="margin:0 0 6px;color:#22c55e;">${r.name}</h4><p style="margin:0 0 4px;font-size:0.9rem;">${r.cuisine || ''}</p><p style="margin:0 0 6px;font-size:0.8rem;color:#555;">${r.address || ''}</p><div><span style="background:#22c55e;color:#fff;padding:2px 10px;border-radius:20px;font-size:0.75rem;"><i class="fa fa-star"></i> ${r.rating || '4.5'}</span>${distance ? `<span style="margin-left:8px;background:#dbeafe;color:#1e40af;padding:2px 10px;border-radius:20px;font-size:0.75rem;"><i class="fa fa-location-arrow"></i> ${distance} km</span>` : ''}</div><button style="margin-top:8px;background:#22c55e;color:#fff;border:none;padding:4px 12px;border-radius:30px;cursor:pointer;" onclick="appOpenRestaurantMenu('${key}')">View Menu</button></div>`;
+const popupContent = `<div style="min-width:200px;"><h4 style="margin:0 0 6px;color:#22c55e;">${r.name}</h4><p style="margin:0 0 4px;font-size:0.9rem;">${r.cuisine || ''}</p><p style="margin:0 0 6px;font-size:0.8rem;color:#555;">${appRestLocationText(r) || '-'}</p><div><span style="background:#22c55e;color:#fff;padding:2px 10px;border-radius:20px;font-size:0.75rem;"><i class="fa fa-star"></i> ${r.rating || '4.5'}</span>${distance ? `<span style="margin-left:8px;background:#dbeafe;color:#1e40af;padding:2px 10px;border-radius:20px;font-size:0.75rem;"><i class="fa fa-location-arrow"></i> ${distance} km</span>` : ''}</div><button style="margin-top:8px;background:#22c55e;color:#fff;border:none;padding:4px 12px;border-radius:30px;cursor:pointer;" onclick="appOpenRestaurantMenu('${key}')">View Menu</button></div>`;
 const marker = L.marker([lat, lng]).addTo(appMap).bindPopup(popupContent, { maxWidth: 300 });
 marker.on('click', function() { highlightRestaurantCard(key); });
 appMarkers.push(marker);
@@ -5955,6 +5960,18 @@ const card = document.querySelector(`.app-card[data-key="${key}"]`);
 if (card) { card.style.borderColor = 'var(--primary)'; card.style.transform = 'scale(1.02)'; card.style.boxShadow = '0 12px 28px rgba(34,197,94,0.2)'; card.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => { card.style.transform = ''; card.style.boxShadow = ''; }, 3000); }
 }
 
+// Location line in the format: {name} location ({lat} Longitude {lng}) {address}
+function appRestLocationText(r) {
+if (!r) return '';
+const lat = (r.lat !== undefined && r.lat !== null && r.lat !== '') ? Number(r.lat) : null;
+const lng = (r.lng !== undefined && r.lng !== null && r.lng !== '') ? Number(r.lng) : null;
+const hasCoords = lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng);
+const parts = [`${r.name || 'Restaurant'} location`];
+if (hasCoords) parts.push(`(${lat} Longitude ${lng})`);
+if (r.address) parts.push(r.address);
+return parts.join(' ');
+}
+
 function appRenderRestaurantList() {
 if (!document.getElementById('appHomeView').classList.contains('active')) return;
 const listContainer = document.getElementById('appRestaurantList');
@@ -5969,7 +5986,8 @@ const distance = customerLocation ? appCalculateDistance(customerLocation.lat, c
 const card = document.createElement('div');
 card.className = 'app-card';
 card.setAttribute('data-key', key);
-card.innerHTML = `<div class="app-card_inner"><img src="${img}" alt="${r.name}" class="app-card_image_view" loading="lazy" /><div><div class="app-card_heading">${r.name}</div><div class="app-card_description">${r.cuisine || 'Restaurant'} • ${r.address || ''}</div><div class="app-restaurant-meta"><div class="app-restaurant-rating"><i class="fa fa-star"></i> ${r.rating || '4.5'}</div><div class="app-restaurant-delivery-info"><span class="app-restaurant-delivery-time"><i class="fa fa-clock"></i> ${r.deliveryTime || '20 min'}</span>${distance ? `<span class="app-restaurant-distance"><i class="fa fa-location-arrow"></i> ${distance} km</span>` : ''}</div></div></div></div>`;
+const cardLoc = appRestLocationText(r);
+card.innerHTML = `<div class="app-card_inner"><img src="${img}" alt="${r.name}" class="app-card_image_view" loading="lazy" /><div><div class="app-card_heading">${r.name}</div><div class="app-card_description">${r.cuisine || 'Restaurant'}</div>${cardLoc ? `<div class="app-card_location" title="${cardLoc}"><i class="fas fa-map-marker-alt"></i><span>${cardLoc}</span></div>` : ''}<div class="app-restaurant-meta"><div class="app-restaurant-rating"><i class="fa fa-star"></i> ${r.rating || '4.5'}</div><div class="app-restaurant-delivery-info"><span class="app-restaurant-delivery-time"><i class="fa fa-clock"></i> ${r.deliveryTime || '20 min'}</span>${distance ? `<span class="app-restaurant-distance"><i class="fa fa-location-arrow"></i> ${distance} km</span>` : ''}</div></div></div></div>`;
 card.addEventListener('click', () => appOpenRestaurantMenu(key));
 listContainer.appendChild(card);
 });
@@ -6008,9 +6026,8 @@ heroEl.style.backgroundImage = rImg ? `url('${rImg}')` : '';
 const rLat = (r.lat !== undefined && r.lat !== null && r.lat !== '') ? Number(r.lat) : null;
 const rLng = (r.lng !== undefined && r.lng !== null && r.lng !== '') ? Number(r.lng) : null;
 const hasCoords = rLat !== null && rLng !== null && !isNaN(rLat) && !isNaN(rLng);
-const coordsTxt = hasCoords ? `${rLat} Longitude ${rLng}` : '';
-const locName = r.name || 'Restaurant';
-const locLine = (hasCoords || r.address) ? `<div class="app-explorer-hero-addr"><i class="fas fa-map-marker-alt"></i><span>${locName} location${hasCoords ? ` (${coordsTxt})` : ''}${r.address ? ` ${r.address}` : ''}</span></div>` : '';
+const locTxt = appRestLocationText(r);
+const locLine = locTxt ? `<div class="app-explorer-hero-addr"><i class="fas fa-map-marker-alt"></i><span>${locTxt}</span></div>` : '';
 const mapsUrl = hasCoords ? `https://www.google.com/maps?q=${rLat},${rLng}` : '';
 const heroInner = `<div class="app-explorer-hero-info"><h2>${r.name}</h2><div class="app-explorer-hero-meta"><span><i class="fas fa-utensils"></i> ${r.cuisine||'Restaurant'}</span><span><i class="fas fa-star" style="color:#f59e0b;"></i> ${r.rating||'4.5'}</span><span><i class="fas fa-clock"></i> ${r.deliveryTime||'20 min'}</span></div>${locLine}${mapsUrl ? `<a class="app-explorer-hero-map" href="${mapsUrl}" target="_blank" rel="noopener"><i class="fas fa-directions"></i> Open in Maps</a>` : ''}</div>`;
 heroEl.innerHTML = heroInner;
