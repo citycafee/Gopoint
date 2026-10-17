@@ -6006,14 +6006,11 @@ const card = document.querySelector(`.app-card[data-key="${key}"]`);
 if (card) { card.style.borderColor = 'var(--primary)'; card.style.transform = 'scale(1.02)'; card.style.boxShadow = '0 12px 28px rgba(34,197,94,0.2)'; card.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => { card.style.transform = ''; card.style.boxShadow = ''; }, 3000); }
 }
 
-// Location line in the format: {name} location ({lat} Longitude {lng}) {address}
+// Location line in the format: {name} location {address} — coordinates are kept
+// off the visible text but still used for the maps link.
 function appRestLocationText(r) {
 if (!r) return '';
-const lat = (r.lat !== undefined && r.lat !== null && r.lat !== '') ? Number(r.lat) : null;
-const lng = (r.lng !== undefined && r.lng !== null && r.lng !== '') ? Number(r.lng) : null;
-const hasCoords = lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng);
 const parts = [`${r.name || 'Restaurant'} location`];
-if (hasCoords) parts.push(`(${lat} Longitude ${lng})`);
 if (r.address) parts.push(r.address);
 return parts.join(' ');
 }

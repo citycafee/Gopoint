@@ -1552,14 +1552,10 @@ return { latlngs: r.geometry.coordinates.map(c => [c[1], c[0]]), distance: typeo
 } catch (e) { return null; }
 }
 
-// Location line in the format: {name} location ({lat} Longitude {lng}) {address}
+// Location line in the format: {name} location {address}
 function dpRestLocationText(r) {
     if (!r) return '';
-    const lat = (r.lat !== undefined && r.lat !== null && r.lat !== '') ? Number(r.lat) : null;
-    const lng = (r.lng !== undefined && r.lng !== null && r.lng !== '') ? Number(r.lng) : null;
-    const hasCoords = lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng);
     const parts = [`${r.name || 'Restaurant'} location`];
-    if (hasCoords) parts.push(`(${lat} Longitude ${lng})`);
     if (r.address) parts.push(r.address);
     return parts.join(' ');
 }
