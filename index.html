@@ -2946,9 +2946,9 @@ Gmail
 <div class="pf-modal-overlay" id="pfPasswordModal">
 <div class="pf-modal-card">
 <button class="pf-modal-close" onclick="pfCloseChangePassword()">×</button>
-<div class="pf-modal-title">Change Password</div>
-<div class="pf-modal-sub">Confirm your current password, then choose a new one.</div>
-<div class="pf-form-group"><label>Current Password</label><input type="password" id="pfCurPassword" placeholder="Enter current password"></div>
+<div class="pf-modal-title" id="pfPwTitle">Change Password</div>
+<div class="pf-modal-sub" id="pfPwSub">Confirm your current password, then choose a new one.</div>
+<div class="pf-form-group" id="pfCurPasswordGroup"><label>Current Password</label><input type="password" id="pfCurPassword" placeholder="Enter current password"></div>
 <div class="pf-form-group"><label>New Password</label><input type="password" id="pfNewPassword" placeholder="At least 6 characters"></div>
 <div class="pf-form-group"><label>Confirm New Password</label><input type="password" id="pfConfPassword" placeholder="Repeat new password"></div>
 <div class="pf-modal-error" id="pfPwError"></div>
@@ -3830,6 +3830,19 @@ sb.auth.onAuthStateChange((event, session) => {
           currentUser.created = prof.registered_at || prof.created_at || parsed.created;
           localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
         }
+      } else if (supaConnected) {
+        // WhatsApp / email accounts aren't in `profiles` — pull their saved
+        // record from the cloud so profile edits survive a storage wipe.
+        try {
+          const remote = await appFindRemoteUser(parsed.email || parsed.phone);
+          if (remote) {
+            currentUser.name = remote.name || parsed.name;
+            currentUser.phone = remote.phone || parsed.phone;
+            currentUser.email = remote.email || parsed.email;
+            currentUser.address = remote.address || parsed.address || '';
+            localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
+          }
+        } catch (_) {}
       }
       goToMarketplace();
     } catch (e) { localStorage.removeItem('gopoint_user'); }
@@ -5139,13 +5152,13 @@ const qPhone = appNormalizePhone(id);
 const rows = [];
 try {
 const { data, error } = await sb.from('app_users').select('*');
-if (!error && data) data.forEach(r => rows.push({ _key: r.id, name: r.full_name || '', phone: r.phone || '', email: r.email || '', provider: r.provider || '', password: r.password || '', created: r.created_at }));
+if (!error && data) data.forEach(r => rows.push({ _key: r.id, name: r.full_name || '', phone: r.phone || '', email: r.email || '', address: r.address || '', provider: r.provider || '', password: r.password || '', created: r.created_at }));
 } catch (_) {}
 try {
 const { data, error } = await sb.from('settings').select('*').like('key', 'usr:%');
 if (!error && data) data.forEach(r => {
 const v = r.value || {};
-rows.push({ _key: String(r.key).slice(4), name: v.name || '', phone: v.phone || '', email: v.email || '', provider: v.provider || '', password: v.password || '', created: v.created || r.updated_at });
+rows.push({ _key: String(r.key).slice(4), name: v.name || '', phone: v.phone || '', email: v.email || '', address: v.address || '', provider: v.provider || '', password: v.password || '', created: v.created || r.updated_at });
 });
 } catch (_) {}
 return rows.find(u => appMatchUser(u, q, qPhone)) || null;
@@ -5381,10 +5394,10 @@ function syncUserRecord(user) {
     const k = Object.keys(reg).find(kk => kk.toLowerCase() === id) || (user.email && Object.keys(reg).find(kk => reg[kk].email === user.email)) || (user.phone && Object.keys(reg).find(kk => reg[kk].phone === user.phone));
     if (k && reg[k].password) localPw = reg[k].password;
   } catch (_) {}
-  const rec = { id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', provider: user.provider || '', password: user.password || localPw || '' };
+  const rec = { id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '', provider: user.provider || '', password: user.password || localPw || '' };
   if (supaConnected) {
     sb.from('app_users').upsert(rec, { onConflict: 'id' }).then(() => {}).catch(() => {});
-    const uVal = { name: rec.full_name, phone: rec.phone, email: rec.email, provider: rec.provider, password: rec.password, created: user.created || user.registeredAt || new Date().toISOString() };
+    const uVal = { name: rec.full_name, phone: rec.phone, email: rec.email, address: rec.address, provider: rec.provider, password: rec.password, created: user.created || user.registeredAt || new Date().toISOString() };
     const uKey = 'usr:' + id;
     sb.from('settings').select('key').eq('key', uKey)
       .then(({ data }) => (data && data.length
@@ -5587,12 +5600,53 @@ window.open('https://wa.me/' + c.phone + '?text=' + encodeURIComponent(msg), '_b
 pfCloseSupport();
 }
 
-function pfOpenChangePassword() {
+let pfAccountHasPassword = true;
+
+// Resolve the stored plaintext password for the signed-in account, checking the
+// local registry, the in-memory user, then the cloud (settings/usr:<id> rows).
+async function pfResolveStoredPassword() {
+let stored = '';
+try {
+const reg = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+const k = Object.keys(reg).find(kk => (currentUser.email && reg[kk].email === currentUser.email)
+|| (currentUser.phone && reg[kk].phone && appNormalizePhone(reg[kk].phone) === appNormalizePhone(currentUser.phone))
+|| kk === String(currentUser.phone || currentUser.email || '').toLowerCase());
+if (k && reg[k].password) stored = reg[k].password;
+} catch (_) {}
+if (!stored) stored = currentUser.password || '';
+if (!stored && supaConnected) {
+try { const r = await appFindRemoteUser(currentUser.email || currentUser.phone); if (r && r.password) stored = r.password; } catch (_) {}
+}
+return stored;
+}
+
+async function pfOpenChangePassword() {
 if (!currentUser) { showAppToast('⚠️ Please sign in first'); return; }
 ['pfCurPassword', 'pfNewPassword', 'pfConfPassword'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
 pfShowPwError('');
 document.getElementById('pfPasswordModal').classList.add('active');
-setTimeout(() => { const el = document.getElementById('pfCurPassword'); if (el) el.focus(); }, 120);
+const curGroup = document.getElementById('pfCurPasswordGroup');
+const titleEl = document.getElementById('pfPwTitle');
+const subEl = document.getElementById('pfPwSub');
+const btn = document.getElementById('pfPwSaveBtn');
+if (curGroup) curGroup.style.display = 'none';
+if (subEl) subEl.textContent = 'Checking your account…';
+pfAccountHasPassword = !!(await pfResolveStoredPassword());
+const provLabel = currentUser.provider === 'whatsapp' ? 'WhatsApp' : (currentUser.provider === 'google' ? 'Google' : 'this sign-in');
+if (pfAccountHasPassword) {
+// Password account — verify the old one first (unchanged behaviour).
+if (curGroup) curGroup.style.display = '';
+if (titleEl) titleEl.textContent = 'Change Password';
+if (subEl) subEl.textContent = 'Confirm your current password, then choose a new one.';
+if (btn) btn.textContent = 'Update Password';
+} else {
+// Social login (WhatsApp / Google) has no password yet — let them set one.
+if (curGroup) curGroup.style.display = 'none';
+if (titleEl) titleEl.textContent = 'Set Password';
+if (subEl) subEl.textContent = `You signed in with ${provLabel}, so there's no current password. Choose one now to secure your account.`;
+if (btn) btn.textContent = 'Set Password';
+}
+setTimeout(() => { const el = document.getElementById(pfAccountHasPassword ? 'pfCurPassword' : 'pfNewPassword'); if (el) el.focus(); }, 120);
 }
 
 function pfCloseChangePassword() { document.getElementById('pfPasswordModal').classList.remove('active'); }
@@ -5608,36 +5662,28 @@ async function pfChangePassword() {
 const cur = document.getElementById('pfCurPassword').value;
 const nw = document.getElementById('pfNewPassword').value;
 const cf = document.getElementById('pfConfPassword').value;
-if (!cur || !nw || !cf) { pfShowPwError('Please fill in all three fields.'); return; }
+const setMode = !pfAccountHasPassword; // social login → setting a password for the first time
+if (setMode ? (!nw || !cf) : (!cur || !nw || !cf)) { pfShowPwError(setMode ? 'Please fill in both fields.' : 'Please fill in all three fields.'); return; }
 if (nw.length < 6) { pfShowPwError('New password must be at least 6 characters.'); return; }
 if (nw !== cf) { pfShowPwError('New passwords do not match.'); return; }
 
 const btn = document.getElementById('pfPwSaveBtn');
-btn.disabled = true; btn.textContent = 'Verifying…';
+const resetLabel = setMode ? 'Set Password' : 'Update Password';
+btn.disabled = true; btn.textContent = setMode ? 'Setting…' : 'Verifying…';
 
-// Resolve the stored password: local registry first, then the cloud.
-let stored = '';
-try {
-const reg = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
-const k = Object.keys(reg).find(kk => (currentUser.email && reg[kk].email === currentUser.email)
-|| (currentUser.phone && reg[kk].phone && appNormalizePhone(reg[kk].phone) === appNormalizePhone(currentUser.phone))
-|| kk === String(currentUser.phone || currentUser.email || '').toLowerCase());
-if (k && reg[k].password) stored = reg[k].password;
-} catch (_) {}
-if (!stored) stored = currentUser.password || '';
-if (!stored && supaConnected) {
-try { const r = await appFindRemoteUser(currentUser.email || currentUser.phone); if (r && r.password) stored = r.password; } catch (_) {}
-}
-
+if (!setMode) {
+// Password account — the old password must match (unchanged behaviour).
+const stored = await pfResolveStoredPassword();
 if (!stored) {
-btn.disabled = false; btn.textContent = 'Update Password';
-pfShowPwError('This account signs in with Google, so it has no password to change.');
+btn.disabled = false; btn.textContent = resetLabel;
+pfShowPwError('This account has no password yet. Reopen this dialog to set one.');
 return;
 }
 if (stored !== cur) {
-btn.disabled = false; btn.textContent = 'Update Password';
+btn.disabled = false; btn.textContent = resetLabel;
 pfShowPwError('Your current password is incorrect.');
 return;
+}
 }
 
 btn.textContent = 'Saving…';
@@ -5652,10 +5698,10 @@ if (k) reg[k].password = nw;
 else if (currentUser.email || currentUser.phone) reg[String(currentUser.phone || currentUser.email).toLowerCase()] = { name: currentUser.name || '', username: currentUser.email ? currentUser.email.split('@')[0] : '', email: currentUser.email || '', phone: currentUser.phone || '', password: nw, provider: currentUser.provider || '' };
 localStorage.setItem('gopoint_users', JSON.stringify(reg));
 } catch (_) {}
-syncUserRecord(currentUser);
+syncUserRecord(currentUser); // persists the password to the cloud (settings/usr:<id>)
 
 btn.textContent = '✓ Updated';
-setTimeout(() => { pfCloseChangePassword(); btn.disabled = false; btn.textContent = 'Update Password'; showAppToast('🔒 Password changed successfully'); }, 700);
+setTimeout(() => { pfCloseChangePassword(); btn.disabled = false; btn.textContent = resetLabel; showAppToast(setMode ? '🔒 Password set — use it next time you sign in' : '🔒 Password changed successfully'); }, 700);
 }
 
 function pfConfirmLogout() { document.getElementById('pfLogoutModal').classList.add('active'); }
