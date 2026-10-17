@@ -541,6 +541,8 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-explorer-hero-meta span { display:flex; align-items:center; gap:5px; }
 .app-explorer-hero-addr { display:flex; align-items:flex-start; gap:7px; font-size:0.82rem; color:rgba(255,255,255,.88); line-height:1.45; text-shadow:0 1px 6px rgba(0,0,0,.45); max-width:640px; }
 .app-explorer-hero-addr i { margin-top:3px; flex-shrink:0; }
+.app-explorer-hero-map { display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:7px 14px; border-radius:20px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.32); color:#fff; font-size:0.78rem; font-weight:600; text-decoration:none; backdrop-filter:blur(6px); transition:background .2s; }
+.app-explorer-hero-map:hover { background:rgba(255,255,255,.32); }
 .app-explorer-cat-tabs { display:flex; gap:8px; overflow-x:auto; padding:4px 0 14px; scrollbar-width:none; }
 .app-explorer-cat-tabs::-webkit-scrollbar { display:none; }
 .app-explorer-cat-tab { padding:7px 18px; border-radius:20px; border:2px solid #e5e7eb; background:white; font-weight:600; font-size:0.85rem; cursor:pointer; white-space:nowrap; transition:all 0.2s; color:#555; }
@@ -6003,8 +6005,15 @@ const r = restaurants[key]; if (!r) return;
 const rImg = r.image || r.logo || (r.menu.food && r.menu.food[0] && r.menu.food[0].image) || (r.menu.coffee && r.menu.coffee[0] && r.menu.coffee[0].image) || restaurantImages[0];
 const heroEl = document.getElementById('appExplorerRestHeader');
 heroEl.style.backgroundImage = rImg ? `url('${rImg}')` : '';
-const heroAddr = r.address ? `<div class="app-explorer-hero-addr"><i class="fas fa-map-marker-alt"></i><span>${r.address}</span></div>` : '';
-heroEl.innerHTML = `<div class="app-explorer-hero-info"><h2>${r.name}</h2><div class="app-explorer-hero-meta"><span><i class="fas fa-utensils"></i> ${r.cuisine||'Restaurant'}</span><span><i class="fas fa-star" style="color:#f59e0b;"></i> ${r.rating||'4.5'}</span><span><i class="fas fa-clock"></i> ${r.deliveryTime||'20 min'}</span></div>${heroAddr}</div>`;
+const rLat = (r.lat !== undefined && r.lat !== null && r.lat !== '') ? Number(r.lat) : null;
+const rLng = (r.lng !== undefined && r.lng !== null && r.lng !== '') ? Number(r.lng) : null;
+const hasCoords = rLat !== null && rLng !== null && !isNaN(rLat) && !isNaN(rLng);
+const coordsTxt = hasCoords ? `${rLat} Longitude ${rLng}` : '';
+const locName = r.name || 'Restaurant';
+const locLine = (hasCoords || r.address) ? `<div class="app-explorer-hero-addr"><i class="fas fa-map-marker-alt"></i><span>${locName} location${hasCoords ? ` (${coordsTxt})` : ''}${r.address ? ` ${r.address}` : ''}</span></div>` : '';
+const mapsUrl = hasCoords ? `https://www.google.com/maps?q=${rLat},${rLng}` : '';
+const heroInner = `<div class="app-explorer-hero-info"><h2>${r.name}</h2><div class="app-explorer-hero-meta"><span><i class="fas fa-utensils"></i> ${r.cuisine||'Restaurant'}</span><span><i class="fas fa-star" style="color:#f59e0b;"></i> ${r.rating||'4.5'}</span><span><i class="fas fa-clock"></i> ${r.deliveryTime||'20 min'}</span></div>${locLine}${mapsUrl ? `<a class="app-explorer-hero-map" href="${mapsUrl}" target="_blank" rel="noopener"><i class="fas fa-directions"></i> Open in Maps</a>` : ''}</div>`;
+heroEl.innerHTML = heroInner;
 const active = r.activeCategories || allCategories;
 appExplorerCurrentCategory = active.includes('food') ? 'food' : active[0] || 'food';
 document.getElementById('appExplorerCatTabs').innerHTML = active.map(c => `<div class="app-explorer-cat-tab${c===appExplorerCurrentCategory?' active':''}" data-cat="${c}" onclick="appSelectExplorerCategory('${c}')">${categoryLabels[c] || c}</div>`).join('');
