@@ -5856,6 +5856,76 @@ showAppToast('⚠️ Location permission denied');
 }, { enableHighAccuracy: true, timeout: 10000 });
 }
 
+// Awaited, verified cloud sync for the profile editor.
+// `prevKey` is the settings/usr: key from before the edit, so a changed
+// phone/email moves the record instead of orphaning the old one.
+// Returns { ok, error } — never throws.
+async function pfSyncProfileToCloud(prevKey) {
+  if (!supaConnected) return { ok: true, error: '', offline: true };
+  const id = String(currentUser.phone || currentUser.email || '').toLowerCase();
+  if (!id) return { ok: true, error: '' };
+
+  // Reuse the existing password if the in-memory user has none yet.
+  let localPw = '';
+  try {
+    const reg = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+    const k = Object.keys(reg).find(kk => kk.toLowerCase() === id)
+      || (currentUser.email && Object.keys(reg).find(kk => reg[kk].email === currentUser.email))
+      || (currentUser.phone && Object.keys(reg).find(kk => reg[kk].phone === currentUser.phone));
+    if (k && reg[k].password) localPw = reg[k].password;
+  } catch (_) {}
+
+  const now = new Date().toISOString();
+  const uVal = {
+    name: currentUser.name || '',
+    phone: currentUser.phone || '',
+    email: currentUser.email || '',
+    address: currentUser.address || '',
+    provider: currentUser.provider || '',
+    password: currentUser.password || localPw || '',
+    created: currentUser.created || currentUser.registeredAt || now
+  };
+  const errors = [];
+
+  // 1) `profiles` — Google/UUID accounts only. Non-fatal if it fails.
+  if (currentUser.id) {
+    try {
+      const { error } = await sb.from('profiles').upsert(
+        { id: currentUser.id, full_name: uVal.name, phone: uVal.phone, email: uVal.email, address: uVal.address },
+        { onConflict: 'id' });
+      if (error) errors.push(error.message);
+    } catch (e) { errors.push(String((e && e.message) || e)); }
+  }
+
+  // 2) `settings` / usr:<id> — the canonical record for WhatsApp & email accounts.
+  //    NOTE: RLS blocks DELETE for the anon key (it returns 204 but removes
+  //    nothing), so a changed phone/email is handled by re-pointing the old
+  //    row at the new identity instead of deleting it. That way both the old
+  //    and new identifiers keep resolving to the same up-to-date record.
+  try {
+    const uKey = 'usr:' + id;
+    const { data, error: serr } = await sb.from('settings').select('key').eq('key', uKey);
+    if (serr) throw serr;
+    const { error: werr } = (data && data.length)
+      ? await sb.from('settings').update({ value: uVal, updated_at: now }).eq('key', uKey)
+      : await sb.from('settings').insert({ key: uKey, value: uVal, updated_at: now });
+    if (werr) throw werr;
+
+    // Repoint the pre-edit key so an old phone/email still finds this record.
+    const oldId = String(prevKey || '').replace(/^usr:/, '');
+    if (oldId && oldId !== id) {
+      const { data: odata, error: oerr } = await sb.from('settings').select('key').eq('key', prevKey);
+      if (oerr) throw oerr;
+      if (odata && odata.length) {
+        const { error: owerr } = await sb.from('settings').update({ value: { ...uVal, migratedTo: uKey }, updated_at: now }).eq('key', prevKey);
+        if (owerr) throw owerr;
+      }
+    }
+  } catch (e) { errors.push(String((e && e.message) || e)); }
+
+  return { ok: errors.length === 0, error: errors.join('; ') };
+}
+
 async function saveProfileFromModal() {
 const name = document.getElementById('pfEditName').value.trim();
 const phone = document.getElementById('pfEditPhone').value.trim();
@@ -5865,13 +5935,34 @@ if (!name) { showAppToast('⚠️ Name required'); return; }
 const saveBtn = document.querySelector('#pfEditModal .pf-modal-save');
 saveBtn.textContent = 'Saving...';
 saveBtn.disabled = true;
+// Cloud key as it was before this edit — used to migrate the record if the
+// phone/email (which key the usr: row) has changed.
+const prevKey = 'usr:' + String(currentUser.phone || currentUser.email || '').toLowerCase();
 currentUser.name = name;
 currentUser.phone = phone || currentUser.phone;
 currentUser.email = email || currentUser.email;
 currentUser.address = address;
 localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
-if (supaConnected && currentUser.id) { await sb.from('profiles').upsert({ id: currentUser.id, full_name: name, phone: phone || '', email: email || '', address: address || '' }, { onConflict: 'id' }); }
+// Keep the local sign-in registry in step so password sign-in still matches.
+try {
+const reg = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
+const lk = Object.keys(reg).find(kk => kk.toLowerCase() === prevKey.slice(4))
+|| (currentUser.email && Object.keys(reg).find(kk => reg[kk].email === currentUser.email))
+|| (currentUser.phone && Object.keys(reg).find(kk => reg[kk].phone && appNormalizePhone(reg[kk].phone) === appNormalizePhone(currentUser.phone)));
+if (lk) { reg[lk].name = name; reg[lk].email = currentUser.email; reg[lk].phone = currentUser.phone; reg[lk].address = address; localStorage.setItem('gopoint_users', JSON.stringify(reg)); }
+} catch (_) {}
+const res = await pfSyncProfileToCloud(prevKey);
+if (!res.ok) {
+// Local save succeeded, cloud did not — be honest about it.
 syncUserRecord(currentUser);
+updateUserUI();
+renderProfileView();
+saveBtn.textContent = 'Save Changes';
+saveBtn.disabled = false;
+showAppToast('⚠️ Saved on this device, but the database sync failed. Please try again.');
+console.error('saveProfileFromModal: cloud sync failed —', res.error);
+return;
+}
 saveBtn.textContent = '✓ Saved';
 saveBtn.style.background = '#16a34a';
 setTimeout(() => {
@@ -5881,7 +5972,7 @@ closeProfileEditModal();
 saveBtn.textContent = 'Save Changes';
 saveBtn.style.background = '';
 saveBtn.disabled = false;
-showAppToast('✅ Profile updated');
+showAppToast('✅ Profile updated & synced');
 setTimeout(() => {
       const rows = document.querySelectorAll('.pf-info-row');
       rows.forEach(r => { r.classList.remove('pf-row-saved'); void r.offsetWidth; r.classList.add('pf-row-saved'); setTimeout(() => r.classList.remove('pf-row-saved'), 1600); });
