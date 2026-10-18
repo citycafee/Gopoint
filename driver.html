@@ -970,10 +970,11 @@ async function dpSyncVehicleStatus() {
     if (data) {
       dpAdminDeactivated = data.status === 'unavailable';
       dpDriver.status = data.status;
-      dpDriver.lat = data.lat;
-      dpDriver.lng = data.lng;
+      // NOTE: lat/lng deliberately NOT synced here. The device's own GPS is the
+      // authority for where this driver is; the DB value is throttled and can be
+      // seconds stale, which used to yank the marker back to a wrong position.
       const vi = vehicles.find(v => v.id === dpDriver.id);
-      if (vi) { vi.status = data.status; vi.lat = data.lat; vi.lng = data.lng; }
+      if (vi) { vi.status = data.status; }
       return;
     }
   }
@@ -984,10 +985,8 @@ async function dpSyncVehicleStatus() {
       if (fresh) {
         dpAdminDeactivated = fresh.status === 'unavailable';
         dpDriver.status = fresh.status;
-        dpDriver.lat = fresh.lat;
-        dpDriver.lng = fresh.lng;
         const vi = vehicles.find(v => v.id === dpDriver.id);
-        if (vi) { vi.status = fresh.status; vi.lat = fresh.lat; vi.lng = fresh.lng; }
+        if (vi) { vi.status = fresh.status; }
       }
     }
   } catch (_) {}
@@ -1463,6 +1462,9 @@ dpRingGain = null;
 
 // ─── DRIVER MAP FUNCTIONS ───
 let dpLocPersistTimer = null;
+// True once the device GPS has reported at least once. Used so the order map
+// never overwrites a real position with a stale/seed coordinate from the DB.
+let dpHasLiveGps = false;
 function dpPersistDriverLocation(la, lo, force) {
   if (dpDriver) { dpDriver.lat = la; dpDriver.lng = lo; }
   const vi = vehicles.find(v => v.id === dpDriver?.id);
@@ -1489,6 +1491,7 @@ function dpStartLocationTracking() {
   dpLocationWatchId = navigator.geolocation.watchPosition(
     (p) => {
       const la = p.coords.latitude, lo = p.coords.longitude;
+      dpHasLiveGps = true;
       if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la, lo]);
       dpPersistDriverLocation(la, lo);
       if (dpActiveMap && !dpActiveOrderId) {
@@ -1532,6 +1535,7 @@ dpActiveDriverMarker = L.marker([la, lo], { icon: ico }).addTo(dpActiveMap);
   } else if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(p => {
       const la2 = p.coords.latitude, lo2 = p.coords.longitude;
+      dpHasLiveGps = true;
       if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la2, lo2]);
       if (dpActiveMap) dpActiveMap.setView([la2, lo2], 15);
       dpPersistDriverLocation(la2, lo2);
@@ -1565,7 +1569,9 @@ if (wrapEl) wrapEl.style.display = 'block';
 if (!dpActiveMap) dpInitActiveMap();
 if (!dpActiveMap) { setTimeout(() => dpShowCustomerOnMap(orderId, opts), 200); return; }
 map = dpActiveMap;
-if (dpActiveDriverMarker && driverLat != null && driverLng != null) dpActiveDriverMarker.setLatLng([driverLat, driverLng]);
+// Only seed the marker from stored coords when we have no live GPS fix yet —
+// otherwise this snaps the driver back to a stale position.
+if (dpActiveDriverMarker && !dpHasLiveGps && driverLat != null && driverLng != null) dpActiveDriverMarker.setLatLng([driverLat, driverLng]);
 dpClearRouteLayers(map);
 dpActiveOrderId = orderId;
 const custIco = L.divIcon({ html: `<div style="width:34px;height:34px;border-radius:50%;background:#ef4444;color:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.35);font-size:14px"><i class="fas fa-home"></i></div>`, className: '', iconSize: [34, 34], iconAnchor: [17, 17] });

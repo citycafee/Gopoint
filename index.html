@@ -3678,6 +3678,9 @@ let profileMiniMapInstance = null;
 // ─── GLOBAL DRIVER PORTAL VARIABLES ───
 let dpDriver = null, dpOnline = true, dpAdminDeactivated = false, dpRinging = new Set(), dpRingCtx = null, dpRingOsc = null, dpRingGain = null, dpRingInt = null, dpCurrentTab = 'incoming', dpHistoryFilter = 'all', dpEarningsFilter = 'all', dpDateFrom = null, dpDateTo = null;
 let dpActiveMap = null, dpActiveDriverMarker = null, dpCustomerMarker = null, dpPickupMarker = null, dpRouteLine = null, dpActiveMidLabel = null, dpActiveOrderId = null;
+// True once the device GPS has reported at least once. Stops the order map
+// overwriting a real position with a stale coordinate read from the DB.
+let dpHasLiveGps = false;
 let dpPickupToCustLabel = null;
 let dpCurrentCallOrderId = null;
 let dpPollInterval = null;
@@ -3790,6 +3793,15 @@ async function handleGoogleUser(u) {
       currentUser.created = prof.registered_at || prof.created_at || u.created_at;
       localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
     }
+    // `area` isn't a profiles column — it lives on the cloud account record.
+    try {
+      const remote = await appFindRemoteUser(u.email || '');
+      if (remote) {
+        currentUser.area = remote.area || '';
+        if (!currentUser.address) currentUser.address = remote.address || '';
+        localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
+      }
+    } catch (_) {}
   }
   syncUserRecord(currentUser);
   setTimeout(() => goToMarketplace(), 300);
@@ -4056,10 +4068,10 @@ async function dpSyncVehicleStatus() {
     if (data) {
       dpAdminDeactivated = data.status === 'unavailable';
       dpDriver.status = data.status;
-      dpDriver.lat = data.lat;
-      dpDriver.lng = data.lng;
+      // lat/lng deliberately NOT synced: the device GPS is the authority, and
+      // the stored DB value is throttled and can be seconds stale.
       const vi = vehicles.find(v => v.id === dpDriver.id);
-      if (vi) { vi.status = data.status; vi.lat = data.lat; vi.lng = data.lng; }
+      if (vi) { vi.status = data.status; }
       return;
     }
   }
@@ -4070,10 +4082,8 @@ async function dpSyncVehicleStatus() {
       if (fresh) {
         dpAdminDeactivated = fresh.status === 'unavailable';
         dpDriver.status = fresh.status;
-        dpDriver.lat = fresh.lat;
-        dpDriver.lng = fresh.lng;
         const vi = vehicles.find(v => v.id === dpDriver.id);
-        if (vi) { vi.status = fresh.status; vi.lat = fresh.lat; vi.lng = fresh.lng; }
+        if (vi) { vi.status = fresh.status; }
       }
     }
   } catch (_) {}
@@ -4615,6 +4625,7 @@ dpToast('✅ Location updated', 'success');
 }
 
 function dpUpdateDriverPosition(lat, lng) {
+dpHasLiveGps = true;
 if (dpDriver) { dpDriver.lat = lat; dpDriver.lng = lng; }
 if (dpActiveDriverMarker) { dpActiveDriverMarker.setLatLng([lat, lng]); }
 if (dpActiveMap) { dpActiveMap.setView([lat, lng], dpActiveMap.getZoom()); }
@@ -4662,7 +4673,8 @@ if (wrapEl) wrapEl.style.display = 'block';
 if (!dpActiveMap) dpInitActiveMap();
 if (!dpActiveMap) { setTimeout(() => dpShowCustomerOnMap(orderId, opts), 200); return; }
 map = dpActiveMap;
-if (dpActiveDriverMarker && driverLat != null && driverLng != null) dpActiveDriverMarker.setLatLng([driverLat, driverLng]);
+// Only seed the marker from stored coords when we have no live GPS fix yet.
+if (dpActiveDriverMarker && !dpHasLiveGps && driverLat != null && driverLng != null) dpActiveDriverMarker.setLatLng([driverLat, driverLng]);
 dpClearRouteLayers(map);
 dpActiveOrderId = orderId;
 const custIco = L.divIcon({ html: `<div style="width:34px;height:34px;border-radius:50%;background:#ef4444;color:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.35);font-size:14px"><i class="fas fa-home"></i></div>`, className: '', iconSize: [34, 34], iconAnchor: [17, 17] });
@@ -5131,13 +5143,13 @@ const qPhone = appNormalizePhone(id);
 const rows = [];
 try {
 const { data, error } = await sb.from('app_users').select('*');
-if (!error && data) data.forEach(r => rows.push({ _key: r.id, name: r.full_name || '', phone: r.phone || '', email: r.email || '', address: r.address || '', provider: r.provider || '', password: r.password || '', created: r.created_at }));
+if (!error && data) data.forEach(r => rows.push({ _key: r.id, name: r.full_name || '', phone: r.phone || '', email: r.email || '', address: r.address || '', area: r.area || '', provider: r.provider || '', password: r.password || '', created: r.created_at }));
 } catch (_) {}
 try {
 const { data, error } = await sb.from('settings').select('*').like('key', 'usr:%');
 if (!error && data) data.forEach(r => {
 const v = r.value || {};
-rows.push({ _key: String(r.key).slice(4), name: v.name || '', phone: v.phone || '', email: v.email || '', address: v.address || '', provider: v.provider || '', password: v.password || '', created: v.created || r.updated_at });
+rows.push({ _key: String(r.key).slice(4), name: v.name || '', phone: v.phone || '', email: v.email || '', address: v.address || '', area: v.area || '', provider: v.provider || '', password: v.password || '', created: v.created || r.updated_at });
 });
 } catch (_) {}
 return rows.find(u => appMatchUser(u, q, qPhone)) || null;
@@ -5373,10 +5385,10 @@ function syncUserRecord(user) {
     const k = Object.keys(reg).find(kk => kk.toLowerCase() === id) || (user.email && Object.keys(reg).find(kk => reg[kk].email === user.email)) || (user.phone && Object.keys(reg).find(kk => reg[kk].phone === user.phone));
     if (k && reg[k].password) localPw = reg[k].password;
   } catch (_) {}
-  const rec = { id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '', provider: user.provider || '', password: user.password || localPw || '' };
+  const rec = { id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '', area: user.area || '', provider: user.provider || '', password: user.password || localPw || '' };
   if (supaConnected) {
     sb.from('app_users').upsert(rec, { onConflict: 'id' }).then(() => {}).catch(() => {});
-    const uVal = { name: rec.full_name, phone: rec.phone, email: rec.email, address: rec.address, provider: rec.provider, password: rec.password, created: user.created || user.registeredAt || new Date().toISOString() };
+    const uVal = { name: rec.full_name, phone: rec.phone, email: rec.email, address: rec.address, area: rec.area, provider: rec.provider, password: rec.password, created: user.created || user.registeredAt || new Date().toISOString() };
     const uKey = 'usr:' + id;
     sb.from('settings').select('key').eq('key', uKey)
       .then(({ data }) => (data && data.length
@@ -5386,7 +5398,30 @@ function syncUserRecord(user) {
   }
 }
 
-async function completeLogin(user) { currentUser = user; if (!user.created && !user.registeredAt) { const existing = localStorage.getItem('gopoint_user'); const parsed = existing ? JSON.parse(existing) : null; user.created = parsed?.created || new Date().toISOString(); } localStorage.setItem('gopoint_user', JSON.stringify(user)); syncUserRecord(user); if (supaConnected && user.id) { await sb.from('profiles').upsert({ id: user.id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '', registered_at: user.created }, { onConflict: 'id' }); } closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500); }
+async function completeLogin(user) {
+  // Social logins (WhatsApp / Google) start from a thin object built by the
+  // sign-in form. Pull back whatever this account already saved to the cloud
+  // so edited details survive signing out and signing in again.
+  if (supaConnected && !user.id) {
+    try {
+      const remote = await appFindRemoteUser(user.email || user.phone);
+      if (remote) {
+        user.name = user.name || remote.name || '';
+        user.email = user.email || remote.email || '';
+        user.address = remote.address || '';
+        user.area = remote.area || '';
+        user.password = user.password || remote.password || '';
+        user.created = remote.created || user.created;
+      }
+    } catch (_) {}
+  }
+  currentUser = user;
+  if (!user.created && !user.registeredAt) { const existing = localStorage.getItem('gopoint_user'); const parsed = existing ? JSON.parse(existing) : null; user.created = parsed?.created || new Date().toISOString(); }
+  localStorage.setItem('gopoint_user', JSON.stringify(user));
+  syncUserRecord(user);
+  if (supaConnected && user.id) { await sb.from('profiles').upsert({ id: user.id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '', registered_at: user.created }, { onConflict: 'id' }); }
+  closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500);
+}
 function goToMarketplace() {
   // The application is locked until the customer allows location access.
   if (!fpHasAllowedLocation()) {
@@ -5881,6 +5916,7 @@ async function pfSyncProfileToCloud(prevKey) {
     phone: currentUser.phone || '',
     email: currentUser.email || '',
     address: currentUser.address || '',
+    area: currentUser.area || '',
     provider: currentUser.provider || '',
     password: currentUser.password || localPw || '',
     created: currentUser.created || currentUser.registeredAt || now
