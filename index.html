@@ -1876,7 +1876,7 @@ Gmail
 
 <div style="margin-bottom:14px;">
 <label style="display:block; font-size:13px; font-weight:600; color:#555; margin-bottom:6px;"><i class="fas fa-user" style="color:#6366f1; margin-right:4px;"></i> Username</label>
-<input type="text" class="fp-phone-input" id="fpAdminUsername" placeholder="Enter admin username" autocomplete="off" style="border:2px solid #e5e7eb; border-radius:14px; padding:14px; font-size:15px; width:100%; transition:all 0.2s ease;">
+<input type="text" class="fp-phone-input" id="fpAdminUsername" placeholder="Enter admin username or email" autocomplete="off" style="border:2px solid #e5e7eb; border-radius:14px; padding:14px; font-size:15px; width:100%; transition:all 0.2s ease;">
 </div>
 
 <div style="margin-bottom:20px;">
@@ -4918,19 +4918,28 @@ if (found) { completeLogin({ name: found.name || found.username, email: found.em
 else { showAppToast('⚠️ Invalid username or password'); }
 }
 
-function adminLoginFromModal() {
+async function adminLoginFromModal() {
 const u = document.getElementById('fpAdminUsername').value.trim();
 const p = document.getElementById('fpAdminPassword').value.trim();
 if (!u || !p) { showAppToast('⚠️ Please enter username and password'); return; }
-if (u === 'admin' && p === 'admin123') {
-// Mark admin as logged in, then go to the dedicated Admin Dashboard (/admin)
-localStorage.setItem('admin_auth', 'true');
+// Real Supabase Auth session instead of the old hardcoded admin/admin123
+// check + forgeable localStorage['admin_auth'] flag. Supabase Auth is
+// email-based, so a bare username maps to an email ("admin" →
+// "admin@gopoint.admin"). Admin rights come from the `admins` table.
+const email = u.includes('@') ? u : u.toLowerCase().replace(/[^a-z0-9._-]/g, '') + '@gopoint.admin';
+let user = null;
+try {
+const { data, error } = await sb.auth.signInWithPassword({ email, password: p });
+if (!error && data && data.session) {
+const { data: rows } = await sb.from('admins').select('user_id').eq('user_id', data.session.user.id).limit(1);
+if (rows && rows.length) user = data.session.user; else { try { await sb.auth.signOut(); } catch (_) {} }
+}
+} catch (_) {}
+if (!user) { showAppToast('⚠️ Invalid admin credentials'); return; }
 closeFrontLogin();
+// supabase-js stores the session per-origin, so /admin picks it up on redirect.
 const isLocal = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
 window.location.href = isLocal ? 'admin.html' : '/admin';
-} else {
-showAppToast('⚠️ Invalid admin credentials');
-}
 }
 
 const hargeisaDistricts = [
@@ -7506,7 +7515,7 @@ function restToast(msg) {
 
 function adLogout() {
 if (!confirm('Logout from Admin Dashboard?')) return;
-localStorage.removeItem('admin_auth');
+try { sb.auth.signOut(); } catch (_) {}
 document.getElementById('adminDashboard').classList.remove('active');
 document.getElementById('adminDashboard').style.display = '';
 document.getElementById('appContainer').classList.remove('active', 'driver-active');

@@ -394,8 +394,8 @@ transition: var(--transition);
 <h2>Admin Sign In</h2>
 <p class="ad-login-sub">Enter your credentials to access the Admin Dashboard</p>
 <div class="ad-login-field">
-<label><i class="fas fa-user"></i> Username</label>
-<input type="text" id="adLoginUsername" placeholder="Enter admin username" autocomplete="off">
+<label><i class="fas fa-user"></i> Username or Email</label>
+<input type="text" id="adLoginUsername" placeholder="Enter admin username or email" autocomplete="off">
 </div>
 <div class="ad-login-field">
 <label><i class="fas fa-lock"></i> Password</label>
@@ -1789,7 +1789,7 @@ function setSavePlatform() {
   adSaveData();
   adToast('Platform info updated!');
 }
-function adLogout() { if (!confirm('Logout from Admin Dashboard?')) return; localStorage.removeItem('admin_auth'); window.location.href = 'index.html'; }
+function adLogout() { if (!confirm('Logout from Admin Dashboard?')) return; try { sb.auth.signOut(); } catch (_) {} window.location.href = 'index.html'; }
 
 function adBackToHome() { document.getElementById('adminDashboard').classList.remove('active'); document.getElementById('adminDashboard').style.display = 'none'; window.location.href = 'index.html'; }
 
@@ -1814,12 +1814,46 @@ function adLoginShowError(msg) {
   err.classList.add('show');
 }
 
-function adLoginSubmit() {
+// ── Admin auth (Supabase Auth) ─────────────────────────────────────────
+// Replaces the old `u === 'admin' && p === 'admin123'` check plus the
+// forgeable localStorage['admin_auth'] flag. Auth is now a real Supabase
+// Auth session, and admin rights come from a row in the `admins` table —
+// so a valid login that isn't on that list still gets nothing.
+// Supabase Auth is email-based, so a bare username is mapped to an email
+// (keep typing "admin" — it becomes "admin@gopoint.admin").
+function adAuthEmail(u) { return u.includes('@') ? u : u.toLowerCase().replace(/[^a-z0-9._-]/g, '') + '@gopoint.admin'; }
+
+async function adSignIn(email, password) {
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error || !data || !data.session) return null;
+    const { data: rows } = await sb.from('admins').select('user_id').eq('user_id', data.session.user.id).limit(1);
+    if (!rows || !rows.length) { try { await sb.auth.signOut(); } catch (_) {} return null; }
+    return data.session.user;
+  } catch (_) { return null; }
+}
+
+// Returns the signed-in admin, or null. Used to restore the dashboard on load.
+async function adCurrentUser() {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session || !session.user) return null;
+    const { data: rows } = await sb.from('admins').select('user_id').eq('user_id', session.user.id).limit(1);
+    if (!rows || !rows.length) { try { await sb.auth.signOut(); } catch (_) {} return null; }
+    return session.user;
+  } catch (_) { return null; }
+}
+
+let adLoginBusy = false;
+async function adLoginSubmit() {
+  if (adLoginBusy) return;
   const u = document.getElementById('adLoginUsername').value.trim();
   const p = document.getElementById('adLoginPassword').value.trim();
   if (!u || !p) { adLoginShowError('⚠️ Please enter username and password'); return; }
-  if (u === 'admin' && p === 'admin123') {
-    localStorage.setItem('admin_auth', 'true');
+  adLoginBusy = true;
+  const user = await adSignIn(adAuthEmail(u), p);
+  adLoginBusy = false;
+  if (user) {
     document.getElementById('adLoginOverlay').classList.remove('active');
     document.body.style.overflow = '';
     document.getElementById('adLoginError').classList.remove('show');
@@ -2242,9 +2276,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     setInterval(() => { if (adCurrentTab === 'users' && typeof adLoadUsers === 'function') adLoadUsers(); }, 15000);
   }
 
-  // Show the Admin login popup unless already signed in
-  const adminAuth = localStorage.getItem('admin_auth');
-  if (adminAuth === 'true') {
+  // Show the Admin login popup unless an admin Supabase Auth session exists.
+  // Verified against the `admins` table on every load — the old
+  // localStorage['admin_auth'] flag was forgeable, so it is no longer read.
+  const adminUser = await adCurrentUser();
+  if (adminUser) {
     showAdminDashboard();
   } else {
     showAdminLogin();
