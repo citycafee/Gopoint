@@ -3783,7 +3783,7 @@ async function handleGoogleUser(u) {
   localStorage.setItem('gopoint_user', JSON.stringify(googleUser));
   localStorage.setItem('gopoint_loc_permitted', '1');
   if (supaConnected && u.id) {
-    await sb.from('profiles').upsert({ id: u.id, full_name: googleUser.name, phone: googleUser.phone, email: googleUser.email, registered_at: u.created_at }, { onConflict: 'id' });
+    await sb.from('profiles').upsert({ id: u.id, full_name: googleUser.name, phone: googleUser.phone, email: googleUser.email }, { onConflict: 'id' });
     const { data: prof } = await sb.from('profiles').select('*').eq('id', u.id).single();
     if (prof) {
       currentUser.name = prof.full_name || googleUser.name;
@@ -5419,7 +5419,7 @@ async function completeLogin(user) {
   if (!user.created && !user.registeredAt) { const existing = localStorage.getItem('gopoint_user'); const parsed = existing ? JSON.parse(existing) : null; user.created = parsed?.created || new Date().toISOString(); }
   localStorage.setItem('gopoint_user', JSON.stringify(user));
   syncUserRecord(user);
-  if (supaConnected && user.id) { await sb.from('profiles').upsert({ id: user.id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '', registered_at: user.created }, { onConflict: 'id' }); }
+  if (supaConnected && user.id) { await sb.from('profiles').upsert({ id: user.id, full_name: user.name || '', phone: user.phone || '', email: user.email || '', address: user.address || '' }, { onConflict: 'id' }); }
   closeFrontLogin(); showAppToast('✅ Welcome, ' + user.name + '!'); setTimeout(() => goToMarketplace(), 500);
 }
 function goToMarketplace() {
