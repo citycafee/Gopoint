@@ -11,6 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Go!point Driver" />
 <link rel="manifest" href="manifest.json" />
 <link rel="icon" href="favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="48x48" href="favicon.png" />
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <title>Go!point — Driver Portal</title>
@@ -296,6 +297,95 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 .app-sync-dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; display: inline-block; animation: pulse-dot 1.5s infinite; }
 .app-sync-dot.offline { background: #ef4444; animation: none; }
 @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+
+/* ─── LOGIN MODE TABS (Driver | Drivers Admin) ─── */
+.dp-login-tabs { display: flex; gap: 6px; background: #0f172a; border: 2px solid #334155; border-radius: 12px; padding: 5px; margin-bottom: 18px; }
+.dp-login-tab { flex: 1; padding: 10px 6px; border: none; border-radius: 8px; background: transparent; color: #94a3b8; font-family: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; transition: all .25s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.dp-login-tab:hover { color: #e2e8f0; }
+.dp-login-tab.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 4px 14px rgba(34,197,94,.28); }
+.dp-login-err { display: none; background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.45); color: #fca5a5; padding: 10px 12px; border-radius: 10px; font-size: .82rem; margin-bottom: 14px; text-align: left; }
+.dp-login-err.show { display: block; }
+.dp-login-hint { margin-top: 16px; font-size: .74rem; color: #64748b; }
+
+/* ─── LIVE GPS + AUTO-REFRESH BAR ─── */
+.dp-gps-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: #111c2e; border: 1px solid #24324a; border-radius: 12px; padding: 9px 12px; margin-top: 10px; }
+.dp-gps-main { display: flex; align-items: center; gap: 8px; color: #cbd5e1; font-size: .76rem; font-weight: 600; min-width: 0; }
+.dp-gps-dot { width: 9px; height: 9px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,.15); transition: all .3s; flex: none; }
+.dp-gps-dot.live { background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,.18); animation: pulse-dot 1.6s infinite; }
+.dp-gps-dot.off { background: #64748b; box-shadow: none; animation: none; }
+.dp-gps-txt b { color: #f8fafc; font-family: 'Courier New', monospace; font-size: .78rem; }
+.dp-gps-txt .muted { color: #64748b; }
+.dp-gps-auto { color: #94a3b8; font-size: .7rem; font-weight: 700; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+.dp-gps-auto i { color: #38bdf8; }
+#dpBtnRefresh.busy i { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+
+/* ─── DRIVERS ADMIN: live map of every driver + order diverting ─── */
+#dpAdminScreen { display: none; background: #0f172a; color: #f8fafc; }
+#dpAdminScreen.open { display: flex; flex-direction: column; height: 100dvh; padding-top: 44px; /* clears the fixed top nav */ }
+.dp-ad-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; background: #0d1526; border-bottom: 1px solid rgba(255,255,255,.08); }
+.dp-ad-brand { font-weight: 800; color: var(--primary); font-size: .95rem; display: flex; align-items: center; gap: 8px; }
+.dp-ad-live { font-size: .6rem; font-weight: 800; letter-spacing: .5px; background: rgba(34,197,94,.15); color: #4ade80; border: 1px solid rgba(34,197,94,.35); padding: 2px 7px; border-radius: 20px; }
+.dp-ad-chip { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; font-size: .7rem; font-weight: 700; padding: 6px 10px; border-radius: 20px; white-space: nowrap; }
+.dp-ad-chip b { color: var(--primary); }
+.dp-ad-spacer { flex: 1; }
+.dp-ad-btn { border: 1px solid #475569; border-radius: 8px; padding: 8px 12px; font-family: inherit; font-size: .76rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg,#334155,#1e293b); color: #e2e8f0; transition: all .2s; }
+.dp-ad-btn:hover { transform: translateY(-1px); border-color: var(--primary); }
+.dp-ad-btn.ghost { background: transparent; }
+.dp-ad-wrap { display: flex; flex: 1; min-height: 0; }
+.dp-ad-mapwrap { position: relative; flex: 1; min-width: 0; }
+#dpAdminMap { position: absolute; inset: 0; background: #0b1220; }
+.dp-ad-legend { position: absolute; left: 10px; bottom: 16px; z-index: 600; background: rgba(15,23,42,.93); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 8px 10px; display: flex; gap: 10px; flex-wrap: wrap; font-size: .66rem; color: #cbd5e1; max-width: calc(100% - 20px); }
+.dp-ad-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.dp-ad-legend i.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.dp-ad-legend i.sq { width: 9px; height: 9px; display: inline-block; border-radius: 2px; }
+
+/* driver / restaurant map pins */
+.dp-ad-iconwrap { position: relative; }
+.dp-ad-pin { width: 100%; height: 100%; border-radius: 50%; background: var(--c, #94a3b8); border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; transition: transform .2s; }
+.dp-ad-pin.sel { transform: scale(1.2); box-shadow: 0 0 0 4px rgba(34,197,94,.5), 0 6px 16px rgba(0,0,0,.5); }
+.dp-ad-name { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 3px; background: rgba(15,23,42,.92); color: #e2e8f0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; white-space: nowrap; border: 1px solid rgba(255,255,255,.12); pointer-events: none; }
+.dp-ad-rest { width: 22px; height: 22px; border-radius: 6px 6px 6px 2px; background: #8b5cf6; border: 2px solid #fff; box-shadow: 0 3px 8px rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; }
+
+/* side panel */
+.dp-ad-panel { width: 380px; max-width: 46vw; background: #111c2e; border-left: 1px solid #24324a; overflow-y: auto; flex: none; }
+.dp-ad-panel-hd { position: sticky; top: 0; z-index: 5; background: #111c2e; border-bottom: 1px solid #24324a; padding: 12px 14px; }
+.dp-ad-panel-hd .t { font-weight: 800; font-size: .92rem; display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+.dp-ad-panel-hd input { width: 100%; padding: 9px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; font-family: inherit; font-size: .8rem; outline: none; }
+.dp-ad-panel-hd input:focus { border-color: var(--primary); }
+.dp-ad-sec-hd { padding: 13px 14px 7px; font-size: .68rem; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: #64748b; display: flex; justify-content: space-between; align-items: center; }
+.dp-ad-sec-hd span { background: rgba(59,130,246,.15); color: #60a5fa; padding: 2px 8px; border-radius: 10px; }
+.dp-ad-list { padding: 0 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+.dp-ad-empty { color: #64748b; font-size: .78rem; text-align: center; padding: 14px 8px; border: 1px dashed #334155; border-radius: 10px; }
+.dp-ad-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 11px 12px; cursor: pointer; transition: all .2s; }
+.dp-ad-card:hover { border-color: #475569; transform: translateY(-1px); }
+.dp-ad-card.sel { border-color: var(--primary); box-shadow: 0 0 0 1px rgba(34,197,94,.35); }
+.dp-ad-card.ord { cursor: default; }
+.dp-ad-card.ord:hover { transform: none; }
+.dp-ad-r1 { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.dp-ad-name2 { color: #f1f5f9; font-weight: 700; font-size: .88rem; display: flex; align-items: center; gap: 7px; }
+.dp-ad-sub { color: #94a3b8; font-size: .72rem; margin-top: 3px; }
+.dp-ad-sub.dim { color: #64748b; }
+.dp-ad-st { font-size: .66rem; font-weight: 800; padding: 3px 8px; border-radius: 20px; white-space: nowrap; color: #fff; }
+.dp-ad-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
+.dp-ad-mini { display: flex; gap: 12px; font-size: .7rem; color: #94a3b8; margin-top: 7px; flex-wrap: wrap; }
+.dp-ad-mini b { color: #cbd5e1; }
+.dp-ad-pick { font-size: .68rem; color: var(--primary); font-weight: 700; }
+.dp-ad-divert { width: 100%; margin-top: 9px; padding: 9px 10px; border: none; border-radius: 9px; cursor: pointer; font-family: inherit; font-size: .78rem; font-weight: 800; color: #fff; background: linear-gradient(135deg,#f59e0b,#d97706); display: flex; align-items: center; justify-content: center; gap: 7px; transition: all .2s; }
+.dp-ad-divert:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(245,158,11,.3); }
+.dp-ad-assigned { margin-top: 9px; padding: 8px 10px; border-radius: 9px; background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.3); color: #4ade80; font-size: .74rem; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+.dp-ad-back { background: none; border: none; color: var(--primary); font-family: inherit; font-size: .74rem; font-weight: 700; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 5px; }
+.dp-ad-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px); background: #1e293b; color: #fff; padding: 12px 22px; border-radius: 30px; font-size: .84rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.1); z-index: 3000; opacity: 0; transition: all .3s; pointer-events: none; max-width: 90%; }
+.dp-ad-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.dp-ad-toast.ok { background: linear-gradient(135deg,#065f46,#047857); border-color: rgba(34,197,94,.4); }
+
+@media (max-width: 860px) {
+  .dp-ad-wrap { flex-direction: column; }
+  .dp-ad-mapwrap { flex: none; height: 44dvh; }
+  .dp-ad-panel { width: 100%; max-width: none; border-left: none; border-top: 1px solid #24324a; }
+  .dp-ad-top { padding: 8px 10px; gap: 6px; }
+  .dp-ad-chip { font-size: .66rem; padding: 5px 8px; }
+}
 </style>
 </head>
 <body>
@@ -307,15 +397,27 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <span class="brand">🛵 Driver Portal</span>
 </nav>
 
-<!-- ─── STANDALONE DRIVER LOGIN ─── -->
+<!-- ─── STANDALONE DRIVER LOGIN (Driver | Drivers Admin) ─── -->
 <div class="dp-login-screen" id="dpLoginScreen">
 <div class="dp-login-card">
 <div class="logo">🛵</div>
-<h2>Driver Portal</h2>
-<p class="sub">Enter your credentials to start delivering</p>
+<h2 id="dpLoginTitle">Driver Portal</h2>
+<p class="sub" id="dpLoginSub">Enter your credentials to start delivering</p>
+<div class="dp-login-tabs">
+<button type="button" class="dp-login-tab active" data-login-mode="driver" onclick="dpSetLoginMode('driver')"><i class="fas fa-motorcycle"></i> Driver</button>
+<button type="button" class="dp-login-tab" data-login-mode="admin" onclick="dpSetLoginMode('admin')"><i class="fas fa-map-marked-alt"></i> Drivers Admin</button>
+</div>
+<div class="dp-login-err" id="dpLoginError"><i class="fas fa-circle-exclamation"></i> <span id="dpLoginErrorMsg">Invalid credentials</span></div>
+<div id="dpDriverFields">
 <input type="text" id="fpDriverUsername" placeholder="Username or Phone" autocomplete="off">
 <input type="password" class="fp-pin-input" id="fpDriverPin" placeholder="••••" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" autocomplete="off">
-<button class="dp-login-btn" onclick="driverLoginWithPin()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+</div>
+<div id="dpAdminFields" style="display:none">
+<input type="text" id="dpAdminUsername" placeholder="Admin username" autocomplete="off">
+<input type="password" id="dpAdminPassword" placeholder="Admin password" autocomplete="off">
+</div>
+<button class="dp-login-btn" onclick="dpSubmitLogin()"><i class="fas fa-sign-in-alt"></i> <span id="dpLoginBtnTxt">Sign In</span></button>
+<div class="dp-login-hint" id="dpLoginHint">Drivers Admin = live map of every driver, tap a driver to divert an order to them.</div>
 </div>
 </div>
 
@@ -388,7 +490,7 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <button class="dp-b" id="dpBtnToggle" onclick="dpToggleOnline()">
 <i class="fas fa-toggle-on"></i> <span id="dpLblOnline">Online</span>
 </button>
-<button class="dp-b dp-b-gray dp-b-sm" onclick="dpResetDemo()"><i class="fas fa-rotate-right"></i> Reset</button>
+<button class="dp-b dp-b-gray dp-b-sm" id="dpBtnRefresh" onclick="dpManualRefresh()"><i class="fas fa-rotate"></i> Refresh</button>
 </div>
 </div>
 <div class="dp-scard" id="dpStatusCard">
@@ -397,6 +499,14 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <p id="dpStMsg">Ready to receive orders</p>
 </div>
 <div class="dp-ico" id="dpStIco">🟢</div>
+</div>
+<!-- LIVE GPS + AUTO-REFRESH -->
+<div class="dp-gps-bar" id="dpGpsBar">
+<div class="dp-gps-main">
+<span class="dp-gps-dot" id="dpGpsDot"></span>
+<span class="dp-gps-txt" id="dpGpsText"><i class="fas fa-satellite-dish"></i> GPS: locating…</span>
+</div>
+<div class="dp-gps-auto" id="dpGpsAuto"><i class="fas fa-arrows-rotate"></i> Auto-refresh in 10s</div>
 </div>
 <div class="dp-stats">
 <div class="dp-stat"><h4>Today</h4><div class="v" id="dpSToday">0</div><div class="sub">Deliveries</div></div>
@@ -479,6 +589,43 @@ pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.08);
 <div id="dpListFleet"></div>
 </div>
 </div>
+</div>
+
+<!-- ─── DRIVERS ADMIN: live map of all drivers + order diverting ─── -->
+<div id="dpAdminScreen">
+<div class="dp-ad-top">
+<button class="dp-ad-btn ghost" onclick="dpAdminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+<div class="dp-ad-brand"><i class="fas fa-map-marked-alt"></i> Drivers Admin <span class="dp-ad-live">● LIVE</span></div>
+<div class="dp-ad-spacer"></div>
+<div class="dp-ad-chip" id="dpAdChipDrivers"><b>0</b> drivers online</div>
+<div class="dp-ad-chip" id="dpAdChipOrders"><b>0</b> open orders</div>
+<button class="dp-ad-btn" onclick="dpAdminRefresh(true)"><i class="fas fa-rotate"></i> Refresh</button>
+</div>
+<div class="dp-ad-wrap">
+<div class="dp-ad-mapwrap">
+<div id="dpAdminMap"></div>
+<div class="dp-ad-legend">
+<span><i class="dot" style="background:#22c55e"></i> Available</span>
+<span><i class="dot" style="background:#3b82f6"></i> On delivery</span>
+<span><i class="dot" style="background:#f59e0b"></i> Offline</span>
+<span><i class="dot" style="background:#ef4444"></i> Deactivated</span>
+<span><i class="sq" style="background:#8b5cf6"></i> Restaurant</span>
+<span>👆 Tap a driver to divert an order</span>
+</div>
+</div>
+<aside class="dp-ad-panel">
+<div class="dp-ad-panel-hd">
+<div class="t"><i class="fas fa-users-gear"></i> <span id="dpAdPanelTitle">All drivers</span></div>
+<input type="text" id="dpAdSearch" placeholder="Search name, plate or phone…" oninput="dpAdRenderDrivers()">
+</div>
+<div id="dpAdSelected"></div>
+<div class="dp-ad-sec-hd">Drivers <span id="dpAdDriverCount">0</span></div>
+<div id="dpAdDriverList" class="dp-ad-list"></div>
+<div class="dp-ad-sec-hd">Orders <span id="dpAdOrderCount">0</span></div>
+<div id="dpAdOrderList" class="dp-ad-list"></div>
+</aside>
+</div>
+<div class="dp-ad-toast" id="dpAdToast"></div>
 </div>
 
 <!-- ─── JAVASCRIPT ─── -->
@@ -819,6 +966,139 @@ localStorage.setItem('gopoint_orders', JSON.stringify(orders));
 localStorage.setItem('gopointSettings', JSON.stringify(settings));
 }
 
+// Pull fresh data from Supabase (falling back to localStorage) and merge it into
+// memory. Used by realtime callbacks and the polling loops, so an order diverted
+// from the Drivers Admin map lands on the target driver's phone immediately.
+async function dpReloadData() {
+if (!supaConnected) { loadFromLocalStorage(); return; }
+try {
+  const [vehData, ordData] = await Promise.all([supaLoadVehicles(), supaLoadOrders()]);
+  if (vehData.length) vehicles = vehData;
+  if (ordData.length) {
+    const byId = new Map(ordData.map(o => [o.id, o]));
+    // keep orders that only exist locally (e.g. simulated demo orders)
+    orders.filter(o => !byId.has(o.id)).forEach(o => byId.set(o.id, o));
+    orders = Array.from(byId.values());
+  }
+  saveLocalData();
+} catch (e) { console.warn('dpReloadData error:', e); }
+}
+
+// ── Auto-refresh (every 10 s) + manual Refresh + live GPS readout ─────
+// Realtime can be missed (blocked socket, RLS), so the portal also re-syncs
+// every 10 seconds — and immediately whenever Refresh is pressed. Each refresh
+// re-schedules the next one, so the countdown and the actual timer never drift.
+const DP_REFRESH_MS = 10000;
+let dpDataPoll = null, dpRefreshAt = 0, dpRefreshTicker = null, dpRefreshBusy = false;
+
+function dpStartDriverRefresh() {
+  dpScheduleDriverRefresh();
+  if (!dpRefreshTicker) {
+    dpRefreshTicker = setInterval(() => {
+      const el = document.getElementById('dpGpsAuto');
+      if (!el) return;
+      const left = Math.max(0, Math.ceil((dpRefreshAt - Date.now()) / 1000));
+      el.innerHTML = `<i class="fas fa-arrows-rotate"></i> ${left > 0 ? 'Auto-refresh in ' + left + 's' : 'Refreshing…'}`;
+    }, 500);
+  }
+}
+function dpScheduleDriverRefresh() {
+  if (dpDataPoll) clearTimeout(dpDataPoll);
+  dpRefreshAt = Date.now() + DP_REFRESH_MS;
+  dpDataPoll = setTimeout(dpRunAutoRefresh, DP_REFRESH_MS);
+}
+async function dpRunAutoRefresh() {
+  dpDataPoll = null;
+  if (!dpDriver || dpAdmActive) return;
+  await dpReloadData();
+  dpRefresh();
+  dpCheckForIncomingCalls();
+  dpUpdateGpsBar(dpDriver?.lat, dpDriver?.lng, dpHasLiveGps);
+  dpScheduleDriverRefresh();
+}
+
+// Manual refresh: re-sync data + request a fresh GPS fix so the admin map and
+// the driver's own marker show the current position.
+function dpManualRefresh() {
+  if (dpRefreshBusy || !dpDriver) return;
+  dpRefreshBusy = true;
+  const btn = document.getElementById('dpBtnRefresh');
+  if (btn) btn.classList.add('busy');
+  (async () => {
+    try {
+      await dpReloadData();
+      dpRefresh();
+      dpCheckForIncomingCalls();
+      const fix = await dpRequestGpsFix();
+      dpUpdateGpsBar(dpDriver?.lat, dpDriver?.lng, fix || dpHasLiveGps);
+      dpScheduleDriverRefresh();
+      const hasPos = dpDriver && dpDriver.lat != null && dpDriver.lng != null;
+      dpToast(fix
+        ? `🔄 Refreshed • GPS ${Number(dpDriver.lat).toFixed(4)}, ${Number(dpDriver.lng).toFixed(4)}`
+        : (hasPos ? '🔄 Data refreshed • using last known GPS' : '🔄 Data refreshed'),
+        fix ? 'success' : 'info');
+    } catch (e) {
+      dpToast('⚠️ Refresh failed', 'error');
+    } finally {
+      dpRefreshBusy = false;
+      if (btn) btn.classList.remove('busy');
+    }
+  })();
+}
+
+function dpRequestGpsFix() {
+  return new Promise(resolve => {
+    if (!navigator.geolocation) return resolve(false);
+    navigator.geolocation.getCurrentPosition(
+      p => {
+        const la = p.coords.latitude, lo = p.coords.longitude;
+        dpHasLiveGps = true;
+        if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la, lo]);
+        if (dpActiveMap) dpActiveMap.setView([la, lo], Math.max(dpActiveMap.getZoom(), 15), { animate: true });
+        dpPersistDriverLocation(la, lo, true); // force-push to Supabase now
+        resolve(true);
+      },
+      () => resolve(false),
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 5000 }
+    );
+  });
+}
+
+function dpUpdateGpsBar(la, lo, live) {
+  const t = document.getElementById('dpGpsText'), d = document.getElementById('dpGpsDot');
+  if (!t) return;
+  if (la == null || lo == null) {
+    t.innerHTML = '<i class="fas fa-satellite-dish"></i> GPS: locating…';
+    if (d) d.className = 'dp-gps-dot';
+    return;
+  }
+  t.innerHTML = `<i class="fas fa-location-dot" style="color:${live ? '#22c55e' : '#f59e0b'}"></i> GPS: <b>${Number(la).toFixed(5)}, ${Number(lo).toFixed(5)}</b> <span class="muted">${live ? 'live' : 'last known'}</span>`;
+  if (d) d.className = 'dp-gps-dot' + (live ? ' live' : '');
+}
+
+function dpStartDriverPoll() { if (!dpDataPoll && dpDriver) dpStartDriverRefresh(); }
+function dpStopDriverPoll() {
+  if (dpDataPoll) { clearTimeout(dpDataPoll); dpDataPoll = null; }
+  if (dpRefreshTicker) { clearInterval(dpRefreshTicker); dpRefreshTicker = null; }
+}
+
+// Reflect the local Online/Offline toggle in the vehicle row so the Drivers
+// Admin map shows who is actually working. 'unavailable' (admin-deactivated)
+// is never touched here.
+function dpPushOnlineState() {
+  if (!dpDriver || dpAdminDeactivated) return;
+  const v = vehicles.find(x => String(x.id) === String(dpDriver.id));
+  if (!v) return;
+  let next = v.status;
+  if (dpOnline) { if (v.status === 'offline') next = 'available'; }
+  else if (v.status === 'available') next = 'offline';
+  if (next === v.status) { if (dpDriver.status !== next) dpDriver.status = next; return; }
+  v.status = next;
+  dpDriver.status = next;
+  try { localStorage.setItem('gopoint_vehicles', JSON.stringify(vehicles)); } catch (_) {}
+  if (supaConnected) { sb.from('vehicles').update({ status: next }).eq('id', v.id).then(() => {}).catch(() => {}); }
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // ★ DRIVER LOGIN WITH USERNAME + PIN ★
 // ═══════════════════════════════════════════════════════════════════
@@ -883,12 +1163,12 @@ setTimeout(() => dpShowCustomerOnMap(activeOrder.id, { useActiveMap: true }), 40
 }, 500);
 }
 
-supaSubscribeToOrders((payload) => {
-loadFromLocalStorage();
+supaSubscribeToOrders(async (payload) => {
+await dpReloadData();
 if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); }
 });
 supaSubscribeToVehicles(async (payload) => {
-loadFromLocalStorage();
+await dpReloadData();
 if (dpDriver) {
 const wasDeactivated = dpAdminDeactivated;
 await dpSyncVehicleStatus();
@@ -900,11 +1180,14 @@ dpToast('🔴 deactivated by admin - Contact admin', 'error');
 }
 }
 });
+dpStartDriverPoll();
+dpPushOnlineState();
 }
 
 // Logout from driver portal back to front page
 function dpLogout() {
 dpDriver = null;
+dpStopDriverPoll();
 dpCleanupMap();
 document.getElementById('appDriverPortal').style.display = 'none';
 document.getElementById('dpFleetSelection').style.display = 'none';
@@ -1049,6 +1332,7 @@ async function dpToggleOnline() {
     dpStopLocationTracking();
     dpToast('⚫ You are now Offline', 'info');
   }
+  setTimeout(dpPushOnlineState, 400);
 }
 
 function dpResetDemo() { if(confirm('Reset all demo data and reload?')) { localStorage.clear(); location.reload(); } }
@@ -1103,7 +1387,7 @@ function dpRejectCurrentCall() {
     hideIncomingCall();
 }
 
-function dpSimulateOrder() {
+async function dpSimulateOrder() {
     const now = new Date();
     const rKeys = Object.keys(restaurants);
     const newOrder = {
@@ -1119,12 +1403,15 @@ function dpSimulateOrder() {
     };
     orders.push(newOrder);
     saveLocalData();
+    // keep the demo order in sync so it shows up on the Drivers Admin map
+    if (supaConnected) { try { await supaSaveOrder(newOrder); } catch (_) {} }
     dpRefresh();
     dpCheckForIncomingCalls();
     dpToast('🔔 New order received!', 'info');
 }
 
 function dpUpdateUI() {
+dpUpdateGpsBar(dpDriver ? dpDriver.lat : null, dpDriver ? dpDriver.lng : null, dpHasLiveGps);
 const c = document.getElementById('dpStatusCard');
 if (dpAdminDeactivated) {
   document.getElementById('dpLblOnline').textContent = 'Deactivated';
@@ -1320,14 +1607,15 @@ const h = o.statusHistory || [];
 h.push({ status: ns, time: new Date().toISOString() });
 orders[i] = { ...o, status: ns, statusHistory: h };
 if (ns === 'completed' && o.vehicleId) {
+const doneStatus = dpOnline ? 'available' : 'offline';
 const v = vehicles.find(v => v.id == o.vehicleId);
-if (v) v.status = 'available';
+if (v) v.status = doneStatus;
 const earn = dpCalcEarnings(o);
 dpToast(`✅ Delivered! You earned ${DP_CONFIG.currency}${earn.driverEarn.toFixed(2)}`, 'success');
 if (dpActiveOrderId === id) { dpClearRouteLayers(dpActiveMap); const wrap = document.getElementById('dpActiveMapWrap'); if (wrap) wrap.style.display = 'none'; dpActiveOrderId = null; }
 if (supaConnected) {
   await supaUpdateOrder(id, { status: ns, statusHistory: h });
-  if (v) await supaSaveVehicle({ ...v, status: 'available' });
+  if (v) await supaSaveVehicle({ ...v, status: doneStatus });
 }
 } else {
 dpToast('✅ Status updated to ' + ns.replace(/_/g, ' '), 'success');
@@ -1496,6 +1784,7 @@ function dpStartLocationTracking() {
       const la = p.coords.latitude, lo = p.coords.longitude;
       dpHasLiveGps = true;
       if (dpActiveDriverMarker) dpActiveDriverMarker.setLatLng([la, lo]);
+      dpUpdateGpsBar(la, lo, true);
       dpPersistDriverLocation(la, lo);
       if (dpActiveMap && !dpActiveOrderId) {
         dpActiveMap.panTo([la, lo]);
@@ -1640,12 +1929,354 @@ e._t = setTimeout(() => { e.classList.remove('show'); }, 3000);
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// ★ DRIVERS ADMIN — admindriver / driver123 ★
+// Live Leaflet map of every driver; tap a driver to divert any order to them.
+// ═══════════════════════════════════════════════════════════════════
+const DP_ADMIN_USER = 'admindriver';
+const DP_ADMIN_PASS = 'driver123';
+const DP_AD_SESSION = 'dpDriversAdmin';
+
+let dpLoginMode = 'driver';
+let dpAdmActive = false, dpAdmMap = null, dpAdmPoll = null, dpAdmSelectedId = null;
+let dpAdmChOrders = null, dpAdmChVehicles = null;
+let dpAdmDriverMarkers = {}, dpAdmRestMarkers = {};
+
+const DP_AD_STATUS = {
+  available:   { c: '#22c55e', l: 'Available' },
+  delivering:  { c: '#3b82f6', l: 'On delivery' },
+  busy:        { c: '#f59e0b', l: 'Busy' },
+  offline:     { c: '#f59e0b', l: 'Offline' },
+  unavailable: { c: '#ef4444', l: 'Deactivated' }
+};
+const DP_AD_ORDER_ST = {
+  pending:          { c: '#f59e0b', l: 'Pending' },
+  preparing:        { c: '#3b82f6', l: 'Preparing' },
+  ready:            { c: '#8b5cf6', l: 'Ready' },
+  out_for_delivery: { c: '#f97316', l: 'On the way' }
+};
+const DP_AD_OPEN = ['pending', 'preparing', 'ready', 'out_for_delivery'];
+
+function dpAdEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function dpAdId(s) { return String(s == null ? '' : s).replace(/['"\\<>]/g, ''); }
+function dpAdStatus(v) { return DP_AD_STATUS[v] || { c: '#94a3b8', l: v ? String(v) : 'Unknown' }; }
+
+function dpAdToast(msg, ok) {
+  const t = document.getElementById('dpAdToast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'dp-ad-toast show' + (ok ? ' ok' : '');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function dpLoginError(msg) {
+  const e = document.getElementById('dpLoginError');
+  if (!e) return;
+  document.getElementById('dpLoginErrorMsg').textContent = msg || '';
+  e.classList.toggle('show', !!msg);
+}
+
+// ── login screen: Driver ⇄ Drivers Admin ──────────────────────────────
+function dpSetLoginMode(mode) {
+  dpLoginMode = mode;
+  document.querySelectorAll('.dp-login-tab').forEach(t => t.classList.toggle('active', t.dataset.loginMode === mode));
+  const admin = mode === 'admin';
+  document.getElementById('dpDriverFields').style.display = admin ? 'none' : 'block';
+  document.getElementById('dpAdminFields').style.display = admin ? 'block' : 'none';
+  document.getElementById('dpLoginTitle').textContent = admin ? 'Drivers Admin' : 'Driver Portal';
+  document.getElementById('dpLoginSub').textContent = admin ? 'Live driver map & dispatch board' : 'Enter your credentials to start delivering';
+  document.getElementById('dpLoginBtnTxt').textContent = admin ? 'Sign in to Admin' : 'Sign In';
+  document.getElementById('dpLoginHint').textContent = admin
+    ? 'Every driver on one map — tap a driver, then divert any order to them.'
+    : 'Drivers Admin = live map of every driver, tap a driver to divert an order to them.';
+  dpLoginError('');
+}
+
+function dpSubmitLogin() { if (dpLoginMode === 'admin') dpAdminLogin(); else driverLoginWithPin(); }
+
+function dpAdminLogin() {
+  const u = document.getElementById('dpAdminUsername').value.trim();
+  const p = document.getElementById('dpAdminPassword').value.trim();
+  if (!u || !p) { dpLoginError('⚠️ Please enter username and password'); return; }
+  if (u.toLowerCase() !== DP_ADMIN_USER || p !== DP_ADMIN_PASS) {
+    dpLoginError('⚠️ Invalid drivers admin credentials');
+    document.getElementById('dpAdminPassword').value = '';
+    document.getElementById('dpAdminPassword').focus();
+    return;
+  }
+  try { sessionStorage.setItem(DP_AD_SESSION, '1'); } catch (_) {}
+  document.getElementById('dpAdminPassword').value = '';
+  dpLoginError('');
+  dpAdminEnter();
+}
+
+function dpAdminEnter() {
+  dpAdmActive = true;
+  dpSetLoginMode('admin');
+  document.getElementById('dpLoginScreen').style.display = 'none';
+  document.getElementById('appDriverPortal').style.display = 'none';
+  document.getElementById('dpAdminScreen').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  dpAdminRefresh(false);
+  setTimeout(() => { dpAdmInitMap(); dpAdmSubscribe(); }, 150);
+  if (!dpAdmPoll) dpAdmPoll = setInterval(() => dpAdminRefresh(false), 10000); // same 10 s cadence as the driver app
+}
+
+function dpAdminLogout() {
+  dpAdmActive = false;
+  if (dpAdmPoll) { clearInterval(dpAdmPoll); dpAdmPoll = null; }
+  try { sessionStorage.removeItem(DP_AD_SESSION); } catch (_) {}
+  [dpAdmChOrders, dpAdmChVehicles].forEach(ch => { if (ch) { try { sb.removeChannel(ch); } catch (_) {} } });
+  dpAdmChOrders = null; dpAdmChVehicles = null;
+  if (dpAdmMap) { try { dpAdmMap.remove(); } catch (_) {} dpAdmMap = null; }
+  dpAdmDriverMarkers = {}; dpAdmRestMarkers = {}; dpAdmSelectedId = null;
+  document.getElementById('dpAdminScreen').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('dpAdminUsername').value = '';
+  document.getElementById('dpAdminPassword').value = '';
+  dpLoginError('');
+  dpSetLoginMode('admin');
+  document.getElementById('dpLoginScreen').style.display = 'flex';
+}
+
+function dpAdmSubscribe() {
+  if (!supaConnected || dpAdmChOrders) return;
+  try {
+    dpAdmChOrders = sb.channel('dp-admin-orders')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => dpAdminRefresh(false))
+      .subscribe();
+    dpAdmChVehicles = sb.channel('dp-admin-vehicles')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => dpAdminRefresh(false))
+      .subscribe();
+  } catch (_) {}
+}
+
+async function dpAdminRefresh(manual) {
+  if (!dpAdmActive) return;
+  if (supaConnected) await dpReloadData(); else loadFromLocalStorage();
+  dpAdRenderAll();
+  if (manual) dpAdToast('🔄 Data refreshed', true);
+}
+
+// ── map ───────────────────────────────────────────────────────────────
+function dpAdmInitMap() {
+  if (dpAdmMap) { dpAdmMap.invalidateSize(); return; }
+  const box = document.getElementById('dpAdminMap');
+  if (!box || typeof L === 'undefined') return;
+  dpAdmMap = L.map('dpAdminMap', { zoomControl: true }).setView([DP_CONFIG.defaultLat, DP_CONFIG.defaultLng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(dpAdmMap);
+  dpAdmDrawRestaurants();
+  dpAdmDrawDrivers();
+  dpAdmFitBounds();
+  window.addEventListener('resize', () => { if (dpAdmMap) dpAdmMap.invalidateSize(); });
+}
+
+function dpAdmDrawRestaurants() {
+  if (!dpAdmMap) return;
+  Object.values(dpAdmRestMarkers).forEach(m => { try { dpAdmMap.removeLayer(m); } catch (_) {} });
+  dpAdmRestMarkers = {};
+  Object.keys(restaurants).forEach(k => {
+    const r = restaurants[k];
+    if (!r || r.lat == null || r.lng == null) return;
+    const ico = L.divIcon({ className: '', iconSize: [22, 22], iconAnchor: [11, 11], html: '<div class="dp-ad-rest"><i class="fas fa-utensils"></i></div>' });
+    const m = L.marker([r.lat, r.lng], { icon: ico, zIndexOffset: -100 }).addTo(dpAdmMap).bindTooltip(r.name || 'Restaurant', { direction: 'top', offset: [0, -12] });
+    dpAdmRestMarkers[k] = m;
+  });
+}
+
+function dpAdmDrawDrivers() {
+  if (!dpAdmMap) return;
+  Object.values(dpAdmDriverMarkers).forEach(m => { try { dpAdmMap.removeLayer(m); } catch (_) {} });
+  dpAdmDriverMarkers = {};
+  vehicles.forEach(v => {
+    if (!v || v.lat == null || v.lng == null) return;
+    const st = dpAdStatus(v.status);
+    const sel = String(dpAdmSelectedId) === String(v.id);
+    const ico = L.divIcon({
+      className: 'dp-ad-iconwrap',
+      iconSize: [36, 36], iconAnchor: [18, 18],
+      html: `<div class="dp-ad-pin${sel ? ' sel' : ''}" style="--c:${st.c}"><i class="fas fa-${v.type === 'bike' ? 'motorcycle' : 'car'}"></i></div><div class="dp-ad-name">${dpAdEsc(v.driverName || 'Driver')}</div>`
+    });
+    const m = L.marker([v.lat, v.lng], { icon: ico, zIndexOffset: sel ? 500 : 0 }).addTo(dpAdmMap);
+    m.bindTooltip(
+      `<b>${dpAdEsc(v.driverName || 'Driver')}</b><br>${dpAdEsc(st.l)} • ${dpAdEsc(v.plateNumber || v.plate || '')}<br>📍 ${Number(v.lat).toFixed(5)}, ${Number(v.lng).toFixed(5)}`,
+      { direction: 'top', offset: [0, -20] }
+    );
+    m.on('click', () => dpAdSelectDriver(v.id));
+    dpAdmDriverMarkers[v.id] = m;
+  });
+}
+
+function dpAdmFitBounds() {
+  if (!dpAdmMap) return;
+  const pts = vehicles.filter(v => v && v.lat != null && v.lng != null).map(v => [v.lat, v.lng]);
+  if (!pts.length) { dpAdmMap.setView([DP_CONFIG.defaultLat, DP_CONFIG.defaultLng], 13); return; }
+  if (pts.length === 1) { dpAdmMap.setView(pts[0], 15); return; }
+  try { dpAdmMap.fitBounds(pts, { padding: [40, 40], maxZoom: 15 }); } catch (_) {}
+}
+
+function dpAdCenterDriver() {
+  const v = dpAdmSelectedId ? vehicles.find(x => String(x.id) === String(dpAdmSelectedId)) : null;
+  if (!v || !dpAdmMap || v.lat == null) return;
+  dpAdmMap.setView([v.lat, v.lng], Math.max(dpAdmMap.getZoom(), 15), { animate: true });
+}
+
+// ── panel rendering ───────────────────────────────────────────────────
+function dpAdOpenOrders() {
+  return orders.filter(o => DP_AD_OPEN.includes(o.status))
+    .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+}
+function dpAdDriverActive(v) {
+  return orders.filter(o => ['preparing', 'ready', 'out_for_delivery'].includes(o.status) && o.vehicle &&
+    (String(o.vehicle.id) === String(v.id) || o.vehicle.driverName === v.driverName)).length;
+}
+
+function dpAdRenderAll() {
+  if (!dpAdmActive) return;
+  dpAdRenderStats();
+  dpAdRenderSelected();
+  dpAdRenderDrivers();
+  dpAdRenderOrders();
+  dpAdmDrawDrivers();
+}
+
+function dpAdRenderStats() {
+  const online = vehicles.filter(v => v.status === 'available' || v.status === 'delivering').length;
+  document.getElementById('dpAdChipDrivers').innerHTML = `<b>${online}</b> drivers online`;
+  document.getElementById('dpAdChipOrders').innerHTML = `<b>${dpAdOpenOrders().length}</b> open orders`;
+}
+
+function dpAdRenderDrivers() {
+  const list = document.getElementById('dpAdDriverList');
+  const q = (document.getElementById('dpAdSearch').value || '').toLowerCase().trim();
+  const filtered = vehicles.filter(v => !q ||
+    (v.driverName || '').toLowerCase().includes(q) ||
+    (v.plateNumber || v.plate || '').toLowerCase().includes(q) ||
+    (v.driverPhone || '').toLowerCase().includes(q));
+  document.getElementById('dpAdDriverCount').textContent = filtered.length;
+  if (!filtered.length) { list.innerHTML = '<div class="dp-ad-empty">No driver matches your search</div>'; return; }
+  list.innerHTML = filtered.map(v => {
+    const st = dpAdStatus(v.status);
+    const sel = String(dpAdmSelectedId) === String(v.id);
+    const act = dpAdDriverActive(v);
+    return `<div class="dp-ad-card${sel ? ' sel' : ''}" onclick="dpAdSelectDriver('${dpAdId(v.id)}')">
+      <div class="dp-ad-r1">
+        <div class="dp-ad-name2"><i class="fas fa-${v.type === 'bike' ? 'motorcycle' : 'car'}" style="color:${st.c}"></i> ${dpAdEsc(v.driverName || 'Driver')}</div>
+        <div class="dp-ad-st" style="background:${st.c}2e;color:${st.c}"><span class="dp-ad-dot" style="background:${st.c};margin-right:5px"></span>${st.l}</div>
+      </div>
+      <div class="dp-ad-sub">${dpAdEsc(v.plateNumber || v.plate || 'No plate')} • ${dpAdEsc(v.driverPhone || 'No phone')}</div>
+      <div class="dp-ad-mini">
+        <span><i class="fas fa-location-dot"></i> <b>${v.lat != null ? Number(v.lat).toFixed(4) + ', ' + Number(v.lng).toFixed(4) : '—'}</b></span>
+        <span><i class="fas fa-bolt"></i> <b>${act}</b> active</span>
+        <span class="dp-ad-pick">${sel ? 'Selected ✓' : 'Tap to divert →'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function dpAdRenderSelected() {
+  const box = document.getElementById('dpAdSelected');
+  const title = document.getElementById('dpAdPanelTitle');
+  const v = dpAdmSelectedId ? vehicles.find(x => String(x.id) === String(dpAdmSelectedId)) : null;
+  if (!v) { box.innerHTML = ''; title.textContent = 'All drivers'; return; }
+  const st = dpAdStatus(v.status);
+  title.textContent = 'Divert to ' + (v.driverName || 'driver');
+  const mine = orders.filter(o => DP_AD_OPEN.includes(o.status) && String(o.vehicleId) === String(v.id)).length;
+  box.innerHTML = `<div style="padding:12px 14px 0">
+    <div class="dp-ad-card sel" style="cursor:default">
+      <div class="dp-ad-r1">
+        <div class="dp-ad-name2"><i class="fas fa-${v.type === 'bike' ? 'motorcycle' : 'car'}" style="color:${st.c}"></i> ${dpAdEsc(v.driverName || 'Driver')}</div>
+        <div class="dp-ad-st" style="background:${st.c}2e;color:${st.c}">${st.l}</div>
+      </div>
+      <div class="dp-ad-sub">${dpAdEsc(v.plateNumber || v.plate || 'No plate')} • ${dpAdEsc(v.driverPhone || 'No phone')} • ${v.type === 'bike' ? 'Motorcycle' : 'Taxi'}</div>
+      <div class="dp-ad-mini">
+        <span><i class="fas fa-bolt"></i> <b>${dpAdDriverActive(v)}</b> on delivery</span>
+        <span><i class="fas fa-box"></i> <b>${mine}</b> open orders here</span>
+      </div>
+      <div class="dp-ad-mini"><span><i class="fas fa-location-dot"></i> <b>${v.lat != null ? Number(v.lat).toFixed(4) + ', ' + Number(v.lng).toFixed(4) : 'no location yet'}</b></span></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px">
+      <button class="dp-ad-back" onclick="dpAdClearDriver()"><i class="fas fa-arrow-left"></i> All drivers</button>
+      <button class="dp-ad-back" onclick="dpAdCenterDriver()"><i class="fas fa-crosshairs"></i> Center on map</button>
+    </div>
+  </div>`;
+}
+
+function dpAdClearDriver() { dpAdmSelectedId = null; dpAdRenderAll(); }
+
+function dpAdRenderOrders() {
+  const list = document.getElementById('dpAdOrderList');
+  const sel = dpAdmSelectedId ? vehicles.find(x => String(x.id) === String(dpAdmSelectedId)) : null;
+  const open = dpAdOpenOrders();
+  document.getElementById('dpAdOrderCount').textContent = open.length;
+  if (!open.length) { list.innerHTML = '<div class="dp-ad-empty">No open orders right now</div>'; return; }
+  list.innerHTML = open.map(o => {
+    const r = restaurants[o.restaurant] || {};
+    const st = DP_AD_ORDER_ST[o.status] || { c: '#64748b', l: o.status };
+    const assigned = !!(o.vehicleId || o.vehicle);
+    const curName = o.vehicle ? (o.vehicle.driverName || 'another driver') : null;
+    const distCust = (sel && sel.lat != null && o.coordinates && o.coordinates.lat != null)
+      ? appCalculateDistance(sel.lat, sel.lng, o.coordinates.lat, o.coordinates.lng) : null;
+    const isMine = sel && (String(o.vehicleId) === String(sel.id) || (o.vehicle && o.vehicle.driverName === sel.driverName));
+    let action;
+    if (!sel) {
+      action = `<div class="dp-ad-sub dim" style="margin-top:8px"><i class="fas fa-hand-pointer"></i> Tap a driver on the map to divert this order</div>`;
+    } else if (isMine) {
+      action = `<div class="dp-ad-assigned"><i class="fas fa-check-circle"></i> Already with ${dpAdEsc(sel.driverName)}</div>`;
+    } else {
+      action = `<button class="dp-ad-divert" onclick="dpAdDivert('${dpAdId(o.id)}','${dpAdId(sel.id)}')"><i class="fas fa-shuffle"></i> Divert to ${dpAdEsc(sel.driverName)}</button>`;
+    }
+    return `<div class="dp-ad-card ord">
+      <div class="dp-ad-r1">
+        <div class="dp-ad-name2">#${dpAdEsc(String(o.id).slice(-6))}</div>
+        <div class="dp-ad-st" style="background:${st.c}2e;color:${st.c}">${st.l}</div>
+      </div>
+      <div class="dp-ad-sub"><i class="fas fa-store"></i> ${dpAdEsc(r.name || o.restaurant || 'Restaurant')} &nbsp;•&nbsp; <i class="fas fa-user"></i> ${dpAdEsc(o.customer?.name || 'Customer')}</div>
+      <div class="dp-ad-sub dim">${dpAdEsc((o.items || []).map(i => i.name + ' ×' + i.quantity).join(', '))} &nbsp;•&nbsp; ${DP_CONFIG.currency}${Number(o.total || 0).toFixed(2)}</div>
+      <div class="dp-ad-mini">
+        <span style="color:${assigned ? '#f59e0b' : '#4ade80'}"><i class="fas fa-motorcycle"></i> ${assigned ? dpAdEsc(curName || 'Assigned') : 'Unassigned'}</span>
+        ${distCust != null ? `<span><i class="fas fa-route"></i> <b>${distCust.toFixed(1)} km</b> to customer</span>` : ''}
+      </div>
+      ${action}
+    </div>`;
+  }).join('');
+}
+
+function dpAdSelectDriver(id) {
+  dpAdmSelectedId = dpAdId(id);
+  const v = vehicles.find(x => String(x.id) === String(dpAdmSelectedId));
+  if (v && dpAdmMap && v.lat != null) dpAdmMap.panTo([v.lat, v.lng], { animate: true });
+  dpAdRenderAll();
+}
+
+async function dpAdDivert(orderId, driverId) {
+  const i = orders.findIndex(o => String(o.id) === String(orderId));
+  const v = vehicles.find(x => String(x.id) === String(driverId));
+  if (i === -1 || !v) { dpAdToast('⚠️ Order or driver not found'); return; }
+  const o = orders[i];
+  const vi = { id: v.id, driverName: v.driverName, driverPhone: v.driverPhone, plateNumber: v.plateNumber || v.plate, type: v.type, lat: v.lat, lng: v.lng };
+  const h = o.statusHistory || [];
+  h.push({ status: o.status, time: new Date().toISOString(), note: 'Diverted to ' + (v.driverName || v.id) });
+  orders[i] = { ...o, vehicle: vi, vehicleId: v.id, statusHistory: h };
+  saveLocalData();
+  if (supaConnected) await supaUpdateOrder(o.id, { vehicle: vi, vehicleId: v.id, statusHistory: h });
+  dpAdRenderAll();
+  dpAdToast(`🔀 Order #${String(o.id).slice(-6)} → ${v.driverName}`, true);
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // ★ DOMContentLoaded — Auto-login & initialization ★
 // ═══════════════════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', async () => {
 loadFromLocalStorage();
 await initSupabaseData();
-const savedDriver = localStorage.getItem('dpDriver');
+// Restore a still-open Drivers Admin session (admindriver) — it takes
+// precedence over a saved driver session, but the Enter-key bindings further
+// below must still run, so no early return here.
+let admSession = false;
+try { admSession = sessionStorage.getItem(DP_AD_SESSION) === '1'; } catch (_) {}
+if (admSession) dpAdminEnter();
+const savedDriver = admSession ? null : localStorage.getItem('dpDriver');
 if (savedDriver) {
   try {
     const drv = JSON.parse(savedDriver);
@@ -1664,12 +2295,12 @@ if (savedDriver) {
       dpRefresh();
       setTimeout(() => dpInitActiveMap(), 200);
       dpCheckForIncomingCalls();
-      supaSubscribeToOrders((payload) => {
-        loadFromLocalStorage();
+      supaSubscribeToOrders(async (payload) => {
+        await dpReloadData();
         if (dpDriver) { dpRefresh(); dpCheckForIncomingCalls(); }
       });
       supaSubscribeToVehicles(async (payload) => {
-        loadFromLocalStorage();
+        await dpReloadData();
         if (dpDriver) {
           const wasDeactivated = dpAdminDeactivated;
           await dpSyncVehicleStatus();
@@ -1681,21 +2312,22 @@ if (savedDriver) {
           }
         }
       });
+      dpStartDriverPoll();
+      dpPushOnlineState();
     }
   } catch (e) { localStorage.removeItem('dpDriver'); }
 }
-const pinInput = document.getElementById('fpDriverPin');
-if (pinInput) {
-  pinInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); driverLoginWithPin(); }
+// Enter submits whichever login mode is active (or moves to the PIN field)
+[['fpDriverUsername', 'fpDriverPin'], ['fpDriverPin', null], ['dpAdminUsername', 'dpAdminPassword'], ['dpAdminPassword', null]].forEach(pair => {
+  const el = document.getElementById(pair[0]);
+  if (!el) return;
+  el.addEventListener('keypress', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    if (pair[1]) { const nxt = document.getElementById(pair[1]); if (nxt) { nxt.focus(); return; } }
+    dpSubmitLogin();
   });
-}
-const usernameInput = document.getElementById('fpDriverUsername');
-if (usernameInput) {
-  usernameInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); if (pinInput) pinInput.focus(); }
-  });
-}
+});
 });
 
 // Save driver session after successful login
