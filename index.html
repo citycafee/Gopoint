@@ -4938,6 +4938,13 @@ const { data: rows } = await sb.from('admins').select('user_id').eq('user_id', d
 if (rows && rows.length) user = data.session.user; else { try { await sb.auth.signOut(); } catch (_) {} }
 }
 } catch (_) {}
+// ⚠️ TEMPORARY FALLBACK (mirrors admin.html): the classic admin/admin123
+// pair still works until the `admins` table + admin@gopoint.admin user are
+// created. sessionStorage survives the redirect below, so /admin opens.
+if (!user && u.toLowerCase() === 'admin' && p === 'admin123') {
+try { sessionStorage.setItem('ad_legacy_admin', '1'); } catch (_) {}
+user = { legacy: true };
+}
 if (!user) { showAppToast('⚠️ Invalid admin credentials'); return; }
 closeFrontLogin();
 // supabase-js stores the session per-origin, so /admin picks it up on redirect.

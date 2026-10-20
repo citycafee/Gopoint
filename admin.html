@@ -1793,7 +1793,7 @@ function setSavePlatform() {
   adSaveData();
   adToast('Platform info updated!');
 }
-function adLogout() { if (!confirm('Logout from Admin Dashboard?')) return; try { sb.auth.signOut(); } catch (_) {} window.location.href = 'index.html'; }
+function adLogout() { if (!confirm('Logout from Admin Dashboard?')) return; try { sessionStorage.removeItem('ad_legacy_admin'); } catch (_) {} try { sb.auth.signOut(); } catch (_) {} window.location.href = 'index.html'; }
 
 function adBackToHome() { document.getElementById('adminDashboard').classList.remove('active'); document.getElementById('adminDashboard').style.display = 'none'; window.location.href = 'index.html'; }
 
@@ -1819,12 +1819,19 @@ function adLoginShowError(msg) {
 }
 
 // ── Admin auth (Supabase Auth) ─────────────────────────────────────────
-// Replaces the old `u === 'admin' && p === 'admin123'` check plus the
-// forgeable localStorage['admin_auth'] flag. Auth is now a real Supabase
-// Auth session, and admin rights come from a row in the `admins` table —
-// so a valid login that isn't on that list still gets nothing.
-// Supabase Auth is email-based, so a bare username is mapped to an email
-// (keep typing "admin" — it becomes "admin@gopoint.admin").
+// Primary path is a real Supabase Auth session, and admin rights come from
+// a row in the `admins` table — so a valid login that isn't on that list
+// still gets nothing. Supabase Auth is email-based, so a bare username is
+// mapped to an email (keep typing "admin" — it becomes "admin@gopoint.admin").
+//
+// ⚠️ TEMPORARY FALLBACK: until the `admins` table (AUTH-STAGE1.sql PART A)
+// and the admin@gopoint.admin user exist, the classic admin/admin123 pair
+// still opens the dashboard so the owner is never locked out. Once Supabase
+// Auth works, delete AD_LEGACY_* / adLegacy* and their two call sites.
+const AD_LEGACY_USER = 'admin', AD_LEGACY_PASS = 'admin123';
+function adLegacyLogin(u, p) { return String(u).toLowerCase() === AD_LEGACY_USER && String(p) === AD_LEGACY_PASS; }
+function adLegacyFlag(on) { try { on ? sessionStorage.setItem('ad_legacy_admin', '1') : sessionStorage.removeItem('ad_legacy_admin'); } catch (_) {} }
+function adLegacyActive() { try { return sessionStorage.getItem('ad_legacy_admin') === '1'; } catch (_) { return false; } }
 function adAuthEmail(u) { return u.includes('@') ? u : u.toLowerCase().replace(/[^a-z0-9._-]/g, '') + '@gopoint.admin'; }
 
 async function adSignIn(email, password) {
@@ -1839,6 +1846,7 @@ async function adSignIn(email, password) {
 
 // Returns the signed-in admin, or null. Used to restore the dashboard on load.
 async function adCurrentUser() {
+  if (adLegacyActive()) return { email: 'admin@gopoint.admin', legacy: true };
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session || !session.user) return null;
@@ -1857,7 +1865,8 @@ async function adLoginSubmit() {
   adLoginBusy = true;
   const user = await adSignIn(adAuthEmail(u), p);
   adLoginBusy = false;
-  if (user) {
+  if (user || adLegacyLogin(u, p)) {
+    if (!user) adLegacyFlag(true);
     document.getElementById('adLoginOverlay').classList.remove('active');
     document.body.style.overflow = '';
     document.getElementById('adLoginError').classList.remove('show');
