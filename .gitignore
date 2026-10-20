@@ -6,3 +6,4 @@ d/node_modules/
 
 .vercel
 .env*
+tools/backup/

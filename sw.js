@@ -1,8 +1,8 @@
 /* Go!point service worker — network-first so the installed app always updates.
    Bump VERSION whenever app shell files change significantly. */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = 'gopoint-' + VERSION;
-const PRECACHE = ['./', './index.html', './driver.html', './admin.html', './styles.css', './manifest.json', './icon-192.png', './icon-512.png', './rider.jpg'];
+const PRECACHE = ['./', './index.html', './driver.html', './admin.html', './styles.css', './manifest.json', './favicon.ico', './icon-192.png', './icon-512.png', './icon-192-maskable.png', './icon-512-maskable.png', './rider.jpg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
