@@ -5833,14 +5833,10 @@ navigator.geolocation.getCurrentPosition(async (pos) => {
 const lat = pos.coords.latitude, lng = pos.coords.longitude;
 customerLocation = { lat, lng, area: 'Detecting...' };
 try {
-  const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
-  const data = await res.json();
-  const a = data.address || {};
-  const area = a.neighbourhood || a.suburb || a.quarter || a.city_district || a.building || a.road || a.city || a.town || a.village || data.display_name?.split(',').slice(0,2).join(',') || 'Detected Location';
-  const landmark = a.amenity || a.shop || a.tourism || '';
-  customerLocation.area = landmark ? `${landmark}, ${area}` : area;
+  const locData = await smartReverseGeocode(lat, lng);
+  customerLocation = { ...customerLocation, ...locData };
 } catch(e) {
-  customerLocation.area = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  customerLocation.area = 'Detected Location';
 }
 localStorage.setItem('gopoint_customer_location', JSON.stringify(customerLocation));
 el.textContent = customerLocation.area;
@@ -6232,7 +6228,8 @@ const statusBox = document.getElementById('appLocationStatusBox');
 const areaInput = document.getElementById('appDetectedLocation');
 const setStatus = (cls, text) => { if (statusBox) { statusBox.className = 'app-location-status ' + cls; statusBox.textContent = text; statusBox.style.display = 'block'; } };
 const applyLocation = async (loc, source) => {
-  if (!loc.area || loc.area === 'Detecting...') {
+  const isCoordinates = (s) => /^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(String(s).trim());
+  if (!loc.area || loc.area === 'Detecting...' || isCoordinates(loc.area)) {
     const locData = await smartReverseGeocode(loc.lat, loc.lng);
     loc = { ...loc, ...locData };
   }
