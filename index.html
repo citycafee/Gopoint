@@ -3193,7 +3193,7 @@ async function supaLoadRestaurants() {
       result[r.id] = {
         name: r.name, address: r.address, phone: r.phone, lat: r.lat, lng: r.lng,
         rating: r.rating, deliveryTime: r.delivery_time, deliveryFee: r.delivery_fee,
-        cuisine: r.cuisine, activeCategories: r.active_categories || Object.keys(menu).filter(k => menu[k].length > 0),
+        cuisine: r.cuisine, activeCategories: Object.keys(menu).filter(k => menu[k].length > 0),
         menu, active: r.active
       };
     });
