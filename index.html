@@ -1711,23 +1711,8 @@ Facebook
   </div>
 </div>
 
-<header class="fp-header" id="fpHeader">
-<div class="fp-logo"><div class="fp-logo-text">Go<span>!</span>point</div></div>
-<nav class="fp-nav">
-<ul>
-<li><a onclick="openFrontLogin()"><i class="fas fa-user"></i> <span>Login</span></a></li>
-<li><a onclick="goToMarketplace()"><i class="fas fa-store"></i> <span>Marketplace</span></a></li>
+<!-- Front page navbar removed -->
 
-<li><a><i class="fas fa-globe"></i> <span>EN</span></a></li>
-</ul>
-</nav>
-<div class="fp-hamburger" id="fpHamburger" onclick="toggleFpMobileMenu()"><span></span><span></span><span></span></div>
-</header>
-<div class="fp-mobile-menu" id="fpMobileMenu">
-<a onclick="openFrontLogin(); toggleFpMobileMenu();"><i class="fas fa-user"></i> Login</a>
-<a onclick="goToMarketplace(); toggleFpMobileMenu();"><i class="fas fa-store"></i> Marketplace</a>
-<a><i class="fas fa-globe"></i> English</a>
-</div>
 
 <!-- ─── LOGIN MODAL (GLOVO/KIKIDROP STYLE) ─── -->
 <div class="fp-login-modal" id="fpLoginModal">
@@ -4836,6 +4821,7 @@ fpShowLocationOverlay();
 
 function toggleFpMobileMenu() {
   var menu = document.getElementById('fpMobileMenu');
+  if (!menu) return;
   var cartBar = document.getElementById('appMiniCartBar');
   var cartWindow = document.getElementById('appCartWindow');
   var isActive = menu.classList.toggle('active');
