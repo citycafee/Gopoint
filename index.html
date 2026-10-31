@@ -5181,7 +5181,7 @@ document.getElementById('fpCustomerPassword').focus();
 return;
 }
 appCacheUserLocally(remoteUser);
-completeLogin({ name: remoteUser.name || 'Customer', username: remoteUser.email ? remoteUser.email.split('@')[0] : (remoteUser.username || ''), email: remoteUser.email || '', phone: remoteUser.phone || '', password: remoteUser.password, provider: remoteUser.provider || '', created: remoteUser.created });
+completeLogin({ name: remoteUser.name || 'Customer', username: remoteUser.email ? remoteUser.email.split('@')[0] : (remoteUser.username || ''), email: remoteUser.email || '', phone: remoteUser.phone || '', address: remoteUser.address || '', area: remoteUser.area || '', password: remoteUser.password, provider: remoteUser.provider || '', created: remoteUser.created });
 return;
 }
 
@@ -5499,12 +5499,16 @@ return { label: 'New Member', icon: 'fa-seedling' };
 }
 
 function pfCalcCompletion() {
+// The delivery location is satisfied by the live GPS detection OR the area
+// that was saved with the account (so a completed profile is remembered on re-sign-in).
+const locDetected = !!(customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...');
+const locSaved = !!(currentUser && (currentUser.area || '').trim());
 const checks = [
 !!(currentUser.name || '').trim(),
 !!(currentUser.phone || '').trim(),
 !!(currentUser.email || '').trim(),
 !!(currentUser.address || '').trim(),
-!!(customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...')
+locDetected || locSaved
 ];
 const done = checks.filter(Boolean).length;
 return Math.round(done / checks.length * 100);
@@ -5531,7 +5535,9 @@ if (!(currentUser.phone || '').trim()) missing.push('phone');
 if (!(currentUser.email || '').trim()) missing.push('email');
 if (!(currentUser.address || '').trim()) missing.push('address');
 title.textContent = 'Complete your profile';
-sub.textContent = 'Add your ' + missing.slice(0, 3).join(', ') + (missing.length > 3 ? ' and more' : '') + ' to finish.';
+sub.textContent = missing.length
+  ? 'Add your ' + missing.slice(0, 3).join(', ') + (missing.length > 3 ? ' and more' : '') + ' to finish.'
+  : 'Confirm your delivery location to finish — tap Detect My Location on the delivery step.';
 btn.textContent = 'Complete';
 btn.disabled = false;
 btn.onclick = () => openProfileEditModal();
@@ -5935,6 +5941,11 @@ currentUser.name = name;
 currentUser.phone = phone || currentUser.phone;
 currentUser.email = email || currentUser.email;
 currentUser.address = address;
+// Persist the detected delivery area with the account so a completed profile
+// is remembered when the customer signs in again (here or on another device).
+if (!currentUser.area && customerLocation && customerLocation.area && customerLocation.area !== 'Detecting...') {
+  currentUser.area = customerLocation.area;
+}
 localStorage.setItem('gopoint_user', JSON.stringify(currentUser));
 // Keep the local sign-in registry in step so password sign-in still matches.
 try {
@@ -5942,7 +5953,7 @@ const reg = JSON.parse(localStorage.getItem('gopoint_users') || '{}');
 const lk = Object.keys(reg).find(kk => kk.toLowerCase() === prevKey.slice(4))
 || (currentUser.email && Object.keys(reg).find(kk => reg[kk].email === currentUser.email))
 || (currentUser.phone && Object.keys(reg).find(kk => reg[kk].phone && appNormalizePhone(reg[kk].phone) === appNormalizePhone(currentUser.phone)));
-if (lk) { reg[lk].name = name; reg[lk].email = currentUser.email; reg[lk].phone = currentUser.phone; reg[lk].address = address; localStorage.setItem('gopoint_users', JSON.stringify(reg)); }
+if (lk) { reg[lk].name = name; reg[lk].email = currentUser.email; reg[lk].phone = currentUser.phone; reg[lk].address = address; reg[lk].area = currentUser.area || ''; localStorage.setItem('gopoint_users', JSON.stringify(reg)); }
 } catch (_) {}
 const res = await pfSyncProfileToCloud(prevKey);
 if (!res.ok) {
