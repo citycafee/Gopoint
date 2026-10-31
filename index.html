@@ -3506,7 +3506,7 @@ function fpRequestLocation() {
     const actionsEl = overlay.querySelector('.fp-loc-actions');
     if (actionsEl) actionsEl.style.display = 'none';
     const bodyEl = overlay.querySelector('.fp-loc-body');
-    if (bodyEl) bodyEl.textContent = 'Allow location access so we can process your delivery, find nearby restaurants, and help riders reach you faster. Accept the browser prompt to continue.';
+    if (bodyEl) bodyEl.innerHTML = '⚠️ <b>Turn ON Location/GPS first</b>, then tap Allow.<br>Go!point needs your location for delivery, nearby restaurants, and rider tracking.';
     const detectedEl = document.getElementById('fpLocDetected');
     if (detectedEl) detectedEl.style.display = 'none';
     overlay.classList.add('active');
@@ -3531,7 +3531,6 @@ function fpRequestLocation() {
       })();
     },
     (err) => {
-      // Location not allowed → the application stays locked (no login, no guest entry).
       window._fpLocRequesting = false;
       localStorage.removeItem('gopoint_loc_permitted');
       localStorage.setItem('gopoint_loc_skipped', '1');
@@ -3546,11 +3545,13 @@ function fpRequestLocation() {
         fpShowLocationError('Your GPS is turned off. Please enable Location/GPS, then tap Allow to continue.');
         showGpsOverlay();
       } else {
-        showAppToast('⚠️ Location request timed out. Please check your GPS and try again.');
-        fpShowLocationError('Location request timed out. Please check your GPS and tap Allow to try again.');
+        // Timeout or other error — treat as likely GPS off
+        showAppToast('⚠️ Location request timed out — check if GPS is ON');
+        fpShowLocationError('Location request timed out. Please ensure Location/GPS is turned ON, then tap Allow to try again.');
+        showGpsOverlay();
       }
     },
-    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
   );
 }
 
