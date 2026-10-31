@@ -3457,37 +3457,34 @@ function fpShowLocationOverlay() {
   try {
     const originEl = document.getElementById('fpLocOrigin');
     if (originEl) originEl.textContent = 'Go!point wants to';
-    const saved = localStorage.getItem('gopoint_customer_location');
-    let hasValidArea = false;
-    if (saved) {
-      try { const loc = JSON.parse(saved); hasValidArea = loc.area && loc.area !== 'Detecting...'; } catch(e) {}
-    }
-    if (fpHasAllowedLocation()) {
-      if (window._fpLoginFlowPending || window._guestFlow) fpChainNotifOrLogin();
-      return;
-    }
-    if (!hasValidArea && customerLocation) detectFrontLocation();
+
     const overlay = document.getElementById('fpLocationOverlay');
     if (!overlay) return;
+
+    const saved = localStorage.getItem('gopoint_customer_location');
+    let detectedArea = '';
+    if (saved) {
+      try { const loc = JSON.parse(saved); if (loc && loc.area && loc.area !== 'Detecting...') detectedArea = loc.area; } catch(e) {}
+    }
+
     const detectedEl = document.getElementById('fpLocDetected');
     const detectedAddr = document.getElementById('fpLocDetectedAddress');
-    if (saved && detectedEl && detectedAddr) {
-      try {
-        const loc = JSON.parse(saved);
-        if (loc.area && loc.area !== 'Detecting...') {
-          detectedEl.style.display = 'flex';
-          detectedAddr.textContent = loc.area;
-        }
-      } catch(e) {}
-    }
-    const actionsEl = overlay.querySelector('.fp-loc-actions');
-    if (actionsEl) actionsEl.style.display = 'flex';
     const bodyEl = overlay.querySelector('.fp-loc-body');
-    if (bodyEl) bodyEl.textContent = 'Allow location access so we can process your delivery, find nearby restaurants, and help riders reach you faster.';
-    const delay = (window._fpLoginFlowPending || window._guestFlow) ? 0 : 800;
+    const actionsEl = overlay.querySelector('.fp-loc-actions');
+
+    if (detectedArea) {
+      if (detectedEl && detectedAddr) { detectedEl.style.display = 'flex'; detectedAddr.textContent = detectedArea; }
+      if (bodyEl) bodyEl.innerHTML = 'We detected your location. Tap <b>Allow</b> to continue into the app.';
+    } else {
+      if (detectedEl) detectedEl.style.display = 'none';
+      if (bodyEl) bodyEl.innerHTML = 'Go!point needs your location to process delivery, find nearby restaurants, and help riders reach you. <b>Make sure Location/GPS is turned ON</b>, then tap <b>Allow</b>.';
+    }
+    if (actionsEl) actionsEl.style.display = 'flex';
+
+    const delay = (window._fpLoginFlowPending || window._guestFlow) ? 0 : 400;
     setTimeout(() => overlay.classList.add('active'), delay);
-    // Fire the browser's native permission prompt straight away (still inside the click gesture).
-    fpRequestLocation();
+    // No auto-fire: the customer taps the "Allow" button (a user gesture) to trigger
+    // the location request via fpRequestLocation(). This guarantees the "ask" always shows.
   } finally {
     window._fpLocOverlayLock = false;
   }
@@ -4746,11 +4743,9 @@ e._t = setTimeout(() => { e.classList.remove('show'); }, 3000);
 // ─── FRONT PAGE LOGIN FUNCTIONS ───
 function openFrontLogin() {
   window._fpLoginFlowPending = true;
-  if (fpHasAllowedLocation()) {
-    fpChainNotifOrLogin();
-  } else {
-    fpShowLocationOverlay();
-  }
+  // Always show the location overlay on "Get Started" so the customer is asked
+  // to allow location access. Tapping "Allow" fires the request (fpRequestLocation).
+  fpShowLocationOverlay();
 }
 
 function closeFrontLogin() {
